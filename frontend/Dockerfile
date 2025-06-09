@@ -1,5 +1,5 @@
 # 1️⃣ 使用更小的 Node.js 版本，减少镜像体积
-FROM registry.cn-hangzhou.aliyuncs.com/google_containers/node:18-alpine AS builder
+FROM node:18-alpine AS builder
 
 # 2️⃣ 设置工作目录
 WORKDIR /usr/src/app
@@ -18,7 +18,7 @@ COPY . .
 RUN pnpm build
 
 # 6️⃣ 使用更小的 Nginx 镜像
-FROM registry.cn-hangzhou.aliyuncs.com/google_containers/nginx:1.23-alpine
+FROM nginx:1.23-alpine
 
 # 7️⃣ 复制前端构建产物到 Nginx 目录
 COPY --from=builder /usr/src/app/dist /usr/share/nginx/html
