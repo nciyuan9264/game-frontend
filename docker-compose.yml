@@ -1,0 +1,13 @@
+# 定义服务，即需要运行的容器集合
+services:
+  clinic-frontend-h5:
+    build:
+      context: ./frontend/
+      dockerfile: Dockerfile
+    networks:
+      - clinic-network
+
+
+networks:
+  clinic-network:
+    external: true
