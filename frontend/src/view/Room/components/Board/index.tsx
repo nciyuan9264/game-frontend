@@ -1,4 +1,3 @@
-import React from 'react'
 import { TileData } from '@/types/room';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';

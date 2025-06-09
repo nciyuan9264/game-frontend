@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { Modal, Card, Radio, Row, Col, Button } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
 

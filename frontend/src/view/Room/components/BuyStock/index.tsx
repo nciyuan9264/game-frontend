@@ -33,7 +33,7 @@ const BuyStock = ({
 
     // 先更新一个临时的 map 判断总花费是否超限
     const temp: Record<CompanyKey, number> = { ...selectedCompany, [key]: value };
-    const tempNumber = Object.entries(temp).reduce((sum, [k, v]) => {
+    const tempNumber = Object.entries(temp).reduce((sum, [_, v]) => {
       const value = v as number; // 添加类型断言
       return sum + value;
     }, 0);

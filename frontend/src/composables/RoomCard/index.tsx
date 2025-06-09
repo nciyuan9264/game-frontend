@@ -10,7 +10,7 @@ interface RoomCardProps {
   onDelete: (roomID: string) => void;
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ roomID, maxPlayers, onDelete }) => {
+const RoomCard: React.FC<RoomCardProps> = ({ roomID, maxPlayers }) => {
   const navigate = useNavigate();
 
   const handleDelete = async () => {

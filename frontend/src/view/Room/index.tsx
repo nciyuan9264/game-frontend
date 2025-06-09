@@ -20,7 +20,7 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userId = getOrCreateUserId();
 
-  const { wsRef, sendMessage } = useWebSocket(`ws://192.168.3.6:8000/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
+  const { sendMessage } = useWebSocket(`ws://192.168.3.6:8000/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'sync') {
       console.log('收到数据：', data);
