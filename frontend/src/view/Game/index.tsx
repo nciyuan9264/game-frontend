@@ -37,6 +37,12 @@ export default function GameMenu() {
 
   useEffect( () => {
     updateRoomList();
+    // const interval = setInterval(() => {
+    //   updateRoomList();
+    // }, 1000);
+    // return () => {
+    //   clearInterval(interval);
+    // };
   },[])
 
   const onChange = (e: any) => setPlayerCount(e.target.value);

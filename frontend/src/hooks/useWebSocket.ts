@@ -1,11 +1,12 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useWebSocket = (
   url: string,
   onMessage: (msg: MessageEvent) => void
 ) => {
   const wsRef = useRef<WebSocket | null>(null);
-
+  const navigate = useNavigate();
   useEffect(() => {
     const ws = new WebSocket(url);
     wsRef.current = ws;

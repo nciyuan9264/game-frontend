@@ -37,9 +37,9 @@ interface GetRoomListReponse{
 
 interface PlayerData {
   info: {
-    money: string;
+    money: number;
   };
-  stocks: Record<CompanyKey, string>;
+  stocks: Record<CompanyKey, number>;
   tiles: string[];
 }
 
@@ -55,8 +55,8 @@ type CompanyKey =
 
 interface CompanyInfoItem {
   name: string;
-  stockPrice: string;
-  stockTotal: string;
+  stockPrice: number;
+  stockTotal: number;
   tiles: string;
   valuation: string;
 }
@@ -70,7 +70,8 @@ interface TileData {
 
 interface RoomInfo {
   maxPlayers: string;
-  status:  GameStatus// 你可以加更多状态
+  gameStatus:  GameStatus// 你可以加更多状态
+  roomStatus: boolean;
 }
 
 interface RoomData {
@@ -79,6 +80,18 @@ interface RoomData {
   currentStep: string;
   roomInfo: RoomInfo;
   tiles: Record<string, TileData>;
+  /**被合并的公司 */
+  merge_other_companies_temp: CompanyKey[];
+  /** 合并别的公司的公司 */
+  merge_main_company_temp: CompanyKey;
+  /** 需要合并结算的玩家*/
+  merge_settle_player_temp: string[];
+  /** 玩家选择留下那个公司 */
+  merge_selection_temp: {mainCompany: string[], otherCompany: string[]};
+  mergeSettleData: Record<CompanyKey, {
+    dividends: Record<string, number>;
+    hoders: string[];
+  }>
 }
 
 interface WsRoomSyncData {
