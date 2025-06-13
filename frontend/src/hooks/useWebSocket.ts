@@ -1,10 +1,10 @@
 import { useEffect, useRef } from 'react';
-import { useLocation, useNavigate } from 'react-router-dom';
+// import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
-  const navigate = useNavigate();
-  const location = useLocation();
+  // const navigate = useNavigate();
+  // const location = useLocation();
   function sendWhenReady(data: any) {
     const message = JSON.stringify(data);
     const trySend = () => {
