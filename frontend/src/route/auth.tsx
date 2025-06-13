@@ -18,15 +18,15 @@ const AuthRoute: React.FC<AuthRouteProps> = ({ children, auth }) => {
 
     useEffect(() => {
         const checkAuth = async () => {
-            try {
-                const data = await check();
-                if (data.data.message === '已认证') {
-                    return;
-                }
-            } catch (err) {
-                console.error('认证检查失败:', err);
-                navigate('/medicine/edit');
-            }
+            // try {
+                // const data = await check();
+                // if (data.data.message === '已认证') {
+                //     return;
+                // }
+            // } catch (err) {
+            //     console.error('认证检查失败:', err);
+            //     navigate('/medicine/edit');
+            // }
             // 如果后端返回 401，则跳转到登录页
         };
         if (auth) {

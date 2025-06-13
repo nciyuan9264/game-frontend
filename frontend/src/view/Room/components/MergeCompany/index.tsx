@@ -94,7 +94,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
     }));
     onOk(result);
   };
-  const mainStockPrice = data?.roomData.companyInfo[mainCompany]?.stockPrice || 0;
+  // const mainStockPrice = data?.roomData.companyInfo[mainCompany]?.stockPrice || 0;
 
   return (
     <Modal
