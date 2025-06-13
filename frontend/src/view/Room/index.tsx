@@ -36,7 +36,7 @@ export default function Room() {
   const mergingSelectionModalVisible = useMemo(() => {
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSelection && userId === data.roomData.currentPlayer;
   }, [data?.roomData.roomInfo.gameStatus, userId, data?.roomData.currentPlayer])
-  const { sendMessage } = useWebSocket(`ws://${baseURL}:8000/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
+  const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'sync') {
       console.log('收到数据：', data);
