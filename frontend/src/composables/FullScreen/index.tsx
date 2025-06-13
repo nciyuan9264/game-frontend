@@ -13,7 +13,7 @@ const FullscreenButton = () => {
   };
 
   useEffect(() => {
-    handleFullscreen();
+    // handleFullscreen();
   }, []);
 
   return (

@@ -1,135 +1,268 @@
 .roomContainer {
   display: flex;
   flex-direction: column;
-  padding: 20px;
-  background: #f3f3f3;
-  min-height: 100vh;
+  justify-content: space-between;
+  gap: 10px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  height: calc(var(--vh, 1vh) * 100);
 
-}
-
-.topBar {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 10px 20px;
-  background: #ffffff;
-  border-bottom: 1px solid #e0e0e0;
-}
-
-.board {
-  flex: 1;
-  display: grid;
-  grid-template-columns: repeat(8, 1fr);
-  grid-gap: 5px;
-  background: #d0d0d0;
-  padding: 10px;
-  margin-top: 20px;
-  border-radius: 8px;
-}
-
-.cell {
-  background: #fff;
-  border: 1px solid #aaa;
-  height: 80px;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-weight: bold;
-}
-
-.assets {
-  margin-top: 20px;
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-}
-
-.playerAssets,
-.commonAssets {
-  background: #ffffff;
-  flex: 1;
-  padding: 10px 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-  .header{
+  .topBar {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 10px;
+    padding: 10px 20px;
+    background: #ffffff;
+    border-bottom: 1px solid #e0e0e0;
 
-    .title{
-      font-size: 18px;
+    .currentPlayer{
+      font-size: 20px;
       font-weight: bold;
-    }
-
-    .buyStockBtn{
-      
+      color: #c61616;
     }
   }
 
-  .playerInfo {
-    list-style: none;
-    padding: 0;
-    font-size: 14px;
-    line-height: 1.6;
+  .gameBoard {
+    flex: 1;
+    width: 100%;
 
-    li {
-      margin-bottom: 8px;
+    .companyInfo {
+      display: none;
+    }
+  }
+
+  .assets {
+    display: flex;
+    justify-content: space-between;
+    gap: 20px;
+  }
+
+  .playerAssets,
+  .commonAssets {
+    background: #ffffff;
+    flex: 1;
+    padding: 10px 20px;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 10px;
+
+      .title {
+        font-size: 18px;
+        font-weight: bold;
+      }
+
+      .buyStockBtn {
+        // 这里你可以自定义按钮样式
+      }
     }
 
-    .stockList {
-      margin-top: 4px;
-      padding-left: 1em;
+    .playerInfo {
+      list-style: none;
+      padding: 0;
+      font-size: 14px;
+      line-height: 1.6;
 
       li {
-        list-style-type: disc;
+        margin-bottom: 8px;
+      }
+
+      .stockList {
+        margin-top: 4px;
+        padding-left: 1em;
+
+        li {
+          list-style-type: disc;
+        }
+      }
+
+      .tileList {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-top: 4px;
+
+        .tile {
+          width: 60px;
+          height: 60px;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 1px solid #ccc;
+          border-radius: 4px;
+          background-color: #f8f8f8;
+          font-weight: bold;
+          font-family: monospace;
+        }
+
+        &:hover {
+          cursor: pointer;
+        }
       }
     }
 
-    .tileList {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
+    .marketTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+      font-size: 14px;
 
-      .tile {
-        display: inline-block;
-        padding: 4px 8px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f8f8f8;
+      .companyName {
         font-weight: bold;
-        font-family: monospace;
+        padding: 8px;
+        &.bgColor0 { background-color: #f8d7da; } // 红
+        &.bgColor1 { background-color: #d4edda; } // 绿
+        &.bgColor2 { background-color: #d1ecf1; } // 蓝
+        &.bgColor3 { background-color: #fff3cd; } // 黄
+        &.bgColor4 { background-color: #e2e3e5; } // 灰
       }
 
-      &:hover {
-        cursor: pointer;
+      th,
+      td {
+        border: 1px solid #ccc;
+        padding: 8px 12px;
+        text-align: center;
+      }
+
+      th {
+        background-color: #f8f8f8;
+        font-weight: bold;
+      }
+
+      tbody tr:hover {
+        background-color: #f5f5f5;
       }
     }
   }
+}
 
-  .marketTable {
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 10px;
-    font-size: 14px;
+// ✅ iPad 横屏优化样式
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .roomContainer {
+    padding: 20px;
+    // height: 96vh;
+    .gameBoard {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
 
-    th,
-    td {
-      border: 1px solid #ccc;
-      padding: 8px 12px;
-      text-align: center;
+      .companyInfo {
+        display: block;
+        width: 40%;
+        background: #ffffff;
+        flex: 1;
+        padding: 10px 20px;
+        border-radius: 8px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 10px;
+
+          .title {
+            font-size: 18px;
+            font-weight: bold;
+          }
+
+          .buyStockBtn {
+
+          }
+        }
+
+        .playerInfo {
+          list-style: none;
+          padding: 0;
+          font-size: 14px;
+          line-height: 1.6;
+
+          li {
+            margin-bottom: 8px;
+          }
+
+          .stockList {
+            margin-top: 4px;
+            padding-left: 1em;
+
+            li {
+              list-style-type: disc;
+            }
+          }
+
+          .tileList {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-top: 4px;
+
+            .tile {
+
+              display: inline-block;
+              padding: 4px 8px;
+              border: 1px solid #ccc;
+              border-radius: 4px;
+              background-color: #f8f8f8;
+              font-weight: bold;
+              font-family: monospace;
+            }
+
+            &:hover {
+              cursor: pointer;
+            }
+          }
+        }
+
+        .marketTable {
+          width: 100%;
+          border-collapse: collapse;
+          margin-top: 10px;
+          font-size: 14px;
+
+          .companyName {
+            font-weight: bold;
+            padding: 8px;
+            &.bgColor0 { background-color: #f8d7da; } // 红
+            &.bgColor1 { background-color: #d4edda; } // 绿
+            &.bgColor2 { background-color: #d1ecf1; } // 蓝
+            &.bgColor3 { background-color: #fff3cd; } // 黄
+            &.bgColor4 { background-color: #e2e3e5; } // 灰
+          }
+
+          th,
+          td {
+            border: 1px solid #ccc;
+            padding: 8px 12px;
+            text-align: center;
+          }
+
+          th {
+            background-color: #f8f8f8;
+            font-weight: bold;
+          }
+
+          tbody tr:hover {
+            background-color: #f5f5f5;
+          }
+        }
+      }
     }
 
-    th {
-      background-color: #f8f8f8;
-      font-weight: bold;
+    .assets {
+      flex-direction: column;
+      gap: 12px;
+
+      .commonAssets{
+        display: none;
+      }
     }
 
-    tbody tr:hover {
-      background-color: #f5f5f5;
+    .playerAssets {
+      width: 100%;
+      padding: 12px 16px;
     }
   }
 }

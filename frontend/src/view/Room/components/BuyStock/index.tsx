@@ -4,10 +4,12 @@ import { useState, useMemo } from 'react';
 
 const BuyStock = ({
   visible = true,
+  setBuyStockModalVisible,
   onSubmit,
   data,
 }: {
   visible: boolean,
+  setBuyStockModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   onSubmit: (modalData: Record<CompanyKey, number>) => void,
   data?: WsRoomSyncData
 }) => {
@@ -18,7 +20,7 @@ const BuyStock = ({
   }, {} as Record<CompanyKey, number>);
 
   const [selectedCompany, setSelectedCompany] = useState<Record<CompanyKey, number>>(initialSelectedCount);
-  const money = parseInt(data?.playerData.info.money || '0', 10);
+  const money =data?.playerData.info.money ?? 0;
 
   const totalCost = useMemo(() => {
     return Object.entries(selectedCompany).reduce((sum, [k, count]) => {
@@ -73,8 +75,11 @@ const BuyStock = ({
           确定购买
         </Button>
       }
+      onCancel={() => {
+        setBuyStockModalVisible(false);
+      }}
       centered
-      maskClosable={false}
+      maskClosable={true}
     >
       <Row gutter={[16, 16]}>
         {Object.entries(data.roomData.companyInfo).map(([k, value]) => {

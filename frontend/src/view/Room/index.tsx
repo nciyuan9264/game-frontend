@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
@@ -22,7 +22,7 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userId = getOrCreateUserId();
   const mergingModalVisible = useMemo(() => {
-    const needSettle = Object.entries(data?.roomData.mergeSettleData || {}).some(([_, val]) => {
+    const needSettle = Object.entries(data?.tempData.mergeSettleData || {}).some(([_, val]) => {
       return val.hoders[0] === userId;
     });
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
@@ -80,7 +80,7 @@ export default function Room() {
   }, [data?.roomData.currentPlayer])
 
   const currentStep = useMemo(() => {
-    if (data?.roomData.roomInfo.gameStatus === GameStatus.WAITING) {
+    if (!data?.roomData.roomInfo.roomStatus) {
       return '等待其他玩家进入';
     }
     if (currentPlayer === userId) {
@@ -88,21 +88,131 @@ export default function Room() {
     } else {
       return '请等待其他玩家操作';
     }
-  }, [data?.roomData.roomInfo.gameStatus, currentPlayer])
+  }, [data, currentPlayer])
 
 
   return (
-    <div className={styles.roomContainer}>
-      <div className={styles.topBar}>
-        <div>房间号：{roomID}</div>
-        <div>当前玩家：{currentPlayer}</div>
-        <div>当前阶段：{currentStep}</div>
+    <>
+      <div className={styles.roomContainer}>
+        <div className={styles.topBar}>
+          <div>房间号：{roomID}</div>
+          <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}</div>
+          <div>当前阶段：{currentStep}</div>
+        </div>
+        <div className={styles.gameBoard}>
+          <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
+          <div className={styles.companyInfo}>
+            <div className={styles.header}>
+              <div className={styles.title}>市场信息</div>
+              <Button
+                type="primary"
+                className={styles.buyStockBtn}
+                disabled={!(currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK)}
+                onClick={() => {
+                  setBuyStockModalVisible(true);
+                }}
+              >
+                购买股票
+              </Button>
+            </div>
+            <table className={styles.marketTable}>
+              <thead>
+                <tr>
+                  <th>公司</th>
+                  <th>股价</th>
+                  <th>剩余股票</th>
+                  <th>土地数</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
+                  <tr key={company.name}>
+                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}>{company.name}</td>
+                    <td>${company.stockPrice}</td>
+                    <td>{company.stockTotal}</td>
+                    <td>{company.tiles}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className={styles.assets}>
+          <div className={styles.commonAssets}>
+            <div className={styles.header}>
+              <div className={styles.title}>市场信息</div>
+              <Button
+                type="primary"
+                className={styles.buyStockBtn}
+                disabled={!(currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK)}
+                onClick={() => {
+                  setBuyStockModalVisible(true);
+                }}
+              >
+                购买股票
+              </Button>
+            </div>
+            <table className={styles.marketTable}>
+              <thead>
+                <tr>
+                  <th>公司</th>
+                  <th>股价</th>
+                  <th>剩余股票</th>
+                  <th>土地数</th>
+                </tr>
+              </thead>
+              <tbody>
+                {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
+                  <tr key={company.name}>
+                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}>{company.name}</td>
+                    <td>${company.stockPrice}</td>
+                    <td>{company.stockTotal}</td>
+                    <td>{company.tiles}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+          <div className={styles.playerAssets}>
+            <h3>你的资产</h3>
+            <ul className={styles.playerInfo}>
+              <li>现金：${data?.playerData.info.money}</li>
+              <li>
+                股票：
+                <ul className={styles.stockList}>
+                  {Object.entries(data?.playerData.stocks || {})
+                    .filter(([_, count]) => Number(count) > 0)
+                    .map(([company, count]) => (
+                      <li key={company}>
+                        {company} × {count}
+                      </li>
+                    ))}
+                </ul>
+              </li>
+              <li>
+                Tiles：
+                <div className={styles.tileList}>
+                  {(data?.playerData.tiles || []).sort().map((tileKey: string) => (
+                    <span
+                      className={styles.tile}
+                      key={tileKey}
+                      onMouseEnter={() => { currentPlayer === userId && setHoveredTile(tileKey) }}
+                      onMouseOut={() => { currentPlayer === userId && setHoveredTile(undefined) }}
+                      onClick={() => currentPlayer === userId && placeTile(tileKey)}
+                    >
+                      {tileKey}
+                    </span>
+                  ))}
+                </div>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
-
-      <WaitingModal visible={waitingModalVisible}/>
-      <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
+      <WaitingModal visible={waitingModalVisible} />
       <BuyStock
         visible={buyStockModalVisible}
+        setBuyStockModalVisible={setBuyStockModalVisible}
         onSubmit={(modalData) => {
           sendMessage(JSON.stringify({
             type: 'buy_stock',
@@ -123,12 +233,10 @@ export default function Room() {
           setBuyStockModalVisible(false);
         }}
       />
-
       <CompanyStockActionModal
         visible={mergingModalVisible}
         data={data}
         onOk={(modalData) => {
-          debugger
           sendMessage(JSON.stringify({
             type: 'merging_settle',
             payload: modalData,
@@ -143,78 +251,7 @@ export default function Room() {
           payload: company,
         }));
       }} />
-      <div className={styles.assets}>
-        <div className={styles.playerAssets}>
-          <h3>你的资产</h3>
-          <ul className={styles.playerInfo}>
-            <li>现金：${data?.playerData.info.money}</li>
-            <li>
-              股票：
-              <ul className={styles.stockList}>
-                {Object.entries(data?.playerData.stocks || {})
-                  .filter(([_, count]) => Number(count) > 0)
-                  .map(([company, count]) => (
-                    <li key={company}>
-                      {company} × {count}
-                    </li>
-                  ))}
-              </ul>
-            </li>
-            <li>
-              Tiles：
-              <div className={styles.tileList}>
-                {(data?.playerData.tiles || []).sort().map((tileKey: string) => (
-                  <span
-                    className={styles.tile}
-                    key={tileKey}
-                    onMouseEnter={() => { currentPlayer === userId && setHoveredTile(tileKey) }}
-                    onMouseOut={() => { currentPlayer === userId && setHoveredTile(undefined) }}
-                    onClick={() => currentPlayer === userId && placeTile(tileKey)}
-                  >
-                    {tileKey}
-                  </span>
-                ))}
-              </div>
-            </li>
-          </ul>
-        </div>
+    </>
 
-        <div className={styles.commonAssets}>
-          <div className={styles.header}>
-            <div className={styles.title}>市场信息</div>
-            <Button
-              type="primary"
-              className={styles.buyStockBtn}
-              disabled={!(currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK)}
-              onClick={() => {
-                setBuyStockModalVisible(true);
-              }}
-            >
-              购买股票
-            </Button>
-          </div>
-          <table className={styles.marketTable}>
-            <thead>
-              <tr>
-                <th>公司</th>
-                <th>股价</th>
-                <th>剩余股票</th>
-                <th>土地数</th>
-              </tr>
-            </thead>
-            <tbody>
-              {Object.values(data?.roomData.companyInfo || {}).map((company) => (
-                <tr key={company.name}>
-                  <td>{company.name}</td>
-                  <td>${company.stockPrice}</td>
-                  <td>{company.stockTotal}</td>
-                  <td>{company.tiles}</td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-        </div>
-      </div>
-    </div>
   );
 }

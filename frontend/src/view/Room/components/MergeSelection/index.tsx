@@ -27,7 +27,7 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
     onOk(mainCompany);
   };
 
-  const companyOptions = data?.roomData.merge_selection_temp.mainCompany || [];
+  const companyOptions = data?.tempData.merge_selection_temp.mainCompany || [];
 
   return (
     <Modal

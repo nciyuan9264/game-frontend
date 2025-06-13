@@ -1,6 +1,5 @@
-import {Route, Routes} from 'react-router-dom';
-import {routes, AppRoute} from './routes.tsx';
-import AuthRoute from './auth.tsx';
+import { Route, Routes } from 'react-router-dom';
+import { routes, AppRoute } from './routes.tsx';
 
 /**
  * 渲染路由
@@ -14,9 +13,9 @@ export const RenderRoutes = () => {
                 key={route.path}
                 path={route.path}
                 element={
-                    <AuthRoute auth={route.auth}>
-                        {route.element}
-                    </AuthRoute>
+                    // <AuthRoute auth={route.auth}>
+                    route.element
+                    // </AuthRoute>
                 }
             >
                 {route.children && renderRoutes(route.children)}

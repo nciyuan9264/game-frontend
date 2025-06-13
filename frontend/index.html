@@ -1,13 +1,40 @@
 <!doctype html>
 <html lang="en" style="font-size: 20px; vertical-align: middle">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>game</title>
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+
+<head>
+  <meta charset="UTF-8" />
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>game</title>
+  <script>
+    function setVhUnit() {
+      const vh = window.innerHeight * 0.01;
+      document.documentElement.style.setProperty('--vh', `${vh}px`);
+    }
+
+    // 初始执行一次
+    setVhUnit();
+
+    // 窗口大小变化时再次设置
+    window.addEventListener('resize', setVhUnit);
+  </script>
+  <style>
+    * {
+      -webkit-user-select: none;
+      /* iOS / Safari */
+      -moz-user-select: none;
+      /* Firefox */
+      -ms-user-select: none;
+      /* IE10+ */
+      user-select: none;
+      /* 标准语法 */
+    }
+  </style>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
 </html>

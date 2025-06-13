@@ -1,4 +1,4 @@
-import { useCheck } from '@/api/login';
+
 import React, { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,7 +15,6 @@ interface AuthRouteProps {
  */
 const AuthRoute: React.FC<AuthRouteProps> = ({ children, auth }) => {
     const navigate = useNavigate();
-    const { check } = useCheck();
 
     useEffect(() => {
         const checkAuth = async () => {

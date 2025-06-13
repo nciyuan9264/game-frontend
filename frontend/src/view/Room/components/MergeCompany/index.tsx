@@ -24,17 +24,17 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
 
   // 每次 visible 或 data.roomData.merge_other_companies_temp 变化时，初始化 actions
   useEffect(() => {
-    if (visible && data?.roomData.merge_other_companies_temp) {
+    if (visible ) {
       const initial: Record<CompanyKey, { sellAmount: number; exchangeAmount: number }> = {} as any;
-      data.roomData.merge_other_companies_temp.forEach(company => {
+      Object.keys(data?.tempData.mergeSettleData ?? {}).forEach(company => {
         initial[company as CompanyKey] = { sellAmount: 0, exchangeAmount: 0 };
       });
       setActions(initial);
       setTotalCost(0);
     }
-  }, [visible, data?.roomData.merge_other_companies_temp]);
+  }, [visible, data?.tempData]);
   
-  const mainCompany = data?.roomData?.merge_main_company_temp;
+  const mainCompany = data?.tempData?.merge_main_company_temp;
   if (!mainCompany) return null;
   const handleSellChange = (company: CompanyKey, value: number | null) => {
     const amount = value ?? 0;
@@ -123,7 +123,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
         </Row>
       </div>
 
-      {(Object.keys(data?.roomData?.mergeSettleData ?? {}) as CompanyKey[])?.map((company: CompanyKey) => {
+      {(Object.keys(data?.tempData?.mergeSettleData ?? {}) as CompanyKey[])?.map((company: CompanyKey) => {
         const playerStock = data?.playerData.stocks[company] ?? 0;
         if (playerStock === 0) return null;
 
