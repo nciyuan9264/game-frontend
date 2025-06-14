@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
-import { message, Popconfirm } from 'antd';
+import { message, Popconfirm, Tag } from 'antd';
 import { ListRoomInfo } from '@/types/room';
 import { getOrCreateUserId } from '@/util/user';
 
@@ -15,7 +15,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete }) => {
   const userId = getOrCreateUserId();
 
   const handleDelete = async () => {
-    if(userId !== data.userID) {
+    if (userId !== data.userID) {
       message.error('您不是房主，无法删除房间');
       return;
     }
@@ -35,10 +35,28 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete }) => {
           <span className={styles.delete}>🗑️</span>
         </Popconfirm>
       </div>
-      <span className={styles.title}>用户ID: {data.userID}</span>
+      <span className={styles.title}>房主ID: {data.userID}</span>
+      <div>
+        玩家列表：<br />
+        {
+          data.roomPlayer.map((player) => {
+            return (
+              <span key={player.playerID} className={styles.player}>
+                {player.playerID} <Tag>{player.online ? '在线' : '掉线'}</Tag>
+              </span>
+            );
+          })
+        }
+      </div>
       <div className={styles.body}>
         最多玩家: {data.maxPlayers}
-        <button onClick={() => navigate(`/room/${data.roomID}`)} className={styles.enterBtn}>
+        <button onClick={() => {
+          if(data.roomPlayer.length >= data.maxPlayers && !data.roomPlayer.some(play => play.playerID === userId)){
+            message.error('房间已满');
+            return;
+          }
+          navigate(`/room/${data.roomID}`)
+        }} className={styles.enterBtn}>
           进入房间
         </button>
       </div>

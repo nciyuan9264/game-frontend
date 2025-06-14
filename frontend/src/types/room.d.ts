@@ -14,6 +14,10 @@ interface ListRoomInfo {
   userID: string;
   maxPlayers: number;
   status: boolean;
+  roomPlayer: {
+    playerID: string;
+    online: boolean;
+  }[]
 }
 
 interface CreateRoomRequest {
@@ -95,4 +99,5 @@ interface WsRoomSyncData {
   roomData: RoomData;
   tempData: TempData;
   type: string;
+  message?: string;
 }

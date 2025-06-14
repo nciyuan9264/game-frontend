@@ -1,6 +1,6 @@
-import { Result } from "@/types/http";
-import { CreateRoomReponse, CreateRoomRequest, DeleteRoomReponse, DeleteRoomRequest, GetRoomListReponse } from "@/types/room";
-import axios from "axios";
+import { Result } from '@/types/http';
+import { CreateRoomReponse, CreateRoomRequest, DeleteRoomReponse, DeleteRoomRequest, GetRoomListReponse } from '@/types/room';
+import axios from 'axios';
 
 const baseURL = import.meta.env.VITE_API_URL;
 export const createRoom = async (params: CreateRoomRequest): Promise<Result<CreateRoomReponse>> => {

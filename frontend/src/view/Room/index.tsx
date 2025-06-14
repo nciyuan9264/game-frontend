@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
 import { useParams } from 'react-router-dom';
 import Board from './components/Board';
-import { Button, Modal } from 'antd';
+import { Button, message, Modal } from 'antd';
 import HotelSelectorModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { WsRoomSyncData } from '@/types/room';
@@ -38,6 +38,10 @@ export default function Room() {
   }, [data?.roomData.roomInfo.gameStatus, userId, data?.roomData.currentPlayer])
   const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
+    if(data.type === 'error'){
+      message.error(data.message);
+      return;
+    }
     if (data.type === 'sync') {
       console.log('收到数据：', data);
       setData(data);

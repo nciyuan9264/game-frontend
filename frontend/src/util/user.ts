@@ -9,7 +9,7 @@ function generateUUIDFallback(): string {
 }
 export function getOrCreateUserId(): string {
   let userId = localStorage.getItem("userId");
-  if (!userId) {
+  if (!userId || userId.length > 10) {
     if (crypto.randomUUID) {
       userId = crypto.randomUUID();
     } else {

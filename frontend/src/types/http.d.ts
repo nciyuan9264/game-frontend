@@ -8,7 +8,7 @@ interface Page<T> {
 
 export interface Result<T> {
     status_code: Status;
-    msg: string;
+    message: string;
     data: T;
 }
 
