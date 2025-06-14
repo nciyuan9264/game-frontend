@@ -5,7 +5,7 @@ import CustomInputNumber from '../CustomInputer';
 import { CompanyColor } from '@/const/color';
 
 const BuyStock = ({
-  visible = true,
+  visible,
   setBuyStockModalVisible,
   onSubmit,
   data,

@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
@@ -15,13 +15,14 @@ import WaitingModal from './components/Waiting';
 import { baseURL } from '@/const/env';
 import { CompanyColor } from '@/const/color';
 import GameEnd from './components/GameEnd';
+import CompanyStockInfoModal from './components/StockInfo';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
   const [buyStockModalVisible, setBuyStockModalVisible] = useState(false);
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
-
+  const [companyInfoVisible, setCompanyInfoVisible] = useState(false);
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userId = getOrCreateUserId();
@@ -128,7 +129,17 @@ export default function Room() {
     <>
       <div className={styles.roomContainer}>
         <div className={styles.topBar}>
-          <div>房间号：{roomID}</div>
+          <div>房间号：{roomID}
+            <Button
+              type="primary"
+              className={styles.buyStockBtn}
+              onClick={() => {
+                setCompanyInfoVisible(true);
+              }}
+            >
+              公司面板
+            </Button>
+          </div>
           <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}
             <Button
               type="primary"
@@ -280,6 +291,10 @@ export default function Room() {
         data={data}
         visible={gameEndModalVisible}
         setGameEndModalVisible={setGameEndModalVisible}
+      />
+      <CompanyStockInfoModal
+        visible={companyInfoVisible}
+        setCompanyInfoVisible={setCompanyInfoVisible}
       />
       <BuyStock
         visible={buyStockModalVisible}
