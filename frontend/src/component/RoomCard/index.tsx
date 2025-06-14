@@ -8,9 +8,10 @@ import { getOrCreateUserId } from '@/util/user';
 interface RoomCardProps {
   data: ListRoomInfo;
   onDelete: (roomID: string) => void;
+  userID: string;
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete }) => {
+const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
   const navigate = useNavigate();
   const userId = getOrCreateUserId();
 
@@ -35,7 +36,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete }) => {
           <span className={styles.delete}>🗑️</span>
         </Popconfirm>
       </div>
-      <span className={styles.title}>房主ID: {data.userID}</span>
+      <span className={styles.title} style={{color: userID === data.userID ? 'red' : 'black'}}>房主ID: {data.userID}</span>
       <div>
         玩家列表：<br />
         {

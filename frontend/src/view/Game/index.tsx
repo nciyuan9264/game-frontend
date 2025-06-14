@@ -9,7 +9,7 @@ import FullscreenButton from '@/component/FullScreen';
 
 const { Title } = Typography;
 export default function GameMenu() {
-  const userId = getOrCreateUserId();
+  const userID = getOrCreateUserId();
 
   const [visible, setVisible] = useState(false);
   const [playerCount, setPlayerCount] = useState(2);
@@ -19,7 +19,7 @@ export default function GameMenu() {
     async (MaxPlayers: number) => {
       await createRoom({
         MaxPlayers: MaxPlayers,
-        UserID: userId,
+        UserID: userID,
       }
       );
     },
@@ -90,7 +90,7 @@ export default function GameMenu() {
 
   return (
     <div className={styles.gameMenu}>
-      <Title level={2} className={styles.titleTop}>并购</Title>
+      <Title level={2} className={styles.titleTop}>并购（ID: {userID}）</Title>
 
       <div className={styles.roomGrid}>
         {roomList?.map(room => (
@@ -100,6 +100,7 @@ export default function GameMenu() {
             onDelete={(roomID: string) => {
               handleDeleteRoom(roomID);
             }}
+            userID={userID}
           />
         ))}
 
