@@ -47,9 +47,6 @@ export default function Room() {
         } else {
           setCreateCompanyModalVisible(false);
         }
-        if (data.roomData.roomInfo.gameStatus === GameStatus.MergingSelection) {
-
-        }
       } else {
         setCreateCompanyModalVisible(false);
       }
@@ -197,9 +194,9 @@ export default function Room() {
                     <span
                       className={styles.tile}
                       key={tileKey}
-                      onMouseEnter={() => { currentPlayer === userId && setHoveredTile(tileKey) }}
+                      onMouseEnter={() => { currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile && setHoveredTile(tileKey) }}
                       onMouseOut={() => { currentPlayer === userId && setHoveredTile(undefined) }}
-                      onClick={() => currentPlayer === userId && placeTile(tileKey)}
+                      onClick={() => currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile && placeTile(tileKey)}
                     >
                       {tileKey}
                     </span>

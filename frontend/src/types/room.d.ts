@@ -1,5 +1,5 @@
 /** 可用的游戏状态类型 */
-export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end';
+export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end'| 'setTile';
 
 // 如果你需要对每个状态加名字，也可以这样定义：
 export const GameStatusMap: Record<GameStatus, string> = {
@@ -9,23 +9,32 @@ export const GameStatusMap: Record<GameStatus, string> = {
   MERGE: '并购中',
   END: '已结束',
 };
-interface Room {
+interface ListRoomInfo {
   roomID: string;
+  userID: string;
   maxPlayers: number;
-  status: GameStatus;
+  status: boolean;
 }
 
 interface CreateRoomRequest {
   RoomID?: string;
   MaxPlayers: number;
+  UserID: string;
+}
+
+interface DeleteRoomRequest{
+  RoomID: string;
 }
 
 interface CreateRoomReponse {
   room_id: string;
 }
 
+interface DeleteRoomReponse{
+}
+
 interface GetRoomListReponse {
-  rooms: Room[];
+  rooms: ListRoomInfo[];
 }
 
 interface PlayerData {

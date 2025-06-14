@@ -1,27 +1,31 @@
 import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
-import { Popconfirm } from 'antd';
-// import { deleteRoom } from '@/api/room';
+import { message, Popconfirm } from 'antd';
+import { ListRoomInfo } from '@/types/room';
+import { getOrCreateUserId } from '@/util/user';
 
 interface RoomCardProps {
-  roomID: string;
-  maxPlayers: number;
+  data: ListRoomInfo;
   onDelete: (roomID: string) => void;
 }
 
-const RoomCard: React.FC<RoomCardProps> = ({ roomID, maxPlayers }) => {
+const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete }) => {
   const navigate = useNavigate();
+  const userId = getOrCreateUserId();
 
   const handleDelete = async () => {
-    // await deleteRoom(roomID);
-    // onDelete(roomID);
+    if(userId !== data.userID) {
+      message.error('您不是房主，无法删除房间');
+      return;
+    }
+    onDelete(data.roomID);
   };
 
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <span className={styles.title}>房间ID: {roomID}</span>
+        <span className={styles.title}>房间ID: {data.roomID}</span>
         <Popconfirm
           title="确定删除这个房间？"
           onConfirm={handleDelete}
@@ -31,9 +35,10 @@ const RoomCard: React.FC<RoomCardProps> = ({ roomID, maxPlayers }) => {
           <span className={styles.delete}>🗑️</span>
         </Popconfirm>
       </div>
+      <span className={styles.title}>用户ID: {data.userID}</span>
       <div className={styles.body}>
-        最多玩家: {maxPlayers}
-        <button onClick={() => navigate(`/room/${roomID}`)} className={styles.enterBtn}>
+        最多玩家: {data.maxPlayers}
+        <button onClick={() => navigate(`/room/${data.roomID}`)} className={styles.enterBtn}>
           进入房间
         </button>
       </div>
