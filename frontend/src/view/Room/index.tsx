@@ -16,6 +16,7 @@ import { baseURL } from '@/const/env';
 import { CompanyColor } from '@/const/color';
 import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
+import { GameStatusMap } from '@/const/game';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
@@ -111,7 +112,7 @@ export default function Room() {
       return '等待其他玩家进入';
     }
     if (currentPlayer === userId) {
-      return data?.roomData.roomInfo.gameStatus;
+      return GameStatusMap[data?.roomData.roomInfo.gameStatus];
     } else {
       return '请等待其他玩家操作';
     }
@@ -130,7 +131,9 @@ export default function Room() {
     <>
       <div className={styles.roomContainer}>
         <div className={styles.topBar}>
-          <div>房间号：{roomID}
+          <div className={styles.left}>
+            <div>房间号：{roomID}</div>
+            <div>用户ID：{userId}</div>
             <Button
               type="primary"
               className={styles.buyStockBtn}
@@ -141,7 +144,8 @@ export default function Room() {
               公司面板
             </Button>
           </div>
-          <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}
+          <div className={styles.middle}>
+            <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}</div>
             <Button
               type="primary"
               className={styles.buyStockBtn}

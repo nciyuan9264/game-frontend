@@ -1,14 +1,6 @@
 /** 可用的游戏状态类型 */
 export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end'| 'setTile';
 
-// 如果你需要对每个状态加名字，也可以这样定义：
-export const GameStatusMap: Record<GameStatus, string> = {
-  WAITING: '等待中',
-  PLAYING: '游戏中',
-  CREATE_COMPANY: '创建公司',
-  MERGE: '并购中',
-  END: '已结束',
-};
 interface ListRoomInfo {
   roomID: string;
   userID: string;
