@@ -23,7 +23,7 @@ export default function Board({ tilesData, hoveredTile }: Props) {
               key={id}
               className={styles.cell}
               style={{
-                backgroundColor: tile?.belong ? CompanyColor[tile?.belong] : hoveredTile === id ? '#d0e9ff' :'#e6f2ff',
+                backgroundColor: tile?.belong ? CompanyColor[tile?.belong] : hoveredTile === id ? '#8a6262' :'#e6f2ff',
               }}
             >
               {id}

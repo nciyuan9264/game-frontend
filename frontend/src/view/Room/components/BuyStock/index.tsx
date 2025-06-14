@@ -1,6 +1,7 @@
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
-import { Modal, Card, InputNumber, Row, Col, Button, message } from 'antd';
+import { Modal, Card, Row, Col, Button, message } from 'antd';
 import { useState, useMemo } from 'react';
+import CustomInputNumber from '../CustomInputer';
 
 const BuyStock = ({
   visible = true,
@@ -91,13 +92,12 @@ const BuyStock = ({
               <Card title={key} variant="outlined" hoverable={!disabled} style={{ opacity: disabled ? 0.2 : 1 }}>
                 <p>股价：{value.stockPrice}</p>
                 <p>地块：{value.stockTotal}</p>
-                <InputNumber
+                <CustomInputNumber
                   min={0}
                   max={Math.min(value.stockTotal , 3)}
                   value={selectedCompany[key] || 0}
                   onChange={(val) => handleChange(key, val)}
                   disabled={disabled}
-                  style={{ width: '100%' }}
                 />
               </Card>
             </Col>
