@@ -166,7 +166,6 @@
   .roomContainer {
     padding: 20px;
 
-    // height: 96vh;
     .gameBoard {
       display: flex;
       flex-direction: row;
@@ -193,49 +192,6 @@
           }
 
           .buyStockBtn {}
-        }
-
-        .playerInfo {
-          list-style: none;
-          padding: 0;
-          font-size: 14px;
-          line-height: 1.6;
-
-          li {
-            margin-bottom: 8px;
-          }
-
-          .stockList {
-            display: flex;
-            margin-top: 4px;
-            padding-left: 1em;
-
-            li {
-              list-style-type: disc;
-            }
-          }
-
-          .tileList {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 4px;
-
-            .tile {
-
-              display: inline-block;
-              padding: 4px 8px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-              background-color: #f8f8f8;
-              font-weight: bold;
-              font-family: monospace;
-            }
-
-            &:hover {
-              cursor: pointer;
-            }
-          }
         }
 
         .marketTable {
@@ -306,6 +262,49 @@
     .playerAssets {
       width: 100%;
       padding: 12px 16px;
+
+      .playerInfo {
+        list-style: none;
+        padding: 0;
+        font-size: 14px;
+        line-height: 1.6;
+
+        li {
+          margin-bottom: 8px;
+        }
+
+        .stockList {
+          display: flex;
+          margin-top: 4px;
+          padding-left: 1em;
+
+          li {
+            list-style-type: disc;
+          }
+        }
+
+        .tileList {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 6px;
+          margin-top: 4px;
+
+          .tile {
+            width: 40px;
+            height: 40px;
+            padding: 4px 8px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            background-color: #f8f8f8;
+            font-weight: bold;
+            font-family: monospace;
+          }
+
+          &:hover {
+            cursor: pointer;
+          }
+        }
+      }
     }
   }
 }
