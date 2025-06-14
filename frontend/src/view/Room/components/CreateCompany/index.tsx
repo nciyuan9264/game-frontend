@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Modal, Card, Radio, Row, Col, Button } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
 import { CompanyColor } from "@/const/color";
@@ -14,9 +14,16 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
 
   const [selected, setSelected] = useState<string | undefined>(undefined);
 
+  useEffect(() => {
+    setSelected(undefined);
+  }, [visible])
   const handleOk = () => {
     if (selected) {
       onSelect(selected);
+    } else {
+      Modal.error({
+        title: "请选择要创建的公司",
+      });
     }
   };
 

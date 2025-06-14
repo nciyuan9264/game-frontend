@@ -22,7 +22,7 @@ const BuyStock = ({
   }, {} as Record<CompanyKey, number>);
 
   const [selectedCompany, setSelectedCompany] = useState<Record<CompanyKey, number>>(initialSelectedCount);
-  const money =data?.playerData.info.money ?? 0;
+  const money = data?.playerData.info.money ?? 0;
 
   useEffect(() => {
     if (!visible) {
@@ -75,6 +75,7 @@ const BuyStock = ({
 
   return (
     <Modal
+      width={800}
       title="请选择要购买的股票"
       open={visible}
       closable={false}
@@ -95,20 +96,31 @@ const BuyStock = ({
           const disabled = Number(value.tiles ?? 0) === 0;
 
           return (
-            <Col span={8} key={key}>
-              <Card title={key} variant="outlined" hoverable={!disabled} style={{ opacity: disabled ? 0.2 : 1, background: CompanyColor[key] }}>
+            <Col span={6} key={key}>
+              <Card
+                title={key}
+                variant="outlined"
+                hoverable={!disabled}
+                style={{
+                  opacity: disabled ? 0.2 : 1,
+                  background: CompanyColor[key],
+                  borderRadius: 8,
+                  color: 'white',
+                }}
+              >
                 <p>股价：{value.stockPrice}</p>
                 <p>地块：{value.tiles}</p>
                 <p>剩余股票：{value.stockTotal}</p>
                 <CustomInputNumber
                   min={0}
-                  max={Math.min(value.stockTotal , 3)}
+                  max={Math.min(value.stockTotal, 3)}
                   value={selectedCompany[key] || 0}
                   onChange={(val) => handleChange(key, val)}
                   disabled={disabled}
                 />
               </Card>
             </Col>
+
           );
         })}
       </Row>

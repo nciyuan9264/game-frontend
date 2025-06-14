@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
 import { useParams } from 'react-router-dom';
 import Board from './components/Board';
-import { Button, message, Modal } from 'antd';
+import { Button, message, Modal, Tag } from 'antd';
 import HotelSelectorModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
@@ -247,12 +247,19 @@ export default function Room() {
               </li>
               <li className={styles.stocks}>
                 📈 股票：
+
+
                 <ul className={styles.stockList}>
                   {Object.entries(data?.playerData.stocks || {})
                     .filter(([_, count]) => Number(count) > 0)
                     .map(([company, count]) => (
-                      <li key={company} className={styles.stockItem} style={{ background: CompanyColor[company as CompanyKey] }}>
-                        {company} × <span className={styles.stockCount}>{count}</span>
+                      <li key={company} className={styles.stockItem}>
+                        <Tag
+                          color={CompanyColor[company as CompanyKey]}
+                          style={{ padding: '4px 8px', fontSize: 14, borderRadius: 8 }}
+                        >
+                          <b>{company}</b> × <span className={styles.stockCount}>{count}</span>
+                        </Tag>
                       </li>
                     ))}
                 </ul>
@@ -339,6 +346,5 @@ export default function Room() {
         }));
       }} />
     </>
-
   );
 }
