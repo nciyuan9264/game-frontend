@@ -133,7 +133,7 @@ export default function Room() {
             <Button
               type="primary"
               className={styles.buyStockBtn}
-              disabled={isGameEnd}
+              disabled={!isGameEnd}
               onClick={() => {
                 sendMessage(JSON.stringify({
                   type: 'game_end',
