@@ -27,9 +27,10 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userId = getOrCreateUserId();
   const mergingModalVisible = useMemo(() => {
-    const needSettle = Object.entries(data?.tempData.mergeSettleData || {}).some(([_, val]) => {
-      return val.hoders[0] === userId;
+    const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
+      return val.hoders.length > 0;
     });
+    const needSettle = firstHoders?.[1].hoders[0] === userId;
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
   }, [data]);
 

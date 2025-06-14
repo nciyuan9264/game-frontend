@@ -98,7 +98,8 @@ const BuyStock = ({
             <Col span={8} key={key}>
               <Card title={key} variant="outlined" hoverable={!disabled} style={{ opacity: disabled ? 0.2 : 1, background: CompanyColor[key] }}>
                 <p>股价：{value.stockPrice}</p>
-                <p>地块：{value.stockTotal}</p>
+                <p>地块：{value.tiles}</p>
+                <p>剩余股票：{value.stockTotal}</p>
                 <CustomInputNumber
                   min={0}
                   max={Math.min(value.stockTotal , 3)}
