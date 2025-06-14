@@ -4,8 +4,8 @@ export const CompanyColor = {
   Continental: '#28a745',
   Festival: '#ffc107',
   Imperial: '#dc3545',
-  Sackson: '#800080',
+  Sackson: 'rgb(235 84 235)',
   Tower: '#17a2b8',
-  Worldwide: '#343a40',
+  Worldwide: 'rgb(125 153 180)',
   Blank: '#6c757d',
 };

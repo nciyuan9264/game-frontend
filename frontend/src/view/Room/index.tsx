@@ -7,12 +7,13 @@ import Board from './components/Board';
 import { Button, message, Modal } from 'antd';
 import HotelSelectorModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
-import { WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import BuyStock from './components/BuyStock';
 import CompanyStockActionModal from './components/MergeCompany';
 import MergeSelection from './components/MergeSelection';
 import WaitingModal from './components/Waiting';
 import { baseURL } from '@/const/env';
+import { CompanyColor } from '@/const/color';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
@@ -166,7 +167,11 @@ export default function Room() {
               <tbody>
                 {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
                   <tr key={company.name}>
-                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}>{company.name}</td>
+                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}
+                    style={{
+                      backgroundColor: CompanyColor[company.name as CompanyKey]
+                    }}
+                    >{company.name}</td>
                     <td>${company.stockPrice}</td>
                     <td>{company.stockTotal}</td>
                     <td>{company.tiles}</td>
