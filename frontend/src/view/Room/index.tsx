@@ -28,7 +28,7 @@ export default function Room() {
       return val.hoders[0] === userId;
     });
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
-  }, [data?.roomData.roomInfo.gameStatus]);
+  }, [data]);
 
   const waitingModalVisible = useMemo(() => {
     return data?.roomData.roomInfo.roomStatus === false;
@@ -195,7 +195,7 @@ export default function Room() {
                   {Object.entries(data?.playerData.stocks || {})
                     .filter(([_, count]) => Number(count) > 0)
                     .map(([company, count]) => (
-                      <li key={company} className={styles.stockItem}>
+                      <li key={company} className={styles.stockItem} style={{background: CompanyColor[company as CompanyKey]}}>
                         {company} × <span className={styles.stockCount}>{count}</span>
                       </li>
                     ))}
