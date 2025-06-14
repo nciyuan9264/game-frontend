@@ -4,24 +4,24 @@ import React  from 'react';
 import { Modal  } from 'antd';
 
 interface WaitingModalProps {
-  visible: boolean;
+  content: string;
 }
 
 const WaitingModal: React.FC<WaitingModalProps> = ({
-  visible,
+  content,
 }) => {
 
   return (
     <Modal
       title=""
-      open={visible}
+      open={content !== ''}
       closable={false}
       footer={null}
       centered
       maskClosable={false}
       width={800}
     >
-      请等待其他玩家加入
+      {content}
     </Modal>
   );
 };

@@ -100,4 +100,5 @@ interface WsRoomSyncData {
   tempData: TempData;
   type: string;
   message?: string;
+  result?: Record<string, int>;
 }

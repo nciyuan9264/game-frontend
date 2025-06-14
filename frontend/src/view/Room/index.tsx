@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
@@ -14,11 +14,13 @@ import MergeSelection from './components/MergeSelection';
 import WaitingModal from './components/Waiting';
 import { baseURL } from '@/const/env';
 import { CompanyColor } from '@/const/color';
+import GameEnd from './components/GameEnd';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
   const [buyStockModalVisible, setBuyStockModalVisible] = useState(false);
+  const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
 
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
@@ -30,9 +32,15 @@ export default function Room() {
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
   }, [data]);
 
-  const waitingModalVisible = useMemo(() => {
-    return data?.roomData.roomInfo.roomStatus === false;
-  }, [data?.roomData.roomInfo.roomStatus]);
+  const waitingModalComtent = useMemo(() => {
+    if (data?.roomData.roomInfo.roomStatus === false) {
+      return '请等待其他玩家加入';
+    }
+    if (data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle) {
+      return '请等待其他玩家结算';
+    }
+    return '';
+  }, [data]);
 
   const mergingSelectionModalVisible = useMemo(() => {
     return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSelection && userId === data.roomData.currentPlayer;
@@ -52,7 +60,7 @@ export default function Room() {
         } else {
           setCreateCompanyModalVisible(false);
         }
-        if(data.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
+        if (data.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
           setBuyStockModalVisible(true);
         } else {
           setBuyStockModalVisible(false);
@@ -84,6 +92,14 @@ export default function Room() {
     });
   };
 
+  const isGameEnd = useMemo(() => {
+    return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) < 11
+    }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) >= 41
+    })
+  }, [data]);
+
   const currentPlayer = useMemo(() => {
     return data?.roomData.currentPlayer;
   }, [data?.roomData.currentPlayer])
@@ -99,13 +115,35 @@ export default function Room() {
     }
   }, [data, currentPlayer])
 
+  useEffect(() => {
+    if (currentPlayer === userId) {
+      const audio = new Audio("/your-turn.mp3");
+      audio.play().catch((err) => {
+        console.warn("音效播放失败（可能是用户未交互）", err);
+      });
+    }
+  }, [currentPlayer, userId]);
 
   return (
     <>
       <div className={styles.roomContainer}>
         <div className={styles.topBar}>
           <div>房间号：{roomID}</div>
-          <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}</div>
+          <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}
+            <Button
+              type="primary"
+              className={styles.buyStockBtn}
+              disabled={isGameEnd}
+              onClick={() => {
+                sendMessage(JSON.stringify({
+                  type: 'game_end',
+                }));
+                setGameEndModalVisible(true);
+              }}
+            >
+              结束清算
+            </Button>
+          </div>
           <div>当前阶段：{currentStep}</div>
         </div>
         <div className={styles.gameBoard}>
@@ -201,7 +239,7 @@ export default function Room() {
                   {Object.entries(data?.playerData.stocks || {})
                     .filter(([_, count]) => Number(count) > 0)
                     .map(([company, count]) => (
-                      <li key={company} className={styles.stockItem} style={{background: CompanyColor[company as CompanyKey]}}>
+                      <li key={company} className={styles.stockItem} style={{ background: CompanyColor[company as CompanyKey] }}>
                         {company} × <span className={styles.stockCount}>{count}</span>
                       </li>
                     ))}
@@ -237,7 +275,12 @@ export default function Room() {
           </div>
         </div>
       </div>
-      <WaitingModal visible={waitingModalVisible} />
+      <WaitingModal content={waitingModalComtent} />
+      <GameEnd
+        data={data}
+        visible={gameEndModalVisible}
+        setGameEndModalVisible={setGameEndModalVisible}
+      />
       <BuyStock
         visible={buyStockModalVisible}
         setBuyStockModalVisible={setBuyStockModalVisible}
