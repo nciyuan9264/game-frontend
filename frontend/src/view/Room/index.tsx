@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { getOrCreateUserId } from '@/util/user';
