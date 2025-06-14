@@ -1,7 +1,8 @@
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import { Modal, Card, Row, Col, Button, message } from 'antd';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import CustomInputNumber from '../CustomInputer';
+import { CompanyColor } from '@/const/color';
 
 const BuyStock = ({
   visible = true,
@@ -22,6 +23,12 @@ const BuyStock = ({
 
   const [selectedCompany, setSelectedCompany] = useState<Record<CompanyKey, number>>(initialSelectedCount);
   const money =data?.playerData.info.money ?? 0;
+
+  useEffect(() => {
+    if (!visible) {
+      setSelectedCompany(initialSelectedCount);
+    }
+  }, [visible]);
 
   const totalCost = useMemo(() => {
     return Object.entries(selectedCompany).reduce((sum, [k, count]) => {
@@ -89,7 +96,7 @@ const BuyStock = ({
 
           return (
             <Col span={8} key={key}>
-              <Card title={key} variant="outlined" hoverable={!disabled} style={{ opacity: disabled ? 0.2 : 1 }}>
+              <Card title={key} variant="outlined" hoverable={!disabled} style={{ opacity: disabled ? 0.2 : 1, background: CompanyColor[key] }}>
                 <p>股价：{value.stockPrice}</p>
                 <p>地块：{value.stockTotal}</p>
                 <CustomInputNumber

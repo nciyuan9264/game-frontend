@@ -14,7 +14,7 @@
     background: #ffffff;
     border-bottom: 1px solid #e0e0e0;
 
-    .currentPlayer{
+    .currentPlayer {
       font-size: 20px;
       font-weight: bold;
       color: #c61616;
@@ -113,11 +113,32 @@
       .companyName {
         font-weight: bold;
         padding: 8px;
-        &.bgColor0 { background-color: #f8d7da; } // 红
-        &.bgColor1 { background-color: #d4edda; } // 绿
-        &.bgColor2 { background-color: #d1ecf1; } // 蓝
-        &.bgColor3 { background-color: #fff3cd; } // 黄
-        &.bgColor4 { background-color: #e2e3e5; } // 灰
+
+        &.bgColor0 {
+          background-color: #f8d7da;
+        }
+
+        // 红
+        &.bgColor1 {
+          background-color: #d4edda;
+        }
+
+        // 绿
+        &.bgColor2 {
+          background-color: #d1ecf1;
+        }
+
+        // 蓝
+        &.bgColor3 {
+          background-color: #fff3cd;
+        }
+
+        // 黄
+        &.bgColor4 {
+          background-color: #e2e3e5;
+        }
+
+        // 灰
       }
 
       th,
@@ -143,6 +164,7 @@
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   .roomContainer {
     padding: 20px;
+
     // height: 96vh;
     .gameBoard {
       display: flex;
@@ -169,9 +191,7 @@
             font-weight: bold;
           }
 
-          .buyStockBtn {
-
-          }
+          .buyStockBtn {}
         }
 
         .playerInfo {
@@ -225,11 +245,32 @@
           .companyName {
             font-weight: bold;
             padding: 8px;
-            &.bgColor0 { background-color: #f8d7da; } // 红
-            &.bgColor1 { background-color: #d4edda; } // 绿
-            &.bgColor2 { background-color: #d1ecf1; } // 蓝
-            &.bgColor3 { background-color: #fff3cd; } // 黄
-            &.bgColor4 { background-color: #e2e3e5; } // 灰
+
+            &.bgColor0 {
+              background-color: #f8d7da;
+            }
+
+            // 红
+            &.bgColor1 {
+              background-color: #d4edda;
+            }
+
+            // 绿
+            &.bgColor2 {
+              background-color: #d1ecf1;
+            }
+
+            // 蓝
+            &.bgColor3 {
+              background-color: #fff3cd;
+            }
+
+            // 黄
+            &.bgColor4 {
+              background-color: #e2e3e5;
+            }
+
+            // 灰
           }
 
           th,
@@ -255,7 +296,7 @@
       flex-direction: column;
       gap: 12px;
 
-      .commonAssets{
+      .commonAssets {
         display: none;
       }
     }

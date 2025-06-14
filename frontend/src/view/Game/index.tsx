@@ -74,16 +74,19 @@ export default function GameMenu() {
   };
 
   useEffect(() => {
-    const timeFlag = setInterval(() => {
-      handleGetRoomList();
-    }, 3000);
+    const timer = setInterval(handleGetRoomList, 10000);
 
-    (window as any).deleteRoom = handleDeleteRoom;
+    // 挂载全局函数（可选判断是否重复绑定）
+    if (!(window as any).deleteRoom) {
+      (window as any).deleteRoom = handleDeleteRoom;
+    }
 
     return () => {
-      clearInterval(timeFlag);
+      clearInterval(timer);
+      // 可选：清除全局方法
+      delete (window as any).deleteRoom;
     };
-  }, [])
+  }, []);
 
   return (
     <div className={styles.gameMenu}>
@@ -112,7 +115,24 @@ export default function GameMenu() {
         </Card>
       </div>
       <FullscreenButton />
-
+      <button onClick={() => {
+        handleGetRoomList();
+      }}
+        style={{
+          position: 'fixed',
+          bottom: '20px',
+          right: '100px',
+          padding: '10px 14px',
+          fontSize: '14px',
+          borderRadius: '8px',
+          backgroundColor: '#1890ff',
+          color: '#fff',
+          border: 'none',
+          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
+          zIndex: 9999
+        }}>
+        刷新
+      </button>
       {/* 弹窗 */}
       <Modal
         title="选择房间人数"

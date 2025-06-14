@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Modal, Card, Radio, Row, Col, Button } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
+import { CompanyColor } from "@/const/color";
 
 
 const HotelSelectorModal = ({ visible, company, onSelect }:
@@ -40,11 +41,12 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
                   style={{
                     opacity: isDisabled ? 0.4 : 1,
                     cursor: isDisabled ? "not-allowed" : "pointer",
+                    backgroundColor: CompanyColor[value.name as CompanyKey]
                   }}
                   onClick={() => !isDisabled && setSelected(key)}
                 >
                   <Radio value={key} disabled={isDisabled}>
-                    <b>{value.name}</b>（股价: {value.stockPrice}）
+                    <b>{value.name}</b>
                   </Radio>
                 </Card>
               </Col>

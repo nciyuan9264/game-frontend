@@ -1,5 +1,3 @@
-import { useEffect } from 'react';
-
 const FullscreenButton = () => {
     const handleFullscreen = () => {
     const el = document.documentElement;
@@ -11,10 +9,6 @@ const FullscreenButton = () => {
       (el as any).msRequestFullscreen(); // IE
     }
   };
-
-  useEffect(() => {
-    // handleFullscreen();
-  }, []);
 
   return (
     <button onClick={handleFullscreen} style={{

@@ -39,7 +39,7 @@ export default function Room() {
   }, [data?.roomData.roomInfo.gameStatus, userId, data?.roomData.currentPlayer])
   const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
-    if(data.type === 'error'){
+    if (data.type === 'error') {
       message.error(data.message);
       return;
     }
@@ -168,9 +168,9 @@ export default function Room() {
                 {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
                   <tr key={company.name}>
                     <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}
-                    style={{
-                      backgroundColor: CompanyColor[company.name as CompanyKey]
-                    }}
+                      style={{
+                        backgroundColor: CompanyColor[company.name as CompanyKey]
+                      }}
                     >{company.name}</td>
                     <td>${company.stockPrice}</td>
                     <td>{company.stockTotal}</td>
@@ -181,31 +181,46 @@ export default function Room() {
             </table>
           </div>
           <div className={styles.playerAssets}>
-            <h3>你的资产</h3>
+            <div className={styles.header}>
+              <div className={styles.title}>你的资产</div>
+            </div>
             <ul className={styles.playerInfo}>
-              <li>现金：${data?.playerData.info.money}</li>
-              <li>
-                股票：
+              <li className={styles.money}>
+                💰 现金：
+                <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
+              </li>
+              <li className={styles.stocks}>
+                📈 股票：
                 <ul className={styles.stockList}>
                   {Object.entries(data?.playerData.stocks || {})
                     .filter(([_, count]) => Number(count) > 0)
                     .map(([company, count]) => (
-                      <li key={company}>
-                        {company} × {count}
+                      <li key={company} className={styles.stockItem}>
+                        {company} × <span className={styles.stockCount}>{count}</span>
                       </li>
                     ))}
                 </ul>
               </li>
               <li>
-                Tiles：
+                🧱 Tiles：
                 <div className={styles.tileList}>
                   {(data?.playerData.tiles || []).sort().map((tileKey: string) => (
                     <span
                       className={styles.tile}
                       key={tileKey}
-                      onMouseEnter={() => { currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile && setHoveredTile(tileKey) }}
-                      onMouseOut={() => { currentPlayer === userId && setHoveredTile(undefined) }}
-                      onClick={() => currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile && placeTile(tileKey)}
+                      onMouseEnter={() =>
+                        currentPlayer === userId &&
+                        data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
+                        setHoveredTile(tileKey)
+                      }
+                      onMouseOut={() => {
+                        currentPlayer === userId && setHoveredTile(undefined);
+                      }}
+                      onClick={() =>
+                        currentPlayer === userId &&
+                        data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
+                        placeTile(tileKey)
+                      }
                     >
                       {tileKey}
                     </span>

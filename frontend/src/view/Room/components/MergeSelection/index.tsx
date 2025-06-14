@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Modal, Button, Radio } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import { CompanyColor } from '@/const/color';
 
 interface CompanyStockActionModalProps {
   visible: boolean;
@@ -51,7 +52,7 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
           onChange={(e) => setMainCompany(e.target.value)}
         >
           {companyOptions.map((company) => (
-            <Radio.Button key={company} value={company}>
+            <Radio.Button key={company} value={company} style={{background: CompanyColor[company as CompanyKey]}}>
               {company}
             </Radio.Button>
           ))}
