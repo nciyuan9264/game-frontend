@@ -52,7 +52,13 @@ export default function Room() {
         } else {
           setCreateCompanyModalVisible(false);
         }
+        if(data.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
+          setBuyStockModalVisible(true);
+        } else {
+          setBuyStockModalVisible(false);
+        }
       } else {
+        setBuyStockModalVisible(false);
         setCreateCompanyModalVisible(false);
       }
     }
