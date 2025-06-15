@@ -3,7 +3,7 @@ import { Modal, Radio, message, Typography, Card, Button } from 'antd';
 import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
 import RoomCard from '@/view/Game/components/RoomCard';
-import { useDebounceFn, useRequest } from 'ahooks';
+import { useThrottleFn, useRequest } from 'ahooks';
 import FullscreenButton from '@/component/FullScreen';
 import EditUserID from './components/EditUserID';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
@@ -78,7 +78,7 @@ export default function GameMenu() {
       },
     },
   );
-  const { run: debouncedHandleOk } = useDebounceFn(() => {
+  const { run: debouncedHandleOk } = useThrottleFn(() => {
     if ((roomList?.length ?? 0) > 25) {
       message.error('房间数量已达上限');
       return;

@@ -3,7 +3,7 @@ import { Modal, Card, Row, Col, Button, message } from 'antd';
 import { useState, useMemo, useEffect } from 'react';
 import CustomInputNumber from '../CustomInputer';
 import { CompanyColor } from '@/const/color';
-import { useDebounceFn } from 'ahooks';
+import { useThrottleFn } from 'ahooks';
 
 const BuyStock = ({
   visible,
@@ -66,7 +66,7 @@ const BuyStock = ({
     setSelectedCompany(temp);
   };
 
-  const { run: debouncedHandleOk } = useDebounceFn(() => {
+  const { run: debouncedHandleOk } = useThrottleFn(() => {
     if (selectedCompany) {
       onSubmit(selectedCompany);
     } else {
@@ -81,7 +81,7 @@ const BuyStock = ({
       width={800}
       title="请选择要购买的股票"
       open={visible}
-      closable={false}
+      closable={true}
       footer={
         <Button type="primary" onClick={debouncedHandleOk} disabled={totalCost > money}>
           确定购买
@@ -97,7 +97,6 @@ const BuyStock = ({
         {Object.entries(data.roomData.companyInfo).map(([k, value]) => {
           const key = k as CompanyKey; // 添加类型断言
           const disabled = Number(value.tiles ?? 0) === 0;
-
           return (
             <Col span={6} key={key}>
               <Card

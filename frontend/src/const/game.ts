@@ -1,8 +1,8 @@
-import { GameStatus } from "@/types/room";
+import { GameStatus } from '@/types/room';
 
 export const GameStatusMap: Record<GameStatus, string> = {
   waiting: '等待中',
-  createCompany: '游戏中',
+  createCompany: '创建公司',
   buyStock: '购买股票',
   setTile: '设置地块',
   merging: '并购中',

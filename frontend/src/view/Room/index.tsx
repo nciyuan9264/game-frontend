@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { useParams } from 'react-router-dom';
 import Board from './components/Board';
 import { Button, message, Modal, Tag } from 'antd';
-import HotelSelectorModal from './components/CreateCompany';
+import CreateCompanyModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import BuyStock from './components/BuyStock';
@@ -17,38 +17,50 @@ import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
 import { GameStatusMap } from '@/const/game';
 import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
+import CompanyInfo from './components/CompanyInfo';
+import { isTabletLandscape } from '@/util/window';
+export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
+  const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
+    return val.hoders.length > 0;
+  });
+  const needSettle = firstHoders?.[1].hoders[0] === userID;
+  return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
+};
 
+export const getMergeSelection = (data: WsRoomSyncData, userID: string) => {
+  return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSelection && data?.roomData.currentPlayer === userID;
+
+};
+
+export const canBuyStock = (data: WsRoomSyncData, userID: string) => {
+  return data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK && data?.roomData.currentPlayer === userID;
+};
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
   const [buyStockModalVisible, setBuyStockModalVisible] = useState(false);
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
   const [companyInfoVisible, setCompanyInfoVisible] = useState(false);
+  const [mergeCompanyModalVisible, setMergeCompanyModalVisible] = useState(false);
+  const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
-  const userId = getLocalStorageUserID();
-  const mergingModalVisible = useMemo(() => {
-    const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
-      return val.hoders.length > 0;
-    });
-    const needSettle = firstHoders?.[1].hoders[0] === userId;
-    return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
-  }, [data]);
+  const userID = getLocalStorageUserID();
 
   const waitingModalComtent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
       return '请等待其他玩家加入';
     }
-    if (data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle) {
-      return '请等待其他玩家结算';
+    if (data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(data, userID)) {
+      const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
+        return val.hoders.length > 0;
+      });
+      return `请等待 ${getLocalStorageUserName(firstHoders?.[1].hoders[0] ?? '')} 结算`;
     }
     return '';
   }, [data]);
 
-  const mergingSelectionModalVisible = useMemo(() => {
-    return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSelection && userId === data.roomData.currentPlayer;
-  }, [data?.roomData.roomInfo.gameStatus, userId, data?.roomData.currentPlayer])
-  const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userId=${userId}`, (msg) => {
+  const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
@@ -57,7 +69,12 @@ export default function Room() {
     if (data.type === 'sync') {
       console.log('收到数据：', data);
       setData(data);
-      if (userId === data.roomData.currentPlayer) {
+      if (getMergingModalAvailible(data, userID)) {
+        setMergeCompanyModalVisible(true);
+      } else {
+        setMergeCompanyModalVisible(false);
+      }
+      if (userID === data.roomData.currentPlayer) {
         if (data.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY) {
           setCreateCompanyModalVisible(true);
         } else {
@@ -68,12 +85,22 @@ export default function Room() {
         } else {
           setBuyStockModalVisible(false);
         }
+        if (data.roomData.roomInfo.gameStatus === GameStatus.MergingSelection) {
+          setMergeSelectionModalVisible(true);
+        } else {
+          setMergeSelectionModalVisible(false);
+        }
       } else {
         setBuyStockModalVisible(false);
         setCreateCompanyModalVisible(false);
+        setMergeSelectionModalVisible(false);
       }
     }
   });
+
+  const canCreateCompany = () => {
+    return data?.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY && userID === data.roomData.currentPlayer;
+  }
 
   const placeTile = (tileKey: string) => {
     Modal.confirm({
@@ -111,7 +138,7 @@ export default function Room() {
     if (!data?.roomData.roomInfo.roomStatus) {
       return '等待其他玩家进入';
     }
-    if (currentPlayer === userId) {
+    if (currentPlayer === userID) {
       return GameStatusMap[data?.roomData.roomInfo.gameStatus];
     } else {
       return '请等待其他玩家操作';
@@ -119,21 +146,85 @@ export default function Room() {
   }, [data, currentPlayer])
 
   useEffect(() => {
-    if (currentPlayer === userId) {
+    if (currentPlayer === userID) {
       const audio = new Audio("/your-turn.mp3");
       audio.play().catch((err) => {
         console.warn("音效播放失败（可能是用户未交互）", err);
       });
     }
-  }, [currentPlayer, userId]);
+  }, [currentPlayer, userID]);
+
+  const renderButton = () => {
+    if (!data) {
+      return;
+    }
+    if (canCreateCompany()) {
+      return (
+        <Button
+          type="primary"
+          className={styles.buyStockBtn}
+          disabled={!canCreateCompany()}
+          onClick={() => {
+            setCreateCompanyModalVisible(true);
+          }}
+        >
+          创建公司
+        </Button>
+      )
+    }
+    if (canBuyStock(data, userID)) {
+      return (
+        <Button
+          type="primary"
+          className={styles.buyStockBtn}
+          disabled={!canBuyStock(data, userID)}
+          onClick={() => {
+            setBuyStockModalVisible(true);
+          }}
+        >
+          购买股票
+        </Button>
+      )
+    }
+    if (getMergingModalAvailible(data, userID)) {
+      return (
+        <Button
+          type="primary"
+          className={styles.buyStockBtn}
+          disabled={!getMergingModalAvailible(data, userID)}
+          onClick={() => {
+            setMergeCompanyModalVisible(true);
+          }}
+        >
+          合并清算
+        </Button>
+      )
+    }
+    if (getMergeSelection(data, userID)) {
+      return (
+        <Button
+          type="primary"
+          className={styles.buyStockBtn}
+          disabled={!getMergeSelection(data, userID)}
+          onClick={() => {
+            setMergeSelectionModalVisible(true);
+          }}
+        >
+          选择留下的公司
+        </Button>
+      )
+    }
+  }
 
   return (
     <>
       <div className={styles.roomContainer}>
         <div className={styles.topBar}>
           <div className={styles.left}>
-            <div>房间号：{roomID}</div>
-            <div>用户ID：{getLocalStorageUserName(userId)}</div>
+            <div className={styles.IDs}>
+              <div>房间号：{roomID}</div>
+              <div>用户ID：{getLocalStorageUserName(userID)}</div>
+            </div>
             <Button
               type="primary"
               className={styles.buyStockBtn}
@@ -143,9 +234,6 @@ export default function Room() {
             >
               公司面板
             </Button>
-          </div>
-          <div className={styles.middle}>
-            <div className={styles.currentPlayer}>{data?.roomData.roomInfo.roomStatus ? currentPlayer === userId ? '你的回合' : '请等待其他玩家操作' : '等待其他玩家进入'}</div>
             <Button
               type="primary"
               className={styles.buyStockBtn}
@@ -160,86 +248,42 @@ export default function Room() {
               结束清算
             </Button>
           </div>
-          <div>当前阶段：{currentStep}</div>
+          <div className={styles.middle}>
+            {data?.roomData.roomInfo.roomStatus ? (
+              currentPlayer === userID ? (
+                <span className={styles.yourTurn}>你的回合</span>
+              ) : (
+                <>
+                  请等待
+                  <span className={styles.playerName}>{getLocalStorageUserName(data.roomData.currentPlayer)}</span>
+                  操作
+                </>
+              )
+            ) : (
+              '等待其他玩家进入'
+            )}
+          </div>
+          <div className={styles.right}>
+            <div>当前阶段：{currentStep}</div>
+            <div>{renderButton()}</div>
+          </div>
         </div>
         <div className={styles.gameBoard}>
           <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
-          <div className={styles.companyInfo}>
-            <div className={styles.header}>
-              <div className={styles.title}>市场信息</div>
-              <Button
-                type="primary"
-                className={styles.buyStockBtn}
-                disabled={!(currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK)}
-                onClick={() => {
-                  setBuyStockModalVisible(true);
-                }}
-              >
-                购买股票
-              </Button>
-            </div>
-            <table className={styles.marketTable}>
-              <thead>
-                <tr>
-                  <th>公司</th>
-                  <th>股价</th>
-                  <th>剩余股票</th>
-                  <th>土地数</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
-                  <tr key={company.name}>
-                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}>{company.name}</td>
-                    <td>${company.stockPrice}</td>
-                    <td>{company.stockTotal}</td>
-                    <td>{company.tiles}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {isTabletLandscape && <CompanyInfo
+            setBuyStockModalVisible={setBuyStockModalVisible}
+            setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+            data={data}
+            userID={userID}
+          />}
         </div>
         <div className={styles.assets}>
-          <div className={styles.commonAssets}>
-            <div className={styles.header}>
-              <div className={styles.title}>市场信息</div>
-              <Button
-                type="primary"
-                className={styles.buyStockBtn}
-                disabled={!(currentPlayer === userId && data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK)}
-                onClick={() => {
-                  setBuyStockModalVisible(true);
-                }}
-              >
-                购买股票
-              </Button>
-            </div>
-            <table className={styles.marketTable}>
-              <thead>
-                <tr>
-                  <th>公司</th>
-                  <th>股价</th>
-                  <th>剩余股票</th>
-                  <th>土地数</th>
-                </tr>
-              </thead>
-              <tbody>
-                {Object.values(data?.roomData.companyInfo || {}).map((company, index) => (
-                  <tr key={company.name}>
-                    <td className={`${styles.companyName} ${styles[`bgColor${index % 5}`]}`}
-                      style={{
-                        backgroundColor: CompanyColor[company.name as CompanyKey]
-                      }}
-                    >{company.name}</td>
-                    <td>${company.stockPrice}</td>
-                    <td>{company.stockTotal}</td>
-                    <td>{company.tiles}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
+          {!isTabletLandscape && <CompanyInfo
+            setBuyStockModalVisible={setBuyStockModalVisible}
+            setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+            data={data}
+            userID={userID}
+          />}
           <div className={styles.playerAssets}>
             <div className={styles.header}>
               <div className={styles.title}>你的资产</div>
@@ -251,8 +295,6 @@ export default function Room() {
               </li>
               <li className={styles.stocks}>
                 📈 股票：
-
-
                 <ul className={styles.stockList}>
                   {Object.entries(data?.playerData.stocks || {})
                     .filter(([_, count]) => Number(count) > 0)
@@ -271,20 +313,26 @@ export default function Room() {
               <li>
                 🧱 Tiles：
                 <div className={styles.tileList}>
-                  {(data?.playerData.tiles || []).sort().map((tileKey: string) => (
+                  {(data?.playerData.tiles || []).sort((a, b) => {
+                    const [aRow, aCol] = a.match(/^(\d+)([A-Z])$/)!.slice(1);
+                    const [bRow, bCol] = b.match(/^(\d+)([A-Z])$/)!.slice(1);
+                    const rowDiff = Number(aRow) - Number(bRow);
+                    if (rowDiff !== 0) return rowDiff;
+                    return aCol.charCodeAt(0) - bCol.charCodeAt(0);
+                  }).map((tileKey: string) => (
                     <span
                       className={styles.tile}
                       key={tileKey}
                       onMouseEnter={() =>
-                        currentPlayer === userId &&
+                        currentPlayer === userID &&
                         data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
                         setHoveredTile(tileKey)
                       }
                       onMouseOut={() => {
-                        currentPlayer === userId && setHoveredTile(undefined);
+                        currentPlayer === userID && setHoveredTile(undefined);
                       }}
                       onClick={() =>
-                        currentPlayer === userId &&
+                        currentPlayer === userID &&
                         data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
                         placeTile(tileKey)
                       }
@@ -321,7 +369,7 @@ export default function Room() {
         data={data} />
 
       <MergeSelection
-        visible={mergingSelectionModalVisible}
+        visible={mergeSelectionModalVisible}
         data={data}
         onOk={(modalData) => {
           sendMessage(JSON.stringify({
@@ -330,25 +378,36 @@ export default function Room() {
           }));
           setBuyStockModalVisible(false);
         }}
+        onCancel={() => {
+          setMergeSelectionModalVisible(false);
+        }}
       />
       <CompanyStockActionModal
-        visible={mergingModalVisible}
+        visible={mergeCompanyModalVisible}
         data={data}
         onOk={(modalData) => {
           sendMessage(JSON.stringify({
             type: 'merging_settle',
             payload: modalData,
           }));
+          setMergeCompanyModalVisible(false);
         }}
         onCancel={function (): void {
-          throw new Error('Function not implemented.');
+          setMergeCompanyModalVisible(false);
         }} />
-      <HotelSelectorModal visible={createCompanyModalVisible} company={data?.roomData.companyInfo} onSelect={(company) => {
-        sendMessage(JSON.stringify({
-          type: 'create_company',
-          payload: company,
-        }));
-      }} />
+      <CreateCompanyModal
+        visible={createCompanyModalVisible}
+        company={data?.roomData.companyInfo}
+        onSelect={(company) => {
+          sendMessage(JSON.stringify({
+            type: 'create_company',
+            payload: company,
+          }));
+        }}
+        onCancel={() => {
+          setCreateCompanyModalVisible(false);
+        }}
+      />
     </>
   );
 }

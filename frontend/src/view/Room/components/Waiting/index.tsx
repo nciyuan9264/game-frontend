@@ -4,7 +4,7 @@ import React  from 'react';
 import { Modal  } from 'antd';
 
 interface WaitingModalProps {
-  content: string;
+  content: string | JSX.Element;
 }
 
 const WaitingModal: React.FC<WaitingModalProps> = ({

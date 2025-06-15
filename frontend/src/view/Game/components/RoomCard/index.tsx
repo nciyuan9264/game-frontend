@@ -38,8 +38,8 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
         </Popconfirm>
       </div>
       <span className={styles.title} style={{color: userID === data.userID ? 'red' : 'black'}}>房主ID: {getLocalStorageUserName(data.userID)}</span>
-      <div>
-        玩家列表：<br />
+      <div className={styles.playerList}>
+        玩家列表
         {
           data.roomPlayer.map((player) => {
             return (

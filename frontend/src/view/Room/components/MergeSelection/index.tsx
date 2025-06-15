@@ -2,23 +2,25 @@ import React, { useState } from 'react';
 import { Modal, Button, Radio } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import { CompanyColor } from '@/const/color';
-import { useDebounceFn } from 'ahooks';
+import { useThrottleFn } from 'ahooks';
 
 interface CompanyStockActionModalProps {
   visible: boolean;
   data?: WsRoomSyncData;
   onOk: (val: CompanyKey) => void;
-  // onCancel?: () => void;
+  onCancel?: () => void;
 }
 
 const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
   visible,
   data,
   onOk,
+  onCancel,
 }) => {
   const [mainCompany, setMainCompany] = useState<CompanyKey | undefined>();
+  const companyOptions = data?.tempData.merge_selection_temp.mainCompany || [];
 
-  const { run: debouncedHandleSubmit } = useDebounceFn(() => {
+  const { run: debouncedHandleSubmit } = useThrottleFn(() => {
     if (!mainCompany) {
       Modal.error({
         title: '请选择要留下的公司',
@@ -27,17 +29,18 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
     }
     onOk(mainCompany);
   }, { wait: 1000 });
-  const companyOptions = data?.tempData.merge_selection_temp.mainCompany || [];
+
   return (
     <Modal
       title="请选择要留下的公司"
       open={visible}
-      closable={false}
+      closable={true}
       footer={
         <Button type="primary" onClick={debouncedHandleSubmit}>确定</Button>
       }
       centered
-      maskClosable={false}
+      maskClosable={true}
+      onCancel={onCancel}
       width={800}
     >
       {companyOptions.length === 0 ? (
@@ -48,9 +51,9 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
           onChange={(e) => setMainCompany(e.target.value)}
         >
           {companyOptions.map((company) => (
-            <Radio.Button key={company} value={company} style={{background: CompanyColor[company as CompanyKey]}}>
+            <Radio key={company} value={company} style={{ color: CompanyColor[company as CompanyKey] }}>
               {company}
-            </Radio.Button>
+            </Radio>
           ))}
         </Radio.Group>
       )}

@@ -3,7 +3,9 @@ import { Modal, Button, Row, Col, message } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import CustomInputNumber from '../CustomInputer';
-import { useDebounceFn } from 'ahooks';
+import { useThrottleFn } from 'ahooks';
+import { getLocalStorageUserName } from '@/util/user';
+import { CompanyColor } from '@/const/color';
 interface CompanyStockActionModalProps {
   visible: boolean;
   data?: WsRoomSyncData;
@@ -22,9 +24,8 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
 }) => {
   const [actions, setActions] = useState<Record<CompanyKey, { sellAmount: number; exchangeAmount: number }>>({} as any);
 
-  // 每次 visible 或 data.roomData.merge_other_companies_temp 变化时，初始化 actions
   useEffect(() => {
-    if (visible) {
+    if (!visible) {
       const initial: Record<CompanyKey, { sellAmount: number; exchangeAmount: number }> = {} as any;
       Object.keys(data?.tempData.mergeSettleData ?? {}).forEach(company => {
         initial[company as CompanyKey] = { sellAmount: 0, exchangeAmount: 0 };
@@ -32,10 +33,10 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       setActions(initial);
     }
   }, [visible, data?.tempData]);
-  const mainCompany = data?.tempData?.merge_main_company_temp;
-  if (!mainCompany) return null;
 
-  const { run: debouncedHandleSellChange } = useDebounceFn((company: CompanyKey, value: number | null) => {
+  const mainCompany = data?.tempData?.merge_main_company_temp;
+
+  const { run: debouncedHandleSellChange } = useThrottleFn((company: CompanyKey, value: number | null) => {
     const amount = value ?? 0;
     const maxAvailable = data?.playerData.stocks[company] || 0;
     const currentExchange = actions[company]?.exchangeAmount || 0;
@@ -52,15 +53,15 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
         sellAmount: amount,
       },
     }));
-  }, { wait: 1000 });
+  }, { wait: 0 });
 
-  const { run: debouncedHandleExchangeChange } = useDebounceFn((company: CompanyKey, value: number | null) => {
+  const { run: debouncedHandleExchangeChange } = useThrottleFn((company: CompanyKey, value: number | null) => {
     const amount = value ?? 0;
     const maxAvailable = data?.playerData.stocks[company] || 0;
     const currentSell = actions[company]?.sellAmount || 0;
 
 
-    const mainStockTotal = data?.roomData.companyInfo[mainCompany]?.stockTotal || 0;
+    const mainStockTotal = mainCompany ? data?.roomData.companyInfo[mainCompany]?.stockTotal || 0 : 0;
     if (amount % 2 !== 0) {
       message.warning('兑换数量必须是偶数');
       return;
@@ -83,9 +84,9 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
         exchangeAmount: amount,
       },
     }));
-  }, { wait: 1000 });
+  }, { wait: 0 });
 
-  const { run: debouncedHandleSubmit } = useDebounceFn(() => {
+  const { run: debouncedHandleSubmit } = useThrottleFn(() => {
     const result = Object.entries(actions).map(([company, { sellAmount, exchangeAmount }]) => ({
       company,
       sellAmount,
@@ -93,41 +94,43 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
     }));
     onOk(result);
   }, { wait: 1000 });
-
+  if (!mainCompany) return null;
   return (
     <Modal
       title="请选择要处理被并购公司股票的方式"
       open={visible}
       onCancel={onCancel}
-      closable={false}
+      closable={true}
       footer={
         <Button type="primary" onClick={debouncedHandleSubmit}>
           确定
         </Button>
       }
       centered
-      maskClosable={false}
+      maskClosable={true}
       width={860}
       className={styles.settlementModal}
     >
       {/* ✅ 破产清算板块 */}
       <div className={styles.settlementContainer}>
-        <div className={styles.sectionTitle}>破产清算</div>
+        <div className={styles.sectionTitle}>破产清算：被<span style={{color: CompanyColor[mainCompany]}}>{mainCompany}</span>合并的公司：</div>
         <div className={styles.companyList}>
           {
             Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
               const companyName = company as CompanyKey;
               const dividends = value.dividends;
               return (
-                <div key={company} className={styles.companyCard}>
-                  <div className={styles.companyName}>{companyName}</div>
+                <div key={company} className={styles.companyCard} style={{borderLeft: `4px solid ${CompanyColor[companyName]}`}}>
+                  <div className={styles.companyName} style={{color: CompanyColor[companyName]}}>{companyName}</div>
                   {
-                    Object.entries(dividends).map(([key, value]) => (
-                      <div key={key} className={styles.dividendRow}>
-                        {key} 获得现金：
-                        <span className={styles.amount}>${value}</span>
-                      </div>
-                    ))
+                    Object.entries(dividends)
+                      .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
+                      .map(([key, value]) => (
+                        <div key={key} className={styles.dividendRow}>
+                          <div className={styles.name}>{getLocalStorageUserName(key)} 获得现金：</div>
+                          <div className={styles.amount}>${value}</div>
+                        </div>
+                      ))
                   }
                 </div>
               )
@@ -141,7 +144,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       <Row className={styles.tableHeader}>
         <Col span={8}>被合并公司</Col>
         <Col span={6}>卖出数量</Col>
-        <Col span={6}>兑换数量 (2:1兑换 {mainCompany})</Col>
+        <Col span={6}>兑换数量 (2:1兑换 <span style={{color: CompanyColor[mainCompany]}}>{mainCompany}</span>)</Col>
         <Col span={4}>持有数量</Col>
       </Row>
 
@@ -163,7 +166,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
           return (
             <Row key={company} className={styles.stockRow} gutter={16}>
               <Col span={8}>
-                <strong>{company}</strong>（单价: ${stockPrice}）
+                <strong style={{color: CompanyColor[company]}}>{company}</strong>（单价: ${stockPrice}）
               </Col>
               <Col span={6}>
                 <CustomInputNumber
@@ -172,7 +175,6 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
                   value={currentAction.sellAmount}
                   onChange={(value) => debouncedHandleSellChange(company as CompanyKey, value)}
                 />
-                {/* <span className={styles.totalPrice}>总价: ${currentAction.sellAmount * stockPrice}</span> */}
               </Col>
               <Col span={6}>
                 <CustomInputNumber

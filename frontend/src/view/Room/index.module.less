@@ -5,7 +5,6 @@
   gap: 10px;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   height: calc(var(--vh, 1vh) * 100);
-
   .topBar {
     display: flex;
     justify-content: space-between;
@@ -13,20 +12,66 @@
     padding: 10px 20px;
     background: #ffffff;
     border-bottom: 1px solid #e0e0e0;
+    font-size: 16px;
 
-    .left{
+    .left {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+
+      .IDs {
+        display: flex;
+        flex-direction: column;
+      }
+    }
+
+    .middle {
+      position: absolute;
+      left: 50%;
+      transform: translateX(-50%);
+      text-align: center;
+      font-size: 20px;
+      padding: 16px 24px;
+      border-radius: 12px;
+      width: fit-content;
+      color: #333;
+    }
+
+    .right{
       display: flex;
       gap: 10px;
       align-items: center;
     }
 
-    .middle {
-      display: flex;
-      align-items: center;
-      gap: 10px;
-      font-size: 20px;
+    .yourTurn {
+      color: #52c41a;
       font-weight: bold;
-      color: #c61616;
+      font-size: 22px;
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .playerName {
+      margin: 0 8px;
+      padding: 2px 6px;
+      background-color: #e6f7ff;
+      border-radius: 6px;
+      font-weight: 600;
+      color: #1890ff;
+      font-size: 18px;
+    }
+
+    @keyframes pulse {
+      0% {
+        transform: scale(1);
+      }
+
+      50% {
+        transform: scale(1.05);
+      }
+
+      100% {
+        transform: scale(1);
+      }
     }
   }
 
@@ -45,8 +90,7 @@
     gap: 20px;
   }
 
-  .playerAssets,
-  .commonAssets {
+  .playerAssets {
     background: #ffffff;
     flex: 1;
     padding: 10px 20px;
@@ -64,8 +108,10 @@
         font-weight: bold;
       }
 
-      .buyStockBtn {
-        // 这里你可以自定义按钮样式
+      .buttons {
+        display: flex;
+        justify-content: flex-end;
+        gap: 20px;
       }
     }
 
@@ -173,90 +219,10 @@
 // ✅ iPad 横屏优化样式
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   .roomContainer {
-    padding: 20px;
-
     .gameBoard {
       display: flex;
       flex-direction: row;
       gap: 10px;
-
-      .companyInfo {
-        display: block;
-        width: 40%;
-        background: #ffffff;
-        flex: 1;
-        padding: 10px 20px;
-        border-radius: 8px;
-        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-        .header {
-          display: flex;
-          justify-content: space-between;
-          align-items: center;
-          margin-bottom: 10px;
-
-          .title {
-            font-size: 18px;
-            font-weight: bold;
-          }
-
-          .buyStockBtn {}
-        }
-
-        .marketTable {
-          width: 100%;
-          border-collapse: collapse;
-          margin-top: 10px;
-          font-size: 14px;
-
-          .companyName {
-            font-weight: bold;
-            padding: 8px;
-
-            &.bgColor0 {
-              background-color: #f8d7da;
-            }
-
-            // 红
-            &.bgColor1 {
-              background-color: #d4edda;
-            }
-
-            // 绿
-            &.bgColor2 {
-              background-color: #d1ecf1;
-            }
-
-            // 蓝
-            &.bgColor3 {
-              background-color: #fff3cd;
-            }
-
-            // 黄
-            &.bgColor4 {
-              background-color: #e2e3e5;
-            }
-
-            // 灰
-          }
-
-          th,
-          td {
-            border: 1px solid #ccc;
-            padding: 8px 12px;
-            text-align: center;
-          }
-
-          th {
-            background-color: #f8f8f8;
-            font-weight: bold;
-          }
-
-          tbody tr:hover {
-            background-color: #f5f5f5;
-          }
-        }
-      }
     }
 
     .assets {

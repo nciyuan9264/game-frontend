@@ -21,7 +21,7 @@ const EditUserID = ({
     <Modal
       open={visible}
       title="请输入用户名"
-      closable={false}
+      closable={true}
       maskClosable={false}
       okText="确认"
       cancelText="取消"

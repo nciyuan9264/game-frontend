@@ -2,13 +2,14 @@ import { useEffect, useState } from "react";
 import { Modal, Card, Radio, Row, Col, Button } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
 import { CompanyColor } from "@/const/color";
-import { useDebounceFn } from "ahooks";
+import { useThrottleFn } from "ahooks";
 
-const HotelSelectorModal = ({ visible, company, onSelect }:
+const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
   {
     visible: boolean,
     company?: Record<CompanyKey, CompanyInfoItem>,
-    onSelect: (company: string) => void
+    onSelect: (company: string) => void,
+    onCancel: () => void,
   }) => {
   if (!company) return null;
 
@@ -18,7 +19,7 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
     setSelected(undefined);
   }, [visible])
 
-  const { run: debouncedHandleOk } = useDebounceFn(() => {
+  const { run: debouncedHandleOk } = useThrottleFn(() => {
     if (selected) {
       onSelect(selected);
     } else {
@@ -33,10 +34,11 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
     <Modal
       title="请选择要创建的公司"
       open={visible}
-      closable={false}
+      closable={true}
       footer={null}
       centered
-      maskClosable={false}
+      maskClosable={true}
+      onCancel={onCancel}
     >
       <Radio.Group onChange={(e) => setSelected(e.target.value)} value={selected}>
         <Row gutter={[16, 16]}>
@@ -77,4 +79,4 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
   );
 };
 
-export default HotelSelectorModal;
+export default CreateCompanyModal;
