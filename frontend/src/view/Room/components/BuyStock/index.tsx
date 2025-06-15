@@ -3,6 +3,7 @@ import { Modal, Card, Row, Col, Button, message } from 'antd';
 import { useState, useMemo, useEffect } from 'react';
 import CustomInputNumber from '../CustomInputer';
 import { CompanyColor } from '@/const/color';
+import { useDebounceFn } from 'ahooks';
 
 const BuyStock = ({
   visible,
@@ -65,13 +66,15 @@ const BuyStock = ({
     setSelectedCompany(temp);
   };
 
-  const handleOk = () => {
+  const { run: debouncedHandleOk } = useDebounceFn(() => {
     if (selectedCompany) {
       onSubmit(selectedCompany);
     } else {
       message.warning("⚠️ 请至少选择一个股票");
     }
-  };
+  }, { wait: 1000 });
+
+
 
   return (
     <Modal
@@ -80,7 +83,7 @@ const BuyStock = ({
       open={visible}
       closable={false}
       footer={
-        <Button type="primary" onClick={handleOk} disabled={totalCost > money}>
+        <Button type="primary" onClick={debouncedHandleOk} disabled={totalCost > money}>
           确定购买
         </Button>
       }

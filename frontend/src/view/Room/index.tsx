@@ -1,7 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
-import { getOrCreateUserId } from '@/util/user';
 import { useParams } from 'react-router-dom';
 import Board from './components/Board';
 import { Button, message, Modal, Tag } from 'antd';
@@ -17,6 +16,7 @@ import { CompanyColor } from '@/const/color';
 import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
 import { GameStatusMap } from '@/const/game';
+import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
@@ -26,7 +26,7 @@ export default function Room() {
   const [companyInfoVisible, setCompanyInfoVisible] = useState(false);
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
-  const userId = getOrCreateUserId();
+  const userId = getLocalStorageUserID();
   const mergingModalVisible = useMemo(() => {
     const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
       return val.hoders.length > 0;
@@ -133,7 +133,7 @@ export default function Room() {
         <div className={styles.topBar}>
           <div className={styles.left}>
             <div>房间号：{roomID}</div>
-            <div>用户ID：{userId}</div>
+            <div>用户ID：{getLocalStorageUserName(userId)}</div>
             <Button
               type="primary"
               className={styles.buyStockBtn}

@@ -1,19 +1,29 @@
 import { useEffect, useState } from 'react';
-import { Modal, Radio, message, Typography, Card } from 'antd';
+import { Modal, Radio, message, Typography, Card, Button } from 'antd';
 import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
-import RoomCard from '@/component/RoomCard';
-import { getOrCreateUserId } from '@/util/user';
-import { useRequest } from 'ahooks';
+import RoomCard from '@/view/Game/components/RoomCard';
+import { useDebounceFn, useRequest } from 'ahooks';
 import FullscreenButton from '@/component/FullScreen';
+import EditUserID from './components/EditUserID';
+import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
 
 const { Title } = Typography;
 export default function GameMenu() {
-  const userID = getOrCreateUserId();
-
-  const [visible, setVisible] = useState(false);
+  const [userID, setUserID] = useState('');
+  const [isUserIDModalVisible, setIsUserIDModalVisible] = useState(false);
+  const [createRoomCisible, setCreateRoomCisible] = useState(false);
   const [playerCount, setPlayerCount] = useState(2);
-  const showModal = () => setVisible(true);
+  const showModal = () => setCreateRoomCisible(true);
+
+  useEffect(() => {
+    const storageUserID = getLocalStorageUserID()
+    if (storageUserID && validateUserName(storageUserID)) {
+      setUserID(storageUserID);
+    } else {
+      setIsUserIDModalVisible(true);
+    }
+  }, []);
 
   const { run: handleCreateRoom } = useRequest(
     async (MaxPlayers: number) => {
@@ -30,7 +40,7 @@ export default function GameMenu() {
       },
       onSuccess: () => {
         handleGetRoomList();
-        setVisible(false);
+        setCreateRoomCisible(false);
       }
     },
   );
@@ -68,14 +78,13 @@ export default function GameMenu() {
       },
     },
   );
-  const handleOk = async () => {
-    if (Number(roomList?.length ?? 0) > 25) {
+  const { run: debouncedHandleOk } = useDebounceFn(() => {
+    if ((roomList?.length ?? 0) > 25) {
       message.error('房间数量已达上限');
       return;
     }
     handleCreateRoom(playerCount);
-  };
-
+  }, { wait: 1000 });
   useEffect(() => {
     const timer = setInterval(handleGetRoomList, 10000);
 
@@ -93,7 +102,18 @@ export default function GameMenu() {
 
   return (
     <div className={styles.gameMenu}>
-      <Title level={2} className={styles.titleTop}>并购（ID: {userID}）</Title>
+      <Title level={2} className={styles.titleTop}>
+        并购（ID: {getLocalStorageUserName(userID)}）
+        <Button
+          type="primary"
+          onClick={() => {
+            setIsUserIDModalVisible(true);
+          }}
+          style={{ marginLeft: 16, fontSize: 14 }}
+        >
+          修改用户名
+        </Button>
+      </Title>
 
       <div className={styles.roomGrid}>
         {roomList?.map(room => (
@@ -106,8 +126,6 @@ export default function GameMenu() {
             userID={userID}
           />
         ))}
-
-        {/* 创建房间卡片 */}
         <Card
           hoverable
           className={styles.createRoomCard}
@@ -140,11 +158,11 @@ export default function GameMenu() {
       {/* 弹窗 */}
       <Modal
         title="选择房间人数"
-        open={visible}
-        onOk={handleOk}
+        open={createRoomCisible}
+        onOk={debouncedHandleOk}
         onCancel={() => {
           setPlayerCount(2);
-          setVisible(false)
+          setCreateRoomCisible(false)
         }}
         okText="创建"
         cancelText="取消"
@@ -160,7 +178,11 @@ export default function GameMenu() {
           ))}
         </Radio.Group>
       </Modal>
+      <EditUserID
+        visible={isUserIDModalVisible}
+        setVisible={setIsUserIDModalVisible}
+        setUserID={setUserID}
+      />
     </div>
-
   );
 }

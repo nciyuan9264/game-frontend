@@ -3,6 +3,7 @@ import { Modal, Button, Row, Col, message } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import CustomInputNumber from '../CustomInputer';
+import { useDebounceFn } from 'ahooks';
 interface CompanyStockActionModalProps {
   visible: boolean;
   data?: WsRoomSyncData;
@@ -13,7 +14,6 @@ interface CompanyStockActionModalProps {
   }>) => void;
   onCancel: () => void;
 }
-
 const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
   visible,
   data,
@@ -32,10 +32,10 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       setActions(initial);
     }
   }, [visible, data?.tempData]);
-
   const mainCompany = data?.tempData?.merge_main_company_temp;
   if (!mainCompany) return null;
-  const handleSellChange = (company: CompanyKey, value: number | null) => {
+
+  const { run: debouncedHandleSellChange } = useDebounceFn((company: CompanyKey, value: number | null) => {
     const amount = value ?? 0;
     const maxAvailable = data?.playerData.stocks[company] || 0;
     const currentExchange = actions[company]?.exchangeAmount || 0;
@@ -52,9 +52,9 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
         sellAmount: amount,
       },
     }));
-  };
+  }, { wait: 1000 });
 
-  const handleExchangeChange = (company: CompanyKey, value: number | null) => {
+  const { run: debouncedHandleExchangeChange } = useDebounceFn((company: CompanyKey, value: number | null) => {
     const amount = value ?? 0;
     const maxAvailable = data?.playerData.stocks[company] || 0;
     const currentSell = actions[company]?.sellAmount || 0;
@@ -83,17 +83,16 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
         exchangeAmount: amount,
       },
     }));
-  };
+  }, { wait: 1000 });
 
-  const handleSubmit = () => {
+  const { run: debouncedHandleSubmit } = useDebounceFn(() => {
     const result = Object.entries(actions).map(([company, { sellAmount, exchangeAmount }]) => ({
       company,
       sellAmount,
       exchangeAmount,
     }));
     onOk(result);
-  };
-  // const mainStockPrice = data?.roomData.companyInfo[mainCompany]?.stockPrice || 0;
+  }, { wait: 1000 });
 
   return (
     <Modal
@@ -102,7 +101,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       onCancel={onCancel}
       closable={false}
       footer={
-        <Button type="primary" onClick={handleSubmit}>
+        <Button type="primary" onClick={debouncedHandleSubmit}>
           确定
         </Button>
       }
@@ -171,7 +170,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
                   min={0}
                   max={maxSell}
                   value={currentAction.sellAmount}
-                  onChange={(value) => handleSellChange(company as CompanyKey, value)}
+                  onChange={(value) => debouncedHandleSellChange(company as CompanyKey, value)}
                 />
                 {/* <span className={styles.totalPrice}>总价: ${currentAction.sellAmount * stockPrice}</span> */}
               </Col>
@@ -181,7 +180,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
                   max={maxExchange}
                   step={2}
                   value={currentAction.exchangeAmount}
-                  onChange={(value) => handleExchangeChange(company as CompanyKey, value)}
+                  onChange={(value) => debouncedHandleExchangeChange(company as CompanyKey, value)}
                 />
               </Col>
               <Col span={4}><strong>{playerStock}</strong></Col>

@@ -2,7 +2,7 @@ import { useEffect, useState } from "react";
 import { Modal, Card, Radio, Row, Col, Button } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
 import { CompanyColor } from "@/const/color";
-
+import { useDebounceFn } from "ahooks";
 
 const HotelSelectorModal = ({ visible, company, onSelect }:
   {
@@ -17,7 +17,8 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
   useEffect(() => {
     setSelected(undefined);
   }, [visible])
-  const handleOk = () => {
+
+  const { run: debouncedHandleOk } = useDebounceFn(() => {
     if (selected) {
       onSelect(selected);
     } else {
@@ -25,7 +26,8 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
         title: "请选择要创建的公司",
       });
     }
-  };
+  }, { wait: 1000 });
+
 
   return (
     <Modal
@@ -66,7 +68,7 @@ const HotelSelectorModal = ({ visible, company, onSelect }:
         <Button
           type="primary"
           disabled={!selected}
-          onClick={handleOk}
+          onClick={debouncedHandleOk}
         >
           确认创建
         </Button>

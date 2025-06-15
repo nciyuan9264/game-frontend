@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Modal, Button, Radio } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import { CompanyColor } from '@/const/color';
+import { useDebounceFn } from 'ahooks';
 
 interface CompanyStockActionModalProps {
   visible: boolean;
@@ -14,11 +15,10 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
   visible,
   data,
   onOk,
-  // onCancel,
 }) => {
   const [mainCompany, setMainCompany] = useState<CompanyKey | undefined>();
 
-  const handleSubmit = () => {
+  const { run: debouncedHandleSubmit } = useDebounceFn(() => {
     if (!mainCompany) {
       Modal.error({
         title: '请选择要留下的公司',
@@ -26,19 +26,15 @@ const MergeSelection: React.FC<CompanyStockActionModalProps> = ({
       return;
     }
     onOk(mainCompany);
-  };
-
+  }, { wait: 1000 });
   const companyOptions = data?.tempData.merge_selection_temp.mainCompany || [];
-
   return (
     <Modal
       title="请选择要留下的公司"
       open={visible}
       closable={false}
       footer={
-        <Button type="primary" onClick={handleSubmit}>
-          确定
-        </Button>
+        <Button type="primary" onClick={debouncedHandleSubmit}>确定</Button>
       }
       centered
       maskClosable={false}
