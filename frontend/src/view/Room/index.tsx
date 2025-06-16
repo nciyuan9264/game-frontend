@@ -373,6 +373,8 @@ export default function Room() {
         data={data}
         visible={gameEndModalVisible}
         setGameEndModalVisible={setGameEndModalVisible}
+        sendMessage={sendMessage}
+        userID={userID}
       />
       <CompanyStockInfoModal
         visible={companyInfoVisible}

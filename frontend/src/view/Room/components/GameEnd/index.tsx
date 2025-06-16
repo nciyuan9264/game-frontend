@@ -1,27 +1,51 @@
 import React from 'react';
-import { Modal } from 'antd';
+import { Button, Modal } from 'antd';
 import { WsRoomSyncData } from '@/types/room';
-
+import { useSearchParams } from 'react-router-dom';
 interface GameEndProps {
   visible: boolean;
   setGameEndModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
   data?: WsRoomSyncData;
+  sendMessage: (message: string) => void;
+  userID: string;
 }
 
 const GameEnd: React.FC<GameEndProps> = ({
   visible,
   setGameEndModalVisible,
   data,
+  sendMessage,
+  userID
 }) => {
-
-
+  const [searchParams] = useSearchParams();
+  const roomUserID = searchParams.get('roomUserID');
   return (
     <Modal
       title="🏁 游戏结算"
       open={visible}
       closable={false}
       footer={
-        null
+        <>
+          {roomUserID === userID && <Button
+            type="primary"
+            onClick={() => {
+              setGameEndModalVisible(false);
+              Modal.confirm({
+                title: '游戏即将重启',
+                content: '游戏即将重启，是否确认？',
+                okText: '确认',
+                cancelText: '取消',
+                onOk: () => {
+                  sendMessage(JSON.stringify({
+                    type: 'restart_game',
+                  }));
+                },
+              })
+            }}
+          >
+            再来一局
+          </Button>}
+        </>
       }
       onCancel={() => setGameEndModalVisible(false)}
       centered
@@ -60,6 +84,7 @@ const GameEnd: React.FC<GameEndProps> = ({
             })
         }
       </div>
+
     </Modal>
 
   );

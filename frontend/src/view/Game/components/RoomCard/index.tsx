@@ -37,7 +37,12 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
           <span className={styles.delete}>🗑️</span>
         </Popconfirm>
       </div>
-      <span className={styles.title} style={{color: userID === data.userID ? 'red' : 'black'}}>房主ID: {getLocalStorageUserName(data.userID)}</span>
+      <span
+        className={styles.title}
+        style={{ color: userID === data.userID ? 'red' : 'black' }}
+      >
+        房主ID: {getLocalStorageUserName(data.userID)}
+      </span>
       <div className={styles.playerList}>
         玩家列表
         {
@@ -53,15 +58,15 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
       <div className={styles.body}>
         最多玩家: {data.maxPlayers}
         <button onClick={() => {
-          if(data.roomPlayer.length >= data.maxPlayers && !data.roomPlayer.some(play => play.playerID === userId)){
+          if (data.roomPlayer.length >= data.maxPlayers && !data.roomPlayer.some(play => play.playerID === userId)) {
             message.error('房间已满');
             return;
           }
-          if(!validateUserName(userID)){
+          if (!validateUserName(userID)) {
             message.error('请先设置用户名');
             return;
           }
-          navigate(`/acquire/room/${data.roomID}`)
+          navigate(`/acquire/room/${data.roomID}?roomUserID=${data.userID}`)
         }} className={styles.enterBtn}>
           进入房间
         </button>
