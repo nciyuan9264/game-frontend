@@ -65,9 +65,9 @@ export default function GameMenu() {
   const { data: roomList, run: handleGetRoomList } = useRequest(
     async () => {
       const res = await getRoomList();
-      const sortList = res.data.rooms.sort((a: any, b: any) => {
+      const sortList = res.data.rooms?.sort((a: any, b: any) => {
         return a.roomID - b.roomID;
-      });
+      }) ?? [];
       return sortList;
     },
     {

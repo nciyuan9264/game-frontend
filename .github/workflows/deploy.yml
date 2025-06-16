@@ -8,7 +8,11 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境运行
-
+    strategy:
+      fail-fast: false
+      max-parallel: 1
+      matrix:
+        attempt: [1, 2, 3] # 用来重试 3 次
     steps:
       - name: Checkout code
         uses: actions/checkout@v2  # 检出代码
