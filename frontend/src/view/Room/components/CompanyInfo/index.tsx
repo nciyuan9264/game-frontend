@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
+import { CompanyTag } from '@/components/CompanyTag';
 
 interface CompanyInfoProps {
   setBuyStockModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -92,7 +93,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
                   className={styles.companyName}
                   style={{ backgroundColor: CompanyColor[company.name as CompanyKey] }}
                 >
-                  {company.name}
+                  <CompanyTag company={company.name as CompanyKey} />
                 </td>
                 <td>{renderValue(company.stockPrice, companyDelta.stockPrice)}</td>
                 <td>{renderValue(company.stockTotal, companyDelta.stockTotal)}</td>

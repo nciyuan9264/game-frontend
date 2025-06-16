@@ -1,7 +1,7 @@
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import { Modal, Card, Row, Col, Button, message } from 'antd';
 import { useState, useMemo, useEffect } from 'react';
-import CustomInputNumber from '../CustomInputer';
+import CustomInputNumber from '../../../../components/CustomInputer';
 import { CompanyColor } from '@/const/color';
 import { useThrottleFn } from 'ahooks';
 

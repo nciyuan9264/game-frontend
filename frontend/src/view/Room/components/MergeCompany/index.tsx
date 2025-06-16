@@ -2,10 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Row, Col, message } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
-import CustomInputNumber from '../CustomInputer';
+import CustomInputNumber from '../../../../components/CustomInputer';
 import { useThrottleFn } from 'ahooks';
 import { getLocalStorageUserName } from '@/util/user';
 import { CompanyColor } from '@/const/color';
+import { CompanyTag } from '@/components/CompanyTag';
 interface CompanyStockActionModalProps {
   visible: boolean;
   data?: WsRoomSyncData;
@@ -113,15 +114,15 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
     >
       {/* ✅ 破产清算板块 */}
       <div className={styles.settlementContainer}>
-        <div className={styles.sectionTitle}>破产清算：被<span style={{color: CompanyColor[mainCompany]}}>{mainCompany}</span>合并的公司：</div>
+        <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey} />合并的公司：</div>
         <div className={styles.companyList}>
           {
             Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
               const companyName = company as CompanyKey;
               const dividends = value.dividends;
               return (
-                <div key={company} className={styles.companyCard} style={{borderLeft: `4px solid ${CompanyColor[companyName]}`}}>
-                  <div className={styles.companyName} style={{color: CompanyColor[companyName]}}>{companyName}</div>
+                <div key={company} className={styles.companyCard} style={{ borderLeft: `4px solid ${CompanyColor[companyName]}` }}>
+                  <CompanyTag company={companyName as CompanyKey} />
                   {
                     Object.entries(dividends)
                       .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
@@ -144,7 +145,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       <Row className={styles.tableHeader}>
         <Col span={8}>被合并公司</Col>
         <Col span={6}>卖出数量</Col>
-        <Col span={6}>兑换数量 (2:1兑换 <span style={{color: CompanyColor[mainCompany]}}>{mainCompany}</span>)</Col>
+        <Col span={6}>兑换数量 (2:1兑换 <CompanyTag company={mainCompany as CompanyKey} />)</Col>
         <Col span={4}>持有数量</Col>
       </Row>
 
@@ -166,7 +167,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
           return (
             <Row key={company} className={styles.stockRow} gutter={16}>
               <Col span={8}>
-                <strong style={{color: CompanyColor[company]}}>{company}</strong>（单价: ${stockPrice}）
+                <CompanyTag company={company as CompanyKey} />（单价: ${stockPrice}）
               </Col>
               <Col span={6}>
                 <CustomInputNumber
