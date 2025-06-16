@@ -167,7 +167,7 @@
         }
       }
 
-      .message{
+      .message {
         position: fixed;
         bottom: 10px;
         right: 10px;
@@ -179,66 +179,92 @@
   }
 }
 
-  // ✅ iPad 横屏优化样式
-  @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-    .roomContainer {
-      .gameBoard {
-        display: flex;
-        flex-direction: row;
+// ✅ iPad 横屏优化样式
+@media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+  .roomContainer {
+
+    .topBar {
+      padding: 8px 12px;
+      font-size: 12px;
+
+      .left {
+        gap: 6px;
+      }
+
+      .middle {
+        font-size: 14px;
+        padding: 8px 12px;
+      }
+
+      .right {
         gap: 10px;
       }
 
-      .assets {
-        flex-direction: column;
-        gap: 12px;
+      .yourTurn {
+        font-size: 18px;
+      }
+    }
 
-        .commonAssets {
-          display: none;
-        }
+    .gameBoard {
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+    }
+
+    .assets {
+      flex-direction: column;
+      gap: 12px;
+
+      .commonAssets {
+        display: none;
       }
 
-      .playerAssets {
-        width: 100%;
-        padding: 12px 16px;
+      .bottomRight {
+        .playerAssets {
+          width: 100%;
+          height: 100%;
+          padding: 12px 16px;
 
-        .playerInfo {
-          list-style: none;
-          padding: 0;
-          font-size: 14px;
-          line-height: 1.6;
+          .playerInfo {
+            list-style: none;
+            padding: 0;
+            font-size: 14px;
+            line-height: 1.6;
 
-          li {
-            margin-bottom: 8px;
-          }
-
-          .stockList {
-            display: flex;
-            margin-top: 4px;
-            padding-left: 1em;
-          }
-
-          .tileList {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            margin-top: 4px;
-
-            .tile {
-              width: 40px;
-              height: 40px;
-              padding: 4px 8px;
-              border: 1px solid #ccc;
-              border-radius: 4px;
-              background-color: #f8f8f8;
-              font-weight: bold;
-              font-family: monospace;
+            li {
+              margin-bottom: 8px;
             }
 
-            &:hover {
-              cursor: pointer;
+            .stockList {
+              display: flex;
+              margin-top: 4px;
+              padding-left: 1em;
+            }
+
+            .tileList {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 6px;
+              margin-top: 4px;
+
+              .tile {
+                width: 40px;
+                height: 40px;
+                padding: 4px 8px;
+                border: 1px solid #ccc;
+                border-radius: 4px;
+                background-color: #f8f8f8;
+                font-weight: bold;
+                font-family: monospace;
+              }
+
+              &:hover {
+                cursor: pointer;
+              }
             }
           }
         }
       }
     }
   }
+}

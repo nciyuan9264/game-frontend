@@ -37,11 +37,15 @@
   .roomGrid {
     display: flex;
     flex-wrap: wrap;
-    gap: 24px; // 横向 & 纵向间距
+    height: 70vh;
+    gap: 50px; // 横向 & 纵向间距
     justify-content: flex-start;
+    overflow-y: scroll;
 
     .createRoomCard {
       width: 200px;
+      min-height: 195px;
+      align-self: flex-start;
       display: flex;
       align-items: center;
       justify-content: center;

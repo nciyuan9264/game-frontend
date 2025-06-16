@@ -48,7 +48,7 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
-  const audioTypes = ['quickily']; // 你可以继续扩展
+  const audioTypes = ['quickily', 'your-turn']; // 你可以继续扩展
 
 
   const waitingModalComtent = useMemo(() => {
@@ -174,10 +174,14 @@ export default function Room() {
 
   useEffect(() => {
     if (currentPlayer === userID) {
-      const audio = new Audio("/your-turn.mp3");
-      audio.play().catch((err) => {
-        console.warn("音效播放失败（可能是用户未交互）", err);
-      });
+      const audio = audioMapRef.current['your-turn'];
+      if (audio) {
+        audio.currentTime = 0; 
+        audio.volume = 1;
+        audio.play().catch((err: any) => {
+          console.warn('音效播放失败（可能是用户未交互）', err);
+        });
+      }
     }
   }, [currentPlayer, userID]);
 

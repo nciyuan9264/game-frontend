@@ -67,7 +67,7 @@ export default function GameMenu() {
     async () => {
       const res = await getRoomList();
       const sortList = res.data.rooms?.sort((a: any, b: any) => {
-        return a.roomID - b.roomID;
+        return a.roomID.localeCompare(b.roomID);
       }) ?? [];
       setOnlinePlayer(res.data.onlinePlayer);
       return sortList;
