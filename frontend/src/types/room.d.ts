@@ -31,6 +31,7 @@ interface DeleteRoomReponse{
 
 interface GetRoomListReponse {
   rooms: ListRoomInfo[];
+  onlinePlayer: number;
 }
 
 interface PlayerData {

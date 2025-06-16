@@ -13,6 +13,7 @@ export default function GameMenu() {
   const [isUserIDModalVisible, setIsUserIDModalVisible] = useState(false);
   const [createRoomCisible, setCreateRoomCisible] = useState(false);
   const [playerCount, setPlayerCount] = useState(2);
+  const [onlinePlayer, setOnlinePlayer] = useState<number>(0)
   const showModal = () => setCreateRoomCisible(true);
 
   useEffect(() => {
@@ -68,6 +69,7 @@ export default function GameMenu() {
       const sortList = res.data.rooms?.sort((a: any, b: any) => {
         return a.roomID - b.roomID;
       }) ?? [];
+      setOnlinePlayer(res.data.onlinePlayer);
       return sortList;
     },
     {
@@ -125,14 +127,17 @@ export default function GameMenu() {
       </div>
       <div className={styles.footer}>
         <div className={styles.left}>
-          <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
-          <Button
-            type="primary"
-            onClick={() => setIsUserIDModalVisible(true)}
-            className={styles.button}
-          >
-            修改用户名
-          </Button>
+          <div>
+            <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
+            <Button
+              type="primary"
+              onClick={() => setIsUserIDModalVisible(true)}
+              className={styles.button}
+            >
+              修改用户名
+            </Button>
+          </div>
+          <span className={styles.userId}>当前在线人数: {onlinePlayer}</span>
         </div>
         <div className={styles.right}>
           <Button
