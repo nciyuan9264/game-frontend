@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useParams } from 'react-router-dom';
@@ -47,6 +47,9 @@ export default function Room() {
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
+  const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
+  const audioTypes = ['quickily']; // 你可以继续扩展
+
 
   const waitingModalComtent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
@@ -61,18 +64,34 @@ export default function Room() {
     return '';
   }, [data]);
 
+
+  useEffect(() => {
+    const map: Record<string, HTMLAudioElement> = {};
+    audioTypes.forEach((type) => {
+      const audio = new Audio(`/${type}.mp3`);
+      audio.load();
+      map[type] = audio;
+    });
+    audioMapRef.current = map;
+  }, []);
   const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
       return;
     }
-    if(data.type === 'audio'){
+    if (data.type === 'audio') {
       const audioType = data.message;
-      const audio = new Audio(`/${audioType}.mp3`);
-      audio.play().catch((err) => {
-        console.warn("音效播放失败（可能是用户未交互）", err);
-      });
+      if(audioType){
+        const audio = audioMapRef.current[audioType];
+        if (audio) {
+          audio.currentTime = 0; // 重置到开头
+          audio.play().catch((err: any) => {
+            console.warn('音效播放失败（可能是用户未交互）', err);
+          });
+        }
+      }
+      return;
     }
     if (data.type === 'sync') {
       console.log('收到数据：', data);
