@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Radio, message, Typography, Card, Button } from 'antd';
+import { Modal, Radio, message, Card, Button } from 'antd';
 import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
 import RoomCard from '@/view/Game/components/RoomCard';
@@ -8,7 +8,6 @@ import FullscreenButton from '@/component/FullScreen';
 import EditUserID from './components/EditUserID';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
 
-const { Title } = Typography;
 export default function GameMenu() {
   const [userID, setUserID] = useState('');
   const [isUserIDModalVisible, setIsUserIDModalVisible] = useState(false);
@@ -87,33 +86,32 @@ export default function GameMenu() {
   }, { wait: 1000 });
   useEffect(() => {
     const timer = setInterval(handleGetRoomList, 10000);
-
-    // 挂载全局函数（可选判断是否重复绑定）
     if (!(window as any).deleteRoom) {
       (window as any).deleteRoom = handleDeleteRoom;
     }
-
     return () => {
       clearInterval(timer);
-      // 可选：清除全局方法
       delete (window as any).deleteRoom;
     };
   }, []);
 
   return (
     <div className={styles.gameMenu}>
-      <Title level={2} className={styles.titleTop}>
-        并购（ID: {getLocalStorageUserName(userID)}）
-        <Button
-          type="primary"
-          onClick={() => {
-            setIsUserIDModalVisible(true);
-          }}
-          style={{ marginLeft: 16, fontSize: 14 }}
-        >
-          修改用户名
-        </Button>
-      </Title>
+      <div className={styles.titleWrapper}>
+        <div className={styles.titleCenter}>
+          <h1>Acquire（并购）</h1>
+        </div>
+        <div className={styles.titleRight}>
+          <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
+          <Button
+            type="primary"
+            onClick={() => setIsUserIDModalVisible(true)}
+            size="small"
+          >
+            修改用户名
+          </Button>
+        </div>
+      </div>
 
       <div className={styles.roomGrid}>
         {roomList?.map(room => (
@@ -155,7 +153,6 @@ export default function GameMenu() {
         }}>
         刷新
       </button>
-      {/* 弹窗 */}
       <Modal
         title="选择房间人数"
         open={createRoomCisible}

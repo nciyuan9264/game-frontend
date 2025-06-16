@@ -13,9 +13,7 @@ export const RenderRoutes = () => {
                 key={route.path}
                 path={route.path}
                 element={
-                    // <AuthRoute auth={route.auth}>
                     route.element
-                    // </AuthRoute>
                 }
             >
                 {route.children && renderRoutes(route.children)}

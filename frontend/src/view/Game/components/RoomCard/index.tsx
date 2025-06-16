@@ -61,7 +61,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
             message.error('请先设置用户名');
             return;
           }
-          navigate(`/room/${data.roomID}`)
+          navigate(`/acquire/room/${data.roomID}`)
         }} className={styles.enterBtn}>
           进入房间
         </button>

@@ -43,7 +43,7 @@ const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
       <Radio.Group onChange={(e) => setSelected(e.target.value)} value={selected}>
         <Row gutter={[16, 16]}>
           {Object.entries(company).map(([key, value]) => {
-            const isDisabled = value.tiles !== "0";
+            const isDisabled = value.tiles !== 0;
             return (
               <Col span={12} key={key}>
                 <Card

@@ -12,19 +12,19 @@ export interface AppRoute {
 
 export const routes: AppRoute[] = [
   {
-    path: "/game",
+    path: "/game/acquire",
     element: <Game />
   },
   {
-    path: "/room/:roomID",
+    path: "/acquire/room/:roomID",
     element: <Room />
   },
   {
     path: "/",
-    element: <Navigate to="/game" replace />
+    element: <Navigate to="/game/acquire" replace />
   },
   {
     path: "*",
-    element: <Navigate to="/game" replace />
+    element: <Navigate to="/game/acquire" replace />
   }
 ];

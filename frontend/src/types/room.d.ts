@@ -47,7 +47,7 @@ interface CompanyInfoItem {
   name: string;
   stockPrice: number;
   stockTotal: number;
-  tiles: string;
+  tiles: number;
   valuation: string;
 }
 

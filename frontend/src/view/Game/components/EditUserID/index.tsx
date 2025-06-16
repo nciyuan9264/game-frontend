@@ -20,7 +20,7 @@ const EditUserID = ({
   return (
     <Modal
       open={visible}
-      title="请输入用户名"
+      title="请输入用户名（请不要频繁修改用户名，用户名与房间是绑定的）"
       closable={true}
       maskClosable={false}
       okText="确认"
