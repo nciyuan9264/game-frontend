@@ -1,7 +1,7 @@
 import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
-import { message, Popconfirm, Tag } from 'antd';
+import { Button, message, Popconfirm, Tag } from 'antd';
 import { ListRoomInfo } from '@/types/room';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
 
@@ -44,11 +44,11 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
         房主ID: {getLocalStorageUserName(data.userID)}
       </span>
       <div className={styles.playerList}>
-        玩家列表
+        玩家列表:
         {
-          data.roomPlayer.map((player) => {
+          data.roomPlayer.length === 0 ? <span>暂无玩家</span> : data.roomPlayer.map((player) => {
             return (
-              <span key={player.playerID} className={styles.player}>
+              <span key={player.playerID}>
                 {getLocalStorageUserName(player.playerID)} <Tag>{player.online ? '在线' : '掉线'}</Tag>
               </span>
             );
@@ -57,19 +57,22 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
       </div>
       <div className={styles.body}>
         最多玩家: {data.maxPlayers}
-        <button onClick={() => {
-          if (data.roomPlayer.length >= data.maxPlayers && !data.roomPlayer.some(play => play.playerID === userId)) {
-            message.error('房间已满');
-            return;
-          }
-          if (!validateUserName(userID)) {
-            message.error('请先设置用户名');
-            return;
-          }
-          navigate(`/acquire/room/${data.roomID}?roomUserID=${data.userID}`)
-        }} className={styles.enterBtn}>
+        <Button
+          type="primary"
+          onClick={() => {
+            if (data.roomPlayer.length >= data.maxPlayers && !data.roomPlayer.some(play => play.playerID === userId)) {
+              message.error('房间已满');
+              return;
+            }
+            if (!validateUserName(userID)) {
+              message.error('请先设置用户名');
+              return;
+            }
+            navigate(`/acquire/room/${data.roomID}?roomUserID=${data.userID}`)
+          }}
+          className={styles.enterBtn}>
           进入房间
-        </button>
+        </Button>
       </div>
     </div>
   );

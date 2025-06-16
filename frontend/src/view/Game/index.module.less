@@ -1,70 +1,107 @@
 .gameMenu {
+  position: relative;
+  width: 100%;
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   padding: 40px;
   min-height: 100vh;
 
-  .titleWrapper {
-    width: 100%;
+  .titleCenter {
     position: relative;
+    width: max-content;
+    max-width: 90%;
+    color: #ffffff; // 使用白色字体更清晰
     display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    margin-bottom: 24px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 32px;
+    font-weight: bold;
+    text-shadow: 2px 2px 6px rgba(0, 0, 0, 0.4); // 增加文字阴影突出效果
+    letter-spacing: 1px;
+    background: linear-gradient(90deg, #ffffff, #ffd700);
+    background-clip: text;
+    padding-bottom: 12px;
+    animation: fadeInDown 1.5s ease-out;
+  }
 
-    .titleCenter {
-      color: rgb(0, 0, 0)250px;
-      display: block;
-      position: absolute;
-      left: 50%;
-      transform: translateX(-50%);
+  @keyframes fadeInDown {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -20px);
     }
+    to {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
 
-    .titleRight {
+  .roomGrid {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 24px; // 横向 & 纵向间距
+    justify-content: flex-start;
+
+    .createRoomCard {
+      width: 200px;
       display: flex;
       align-items: center;
-      font-size: 14px;
+      justify-content: center;
+      cursor: pointer;
+      border: 2px dashed #1890ff;
+      color: #1890ff;
+      text-align: center;
+      transition: all 0.3s;
+
+      &:hover {
+        background: #e6f7ff;
+        border-color: #40a9ff;
+      }
+
+      .createRoomInner {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+    }
+  }
+
+  .footer {
+    position: absolute;
+    padding: 40px;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+
+
+    .left {
+      display: flex;
+      align-items: center;
+      font-size: 16px;
       color: #666;
 
       .userId {
         margin-right: 12px;
         color: aliceblue;
       }
+    }
 
-      .ant-btn {
-        font-size: 13px;
-        height: 28px;
-        padding: 0 12px;
-      }
+    .right{
+      display: flex;
+      align-items: center;
+      gap: 10px;
     }
   }
 }
 
-.roomGrid {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 24px; // 横向 & 纵向间距
-  justify-content: flex-start;
-}
-
-.createRoomCard {
-  width: 200px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  border: 2px dashed #1890ff;
-  color: #1890ff;
-  text-align: center;
-  transition: all 0.3s;
-
-  &:hover {
-    background: #e6f7ff;
-    border-color: #40a9ff;
-  }
-}
-
-.createRoomInner {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.button {
+  padding: 10px 14px;
+  font-size: 14px;
+  border-radius: 8px;
+  background: #1890ff;
+  color: #fff;
+  border: none;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  z-index: 9999;
 }

@@ -4,9 +4,9 @@ import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
 import RoomCard from '@/view/Game/components/RoomCard';
 import { useThrottleFn, useRequest } from 'ahooks';
-import FullscreenButton from '@/component/FullScreen';
 import EditUserID from './components/EditUserID';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
+import { handleFullscreen } from '@/util/window';
 
 export default function GameMenu() {
   const [userID, setUserID] = useState('');
@@ -77,6 +77,7 @@ export default function GameMenu() {
       },
     },
   );
+
   const { run: debouncedHandleOk } = useThrottleFn(() => {
     if ((roomList?.length ?? 0) > 25) {
       message.error('房间数量已达上限');
@@ -84,6 +85,7 @@ export default function GameMenu() {
     }
     handleCreateRoom(playerCount);
   }, { wait: 1000 });
+
   useEffect(() => {
     const timer = setInterval(handleGetRoomList, 10000);
     if (!(window as any).deleteRoom) {
@@ -97,22 +99,9 @@ export default function GameMenu() {
 
   return (
     <div className={styles.gameMenu}>
-      <div className={styles.titleWrapper}>
-        <div className={styles.titleCenter}>
-          <h1>Acquire（并购）</h1>
-        </div>
-        <div className={styles.titleRight}>
-          <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
-          <Button
-            type="primary"
-            onClick={() => setIsUserIDModalVisible(true)}
-            size="small"
-          >
-            修改用户名
-          </Button>
-        </div>
+      <div className={styles.titleCenter}>
+        <h1>Acquire</h1>
       </div>
-
       <div className={styles.roomGrid}>
         {roomList?.map(room => (
           <RoomCard
@@ -134,25 +123,37 @@ export default function GameMenu() {
           </div>
         </Card>
       </div>
-      <FullscreenButton />
-      <button onClick={() => {
-        handleGetRoomList();
-      }}
-        style={{
-          position: 'fixed',
-          bottom: '20px',
-          right: '100px',
-          padding: '10px 14px',
-          fontSize: '14px',
-          borderRadius: '8px',
-          backgroundColor: '#1890ff',
-          color: '#fff',
-          border: 'none',
-          boxShadow: '0 2px 8px rgba(0, 0, 0, 0.15)',
-          zIndex: 9999
-        }}>
-        刷新
-      </button>
+      <div className={styles.footer}>
+        <div className={styles.left}>
+          <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
+          <Button
+            type="primary"
+            onClick={() => setIsUserIDModalVisible(true)}
+            className={styles.button}
+          >
+            修改用户名
+          </Button>
+        </div>
+        <div className={styles.right}>
+          <Button
+            className={styles.button}
+            onClick={() => {
+              handleGetRoomList();
+            }}
+          >
+            刷新
+          </Button>
+          <Button
+            className={styles.button}
+            onClick={() => {
+              handleFullscreen();
+            }}
+          >
+            全屏
+          </Button>
+        </div>
+      </div>
+
       <Modal
         title="选择房间人数"
         open={createRoomCisible}

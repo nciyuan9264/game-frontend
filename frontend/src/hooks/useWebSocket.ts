@@ -3,8 +3,6 @@ import { useEffect, useRef } from 'react';
 
 export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
-  // const navigate = useNavigate();
-  // const location = useLocation();
   function sendWhenReady(data: any) {
     const message = JSON.stringify(data);
     const trySend = () => {
@@ -16,7 +14,7 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
     };
     trySend();
   }
-  function close() {
+  const close = () => {
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
       wsRef.current.close(1000, 'Component unmounted');
       wsRef.current = null;
@@ -50,7 +48,7 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
         }, 1000);
       }
     };
-    window.addEventListener('popstate', () => close());
+    window.addEventListener('popstate', close);
 
     return () => {
       clearTimeout(reconnectTimeout);
@@ -58,7 +56,6 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
         ws.close(1000, 'Component unmounted');
         wsRef.current = null;
       }
-      window.removeEventListener('popstate', () => close());
     };
   }, [url]);
 
