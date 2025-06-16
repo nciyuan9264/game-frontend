@@ -43,7 +43,9 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
           tiles: currCompany.tiles - prevCompany.tiles,
         };
       }
-      setDeltas(delta);
+      if (!Object.entries(delta).map(([_, v]) => v).every(v => v.stockPrice === 0 && v.stockTotal === 0 && v.tiles === 0)) {
+        setDeltas(delta);
+      }
     }
 
     prevDataRef.current = data;

@@ -48,6 +48,7 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
         }, 1000);
       }
     };
+    //deepscan-disable-next-line
     window.addEventListener('popstate', close);
 
     return () => {

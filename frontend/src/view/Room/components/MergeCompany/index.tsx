@@ -95,6 +95,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
     }));
     onOk(result);
   }, { wait: 1000 });
+
   if (!mainCompany) return null;
   return (
     <Modal
@@ -114,7 +115,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
     >
       {/* ✅ 破产清算板块 */}
       <div className={styles.settlementContainer}>
-        <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey} />合并的公司：</div>
+        <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey}/>合并的公司：</div>
         <div className={styles.companyList}>
           {
             Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
@@ -144,9 +145,9 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       <div className={styles.sectionTitle} style={{ marginTop: 32 }}>股票处理</div>
       <Row className={styles.tableHeader}>
         <Col span={8}>被合并公司</Col>
-        <Col span={6}>卖出数量</Col>
-        <Col span={6}>兑换数量 (2:1兑换 <CompanyTag company={mainCompany as CompanyKey} />)</Col>
-        <Col span={4}>持有数量</Col>
+        <Col span={5}>卖出数量</Col>
+        <Col span={8}>兑换数量 (2:1兑换 <CompanyTag company={mainCompany as CompanyKey} />)</Col>
+        <Col span={3}>持有数量</Col>
       </Row>
 
       {/* ✅ 每家公司股票操作 */}
@@ -158,9 +159,9 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
           const stockPrice = data?.roomData.companyInfo[company]?.stockPrice || 0;
           const currentAction = actions[company] || { sellAmount: 0, exchangeAmount: 0 };
 
-          const maxSell = playerStock - currentAction.exchangeAmount;
+          const maxSell = playerStock - Number(currentAction.exchangeAmount ?? 0);
           const maxExchange = Math.min(
-            playerStock - currentAction.sellAmount,
+            playerStock - Number(currentAction.sellAmount ?? 0),
             (data?.roomData.companyInfo[mainCompany]?.stockTotal || 0) * 2
           );
 
@@ -169,30 +170,29 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
               <Col span={8}>
                 <CompanyTag company={company as CompanyKey} />（单价: ${stockPrice}）
               </Col>
-              <Col span={6}>
+              <Col span={5}>
                 <CustomInputNumber
                   min={0}
                   max={maxSell}
-                  value={currentAction.sellAmount}
+                  value={Number(currentAction.sellAmount ?? 0)}
                   onChange={(value) => debouncedHandleSellChange(company as CompanyKey, value)}
                 />
               </Col>
-              <Col span={6}>
+              <Col span={8}>
                 <CustomInputNumber
                   min={0}
                   max={maxExchange}
                   step={2}
-                  value={currentAction.exchangeAmount}
+                  value={Number(currentAction.exchangeAmount ?? 0)}
                   onChange={(value) => debouncedHandleExchangeChange(company as CompanyKey, value)}
                 />
               </Col>
-              <Col span={4}><strong>{playerStock}</strong></Col>
+              <Col span={3}><strong>{playerStock}</strong></Col>
             </Row>
           );
         })
       }
     </Modal>
-
   );
 };
 

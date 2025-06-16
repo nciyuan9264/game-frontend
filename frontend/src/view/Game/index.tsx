@@ -81,7 +81,7 @@ export default function GameMenu() {
   );
 
   const { run: debouncedHandleOk } = useThrottleFn(() => {
-    if ((roomList?.length ?? 0) > 25) {
+    if ((roomList?.length ?? 0) > 8) {
       message.error('房间数量已达上限');
       return;
     }

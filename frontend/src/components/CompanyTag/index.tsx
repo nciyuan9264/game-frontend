@@ -18,7 +18,7 @@ const companyIcons: Record<string, JSX.Element> = {
 export const CompanyTag = ({ company }: { company: keyof typeof CompanyColor }) => (
   <Tag
     color={CompanyColor[company]}
-    style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 13, borderRadius: 8, padding: '2px 8px' }}
+    style={{ display: 'inline-flex', alignItems: 'center', gap: 6, fontSize: 13, borderRadius: 8, padding: '2px 8px', margin: '0 8px' }}
   >
     {companyIcons[company]} {company}
   </Tag>

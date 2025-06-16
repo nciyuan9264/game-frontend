@@ -41,8 +41,8 @@ const MessageSender: React.FC<MessageSenderProps> = ({ onMessageSend }) => {
       content={content}
       trigger="click"
       placement="topRight"
-      visible={visible}
-      onVisibleChange={setVisible}
+      open={visible}
+      onOpenChange={setVisible}
     >
       <Button
         size='large'

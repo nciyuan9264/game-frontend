@@ -24,7 +24,8 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = ({ value, onChange, 
       <div className={styles.number}>{value}</div>
 
       <Button
-        onClick={() => onChange(Math.min(max, value + step))}
+        onClick={() => {
+          onChange(Math.min(max, value + step))}}
         disabled={value >= max || disabled}
         size="small"
       >+</Button>
