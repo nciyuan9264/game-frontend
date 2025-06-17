@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
-import { useParams } from 'react-router-dom';
+import { useParams, useSearchParams } from 'react-router-dom';
 import Board from './components/Board';
 import { Button, message, Modal, Tag } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
@@ -49,6 +49,8 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
+  const [searchParams] = useSearchParams();
+  const roomUserID = searchParams.get('roomUserID');
   const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
 
   const waitingModalComtent = useMemo(() => {
@@ -63,7 +65,6 @@ export default function Room() {
     }
     return '';
   }, [data]);
-
 
   useEffect(() => {
     const map: Record<string, HTMLAudioElement> = {};
@@ -154,7 +155,7 @@ export default function Room() {
       return Number(val.tiles ?? 0) < 11
     }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) >= 41
-    })
+    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END;
   }, [data]);
 
   const currentPlayer = useMemo(() => {
@@ -164,6 +165,9 @@ export default function Room() {
   const currentStep = useMemo(() => {
     if (!data?.roomData.roomInfo.roomStatus) {
       return '等待其他玩家进入';
+    }
+    if (data?.roomData.roomInfo.gameStatus === GameStatus.END) {
+      return '游戏结束';
     }
     if (currentPlayer === userID) {
       return GameStatusMap[data?.roomData.roomInfo.gameStatus];
@@ -271,6 +275,25 @@ export default function Room() {
             >
               结束清算
             </Button>
+            {userID === roomUserID && <Button
+              type="primary"
+              className={styles.buyStockBtn}
+              onClick={() => {
+                Modal.confirm({
+                  title: '确认操作',
+                  content: '你确定要结束游戏吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                  onOk: () => {
+                    sendMessage(JSON.stringify({
+                      type: 'game_end',
+                    }));
+                  },
+                });
+              }}
+            >
+              强制结束清算
+            </Button>}
           </div>
           <div className={styles.middle}>
             {data?.roomData.roomInfo.roomStatus ? (
