@@ -11,6 +11,14 @@ export const PRESET_MESSAGES = [
   {
     message: '快点啊，我等的花都谢了',
     audioType: 'quickily'
+  },
+  {
+    message: '阿姨，你快点啊阿姨',
+    audioType: 'quickily1'
+  },
+  {
+    message: '给阿姨倒一杯卡布奇诺',
+    audioType: 'quickily2'
   }
 ];
 

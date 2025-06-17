@@ -20,6 +20,7 @@ import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
 import CompanyInfo from './components/CompanyInfo';
 import { isTabletLandscape } from '@/util/window';
 import MessageSender from './components/MessageSender';
+import { playAudio } from '@/util/audio';
 export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
   const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
     return val.hoders.length > 0;
@@ -48,8 +49,7 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
-  const audioTypes = ['quickily', 'your-turn']; // 你可以继续扩展
-
+  const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
 
   const waitingModalComtent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
@@ -82,7 +82,7 @@ export default function Room() {
     }
     if (data.type === 'audio') {
       const audioType = data.message;
-      if(audioType){
+      if (audioType) {
         const audio = audioMapRef.current[audioType];
         if (audio) {
           audio.currentTime = 0; // 重置到开头
@@ -174,14 +174,7 @@ export default function Room() {
 
   useEffect(() => {
     if (currentPlayer === userID) {
-      const audio = audioMapRef.current['your-turn'];
-      if (audio) {
-        audio.currentTime = 0; 
-        audio.volume = 1;
-        audio.play().catch((err: any) => {
-          console.warn('音效播放失败（可能是用户未交互）', err);
-        });
-      }
+      playAudio(audioMapRef, 'your-turn');
     }
   }, [currentPlayer, userID]);
 
@@ -407,6 +400,7 @@ export default function Room() {
         visible={buyStockModalVisible}
         setBuyStockModalVisible={setBuyStockModalVisible}
         onSubmit={(modalData) => {
+          // playAudio(audioMapRef, 'buy-stock');
           sendMessage(JSON.stringify({
             type: 'buy_stock',
             payload: modalData,
@@ -446,10 +440,12 @@ export default function Room() {
         visible={createCompanyModalVisible}
         company={data?.roomData.companyInfo}
         onSelect={(company) => {
+          playAudio(audioMapRef, 'create-company');
           sendMessage(JSON.stringify({
             type: 'create_company',
             payload: company,
           }));
+          setCreateCompanyModalVisible(false);
         }}
         onCancel={() => {
           setCreateCompanyModalVisible(false);

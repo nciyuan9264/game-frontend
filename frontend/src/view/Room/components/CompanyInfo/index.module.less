@@ -81,6 +81,7 @@
 
     th,
     td {
+      width: 20%;
       border: 1px solid #ccc;
       padding: 8px 12px;
       text-align: center;
@@ -96,6 +97,13 @@
       background-color: #f5f5f5;
     }
 
+    .value{
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 4px;
+    }
+
     @keyframes flashAnimation {
       0% {
         background-color: rgba(255, 255, 0, 0.5);
@@ -108,13 +116,13 @@
 
 
     .increase {
+      font-size: 20px;
       color: #52c41a;
-      font-size: 12px;
     }
 
     .decrease {
+      font-size: 20px;
       color: #f5222d;
-      font-size: 12px;
     }
 
     .flash {
@@ -169,7 +177,7 @@
         border: 1px solid #ccc;
         padding: 8px 12px;
         text-align: center;
-        font-size: 16px;
+        font-size: 12px;
       }
 
       th {
@@ -180,7 +188,16 @@
       tbody tr:hover {
         background-color: #f5f5f5;
       }
+
+      .increase {
+        font-size: 12px;
+        color: #52c41a;
+      }
+  
+      .decrease {
+        font-size: 12px;
+        color: #f5222d;
+      }
     }
   }
-
 }

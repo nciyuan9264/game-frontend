@@ -134,7 +134,6 @@
           .stockList {
             display: flex;
             margin-top: 4px;
-            padding-left: 1em;
 
             li {
               list-style-type: none;
@@ -182,7 +181,6 @@
 // ✅ iPad 横屏优化样式
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   .roomContainer {
-
     .topBar {
       padding: 8px 12px;
       font-size: 12px;
@@ -233,12 +231,16 @@
 
             li {
               margin-bottom: 8px;
+              display: flex;
+              align-items: center;
+              height: 40px;
+              font-size: 16px;
             }
 
             .stockList {
               display: flex;
               margin-top: 4px;
-              padding-left: 1em;
+              padding-left: 0;
             }
 
             .tileList {
