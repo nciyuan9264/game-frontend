@@ -267,6 +267,7 @@ export default function Room() {
             <Button
               type="primary"
               className={styles.buyStockBtn}
+              style={{zIndex: 9999}}
               disabled={!isGameEnd}
               onClick={() => {
                 setGameEndModalVisible(true);
