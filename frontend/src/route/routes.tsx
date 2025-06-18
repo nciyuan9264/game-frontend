@@ -1,5 +1,5 @@
-import Game from "@/view/Game";
-import Room from "@/view/Room";
+import Game from "@/view/Acquire/GameBoard";
+import Room from "@/view/Acquire/Room";
 import React from "react";
 import { Navigate } from "react-router-dom";
 

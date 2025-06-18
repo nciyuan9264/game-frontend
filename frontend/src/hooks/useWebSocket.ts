@@ -1,5 +1,4 @@
 import { useEffect, useRef } from 'react';
-// import { useLocation, useNavigate } from 'react-router-dom';
 
 export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
@@ -19,7 +18,7 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
       wsRef.current.close(1000, 'Component unmounted');
       wsRef.current = null;
     }
-  }
+  };
   useEffect(() => {
     if (wsRef.current !== null) return;
     let ws = new WebSocket(url);

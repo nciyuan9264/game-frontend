@@ -1,5 +1,3 @@
-// utils/user.ts
-
 function generateUUIDFallback(): string {
   return 'xxxxxxxx'.replace(/[xy]/g, c => {
     const r = crypto.getRandomValues(new Uint8Array(1))[0] % 16 | 0;

@@ -6,10 +6,10 @@ interface Page<T> {
     records: T[];
 }
 
-export interface Result<T> {
+export interface Result<T = any> {
     status_code: Status;
     message: string;
-    data: T;
+    data?: T;
 }
 
 

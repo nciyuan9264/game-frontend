@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Modal, Button, Row, Col, message } from 'antd';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
-import CustomInputNumber from '../../../../components/CustomInputer';
+import CustomInputNumber from '../../../../../components/CustomInputer';
 import { useThrottleFn } from 'ahooks';
 import { getLocalStorageUserName } from '@/util/user';
 import { CompanyColor } from '@/const/color';

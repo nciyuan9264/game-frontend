@@ -1,17 +1,28 @@
-import { Result } from '@/types/http';
-import { CreateRoomReponse, CreateRoomRequest, DeleteRoomReponse, DeleteRoomRequest, GetRoomListReponse } from '@/types/room';
-import axios from 'axios';
+import {
+  CreateRoomReponse,
+  CreateRoomRequest,
+  DeleteRoomReponse,
+  DeleteRoomRequest,
+  GetRoomListReponse,
+} from "@/types/room";
+import APIClient from "./apiClient"; // 这里路径按你的项目结构修改
 
-const baseURL = import.meta.env.VITE_API_URL;
-export const createRoom = async (params: CreateRoomRequest): Promise<Result<CreateRoomReponse>> => {
-  return (await axios.post(`http://${baseURL}/room/create`, params)).data;
+export const createRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
+  return APIClient.post({
+    url: "/room/create",
+    data: params,
+  });
 };
 
-export const deleteRoom = async (params: DeleteRoomRequest): Promise<Result<DeleteRoomReponse>> => {
-  const res = await axios.post(`http://${baseURL}/room/delete`, params);
-  return res.data;
+export const deleteRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
+  return APIClient.post({
+    url: "/room/delete",
+    data: params,
+  });
 };
 
-export const getRoomList = async (): Promise<Result<GetRoomListReponse>> => {
-  return (await axios.get(`http://${baseURL}/room/list`)).data;
+export const getRoomList = async (): Promise<GetRoomListReponse> => {
+  return APIClient.get({
+    url: "/room/list",
+  });
 };

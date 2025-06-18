@@ -11,7 +11,7 @@ import BuyStock from './components/BuyStock';
 import CompanyStockActionModal from './components/MergeCompany';
 import MergeSelection from './components/MergeSelection';
 import WaitingModal from './components/Waiting';
-import { baseURL } from '@/const/env';
+import { wsUrl } from '@/const/env';
 import { CompanyColor } from '@/const/color';
 import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
@@ -75,7 +75,8 @@ export default function Room() {
     });
     audioMapRef.current = map;
   }, []);
-  const { sendMessage } = useWebSocket(`ws://${baseURL}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+
+  const { sendMessage } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
@@ -125,7 +126,6 @@ export default function Room() {
       }
     }
   });
-
   const canCreateCompany = () => {
     return data?.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY && userID === data.roomData.currentPlayer;
   }
@@ -155,7 +155,9 @@ export default function Room() {
       return Number(val.tiles ?? 0) < 11
     }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) >= 41
-    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END;
+    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
+    });
   }, [data]);
 
   const currentPlayer = useMemo(() => {

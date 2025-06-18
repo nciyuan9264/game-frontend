@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Modal, Radio, message, Card, Button } from 'antd';
 import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
-import RoomCard from '@/view/Game/components/RoomCard';
+import RoomCard from '@/view/Acquire/GameBoard/components/RoomCard';
 import { useThrottleFn, useRequest } from 'ahooks';
 import EditUserID from './components/EditUserID';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
@@ -66,10 +66,10 @@ export default function GameMenu() {
   const { data: roomList, run: handleGetRoomList } = useRequest(
     async () => {
       const res = await getRoomList();
-      const sortList = res.data.rooms?.sort((a: any, b: any) => {
+      const sortList = res?.rooms?.sort((a: any, b: any) => {
         return a.roomID.localeCompare(b.roomID);
       }) ?? [];
-      setOnlinePlayer(res.data.onlinePlayer);
+      setOnlinePlayer(res?.onlinePlayer);
       return sortList;
     },
     {

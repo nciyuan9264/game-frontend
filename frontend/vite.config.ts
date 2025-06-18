@@ -16,14 +16,15 @@ export default defineConfig(({ mode }) => {
       open: true,
       host: true,
       port: 3001,
-      // proxy: {
-      //   '/api': {
-      //     target: apiBase,
-      //     changeOrigin: true,
-      //     rewrite: (path) => path.replace(/^\/api/, ''),
-      //     secure: false,
-      //   },
-      // },
+      proxy: {
+        '/api': {
+          target: 'http://192.168.3.6:8000',
+          changeOrigin: true,
+          secure: false,
+          // rewrite路径也可以用，根据你的后端是否需要/api前缀
+          // rewrite: (path) => path.replace(/^\/api/, ''),
+        },
+      },
     },
     resolve: {
       alias: {
