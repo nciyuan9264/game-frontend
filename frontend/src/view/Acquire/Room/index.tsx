@@ -269,9 +269,6 @@ export default function Room() {
               className={styles.buyStockBtn}
               disabled={!isGameEnd}
               onClick={() => {
-                sendMessage(JSON.stringify({
-                  type: 'game_end',
-                }));
                 setGameEndModalVisible(true);
               }}
             >
