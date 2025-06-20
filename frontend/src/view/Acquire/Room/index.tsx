@@ -151,13 +151,18 @@ export default function Room() {
   };
 
   const isGameEnd = useMemo(() => {
+    if (!data) {
+      return false;
+    }
     return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) < 11
     }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) >= 41
-    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
-    });
+    }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
+      return Number(val.tiles ?? 0) === 0
+    }));
   }, [data]);
 
   const currentPlayer = useMemo(() => {
@@ -267,7 +272,7 @@ export default function Room() {
             <Button
               type="primary"
               className={styles.buyStockBtn}
-              style={{zIndex: 9999}}
+              style={{ zIndex: 9999 }}
               disabled={!isGameEnd}
               onClick={() => {
                 setGameEndModalVisible(true);
