@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { Modal, Radio, message, Card, Button } from 'antd';
+import { Modal, Radio, message, Card, Button, Tabs } from 'antd';
 import styles from './index.module.less';
 import { createRoom, deleteRoom, getRoomList } from '@/api/room';
 import RoomCard from '@/view/Acquire/GameBoard/components/RoomCard';
@@ -14,6 +14,8 @@ export default function GameMenu() {
   const [createRoomCisible, setCreateRoomCisible] = useState(false);
   const [playerCount, setPlayerCount] = useState(2);
   const [onlinePlayer, setOnlinePlayer] = useState<number>(0)
+  const [tabKey, setTabKey] = useState('user');
+
   const showModal = () => setCreateRoomCisible(true);
 
   useEffect(() => {
@@ -26,9 +28,10 @@ export default function GameMenu() {
   }, []);
 
   const { run: handleCreateRoom } = useRequest(
-    async (MaxPlayers: number) => {
+    async ({ tabKey, playerCount }: { tabKey: string, playerCount: number }) => {
       await createRoom({
-        MaxPlayers: MaxPlayers,
+        MaxPlayers: playerCount,
+        GameType: tabKey,
         UserID: userID,
       }
       );
@@ -85,7 +88,10 @@ export default function GameMenu() {
       message.error('房间数量已达上限');
       return;
     }
-    handleCreateRoom(playerCount);
+    handleCreateRoom({
+      tabKey,
+      playerCount,
+    });
   }, { wait: 1000 });
 
   useEffect(() => {
@@ -158,28 +164,55 @@ export default function GameMenu() {
           </Button>
         </div>
       </div>
-
       <Modal
-        title="选择房间人数"
+        title="选择对战模式"
         open={createRoomCisible}
         onOk={debouncedHandleOk}
         onCancel={() => {
           setPlayerCount(2);
-          setCreateRoomCisible(false)
+          setCreateRoomCisible(false);
+          setTabKey('user');
         }}
         okText="创建"
         cancelText="取消"
         centered
         className={styles.modal}
-        styles={{ body: { textAlign: 'center', height: '100px', paddingTop: '30px' } }}
+        styles={{
+          body: { textAlign: 'center', minHeight: '150px', paddingTop: '20px' },
+        }}
       >
-        <Radio.Group onChange={(e) => setPlayerCount(e.target.value)} value={playerCount} size="large">
-          {[2, 3, 4, 5, 6].map((num) => (
-            <Radio.Button key={num} value={num} className={styles.radio}>
-              {num} 人
-            </Radio.Button>
-          ))}
-        </Radio.Group>
+        <Tabs
+          centered
+          activeKey={tabKey}
+          onChange={(key) => {
+            if (key === 'ai') {
+              setPlayerCount(2);
+            }
+            setTabKey(key)
+          }}
+          items={[
+            { key: 'user', label: '用户对战' },
+            { key: 'ai', label: '人机对战' },
+          ]}
+        />
+
+        {tabKey === 'user' ? (
+          <Radio.Group
+            onChange={(e) => setPlayerCount(e.target.value)}
+            value={playerCount}
+            size="large"
+          >
+            {[2, 3, 4, 5, 6].map((num) => (
+              <Radio.Button key={num} value={num} className={styles.radio}>
+                {num} 人
+              </Radio.Button>
+            ))}
+          </Radio.Group>
+        ) : (
+          <Card hoverable className={styles.radio}>
+            <div style={{ fontSize: '18px', fontWeight: 500 }}>1v1 人机对战</div>
+          </Card>
+        )}
       </Modal>
       <EditUserID
         visible={isUserIDModalVisible}
