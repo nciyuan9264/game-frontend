@@ -11,8 +11,6 @@ const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
     onSelect: (company: string) => void,
     onCancel: () => void,
   }) => {
-  if (!company) return null;
-
   const [selected, setSelected] = useState<string | undefined>(undefined);
 
   useEffect(() => {
@@ -29,7 +27,7 @@ const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
     }
   }, { wait: 1000 });
 
-
+  if (!company) return null;
   return (
     <Modal
       title="请选择要创建的公司"

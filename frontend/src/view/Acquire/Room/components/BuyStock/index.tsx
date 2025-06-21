@@ -16,8 +16,7 @@ const BuyStock = ({
   onSubmit: (modalData: Record<CompanyKey, number>) => void,
   data?: WsRoomSyncData
 }) => {
-  if (!data) return null;
-  const initialSelectedCount = Object.keys(data.roomData.companyInfo).reduce((acc, key) => {
+  const initialSelectedCount = Object.keys(data?.roomData?.companyInfo ?? {}).reduce((acc, key) => {
     acc[key as CompanyKey] = 0;
     return acc;
   }, {} as Record<CompanyKey, number>);
@@ -34,7 +33,7 @@ const BuyStock = ({
   const totalCost = useMemo(() => {
     return Object.entries(selectedCompany).reduce((sum, [k, count]) => {
       const key = k as CompanyKey; // 添加类型断言
-      const price = Number(data.roomData.companyInfo[key]?.stockPrice ?? 0);
+      const price = Number(data?.roomData.companyInfo[key]?.stockPrice ?? 0);
       return sum + price * count;
     }, 0);
   }, [selectedCompany]);
@@ -55,7 +54,7 @@ const BuyStock = ({
     const tempCost = Object.entries(temp).reduce((sum, [k, v]) => {
       const key = k as CompanyKey; // 添加类型断言
       const value = v as number; // 添加类型断言
-      const price = Number(data.roomData.companyInfo[key]?.stockPrice ?? 0);
+      const price = Number(data?.roomData.companyInfo[key]?.stockPrice ?? 0);
       return sum + price * value;
     }, 0);
 
@@ -73,9 +72,7 @@ const BuyStock = ({
       message.warning("⚠️ 请至少选择一个股票");
     }
   }, { wait: 1000 });
-
-
-
+  if (!data) return null;
   return (
     <Modal
       width={800}
@@ -122,7 +119,6 @@ const BuyStock = ({
                 />
               </Card>
             </Col>
-
           );
         })}
       </Row>

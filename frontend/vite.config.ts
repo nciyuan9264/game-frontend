@@ -34,6 +34,18 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       target: 'es2020',
+      chunkSizeWarningLimit: 1000, // 调大警告阈值（可选）
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (id.includes('node_modules')) {
+              if (id.includes('react')) return 'vendor-react';
+              if (id.includes('antd')) return 'vendor-antd';
+              return 'vendor'; // 其他 node_modules
+            }
+          },
+        },
+      },
     },
   };
 });

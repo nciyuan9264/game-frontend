@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
-import { useParams, useSearchParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Board from './components/Board';
 import { Button, message, Modal, Tag } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
@@ -50,8 +50,8 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
-  const [searchParams] = useSearchParams();
-  const roomUserID = searchParams.get('roomUserID');
+  // const [searchParams] = useSearchParams();
+  // const roomUserID = searchParams.get('roomUserID');
   const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
 
   const waitingModalComtent = useMemo(() => {
@@ -283,7 +283,7 @@ export default function Room() {
             >
               结束清算
             </Button>
-            {userID === roomUserID && <Button
+            {/* {userID === roomUserID && <Button
               type="primary"
               className={styles.buyStockBtn}
               onClick={() => {
@@ -301,7 +301,7 @@ export default function Room() {
               }}
             >
               强制结束清算
-            </Button>}
+            </Button>} */}
           </div>
           <div className={styles.middle}>
             {data?.roomData.roomInfo.roomStatus ? (
