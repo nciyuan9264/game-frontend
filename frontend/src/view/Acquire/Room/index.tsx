@@ -80,7 +80,7 @@ export default function Room() {
     audioMapRef.current = map;
   }, []);
 
-  const { sendMessage } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
@@ -269,7 +269,13 @@ export default function Room() {
                   okText: '确认',
                   cancelText: '取消',
                   onOk: () => {
-                    navigate(`/game/acquire`)
+                    // 假设 ws 是你的 WebSocket 实例
+                    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                      wsRef.current.close(); // ✅ 主动关闭连接
+                    }
+                    setTimeout(() => {
+                      navigate('/game/acquire');
+                    }, 200);
                   }
                 })
               }}
