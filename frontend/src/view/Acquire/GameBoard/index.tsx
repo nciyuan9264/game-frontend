@@ -16,6 +16,7 @@ export default function GameMenu() {
   const [playerCount, setPlayerCount] = useState(2);
   const [onlinePlayer, setOnlinePlayer] = useState<number>(0)
   const [tabKey, setTabKey] = useState('user');
+  const [aiCount, setAiCount] = useState(1);
 
   const showModal = () => setCreateRoomCisible(true);
 
@@ -29,10 +30,10 @@ export default function GameMenu() {
   }, []);
 
   const { run: handleCreateRoom } = useRequest(
-    async ({ tabKey, playerCount }: { tabKey: string, playerCount: number }) => {
+    async ({ playerCount, aiCount }: {playerCount: number, aiCount: number }) => {
       await createRoom({
         MaxPlayers: playerCount,
-        GameType: tabKey,
+        AiCount: aiCount,
         UserID: userID,
       }
       );
@@ -85,13 +86,13 @@ export default function GameMenu() {
   );
 
   const { run: debouncedHandleOk } = useThrottleFn(() => {
-    if ((roomList?.length ?? 0) > 8) {
+    if ((roomList?.length ?? 0) > 20) {
       message.error('房间数量已达上限');
       return;
     }
     handleCreateRoom({
-      tabKey,
       playerCount,
+      aiCount,
     });
   }, { wait: 1000 });
 
@@ -212,9 +213,44 @@ export default function GameMenu() {
             ))}
           </Radio.Group>
         ) : (
-          <Card hoverable className={styles.radio}>
-            <div style={{ fontSize: '18px', fontWeight: 500 }}>1v1 人机对战</div>
-          </Card>
+          <>
+            <div style={{ marginBottom: 16 }}>
+              <div style={{ fontWeight: 500, marginBottom: 8 }}>请选择总人数</div>
+              <Radio.Group
+                onChange={(e) => {
+                  const newPlayerCount = e.target.value;
+                  setPlayerCount(newPlayerCount);
+                  // 🧠 限制 AI 数量不超过总人数
+                  if (aiCount > newPlayerCount) {
+                    setAiCount(newPlayerCount);
+                  }
+                }}
+                value={playerCount}
+                size="large"
+              >
+                {[2, 3, 4, 5, 6].map((num) => (
+                  <Radio.Button key={num} value={num} className={styles.radio}>
+                    {num} 人
+                  </Radio.Button>
+                ))}
+              </Radio.Group>
+            </div>
+
+            <div>
+              <div style={{ fontWeight: 500, marginBottom: 8 }}>请选择人机数量</div>
+              <Radio.Group
+                onChange={(e) => setAiCount(e.target.value)}
+                value={aiCount}
+                size="large"
+              >
+                {Array.from({ length: playerCount - 1 }, (_, i) => i + 1).map((num) => (
+                  <Radio.Button key={num} value={num} className={styles.radio}>
+                    {num} 个
+                  </Radio.Button>
+                ))}
+              </Radio.Group>
+            </div>
+          </>
         )}
       </Modal>
       <EditUserID

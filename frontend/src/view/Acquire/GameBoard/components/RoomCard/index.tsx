@@ -30,7 +30,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
       <div className={styles.header}>
         <div className={styles.homeId}>
           <div className={styles.label}>房间ID:</div>
-          <Text ellipsis={{ tooltip: true }} style={{ color: userID === data.userID ? 'red' : 'black' }}>
+          <Text ellipsis={{ tooltip: true }}>
             {data.roomID}
           </Text>
         </div>
@@ -45,7 +45,13 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
       </div>
       <div className={styles.roomAdmin}>
         <div className={styles.label}>房主ID:</div>
-        <Text ellipsis={{ tooltip: true }} style={{ color: userID === data.userID ? 'red' : 'black' }}>
+        <Text ellipsis={{ tooltip: true }} style={{
+          border: userID === data.userID ? '1px solid #61d7f2' : 'unset',
+          borderRadius: userID === data.userID? '5px' : 'unset',
+          padding: userID === data.userID? '2px 5px' : 'unset',
+          color: userID === data.userID? '#1e7fbd' : 'unset',
+          backgroundColor: userID === data.userID? '#e8ffff' : 'unset',
+        }}>
           {getLocalStorageUserName(data.userID)}
         </Text>
       </div>

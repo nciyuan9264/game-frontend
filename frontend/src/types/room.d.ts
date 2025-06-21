@@ -15,7 +15,7 @@ interface ListRoomInfo {
 interface CreateRoomRequest {
   RoomID?: string;
   MaxPlayers: number;
-  GameType: string;
+  AiCount: number;
   UserID: string;
 }
 
