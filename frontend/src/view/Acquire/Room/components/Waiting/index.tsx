@@ -1,7 +1,7 @@
 
 
-import React  from 'react';
-import { Modal  } from 'antd';
+import React from 'react';
+import { Modal } from 'antd';
 
 interface WaitingModalProps {
   content: string | JSX.Element;

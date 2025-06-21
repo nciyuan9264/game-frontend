@@ -3,7 +3,7 @@ import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useNavigate, useParams } from 'react-router-dom';
 import Board from './components/Board';
-import { Button, message, Modal, Tag } from 'antd';
+import { Alert, Button, message, Modal, Tag } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
@@ -23,6 +23,7 @@ import MessageSender from './components/MessageSender';
 import { playAudio } from '@/util/audio';
 import { useFullHeight } from '@/hooks/useFullHeight';
 import { LeftOutlined } from '@ant-design/icons';
+import { CompanyTag } from '@/components/CompanyTag';
 export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
   const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
     return val.hoders.length > 0;
@@ -65,7 +66,42 @@ export default function Room() {
       const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
         return val.hoders.length > 0;
       });
-      return `请等待 ${getLocalStorageUserName(firstHoders?.[1].hoders[0] ?? '')} 结算`;
+      return (
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+          <Alert
+            message={`请等待 ${getLocalStorageUserName(firstHoders?.[1].hoders[0] ?? '')} 结算`}
+            type="info"
+            showIcon
+          />
+          {
+            <div className={styles.settlementContainer}>
+              <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={data?.tempData?.merge_main_company_temp as CompanyKey} />合并的公司：</div>
+              <div className={styles.companyList}>
+                {
+                  Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
+                    const companyName = company as CompanyKey;
+                    const dividends = value.dividends;
+                    return (
+                      <div key={company} className={styles.companyCard} style={{ borderLeft: `4px solid ${CompanyColor[companyName]}` }}>
+                        <CompanyTag company={companyName as CompanyKey} />
+                        {
+                          Object.entries(dividends)
+                            .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
+                            .map(([key, value]) => (
+                              <div key={key} className={styles.dividendRow}>
+                                <div className={styles.name}>{getLocalStorageUserName(key)} 获得现金：</div>
+                                <div className={styles.amount}>${value}</div>
+                              </div>
+                            ))
+                        }
+                      </div>
+                    )
+                  })
+                }
+              </div>
+            </div>
+          }
+        </div>)
     }
     return '';
   }, [data]);
