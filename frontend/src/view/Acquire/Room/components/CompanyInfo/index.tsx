@@ -54,9 +54,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
 
   return (
     <div className={styles.companyInfo}>
-      <div className={styles.header}>
-        <div className={styles.title}>市场信息</div>
-      </div>
       <table className={styles.marketTable}>
         <thead>
           <tr>

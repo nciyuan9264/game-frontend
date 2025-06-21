@@ -21,6 +21,7 @@ import CompanyInfo from './components/CompanyInfo';
 import { isTabletLandscape } from '@/util/window';
 import MessageSender from './components/MessageSender';
 import { playAudio } from '@/util/audio';
+import { useFullHeight } from '@/hooks/useFullHeight';
 export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
   const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
     return val.hoders.length > 0;
@@ -251,6 +252,8 @@ export default function Room() {
     }
   }
 
+  useFullHeight(styles.roomContainer);
+
   return (
     <>
       <div className={styles.roomContainer}>
@@ -339,41 +342,39 @@ export default function Room() {
           />}
           <div className={styles.bottomRight}>
             <div className={styles.playerAssets}>
-              <div className={styles.header}>
-                <div className={styles.title}>你的资产</div>
+              <div className={styles.assetGroup}>
+                <span className={styles.assetLabel}>💰 现金：</span>
+                <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
               </div>
-              <ul className={styles.playerInfo}>
-                <li className={styles.money}>
-                  💰 现金：
-                  <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
-                </li>
-                <li className={styles.stocks}>
-                  📈 股票：
-                  <ul className={styles.stockList}>
-                    {Object.entries(data?.playerData.stocks || {})
-                      .filter(([_, count]) => Number(count) > 0)
-                      .map(([company, count]) => (
-                        <li key={company} className={styles.stockItem}>
-                          <Tag
-                            color={CompanyColor[company as CompanyKey]}
-                            style={{ padding: '4px 8px', fontSize: 14, borderRadius: 8 }}
-                          >
-                            <b>{company}</b> × <span className={styles.stockCount}>{count}</span>
-                          </Tag>
-                        </li>
-                      ))}
-                  </ul>
-                </li>
-                <li>
-                  🧱 Tiles：
-                  <div className={styles.tileList}>
-                    {(data?.playerData.tiles || []).sort((a, b) => {
+
+              <div className={styles.assetGroup}>
+                <span className={styles.assetLabel}>📈 股票：</span>
+                <div className={styles.stockList}>
+                  {Object.entries(data?.playerData.stocks || {})
+                    .filter(([_, count]) => Number(count) > 0)
+                    .map(([company, count]) => (
+                      <Tag
+                        key={company}
+                        color={CompanyColor[company as CompanyKey]}
+                        className={styles.stockTag}
+                      >
+                        <b>{company}</b> × {count}
+                      </Tag>
+                    ))}
+                </div>
+              </div>
+
+              <div className={styles.assetGroup}>
+                <span className={styles.assetLabel}>🧱 Tiles：</span>
+                <div className={styles.tileList}>
+                  {(data?.playerData.tiles || [])
+                    .sort((a, b) => {
                       const [aRow, aCol] = a.match(/^(\d+)([A-Z])$/)!.slice(1);
                       const [bRow, bCol] = b.match(/^(\d+)([A-Z])$/)!.slice(1);
                       const rowDiff = Number(aRow) - Number(bRow);
-                      if (rowDiff !== 0) return rowDiff;
-                      return aCol.charCodeAt(0) - bCol.charCodeAt(0);
-                    }).map((tileKey: string) => (
+                      return rowDiff !== 0 ? rowDiff : aCol.charCodeAt(0) - bCol.charCodeAt(0);
+                    })
+                    .map((tileKey) => (
                       <span
                         className={styles.tile}
                         key={tileKey}
@@ -382,9 +383,7 @@ export default function Room() {
                           data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
                           setHoveredTile(tileKey)
                         }
-                        onMouseOut={() => {
-                          currentPlayer === userID && setHoveredTile(undefined);
-                        }}
+                        onMouseOut={() => currentPlayer === userID && setHoveredTile(undefined)}
                         onClick={() =>
                           currentPlayer === userID &&
                           data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
@@ -394,20 +393,20 @@ export default function Room() {
                         {tileKey}
                       </span>
                     ))}
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div className={styles.message}>
-              <MessageSender
-                onMessageSend={(msg) => {
-                  console.log("用户发送消息:", msg);
-                  sendMessage(JSON.stringify({
-                    type: 'play_audio',
-                    payload: msg,
-                  }));
-                }}
-              />
+                </div>
+              </div>
+
+              <div className={styles.message}>
+                <MessageSender
+                  onMessageSend={(msg) => {
+                    console.log("用户发送消息:", msg);
+                    sendMessage(JSON.stringify({
+                      type: 'play_audio',
+                      payload: msg,
+                    }));
+                  }}
+                />
+              </div>
             </div>
           </div>
         </div>

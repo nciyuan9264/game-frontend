@@ -7,6 +7,7 @@ import { useThrottleFn, useRequest } from 'ahooks';
 import EditUserID from './components/EditUserID';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
 import { handleFullscreen } from '@/util/window';
+import { useFullHeight } from '@/hooks/useFullHeight';
 
 export default function GameMenu() {
   const [userID, setUserID] = useState('');
@@ -105,64 +106,66 @@ export default function GameMenu() {
     };
   }, []);
 
+  useFullHeight(styles.gameMenu);
   return (
-    <div className={styles.gameMenu}>
-      <div className={styles.titleCenter}>
-        <h1>Acquire</h1>
-      </div>
-      <div className={styles.roomGrid}>
-        {roomList?.map(room => (
-          <RoomCard
-            key={room.roomID}
-            data={room}
-            onDelete={(roomID: string) => {
-              handleDeleteRoom(roomID);
-            }}
-            userID={userID}
-          />
-        ))}
-        <Card
-          hoverable
-          className={styles.createRoomCard}
-          onClick={showModal}
-        >
-          <div className={styles.createRoomInner}>
-            <div style={{ marginTop: 8 }}>创建房间</div>
+    <>
+      <div className={styles.gameMenu} style={{ height: window.innerHeight }}>
+        <div className={styles.title}>Acquire</div>
+        <div className={styles.roomGrid}>
+          {roomList?.map(room => (
+            <RoomCard
+              key={room.roomID}
+              data={room}
+              onDelete={(roomID: string) => {
+                handleDeleteRoom(roomID);
+              }}
+              userID={userID}
+            />
+          ))}
+          <Card
+            hoverable
+            className={styles.createRoomCard}
+            onClick={showModal}
+          >
+            <div className={styles.createRoomInner}>
+              <div style={{ marginTop: 8 }}>创建房间</div>
+            </div>
+          </Card>
+        </div>
+        <div className={styles.footer}>
+          <div className={styles.left}>
+            <div>
+              <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
+              <Button
+                type="primary"
+                onClick={() => setIsUserIDModalVisible(true)}
+                className={styles.button}
+              >
+                修改用户名
+              </Button>
+            </div>
+            <span className={styles.userId}>当前在线人数: {onlinePlayer}</span>
           </div>
-        </Card>
-      </div>
-      <div className={styles.footer}>
-        <div className={styles.left}>
-          <div>
-            <span className={styles.userId}>ID: {getLocalStorageUserName(userID)}</span>
+          <div className={styles.right}>
             <Button
-              type="primary"
-              onClick={() => setIsUserIDModalVisible(true)}
               className={styles.button}
+              onClick={() => {
+                handleGetRoomList();
+              }}
             >
-              修改用户名
+              刷新
+            </Button>
+            <Button
+              className={styles.button}
+              onClick={() => {
+                handleFullscreen();
+              }}
+            >
+              全屏
             </Button>
           </div>
-          <span className={styles.userId}>当前在线人数: {onlinePlayer}</span>
         </div>
-        <div className={styles.right}>
-          <Button
-            className={styles.button}
-            onClick={() => {
-              handleGetRoomList();
-            }}
-          >
-            刷新
-          </Button>
-          <Button
-            className={styles.button}
-            onClick={() => {
-              handleFullscreen();
-            }}
-          >
-            全屏
-          </Button>
-        </div>
+
       </div>
       <Modal
         title="选择对战模式"
@@ -219,6 +222,6 @@ export default function GameMenu() {
         setVisible={setIsUserIDModalVisible}
         setUserID={setUserID}
       />
-    </div>
+    </>
   );
 }

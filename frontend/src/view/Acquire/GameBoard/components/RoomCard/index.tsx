@@ -1,10 +1,11 @@
 import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
-import { Button, message, Popconfirm, Tag } from 'antd';
+import { Button, message, Popconfirm, Tag, Typography } from 'antd';
 import { ListRoomInfo } from '@/types/room';
 import { getLocalStorageUserID, getLocalStorageUserName, validateUserName } from '@/util/user';
-
+import { DeleteOutlined } from '@ant-design/icons';
+const { Text } = Typography;
 
 interface RoomCardProps {
   data: ListRoomInfo;
@@ -27,33 +28,45 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, onDelete, userID }) => {
   return (
     <div className={styles.card}>
       <div className={styles.header}>
-        <span className={styles.title}>房间ID: {data.roomID}</span>
+        <div className={styles.homeId}>
+          <div className={styles.label}>房间ID:</div>
+          <Text ellipsis={{ tooltip: true }} style={{ color: userID === data.userID ? 'red' : 'black' }}>
+            {data.roomID}
+          </Text>
+        </div>
         <Popconfirm
           title="确定删除这个房间？"
           onConfirm={handleDelete}
           okText="删除"
           cancelText="取消"
         >
-          <span className={styles.delete}>🗑️</span>
+          <div className={styles.delete}><DeleteOutlined /></div>
         </Popconfirm>
       </div>
-      <span
-        className={styles.title}
-        style={{ color: userID === data.userID ? 'red' : 'black' }}
-      >
-        房主ID: {getLocalStorageUserName(data.userID)}
-      </span>
+      <div className={styles.roomAdmin}>
+        <div className={styles.label}>房主ID:</div>
+        <Text ellipsis={{ tooltip: true }} style={{ color: userID === data.userID ? 'red' : 'black' }}>
+          {getLocalStorageUserName(data.userID)}
+        </Text>
+      </div>
+      <div className={styles.label}>玩家列表:</div>
       <div className={styles.playerList}>
-        玩家列表:
-        {
-          data.roomPlayer.length === 0 ? <span>暂无玩家</span> : data.roomPlayer.map((player) => {
-            return (
-              <span key={player.playerID}>
-                {getLocalStorageUserName(player.playerID)} <Tag>{player.online ? '在线' : '掉线'}</Tag>
-              </span>
-            );
-          })
-        }
+        {data.roomPlayer.length === 0 ? (
+          <span>暂无玩家</span>
+        ) : (
+          <ul className={styles.list}>
+            {data.roomPlayer.map((player) => (
+              <li key={player.playerID} className={styles.playerItem}>
+                <span className={styles.playerName}>
+                  {getLocalStorageUserName(player.playerID)}
+                </span>
+                <Tag color={player.online ? 'green' : 'red'}>
+                  {player.online ? '在线' : '掉线'}
+                </Tag>
+              </li>
+            ))}
+          </ul>
+        )}
       </div>
       <div className={styles.body}>
         最多玩家: {data.maxPlayers}

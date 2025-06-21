@@ -26,7 +26,6 @@ const MessageSender: React.FC<MessageSenderProps> = ({ onMessageSend }) => {
   const [visible, setVisible] = useState(false);
   const [cooldown, setCooldown] = useState(0);
   const timerRef = useRef<NodeJS.Timeout | null>(null);
-
   const handleSelect = (msg: string) => {
     if (cooldown > 0) {
       message.warning('10秒内只能发送一次消息哦～');
@@ -79,7 +78,7 @@ const MessageSender: React.FC<MessageSenderProps> = ({ onMessageSend }) => {
       <Button
         size="large"
         shape="circle"
-        icon={cooldown <= 0 && <MessageOutlined />}
+        icon={cooldown <= 0 && <MessageOutlined className={styles.icon}/>}
         className={styles.messageButton}
         disabled={cooldown > 0}
       >
