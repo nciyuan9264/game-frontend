@@ -33,7 +33,7 @@ export default function GameMenu() {
     async ({ playerCount, aiCount }: {playerCount: number, aiCount: number }) => {
       await createRoom({
         MaxPlayers: playerCount,
-        AiCount: aiCount,
+        AiCount: tabKey === 'user' ? 0 : aiCount,
         UserID: userID,
       }
       );
