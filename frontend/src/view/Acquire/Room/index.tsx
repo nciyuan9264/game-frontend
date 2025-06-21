@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Board from './components/Board';
 import { Button, message, Modal, Tag } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
@@ -22,6 +22,7 @@ import { isTabletLandscape } from '@/util/window';
 import MessageSender from './components/MessageSender';
 import { playAudio } from '@/util/audio';
 import { useFullHeight } from '@/hooks/useFullHeight';
+import { LeftOutlined } from '@ant-design/icons';
 export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
   const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
     return val.hoders.length > 0;
@@ -50,6 +51,8 @@ export default function Room() {
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const userID = getLocalStorageUserID();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
+  const navigate = useNavigate();
+
   // const [searchParams] = useSearchParams();
   // const roomUserID = searchParams.get('roomUserID');
   const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
@@ -198,7 +201,6 @@ export default function Room() {
       return (
         <Button
           type="primary"
-          className={styles.buyStockBtn}
           disabled={!canCreateCompany()}
           onClick={() => {
             setCreateCompanyModalVisible(true);
@@ -212,7 +214,6 @@ export default function Room() {
       return (
         <Button
           type="primary"
-          className={styles.buyStockBtn}
           disabled={!canBuyStock(data, userID)}
           onClick={() => {
             setBuyStockModalVisible(true);
@@ -226,7 +227,6 @@ export default function Room() {
       return (
         <Button
           type="primary"
-          className={styles.buyStockBtn}
           disabled={!getMergingModalAvailible(data, userID)}
           onClick={() => {
             setMergeCompanyModalVisible(true);
@@ -240,7 +240,6 @@ export default function Room() {
       return (
         <Button
           type="primary"
-          className={styles.buyStockBtn}
           disabled={!getMergeSelection(data, userID)}
           onClick={() => {
             setMergeSelectionModalVisible(true);
@@ -259,13 +258,29 @@ export default function Room() {
       <div className={styles.roomContainer}>
         <div className={styles.topBar}>
           <div className={styles.left}>
+            <Button
+              className={styles.backButton}
+              type="text"
+              icon={<LeftOutlined style={{ fontSize: 20 }} />}
+              onClick={() => {
+                Modal.confirm({
+                  title: '确认操作',
+                  content: '你确定要离开房间吗？',
+                  okText: '确认',
+                  cancelText: '取消',
+                  onOk: () => {
+                    navigate(`/game/acquire`)
+                  }
+                })
+              }}
+            >
+            </Button>
             <div className={styles.IDs}>
               <div>房间号：{roomID}</div>
               <div>用户ID：{getLocalStorageUserName(userID)}</div>
             </div>
             <Button
               type="primary"
-              className={styles.buyStockBtn}
               onClick={() => {
                 setCompanyInfoVisible(true);
               }}
@@ -274,7 +289,6 @@ export default function Room() {
             </Button>
             <Button
               type="primary"
-              className={styles.buyStockBtn}
               style={{ zIndex: 9999 }}
               disabled={!isGameEnd}
               onClick={() => {
@@ -285,7 +299,6 @@ export default function Room() {
             </Button>
             {/* {userID === roomUserID && <Button
               type="primary"
-              className={styles.buyStockBtn}
               onClick={() => {
                 Modal.confirm({
                   title: '确认操作',
