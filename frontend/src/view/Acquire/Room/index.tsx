@@ -18,7 +18,7 @@ import CompanyStockInfoModal from './components/StockInfo';
 import { GameStatusMap } from '@/const/game';
 import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
 import CompanyInfo from './components/CompanyInfo';
-import { isTabletLandscape } from '@/util/window';
+// import { isTabletLandscape } from '@/util/window';
 import MessageSender from './components/MessageSender';
 import { playAudio } from '@/util/audio';
 import { useFullHeight } from '@/hooks/useFullHeight';
