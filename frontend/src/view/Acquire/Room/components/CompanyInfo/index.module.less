@@ -5,69 +5,6 @@
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 
-  .header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 10px;
-
-    .title {
-      font-size: 18px;
-      font-weight: bold;
-    }
-
-    .buttons {
-      display: flex;
-      justify-content: flex-end;
-      gap: 20px;
-    }
-  }
-
-  .playerInfo {
-    list-style: none;
-    padding: 0;
-    font-size: 14px;
-    line-height: 1.6;
-
-    li {
-      margin-bottom: 8px;
-    }
-
-    .stockList {
-      display: flex;
-      margin-top: 4px;
-      padding-left: 1em;
-
-      li {
-        list-style-type: none;
-      }
-    }
-
-    .tileList {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin-top: 4px;
-
-      .tile {
-        width: 60px;
-        height: 60px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        background-color: #f8f8f8;
-        font-weight: bold;
-        font-family: monospace;
-      }
-
-      &:hover {
-        cursor: pointer;
-      }
-    }
-  }
-
   .marketTable {
     width: 100%;
     border-collapse: collapse;
@@ -86,6 +23,7 @@
       padding: 8px 12px;
       text-align: center;
       font-size: 20px;
+      white-space: nowrap;
     }
 
     th {
@@ -134,9 +72,6 @@
   }
 }
 
-
-
-
 @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
   .companyInfo {
     display: block;
@@ -146,21 +81,6 @@
     padding: 10px 20px;
     border-radius: 12px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-
-
-    .header {
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 10px;
-
-      .title {
-        font-size: 18px;
-        font-weight: bold;
-      }
-
-      .buyStockBtn {}
-    }
 
     .marketTable {
       width: 100%;
@@ -192,12 +112,28 @@
 
       .increase {
         font-size: 12px;
-        color: #52c41a;
       }
 
       .decrease {
         font-size: 12px;
-        color: #f5222d;
+      }
+
+      .flash {
+        animation: flashAnim 1s ease-in-out 3;
+      }
+
+      @keyframes flashAnim {
+
+        0%,
+        100% {
+          opacity: 1;
+          text-shadow: 0 0 8px #00fff7;
+        }
+
+        50% {
+          opacity: 0.4;
+          text-shadow: none;
+        }
       }
     }
   }

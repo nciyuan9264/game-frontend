@@ -57,7 +57,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
       <table className={styles.marketTable}>
         <thead>
           <tr>
-            <th>公司</th>
+            <th className={styles.companyName}>公司</th>
             <th>股价</th>
             <th>剩余股票</th>
             <th>土地数</th>
