@@ -381,7 +381,7 @@ export default function Room() {
         </div>
         <div className={styles.gameBoard}>
           <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
-          {isTabletLandscape && <CompanyInfo
+          {<CompanyInfo
             setBuyStockModalVisible={setBuyStockModalVisible}
             setMergeCompanyModalVisible={setMergeCompanyModalVisible}
             data={data}
@@ -389,12 +389,12 @@ export default function Room() {
           />}
         </div>
         <div className={styles.assets}>
-          {!isTabletLandscape && <CompanyInfo
+          {/* {!isTabletLandscape && <CompanyInfo
             setBuyStockModalVisible={setBuyStockModalVisible}
             setMergeCompanyModalVisible={setMergeCompanyModalVisible}
             data={data}
             userID={userID}
-          />}
+          />} */}
           <div className={styles.bottomRight}>
             <div className={styles.playerAssets}>
               <div className={styles.assetGroup}>

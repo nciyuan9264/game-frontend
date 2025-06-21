@@ -49,7 +49,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
 
     prevDataRef.current = data;
   }, [data?.roomData.companyInfo]);
-
   if (!data) return null;
 
   return (
@@ -66,7 +65,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
         <tbody>
           {Object.values(data.roomData.companyInfo).map((company) => {
             const companyDelta = deltas[company.name] || { stockPrice: 0, stockTotal: 0, tiles: 0 };
-
             const renderValue = (value: number, diff: number) => {
               let className = '';
               if (diff > 0) className = `${styles.increase} ${styles.flash}`;
@@ -83,7 +81,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 </div>
               );
             };
-
 
             return (
               <tr key={company.name}>

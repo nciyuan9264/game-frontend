@@ -1,5 +1,5 @@
 /** 可用的游戏状态类型 */
-export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end'| 'setTile';
+export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end' | 'setTile';
 
 interface ListRoomInfo {
   roomID: string;
@@ -9,7 +9,7 @@ interface ListRoomInfo {
   roomPlayer: {
     playerID: string;
     online: boolean;
-  }[]
+  }[];
 }
 
 interface CreateRoomRequest {
@@ -19,7 +19,7 @@ interface CreateRoomRequest {
   UserID: string;
 }
 
-interface DeleteRoomRequest{
+interface DeleteRoomRequest {
   RoomID: string;
 }
 
@@ -27,8 +27,7 @@ interface CreateRoomReponse {
   room_id: string;
 }
 
-interface DeleteRoomReponse{
-}
+interface DeleteRoomReponse {}
 
 interface GetRoomListReponse {
   rooms: ListRoomInfo[];
