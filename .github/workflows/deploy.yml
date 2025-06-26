@@ -31,12 +31,13 @@ jobs:
           sudo mv ossutil /usr/local/bin/ && sudo ln -s /usr/local/bin/ossutil /usr/bin/ossutil
 
 
-      - name: Configure ossutil
+      - name: Configure ossutil (non-interactive)
         run: |
           ossutil config \
+            -e oss-cn-beijing.aliyuncs.com \
             -i "${{ secrets.OSS_ACCESS_KEY_ID }}" \
             -k "${{ secrets.OSS_ACCESS_KEY_SECRET }}" \
-            -e "oss-cn-beijing.aliyuncs.com"
+            --config-file ~/.ossutilconfig
 
       - name: Upload to OSS
         run: |
