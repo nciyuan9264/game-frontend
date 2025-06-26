@@ -80,7 +80,7 @@ export default function Room() {
     audioMapRef.current = map;
   }, []);
 
-  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: SplendorWsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
