@@ -22,11 +22,9 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: pnpm run build
-
       - name: Install ossutil
         run: |
-          curl -o ossutil.tar.gz https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64.tar.gz
-          tar -xzf ossutil.tar.gz
+          curl -L -o ossutil64 https://github.com/aliyun/ossutil/releases/download/v1.7.18/ossutil-v1.7.18-linux-amd64
           chmod +x ossutil64
           sudo mv ossutil64 /usr/local/bin/ossutil
 
