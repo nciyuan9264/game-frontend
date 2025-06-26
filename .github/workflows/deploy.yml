@@ -36,6 +36,7 @@ jobs:
           echo "[Credentials]" > ~/.ossutilconfig
           echo "language=CH" >> ~/.ossutilconfig
           echo "endpoint=oss-cn-beijing.aliyuncs.com" >> ~/.ossutilconfig
+          echo "region=cn-beijing" >> ~/.ossutilconfig
           echo "accessKeyID=${{ secrets.OSS_ACCESS_KEY_ID }}" >> ~/.ossutilconfig
           echo "accessKeySecret=${{ secrets.OSS_ACCESS_KEY_SECRET }}" >> ~/.ossutilconfig
 
