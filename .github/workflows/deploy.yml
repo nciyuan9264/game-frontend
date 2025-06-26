@@ -22,6 +22,7 @@ jobs:
       - name: Build frontend
         working-directory: frontend
         run: pnpm run build
+
       - name: Install ossutil
         run: |
           curl -o ossutil-2.1.1-linux-amd64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.1/ossutil-2.1.1-linux-amd64.zip
@@ -30,15 +31,14 @@ jobs:
           chmod 755 ossutil
           sudo mv ossutil /usr/local/bin/ && sudo ln -s /usr/local/bin/ossutil /usr/bin/ossutil
 
-
-      - name: Configure ossutil (non-interactive)
+      - name: Write ossutil config file
         run: |
-          ossutil config \
-            -e oss-cn-beijing.aliyuncs.com \
-            -i "${{ secrets.OSS_ACCESS_KEY_ID }}" \
-            -k "${{ secrets.OSS_ACCESS_KEY_SECRET }}" \
-            --config-file ~/.ossutilconfig
+          echo "[Credentials]" > ~/.ossutilconfig
+          echo "language=CH" >> ~/.ossutilconfig
+          echo "endpoint=oss-cn-beijing.aliyuncs.com" >> ~/.ossutilconfig
+          echo "accessKeyID=${{ secrets.OSS_ACCESS_KEY_ID }}" >> ~/.ossutilconfig
+          echo "accessKeySecret=${{ secrets.OSS_ACCESS_KEY_SECRET }}" >> ~/.ossutilconfig
 
-      - name: Upload to OSS
+      - name: Upload dist to OSS
         run: |
-          ossutil cp frontend/dist/ oss://game-frontend/ -r -f
+          ossutil cp frontend/dist/ oss://game-frontend/ -r -f --config-file ~/.ossutilconfig
