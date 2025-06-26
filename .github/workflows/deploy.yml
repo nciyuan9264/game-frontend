@@ -24,9 +24,12 @@ jobs:
         run: pnpm run build
       - name: Install ossutil
         run: |
-          curl -L -o ossutil64 https://github.com/aliyun/ossutil/releases/download/v1.7.18/ossutil-v1.7.18-linux-amd64
-          chmod +x ossutil64
-          sudo mv ossutil64 /usr/local/bin/ossutil
+          curl -o ossutil-2.1.1-linux-amd64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.1/ossutil-2.1.1-linux-amd64.zip
+          unzip ossutil-2.1.1-linux-amd64.zip
+          cd ossutil-2.1.1-linux-amd64
+          chmod 755 ossutil
+          sudo mv ossutil /usr/local/bin/ && sudo ln -s /usr/local/bin/ossutil /usr/bin/ossutil
+
 
       - name: Configure ossutil
         run: |
