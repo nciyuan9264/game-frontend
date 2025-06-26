@@ -10,26 +10,33 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Install Dependencies & Build (Vite)
+      - name: Enable corepack and install dependencies
+        working-directory: frontend
         run: |
           corepack enable
           pnpm install
-          pnpm run build
+
+      - name: Build frontend
+        working-directory: frontend
+        run: pnpm run build
 
       - name: Install ossutil
         run: |
           curl -o ossutil.tar.gz https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64.tar.gz
           tar -xzf ossutil.tar.gz
           chmod +x ossutil64
-          mv ossutil64 /usr/local/bin/ossutil
+          sudo mv ossutil64 /usr/local/bin/ossutil
 
       - name: Configure ossutil
         run: |
-          ossutil config -i "${{ secrets.OSS_ACCESS_KEY_ID }}" -k "${{ secrets.OSS_ACCESS_KEY_SECRET }}" -e "oss-cn-beijing.aliyuncs.com"
+          ossutil config \
+            -i "${{ secrets.OSS_ACCESS_KEY_ID }}" \
+            -k "${{ secrets.OSS_ACCESS_KEY_SECRET }}" \
+            -e "oss-cn-beijing.aliyuncs.com"
 
       - name: Upload to OSS
         run: |
-          ossutil cp dist/ oss://game-frontend/ -r -f
+          ossutil cp frontend/dist/ oss://game-frontend/ -r -f
