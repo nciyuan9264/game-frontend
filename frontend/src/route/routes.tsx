@@ -1,5 +1,8 @@
-import Game from "@/view/Acquire/GameBoard";
-import Room from "@/view/Acquire/Room";
+import AcquireGame from "@/view/Acquire/GameBoard";
+import AcquireRoom from "@/view/Acquire/Room";
+import SplendorGame from "@/view/Splendor/GameBoard";
+import SplendorRoom from "@/view/Splendor/Room";
+
 import React from "react";
 import { Navigate } from "react-router-dom";
 
@@ -13,11 +16,19 @@ export interface AppRoute {
 export const routes: AppRoute[] = [
   {
     path: "/game/acquire",
-    element: <Game />
+    element: <AcquireGame />
   },
   {
     path: "/acquire/room/:roomID",
-    element: <Room />
+    element: <AcquireRoom />
+  },
+  {
+    path: "/game/splendor",
+    element: <SplendorGame />
+  },
+  {
+    path: "/splendor/room/:roomID",
+    element: <SplendorRoom />
   },
   {
     path: "/",

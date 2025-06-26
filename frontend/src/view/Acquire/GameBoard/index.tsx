@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { Modal, Radio, message, Card, Button, Tabs } from 'antd';
 import styles from './index.module.less';
-import { createRoom, deleteRoom, getRoomList } from '@/api/room';
+import { createAcquireRoom, deleteAcquireRoom, getAcquireRoomList } from '@/api/room';
 import RoomCard from '@/view/Acquire/GameBoard/components/RoomCard';
 import { useThrottleFn, useRequest } from 'ahooks';
 import EditUserID from './components/EditUserID';
@@ -31,7 +31,7 @@ export default function GameMenu() {
 
   const { run: handleCreateRoom } = useRequest(
     async ({ playerCount, aiCount }: {playerCount: number, aiCount: number }) => {
-      await createRoom({
+      await createAcquireRoom({
         MaxPlayers: playerCount,
         AiCount: tabKey === 'user' ? 0 : aiCount,
         UserID: userID,
@@ -52,7 +52,7 @@ export default function GameMenu() {
 
   const { run: handleDeleteRoom } = useRequest(
     async (roomID: string) => {
-      await deleteRoom({
+      await deleteAcquireRoom({
         RoomID: roomID,
       }
       );
@@ -70,7 +70,7 @@ export default function GameMenu() {
 
   const { data: roomList, run: handleGetRoomList } = useRequest(
     async () => {
-      const res = await getRoomList();
+      const res = await getAcquireRoomList();
       const sortList = res?.rooms?.sort((a: any, b: any) => {
         return a.roomID.localeCompare(b.roomID);
       }) ?? [];
@@ -98,12 +98,12 @@ export default function GameMenu() {
 
   useEffect(() => {
     const timer = setInterval(handleGetRoomList, 10000);
-    if (!(window as any).deleteRoom) {
-      (window as any).deleteRoom = handleDeleteRoom;
+    if (!(window as any).deleteAcquireRoom) {
+      (window as any).deleteAcquireRoom = handleDeleteRoom;
     }
     return () => {
       clearInterval(timer);
-      delete (window as any).deleteRoom;
+      delete (window as any).deleteAcquireRoom;
     };
   }, []);
 

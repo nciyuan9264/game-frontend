@@ -1,0 +1,69 @@
+.playerDataContainer {
+  background: #154d79;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 12px;
+  flex: 1;
+  border-radius: 12px;
+  overflow-y: scroll;
+}
+.playerDataContainer::-webkit-scrollbar{
+  display: none;
+}
+
+.playerCard {
+  border: 1px solid #ccc;
+  border-left: 4px solid #4a90e2;
+  border-radius: 6px;
+  padding: 12px;
+  background: #a2b9ff;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.06);
+}
+
+.header {
+  font-weight: bold;
+  margin-bottom: 8px;
+  font-size: 16px;
+  color: #333;
+}
+
+.selfTag {
+  color: #4a90e2;
+  margin-left: 6px;
+  font-size: 12px;
+}
+
+.section {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 6px;
+
+  .title {
+    font-weight: 600;
+    margin-right: 6px;
+  }
+
+  .noble-item{
+    width: 8%;
+    aspect-ratio: 2 / 3;
+  }
+
+  .cost-item{
+    width: 8%;
+    aspect-ratio: 1 / 1;
+  }
+
+  .item {
+    display: inline-block;
+    margin-right: 8px;
+    font-size: 13px;
+    color: #444;
+  }
+
+  .empty {
+    color: #888;
+    font-style: italic;
+    font-size: 13px;
+  }
+}

@@ -1,0 +1,111 @@
+.game-board {
+  display: flex;
+  width: 70%;
+  height: 100%;
+  padding: 20px;
+  background: #154d79;
+  font-family: 'Arial', sans-serif;
+  border-radius: 12px;
+
+  .noble-row {
+    width: 20%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+    justify-content: center;
+
+    .noble-card {
+      width: 80%;
+      height: 30%;
+    }
+  }
+
+  .card-rows {
+    width: 80%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+    gap: 16px;
+
+    .card-row {
+      width: 80%;
+      height: 100%;
+      display: flex;
+      gap: 16px;
+      justify-content: center;
+
+      .card-item {
+        position: relative;
+        width: 100%;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+        border-radius: 12px;
+        overflow: hidden;
+        transition-duration: 400ms;
+
+        &:hover {
+          transform: scale(1.1);
+          box-shadow: 0 0 .6vw .6vw #4cee2c99; // 选中态也高亮
+        }
+      }
+
+      .selected {
+        transform: scale(1.1);
+        box-shadow: 0 0 .6vw .6vw #4cee2c99; // 选中态也高亮
+      }
+
+      .canBuy{
+        box-shadow: 0 0.6vw.6vw rgba(238, 225, 44, 0.6);
+      }
+    }
+  }
+}
+
+.cardModalContent {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.cardModalTitle {
+  font-size: 20px;
+  margin-bottom: 24px;
+}
+
+.cardModalActions {
+  display: flex;
+  gap: 24px;
+  margin-bottom: 24px;
+  width: 100%;
+  justify-content: center;
+}
+
+.actionCard {
+  background-color: #f5f5f5;
+  border-radius: 12px;
+  padding: 16px 24px;
+  font-size: 18px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+
+  &:hover {
+    background-color: #eaeaea;
+    transform: scale(1.05);
+  }
+}
+
+.cardModalClose {
+  background: transparent;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 14px;
+
+  &:hover {
+    color: #000;
+  }
+}

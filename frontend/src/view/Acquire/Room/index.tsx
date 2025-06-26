@@ -18,7 +18,6 @@ import CompanyStockInfoModal from './components/StockInfo';
 import { GameStatusMap } from '@/const/game';
 import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
 import CompanyInfo from './components/CompanyInfo';
-// import { isTabletLandscape } from '@/util/window';
 import MessageSender from './components/MessageSender';
 import { playAudio } from '@/util/audio';
 import { useFullHeight } from '@/hooks/useFullHeight';
@@ -116,7 +115,7 @@ export default function Room() {
     audioMapRef.current = map;
   }, []);
 
-  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
