@@ -7,22 +7,43 @@ import {
 } from "@/types/room";
 import APIClient from "./apiClient"; // 这里路径按你的项目结构修改
 
-export const createRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
+export const createAcquireRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
   return APIClient.post({
-    url: "/room/create",
+    url: "/acquire/room/create",
     data: params,
   });
 };
 
-export const deleteRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
+export const deleteAcquireRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
   return APIClient.post({
-    url: "/room/delete",
+    url: "/acquire/room/delete",
     data: params,
   });
 };
 
-export const getRoomList = async (): Promise<GetRoomListReponse> => {
+export const getAcquireRoomList = async (): Promise<GetRoomListReponse> => {
   return APIClient.get({
-    url: "/room/list",
+    url: "/acquire/room/list",
+  });
+};
+
+
+export const createSplendorRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
+  return APIClient.post({
+    url: "/splendor/room/create",
+    data: params,
+  });
+};
+
+export const getSplendorRoomList = async (): Promise<GetRoomListReponse> => {
+  return APIClient.get({
+    url: "/splendor/room/list",
+  });
+};
+
+export const deleteSplendorRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
+  return APIClient.post({
+    url: "/splendor/splendor/room/delete",
+    data: params,
   });
 };

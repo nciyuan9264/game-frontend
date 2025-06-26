@@ -11,18 +11,17 @@ export default defineConfig(({ mode }) => {
       'process.env': {},
     },
     plugins: [react()],
-    base: '/', 
+    base: '/',
     server: {
       open: true,
       host: true,
       port: 3001,
       proxy: {
-        '/api': {
+        '/api/splendor': {
           target: 'http://192.168.3.6:8000',
           changeOrigin: true,
           secure: false,
-          // rewrite路径也可以用，根据你的后端是否需要/api前缀
-          // rewrite: (path) => path.replace(/^\/api/, ''),
+          rewrite: path => path.replace(/^\/api\/splendor/, ''),
         },
       },
     },

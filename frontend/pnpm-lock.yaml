@@ -35,6 +35,9 @@ importers:
       classnames:
         specifier: ^2.5.1
         version: 2.5.1
+      framer-motion:
+        specifier: ^12.18.2
+        version: 12.18.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0)
       less:
         specifier: ^4.2.0
         version: 4.2.0
@@ -866,6 +869,20 @@ packages:
     resolution: {integrity: sha512-ETEklSGi5t0QMZuiXoA/Q6vcnxcLQP5vdugSpuAyi6SVGi2clPPp+xgEhuMaHC+zGgn31Kd235W35f7Hykkaww==}
     engines: {node: '>= 6'}
 
+  framer-motion@12.18.2:
+    resolution: {integrity: sha512-XesLt+IPAkOheawQ2xINL+9YUdx96zpRCJLTGKfM6SwrKfvPbENX7Iw3aNnDRQl+gFyXYWM/+rVP7NEF4JSiUQ==}
+    peerDependencies:
+      '@emotion/is-prop-valid': '*'
+      react: ^18.0.0 || ^19.0.0
+      react-dom: ^18.0.0 || ^19.0.0
+    peerDependenciesMeta:
+      '@emotion/is-prop-valid':
+        optional: true
+      react:
+        optional: true
+      react-dom:
+        optional: true
+
   fs.realpath@1.0.0:
     resolution: {integrity: sha512-OO0pH2lK6a0hZnAdau5ItzHPI6pUlvI7jMVnxUQRtw4owF2wk8lOSabtGDCTP4Ggrg2MbGnWO9X8K1t4+fGMDw==}
 
@@ -1018,6 +1035,12 @@ packages:
 
   minimatch@3.1.2:
     resolution: {integrity: sha512-J7p63hRiAjw1NDEww1W7i37+ByIrOWO5XQQAzZ3VOcL0PNybwpfmV/N05zFAzwQ9USyEcX6t3UO+K5aqBQOIHw==}
+
+  motion-dom@12.18.2:
+    resolution: {integrity: sha512-XKqpwAE/2bsjicpEP9s/OGVoJpEUnrT+uUufEq9usEtc+Wl2v3EnFLWsByH5KeiXKEuESj2GLoHev0/3nVbubg==}
+
+  motion-utils@12.18.2:
+    resolution: {integrity: sha512-CMnw6jUdEw/EZ7DXWkej/SVuKSTIpNbVDrZMSEXyhMFsW7kTZbCXvPwrnpmeBhsZNzPdU75wHQXBEzdLOlyocQ==}
 
   ms@2.1.2:
     resolution: {integrity: sha512-sGkPx+VjMtmA6MX27oA4FBFELFCZZ4S4XqeGOXCv68tT+jb3vk/RyaKWP0PTKyWtmLSM0b+adUTEvbs1PEaH2w==}
@@ -2359,6 +2382,15 @@ snapshots:
       combined-stream: 1.0.8
       mime-types: 2.1.35
 
+  framer-motion@12.18.2(react-dom@18.2.0(react@18.2.0))(react@18.2.0):
+    dependencies:
+      motion-dom: 12.18.2
+      motion-utils: 12.18.2
+      tslib: 2.6.2
+    optionalDependencies:
+      react: 18.2.0
+      react-dom: 18.2.0(react@18.2.0)
+
   fs.realpath@1.0.0: {}
 
   fsevents@2.3.3:
@@ -2503,6 +2535,12 @@ snapshots:
   minimatch@3.1.2:
     dependencies:
       brace-expansion: 1.1.11
+
+  motion-dom@12.18.2:
+    dependencies:
+      motion-utils: 12.18.2
+
+  motion-utils@12.18.2: {}
 
   ms@2.1.2: {}
 

@@ -1,4 +1,4 @@
-name: Deploy to Huaweiyun Server
+name: Deploy Frontend to OSS
 
 on:
   push:
@@ -7,21 +7,29 @@ on:
 
 jobs:
   deploy:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境运行
+    runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v2  # 检出代码
+      - name: Checkout Code
+        uses: actions/checkout@v2
 
-      - name: Set up SSH key for Huaweiyun
+      - name: Install Dependencies & Build (Vite)
         run: |
-          mkdir -p ~/.ssh
-          echo "${{ secrets.HUAWEIYUN_SSH_KEY }}" > ~/.ssh/wzy.pem
-          chmod 600 ~/.ssh/wzy.pem
-          ssh-keyscan -H 120.46.74.14 >> ~/.ssh/known_hosts  # 添加阿里云服务器的公钥
-        env:
-          HUAWEIYUN_SSH_KEY: ${{ secrets.HUAWEIYUN_SSH_KEY }}  # 使用 GitHub Secrets
+          corepack enable
+          pnpm install
+          pnpm run build
 
-      - name: Deploy to Huaweiyun
+      - name: Install ossutil
         run: |
-          ssh -i ~/.ssh/wzy.pem root@120.46.74.14 "cd /home/game-frontend && git pull && docker compose down && docker compose -f docker-compose.yml up -d --build"
+          curl -o ossutil.tar.gz https://gosspublic.alicdn.com/ossutil/1.7.16/ossutil64.tar.gz
+          tar -xzf ossutil.tar.gz
+          chmod +x ossutil64
+          mv ossutil64 /usr/local/bin/ossutil
+
+      - name: Configure ossutil
+        run: |
+          ossutil config -i "${{ secrets.OSS_ACCESS_KEY_ID }}" -k "${{ secrets.OSS_ACCESS_KEY_SECRET }}" -e "oss-cn-beijing.aliyuncs.com"
+
+      - name: Upload to OSS
+        run: |
+          ossutil cp dist/ oss://game-frontend/ -r -f
