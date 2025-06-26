@@ -12,6 +12,7 @@ import { LeftOutlined } from '@ant-design/icons';
 import PlayerData from './components/PlayerData';
 import UserData from './components/UserData';
 import GemSelect from './components/GemSelect';
+import WaitingModal from './components/Waiting';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
@@ -22,53 +23,12 @@ export default function Room() {
   const navigate = useNavigate();
   const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
 
-  // const waitingModalComtent = useMemo(() => {
-  //   if (data?.roomData.roomInfo.roomStatus === false) {
-  //     return '请等待其他玩家加入';
-  //   }
-  //   if (data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(data, userID)) {
-  //     const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
-  //       return val.hoders.length > 0;
-  //     });
-  //     return (
-  //       <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-  //         <Alert
-  //           message={`请等待 ${getLocalStorageUserName(firstHoders?.[1].hoders[0] ?? '')} 结算`}
-  //           type="info"
-  //           showIcon
-  //         />
-  //         {
-  //           <div className={styles.settlementContainer}>
-  //             <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={data?.tempData?.merge_main_company_temp as CompanyKey} />合并的公司：</div>
-  //             <div className={styles.companyList}>
-  //               {
-  //                 Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
-  //                   const companyName = company as CompanyKey;
-  //                   const dividends = value.dividends;
-  //                   return (
-  //                     <div key={company} className={styles.companyCard} style={{ borderLeft: `4px solid ${CompanyColor[companyName]}` }}>
-  //                       <CompanyTag company={companyName as CompanyKey} />
-  //                       {
-  //                         Object.entries(dividends)
-  //                           .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
-  //                           .map(([key, value]) => (
-  //                             <div key={key} className={styles.dividendRow}>
-  //                               <div className={styles.name}>{getLocalStorageUserName(key)} 获得现金：</div>
-  //                               <div className={styles.amount}>${value}</div>
-  //                             </div>
-  //                           ))
-  //                       }
-  //                     </div>
-  //                   )
-  //                 })
-  //               }
-  //             </div>
-  //           </div>
-  //         }
-  //       </div>)
-  //   }
-  //   return '';
-  // }, [data]);
+  const waitingModalComtent = useMemo(() => {
+    if (data?.roomData.roomInfo.roomStatus === false) {
+      return '请等待其他玩家加入';
+    }
+    return '';
+  }, [data]);
 
   useEffect(() => {
     const map: Record<string, HTMLAudioElement> = {};
@@ -133,7 +93,7 @@ export default function Room() {
                       wsRef.current.close(); // ✅ 主动关闭连接
                     }
                     setTimeout(() => {
-                      navigate('/game/acquire');
+                      navigate('/game/splendor');
                     }, 200);
                   }
                 })
@@ -211,7 +171,7 @@ export default function Room() {
           </div>
         </div>
       </div>
-      {/* <WaitingModal content={waitingModalComtent} /> */}
+      <WaitingModal content={waitingModalComtent} />
     </>
   );
 }
