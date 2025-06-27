@@ -1,5 +1,6 @@
 import AcquireGame from "@/view/Acquire/GameBoard";
 import AcquireRoom from "@/view/Acquire/Room";
+import Home from "@/view/Home";
 import SplendorGame from "@/view/Splendor/GameBoard";
 import SplendorRoom from "@/view/Splendor/Room";
 
@@ -7,10 +8,10 @@ import React from "react";
 import { Navigate } from "react-router-dom";
 
 export interface AppRoute {
-    path: string;
-    element: React.ReactNode;
-    auth?: boolean;
-    children?: AppRoute[];
+  path: string;
+  element: React.ReactNode;
+  auth?: boolean;
+  children?: AppRoute[];
 }
 
 export const routes: AppRoute[] = [
@@ -32,10 +33,10 @@ export const routes: AppRoute[] = [
   },
   {
     path: "/",
-    element: <Navigate to="/game/acquire" replace />
+    element: <Home />
   },
   {
     path: "*",
-    element: <Navigate to="/game/acquire" replace />
+    element: <Navigate to="/game/home" replace />
   }
 ];

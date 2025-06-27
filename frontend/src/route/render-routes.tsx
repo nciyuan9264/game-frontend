@@ -6,7 +6,6 @@ import { routes, AppRoute } from './routes.tsx';
  * @constructor RenderRoutes
  */
 export const RenderRoutes = () => {
-
     const renderRoutes = (routes: AppRoute[]) => {
         return routes.map(route => (
             <Route

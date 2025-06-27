@@ -1,16 +1,16 @@
-# 定义服务，即需要运行的容器集合
-services:
-  game-frontend:
-    container_name: game-frontend
-    build:
-      context: ./frontend/
-      dockerfile: Dockerfile
-    ports:
-      - "80:80"
-    networks:
-      - game-network
+# # 定义服务，即需要运行的容器集合
+# services:
+#   game-frontend:
+#     container_name: game-frontend
+#     build:
+#       context: ./frontend/
+#       dockerfile: Dockerfile
+#     ports:
+#       - "80:80"
+#     networks:
+#       - game-network
 
 
-networks:
-  game-network:
-      driver: bridge
+# networks:
+#   game-network:
+#       driver: bridge
