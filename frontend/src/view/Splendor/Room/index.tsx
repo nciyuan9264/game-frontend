@@ -64,6 +64,9 @@ export default function Room() {
     }
     if (data.type === 'sync') {
       console.log('收到数据：', data);
+      if (data.roomData.roomInfo.gameStatus === SplendorGameStatus.END) {
+        setGameEndModalVisible(true);
+      }
       setSelectedCard(undefined)
       setData(data);
     }
