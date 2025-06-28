@@ -1,9 +1,9 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
-import { useNavigate, useParams } from 'react-router-dom';
+import { useParams } from 'react-router-dom';
 import Board from './components/Board';
-import { Alert, Button, message, Modal, Tag } from 'antd';
+import { Alert, message, Modal, Tag } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
@@ -15,32 +15,18 @@ import { wsUrl } from '@/const/env';
 import { CompanyColor } from '@/const/color';
 import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
-import { GameStatusMap } from '@/const/game';
 import { getLocalStorageUserID, getLocalStorageUserName } from '@/util/user';
 import CompanyInfo from './components/CompanyInfo';
 import MessageSender from './components/MessageSender';
-import { playAudio } from '@/util/audio';
 import { useFullHeight } from '@/hooks/useFullHeight';
-import { LeftOutlined } from '@ant-design/icons';
-import { CompanyTag } from '@/components/CompanyTag';
-export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
-  const firstHoders = Object.entries(data?.tempData.mergeSettleData || {}).find(([_, val]) => {
-    return val.hoders.length > 0;
-  });
-  const needSettle = firstHoders?.[1].hoders[0] === userID;
-  return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && needSettle;
-};
-
-export const getMergeSelection = (data: WsRoomSyncData, userID: string) => {
-  return data?.roomData.roomInfo.gameStatus === GameStatus.MergingSelection && data?.roomData.currentPlayer === userID;
-
-};
-
-export const canBuyStock = (data: WsRoomSyncData, userID: string) => {
-  return data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK && data?.roomData.currentPlayer === userID;
-};
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
+import Settlement from './components/Settlement';
+import TopBar from './components/TopBar';
+import { getMergingModalAvailible } from './utils/game';
+import PlayerAssets from './components/PlayerAssets';
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
+  const userID = getLocalStorageUserID();
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
   const [buyStockModalVisible, setBuyStockModalVisible] = useState(false);
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
@@ -49,15 +35,9 @@ export default function Room() {
   const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
-  const userID = getLocalStorageUserID();
-  const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
-  const navigate = useNavigate();
+  const { playAudio } = useAudio();
 
-  // const [searchParams] = useSearchParams();
-  // const roomUserID = searchParams.get('roomUserID');
-  const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
-
-  const waitingModalComtent = useMemo(() => {
+  const waitingModalContent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
       return '请等待其他玩家加入';
     }
@@ -72,48 +52,11 @@ export default function Room() {
             type="info"
             showIcon
           />
-          {
-            <div className={styles.settlementContainer}>
-              <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={data?.tempData?.merge_main_company_temp as CompanyKey} />合并的公司：</div>
-              <div className={styles.companyList}>
-                {
-                  Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
-                    const companyName = company as CompanyKey;
-                    const dividends = value.dividends;
-                    return (
-                      <div key={company} className={styles.companyCard} style={{ borderLeft: `4px solid ${CompanyColor[companyName]}` }}>
-                        <CompanyTag company={companyName as CompanyKey} />
-                        {
-                          Object.entries(dividends)
-                            .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
-                            .map(([key, value]) => (
-                              <div key={key} className={styles.dividendRow}>
-                                <div className={styles.name}>{getLocalStorageUserName(key)} 获得现金：</div>
-                                <div className={styles.amount}>${value}</div>
-                              </div>
-                            ))
-                        }
-                      </div>
-                    )
-                  })
-                }
-              </div>
-            </div>
-          }
+          <Settlement data={data} />
         </div>)
     }
     return '';
   }, [data]);
-
-  useEffect(() => {
-    const map: Record<string, HTMLAudioElement> = {};
-    audioTypes.forEach((type) => {
-      const audio = new Audio(`/${type}.mp3`);
-      audio.load();
-      map[type] = audio;
-    });
-    audioMapRef.current = map;
-  }, []);
 
   const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: WsRoomSyncData = JSON.parse(msg.data);
@@ -124,13 +67,7 @@ export default function Room() {
     if (data.type === 'audio') {
       const audioType = data.message;
       if (audioType) {
-        const audio = audioMapRef.current[audioType];
-        if (audio) {
-          audio.currentTime = 0; // 重置到开头
-          audio.play().catch((err: any) => {
-            console.warn('音效播放失败（可能是用户未交互）', err);
-          });
-        }
+        playAudio(audioType);
       }
       return;
     }
@@ -165,307 +102,68 @@ export default function Room() {
       }
     }
   });
-  const canCreateCompany = () => {
-    return data?.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY && userID === data.roomData.currentPlayer;
-  }
 
-  const placeTile = (tileKey: string) => {
-    Modal.confirm({
-      title: '确认操作',
-      content: (
-        <div>
-          你确定要放置这个 tile 吗？
-          <div style={{ fontWeight: 'bold', marginTop: 8 }}>{tileKey}</div>
-        </div>
-      ),
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => {
-        sendMessage(JSON.stringify({
-          type: 'place_tile',
-          payload: tileKey,
-        }));
-      },
-    });
-  };
-
-  const isGameEnd = useMemo(() => {
-    if (!data) {
-      return false;
-    }
-    return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) < 11
-    }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) >= 41
-    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
-    }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
-      return Number(val.tiles ?? 0) === 0
-    }));
-  }, [data]);
+  const placeTile = (tileKey: string) => Modal.confirm({
+    title: '确认操作',
+    content: (
+      <div>
+        你确定要放置这个 tile 吗？
+        <div style={{ fontWeight: 'bold', marginTop: 8 }}>{tileKey}</div>
+      </div>
+    ),
+    okText: '确认',
+    cancelText: '取消',
+    onOk: () => {
+      sendMessage(JSON.stringify({
+        type: 'place_tile',
+        payload: tileKey,
+      }));
+    },
+  });
 
   const currentPlayer = useMemo(() => {
     return data?.roomData.currentPlayer;
   }, [data?.roomData.currentPlayer])
 
-  const currentStep = useMemo(() => {
-    if (!data?.roomData.roomInfo.roomStatus) {
-      return '等待其他玩家进入';
-    }
-    if (data?.roomData.roomInfo.gameStatus === GameStatus.END) {
-      return '游戏结束';
-    }
-    if (currentPlayer === userID) {
-      return GameStatusMap[data?.roomData.roomInfo.gameStatus];
-    } else {
-      return '请等待其他玩家操作';
-    }
-  }, [data, currentPlayer])
-
   useEffect(() => {
     if (currentPlayer === userID) {
-      playAudio(audioMapRef, 'your-turn');
+      playAudio(AudioTypeEnum.YourTurn);
     }
   }, [currentPlayer, userID]);
-
-  const renderButton = () => {
-    if (!data) {
-      return;
-    }
-    if (canCreateCompany()) {
-      return (
-        <Button
-          type="primary"
-          disabled={!canCreateCompany()}
-          onClick={() => {
-            setCreateCompanyModalVisible(true);
-          }}
-        >
-          创建公司
-        </Button>
-      )
-    }
-    if (canBuyStock(data, userID)) {
-      return (
-        <Button
-          type="primary"
-          disabled={!canBuyStock(data, userID)}
-          onClick={() => {
-            setBuyStockModalVisible(true);
-          }}
-        >
-          购买股票
-        </Button>
-      )
-    }
-    if (getMergingModalAvailible(data, userID)) {
-      return (
-        <Button
-          type="primary"
-          disabled={!getMergingModalAvailible(data, userID)}
-          onClick={() => {
-            setMergeCompanyModalVisible(true);
-          }}
-        >
-          合并清算
-        </Button>
-      )
-    }
-    if (getMergeSelection(data, userID)) {
-      return (
-        <Button
-          type="primary"
-          disabled={!getMergeSelection(data, userID)}
-          onClick={() => {
-            setMergeSelectionModalVisible(true);
-          }}
-        >
-          选择留下的公司
-        </Button>
-      )
-    }
-  }
 
   useFullHeight(styles.roomContainer);
 
   return (
     <>
       <div className={styles.roomContainer}>
-        <div className={styles.topBar}>
-          <div className={styles.left}>
-            <Button
-              className={styles.backButton}
-              type="text"
-              icon={<LeftOutlined style={{ fontSize: 20 }} />}
-              onClick={() => {
-                Modal.confirm({
-                  title: '确认操作',
-                  content: '你确定要离开房间吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                  onOk: () => {
-                    // 假设 ws 是你的 WebSocket 实例
-                    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                      wsRef.current.close(); // ✅ 主动关闭连接
-                    }
-                    setTimeout(() => {
-                      navigate('/game/acquire');
-                    }, 200);
-                  }
-                })
-              }}
-            >
-            </Button>
-            <div className={styles.IDs}>
-              <div>房间号：{roomID}</div>
-              <div>用户ID：{getLocalStorageUserName(userID)}</div>
-            </div>
-            <Button
-              type="primary"
-              onClick={() => {
-                setCompanyInfoVisible(true);
-              }}
-            >
-              公司面板
-            </Button>
-            <Button
-              type="primary"
-              style={{ zIndex: 9999 }}
-              disabled={!isGameEnd}
-              onClick={() => {
-                setGameEndModalVisible(true);
-              }}
-            >
-              结束清算
-            </Button>
-            {/* {userID === roomUserID && <Button
-              type="primary"
-              onClick={() => {
-                Modal.confirm({
-                  title: '确认操作',
-                  content: '你确定要结束游戏吗？',
-                  okText: '确认',
-                  cancelText: '取消',
-                  onOk: () => {
-                    sendMessage(JSON.stringify({
-                      type: 'game_end',
-                    }));
-                  },
-                });
-              }}
-            >
-              强制结束清算
-            </Button>} */}
-          </div>
-          <div className={styles.middle}>
-            {data?.roomData.roomInfo.roomStatus ? (
-              currentPlayer === userID ? (
-                <span className={styles.yourTurn}>你的回合</span>
-              ) : (
-                <>
-                  请等待
-                  <span className={styles.playerName}>{getLocalStorageUserName(data.roomData.currentPlayer)}</span>
-                  操作
-                </>
-              )
-            ) : (
-              '等待其他玩家进入'
-            )}
-          </div>
-          <div className={styles.right}>
-            {data?.tempData.last_tile_key && <div>上一个放置的地块：<span className={styles.playerName}>{data?.tempData.last_tile_key}</span></div>}
-            <div>当前阶段：{currentStep}</div>
-            <div>{renderButton()}</div>
-          </div>
-        </div>
+        <TopBar
+          data={data}
+          wsRef={wsRef}
+          setCompanyInfoVisible={setCompanyInfoVisible}
+          setGameEndModalVisible={setGameEndModalVisible}
+          setCreateCompanyModalVisible={setCreateCompanyModalVisible}
+          setBuyStockModalVisible={setBuyStockModalVisible}
+          setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+          setMergeSelectionModalVisible={setMergeSelectionModalVisible}
+        />
         <div className={styles.gameBoard}>
           <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
-          {<CompanyInfo
+          <CompanyInfo
             setBuyStockModalVisible={setBuyStockModalVisible}
             setMergeCompanyModalVisible={setMergeCompanyModalVisible}
             data={data}
             userID={userID}
-          />}
+          />
         </div>
         <div className={styles.assets}>
-          {/* {!isTabletLandscape && <CompanyInfo
-            setBuyStockModalVisible={setBuyStockModalVisible}
-            setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+          <PlayerAssets
             data={data}
-            userID={userID}
-          />} */}
-          <div className={styles.bottomRight}>
-            <div className={styles.playerAssets}>
-              <div className={styles.assetGroup}>
-                <span className={styles.assetLabel}>💰 现金：</span>
-                <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
-              </div>
-
-              <div className={styles.assetGroup}>
-                <span className={styles.assetLabel}>📈 股票：</span>
-                <div className={styles.stockList}>
-                  {Object.entries(data?.playerData.stocks || {})
-                    .filter(([_, count]) => Number(count) > 0)
-                    .map(([company, count]) => (
-                      <Tag
-                        key={company}
-                        color={CompanyColor[company as CompanyKey]}
-                        className={styles.stockTag}
-                      >
-                        <b>{company}</b> × {count}
-                      </Tag>
-                    ))}
-                </div>
-              </div>
-
-              <div className={styles.assetGroup}>
-                <span className={styles.assetLabel}>🧱 Tiles：</span>
-                <div className={styles.tileList}>
-                  {(data?.playerData.tiles || [])
-                    .sort((a, b) => {
-                      const [aRow, aCol] = a.match(/^(\d+)([A-Z])$/)!.slice(1);
-                      const [bRow, bCol] = b.match(/^(\d+)([A-Z])$/)!.slice(1);
-                      const rowDiff = Number(aRow) - Number(bRow);
-                      return rowDiff !== 0 ? rowDiff : aCol.charCodeAt(0) - bCol.charCodeAt(0);
-                    })
-                    .map((tileKey) => (
-                      <span
-                        className={styles.tile}
-                        key={tileKey}
-                        onMouseEnter={() =>
-                          currentPlayer === userID &&
-                          data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
-                          setHoveredTile(tileKey)
-                        }
-                        onMouseOut={() => currentPlayer === userID && setHoveredTile(undefined)}
-                        onClick={() =>
-                          currentPlayer === userID &&
-                          data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
-                          placeTile(tileKey)
-                        }
-                      >
-                        {tileKey}
-                      </span>
-                    ))}
-                </div>
-              </div>
-
-              <div className={styles.message}>
-                <MessageSender
-                  onMessageSend={(msg) => {
-                    console.log("用户发送消息:", msg);
-                    sendMessage(JSON.stringify({
-                      type: 'play_audio',
-                      payload: msg,
-                    }));
-                  }}
-                />
-              </div>
-            </div>
-          </div>
+            sendMessage={sendMessage}
+            setHoveredTile={setHoveredTile}
+            placeTile={placeTile} />
         </div>
       </div>
-      <WaitingModal content={waitingModalComtent} />
+      <WaitingModal content={waitingModalContent} />
       <GameEnd
         data={data}
         visible={gameEndModalVisible}
@@ -481,7 +179,6 @@ export default function Room() {
         visible={buyStockModalVisible}
         setBuyStockModalVisible={setBuyStockModalVisible}
         onSubmit={(modalData) => {
-          // playAudio(audioMapRef, 'buy-stock');
           sendMessage(JSON.stringify({
             type: 'buy_stock',
             payload: modalData,
@@ -489,7 +186,6 @@ export default function Room() {
           setBuyStockModalVisible(false);
         }}
         data={data} />
-
       <MergeSelection
         visible={mergeSelectionModalVisible}
         data={data}
@@ -521,7 +217,7 @@ export default function Room() {
         visible={createCompanyModalVisible}
         company={data?.roomData.companyInfo}
         onSelect={(company) => {
-          playAudio(audioMapRef, 'create-company');
+          playAudio(AudioTypeEnum.CreateCompany);
           sendMessage(JSON.stringify({
             type: 'create_company',
             payload: company,

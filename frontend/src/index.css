@@ -1,5 +1,6 @@
 html{
     overflow: hidden;
+    overscroll-behavior: none; /* 禁止边界回弹 */
 }
 * {
     margin: 0;

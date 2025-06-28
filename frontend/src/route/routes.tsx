@@ -37,6 +37,6 @@ export const routes: AppRoute[] = [
   },
   {
     path: "*",
-    element: <Navigate to="/game/home" replace />
+    element: <Navigate to="/" replace />
   }
 ];

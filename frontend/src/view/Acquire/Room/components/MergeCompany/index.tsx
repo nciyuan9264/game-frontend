@@ -7,6 +7,7 @@ import { useThrottleFn } from 'ahooks';
 import { getLocalStorageUserName } from '@/util/user';
 import { CompanyColor } from '@/const/color';
 import { CompanyTag } from '@/components/CompanyTag';
+import Settlement from '../Settlement';
 interface CompanyStockActionModalProps {
   visible: boolean;
   data?: WsRoomSyncData;
@@ -99,7 +100,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
   if (!mainCompany) return null;
   return (
     <Modal
-      title="请选择要处理被并购公司股票的方式"
+      title="请选择处理被并购公司股票的方式"
       open={visible}
       onCancel={onCancel}
       closable={true}
@@ -114,32 +115,7 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
       className={styles.settlementModal}
     >
       {/* ✅ 破产清算板块 */}
-      <div className={styles.settlementContainer}>
-        <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey}/>合并的公司：</div>
-        <div className={styles.companyList}>
-          {
-            Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
-              const companyName = company as CompanyKey;
-              const dividends = value.dividends;
-              return (
-                <div key={company} className={styles.companyCard} style={{ borderLeft: `4px solid ${CompanyColor[companyName]}` }}>
-                  <CompanyTag company={companyName as CompanyKey} />
-                  {
-                    Object.entries(dividends)
-                      .sort(([, a], [, b]) => Number(b) - Number(a)) // 按金额降序排列
-                      .map(([key, value]) => (
-                        <div key={key} className={styles.dividendRow}>
-                          <div className={styles.name}>{getLocalStorageUserName(key)} 获得现金：</div>
-                          <div className={styles.amount}>${value}</div>
-                        </div>
-                      ))
-                  }
-                </div>
-              )
-            })
-          }
-        </div>
-      </div>
+      <Settlement data={data} />
 
       {/* ✅ 股票操作表头 */}
       <div className={styles.sectionTitle} style={{ marginTop: 32 }}>股票处理</div>

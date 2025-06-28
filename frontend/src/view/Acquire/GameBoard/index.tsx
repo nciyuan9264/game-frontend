@@ -18,8 +18,6 @@ export default function GameMenu() {
   const [tabKey, setTabKey] = useState('user');
   const [aiCount, setAiCount] = useState(1);
 
-  const showModal = () => setCreateRoomCisible(true);
-
   useEffect(() => {
     const storageUserID = getLocalStorageUserID()
     if (storageUserID && validateUserName(storageUserID)) {
@@ -30,7 +28,7 @@ export default function GameMenu() {
   }, []);
 
   const { run: handleCreateRoom } = useRequest(
-    async ({ playerCount, aiCount }: {playerCount: number, aiCount: number }) => {
+    async ({ playerCount, aiCount }: { playerCount: number, aiCount: number }) => {
       await createAcquireRoom({
         MaxPlayers: playerCount,
         AiCount: tabKey === 'user' ? 0 : aiCount,
@@ -63,6 +61,7 @@ export default function GameMenu() {
         message.error('删除失败，请重试');
       },
       onSuccess: () => {
+        message.error('删除成功');
         handleGetRoomList();
       }
     },
@@ -86,10 +85,6 @@ export default function GameMenu() {
   );
 
   const { run: debouncedHandleOk } = useThrottleFn(() => {
-    if ((roomList?.length ?? 0) > 20) {
-      message.error('房间数量已达上限');
-      return;
-    }
     handleCreateRoom({
       playerCount,
       aiCount,
@@ -108,6 +103,7 @@ export default function GameMenu() {
   }, []);
 
   useFullHeight(styles.gameMenu);
+
   return (
     <>
       <div className={styles.gameMenu} style={{ height: window.innerHeight }}>
@@ -126,7 +122,13 @@ export default function GameMenu() {
           <Card
             hoverable
             className={styles.createRoomCard}
-            onClick={showModal}
+            onClick={() => {
+              if ((roomList?.length ?? 0) > 20) {
+                message.error('房间数量已达上限');
+                return;
+              }
+              setCreateRoomCisible(true)
+            }}
           >
             <div className={styles.createRoomInner}>
               <div style={{ marginTop: 8 }}>创建房间</div>

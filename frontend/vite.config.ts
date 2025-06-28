@@ -23,6 +23,12 @@ export default defineConfig(({ mode }) => {
           secure: false,
           rewrite: path => path.replace(/^\/api\/splendor/, ''),
         },
+        '/api/acquire': {
+          target: 'http://192.168.3.6:8000',
+          changeOrigin: true,
+          secure: false,
+          rewrite: path => path.replace(/^\/api\/acquire/, ''),
+        },
       },
     },
     resolve: {

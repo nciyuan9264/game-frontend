@@ -33,7 +33,7 @@ export default function Room() {
   useEffect(() => {
     const map: Record<string, HTMLAudioElement> = {};
     audioTypes.forEach((type) => {
-      const audio = new Audio(`/${type}.mp3`);
+      const audio = new Audio(`/music/${type}.mp3`);
       audio.load();
       map[type] = audio;
     });

@@ -48,7 +48,8 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
     }
 
     prevDataRef.current = data;
-  }, [data?.roomData.companyInfo]);
+  }, [data?.roomData.currentPlayer]);
+
   if (!data) return null;
 
   return (
@@ -81,7 +82,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
                 </div>
               );
             };
-
             return (
               <tr key={company.name}>
                 <td

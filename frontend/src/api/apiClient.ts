@@ -26,12 +26,12 @@ axiosInstance.interceptors.request.use(
 // 响应拦截
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<Result>) => {
-    if (!res.data) throw new Error();
+    // if (!res.data) throw new Error();
 
     const { status_code, data, message } = res.data;
 
     // 业务请求成功
-    const hasSuccess = data && Reflect.has(res.data, 'status_code') && status_code === Status.Succeed;
+    const hasSuccess = Reflect.has(res.data, 'status_code') && status_code === Status.Succeed;
     if (hasSuccess) {
       return data;
     }
