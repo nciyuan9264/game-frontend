@@ -8,3 +8,10 @@ export enum GameStatus {
   END = 'end',
 }
 
+export enum SplendorGameStatus {
+  WAITING = 'waiting',
+  PLAYING= 'playing',
+  LAST_TURN = 'last_turn',
+  END = 'end',
+}
+

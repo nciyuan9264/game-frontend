@@ -4,6 +4,7 @@ import SmallCard from '../Card/SmallCard';
 import { CardColorType } from '../UserData';
 import RoundCard from '../Card/RoundCard';
 import NormalCard from '../Card/NormalCard';
+import { getLocalStorageUserName } from '@/util/user';
 
 interface PlayerDataProps {
   data?: SplendorWsRoomSyncData;
@@ -12,21 +13,35 @@ interface PlayerDataProps {
 
 const PlayerData: React.FC<PlayerDataProps> = ({ data, userID }) => {
   if (!data) return null;
-   
+
   return (
     <div className={styles.playerDataContainer}>
       {Object.entries(data.playerData).map(([playerId, info]) => {
+        if (playerId === userID) return null; // 跳过当前玩家的信息
         const playerData = info as SplendorPlayerData; // 添加类型断言
+        const cardCount: Record<CardColorType, number> = {
+          Black: 0,
+          Blue: 0,
+          Green: 0,
+          Red: 0,
+          White: 0,
+        };
+        playerData.normalCard.forEach((item) =>{
+          if (!cardCount[item.bonus as CardColorType]) {
+            cardCount[item.bonus as CardColorType] = 1;
+          }else{
+            cardCount[item.bonus as CardColorType] += 1;
+          }
+        })
         return (
           <div key={playerId} className={styles.playerCard}>
             <div className={styles.header}>
-              玩家：{playerId}
-              {playerId === userID && <span className={styles.selfTag}>（你）</span>}
+              {getLocalStorageUserName(playerId)}
             </div>
 
             <div className={styles.section}>
               <span className={styles.title}>卡牌：</span>
-              {Object.entries(playerData.card ?? {}).filter(([color, _]) => color !== "Gold").map(([color, count]) => (
+              {Object.entries(cardCount ?? {}).filter(([color, _]) => color !== "Gold").map(([color, count]) => (
                 <div key={color} className={styles["noble-item"]}>
                   <SmallCard key={color} cost={count as number} color={color as CardColorType} />
                 </div>
@@ -52,24 +67,8 @@ const PlayerData: React.FC<PlayerDataProps> = ({ data, userID }) => {
             </div>
 
             <div className={styles.section}>
-              <span className={styles.title}>预购卡牌：</span>
-              {playerData.reserveCard && playerData.reserveCard.length > 0 ? (
-                playerData.reserveCard.map((card: SplendorCard) => (
-                  <NormalCard
-                    key={card.id}
-                    card={card}
-                    style={{
-                      position: 'absolute',
-                      backgroundImage: `url('/splendorCard/card${card.bonus}1.jpg')`,
-                      width: '100px',
-                      height: '150px',
-                      transform: 'scale(0.2)',
-                    }}
-                  />
-                ))
-              ) : (
-                <span className={styles.empty}>暂无</span>
-              )}
+              <span className={styles.title}>预购：</span>
+              {`${playerData.reserveCard.length ?? 0}`}
             </div>
           </div>
         )

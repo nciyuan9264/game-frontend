@@ -2,6 +2,7 @@ import React from 'react';
 import { Button, Modal } from 'antd';
 import { WsRoomSyncData } from '@/types/room';
 import { useSearchParams } from 'react-router-dom';
+import { getLocalStorageUserName } from '@/util/user';
 interface GameEndProps {
   visible: boolean;
   setGameEndModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -76,7 +77,7 @@ const GameEnd: React.FC<GameEndProps> = ({
                   }}
                 >
                   <span>
-                    🏅 第{index + 1}名：<strong>{player}</strong>
+                    🏅 第{index + 1}名：<strong>{getLocalStorageUserName(player)}</strong>
                   </span>
                   <span>总资产：${score}</span>
                 </div>

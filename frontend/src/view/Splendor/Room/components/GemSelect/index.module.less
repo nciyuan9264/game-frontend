@@ -11,14 +11,13 @@
     height: 80%;
     display: flex;
     align-items: center;
-    justify-content: flex-start;
-    gap: 5%;
-    border: .3vw solid rgb(244, 194, 45);
+    justify-content: space-between;
+    padding: 0 1vw;
     border-radius: 1vw;
     background-color: rgb(244, 194, 45);
 
     .gemSlot {
-      width: 30%;
+      height: 80%;
       aspect-ratio: 1 / 1;
       margin: 8px;
       background: rgb(157, 113, 113);
@@ -28,11 +27,6 @@
       justify-content: center;
       cursor: pointer;
       z-index: 1s;
-
-      &:hover {
-        transform: scale(1.1);
-        transition: transform 0.2s ease;
-      }
     }
   }
 

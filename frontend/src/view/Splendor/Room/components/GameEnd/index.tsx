@@ -1,11 +1,11 @@
 import React from 'react';
 import { Button, Modal } from 'antd';
-import { WsRoomSyncData } from '@/types/room';
 import { useSearchParams } from 'react-router-dom';
+import { getLocalStorageUserName } from '@/util/user';
 interface GameEndProps {
   visible: boolean;
   setGameEndModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
-  data?: WsRoomSyncData;
+  data?: SplendorWsRoomSyncData;
   sendMessage: (message: string) => void;
   userID: string;
 }
@@ -54,15 +54,24 @@ const GameEnd: React.FC<GameEndProps> = ({
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
         {
-          Object.entries(data?.result ?? {})
-            .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA)) // 排序
-            .map(([player, score], index) => {
+          Object.entries(data?.playerData ?? {})
+            .sort(([, playerA], [, playerB]) => {
+              const playerAData = playerA as SplendorPlayerData;
+              const playerBData = playerB as SplendorPlayerData;
+              if (playerAData.score === playerBData.score) {
+                return Number(playerAData.nobleCard.reduce((acc, card) => acc + card.points, 0)) - Number(playerBData.nobleCard.reduce((acc, card) => acc + card.points, 0));
+              } else {
+                return Number((playerB as SplendorPlayerData).score) - Number((playerA as SplendorPlayerData).score)
+              }
+            }) // 排序
+            .map(([playerID, player], index) => {
+              const playerData = player as SplendorPlayerData;
               const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32']; // 金 银 铜
               const bgColor = rankColors[index] || '#f0f2f5';
-
+              const nobleScore = playerData.nobleCard.reduce((acc, card) => acc + card.points, 0);
               return (
                 <div
-                  key={player}
+                  key={playerID}
                   style={{
                     padding: '16px 24px',
                     borderRadius: 10,
@@ -76,17 +85,17 @@ const GameEnd: React.FC<GameEndProps> = ({
                   }}
                 >
                   <span>
-                    🏅 第{index + 1}名：<strong>{player}</strong>
+                    🏅 第{index + 1}名：<strong>{getLocalStorageUserName(playerID)}</strong>
                   </span>
-                  <span>总资产：${score}</span>
+                  <span>普通牌：{(playerData as SplendorPlayerData).score - nobleScore}分</span>
+                  <span>贵族牌：{nobleScore}分</span>
+                  <span>总分：{(playerData as SplendorPlayerData).score}</span>
                 </div>
               );
             })
         }
       </div>
-
     </Modal>
-
   );
 };
 

@@ -4,6 +4,9 @@ import RoundCard from '../Card/RoundCard';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from 'antd';
+import { getLocalStorageUserID } from '@/util/user';
+import { canBuy } from '../CardBoard';
+import { SplendorGameStatus } from '@/enum/game';
 const GemSelect = ({
   data,
   sendMessage,
@@ -14,6 +17,7 @@ const GemSelect = ({
   selectedCard?: SplendorCard,
   setSelectedCard: React.Dispatch<React.SetStateAction<SplendorCard | undefined>>
 }) => {
+  const userID = getLocalStorageUserID();
   const [selectedGems, setSelectedGems] = useState<(CardColorType | null)[]>([null, null, null]);
   const [localGems, setLocalGems] = useState<Record<CardColorType, number>>({} as Record<CardColorType, number>);
   useEffect(() => {
@@ -70,74 +74,57 @@ const GemSelect = ({
   const canGet = () => {
     const userID = data?.playerId;
     if (!userID || userID !== data?.roomData.currentPlayer) return false;
-    if(selectedGems.filter(Boolean).length === 0) return false;
+
+    if(data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING){
+      return false;
+    }
+
+    // 过滤掉 null 或 undefined 的选择
+    const filteredGems = selectedGems.filter(Boolean);
+    if (filteredGems.length === 0) return false;
+
     const allGems = data?.roomData.gems;
     const playerGems = data?.playerData[userID].gem;
-    const totalGems = Object.values(playerGems as Record<string, number> || {}).reduce((sum: number, count: number) => sum + count, 0);
-    if (totalGems + selectedGems.filter(Boolean).length > 10) return false;
-    const isTripleSame = Object.values(
-      selectedGems.filter(Boolean).reduce((acc, color) => {
-        acc[color!] = (acc[color!] || 0) + 1;
-        return acc;
-      }, {} as Record<CardColorType, number>)
-    ).some(count => count === 3);
-    if (isTripleSame) return false;
+    const totalGems = Object.values(playerGems as Record<string, number> || {}).reduce(
+      (sum: number, count: number) => sum + count,
+      0
+    );
+
+    if (totalGems + filteredGems.length > 10) return false;
+
+    // 检查是否三颗同色（非法）
+    const colorCountMap = filteredGems.reduce((acc, color) => {
+      acc[color!] = (acc[color!] || 0) + 1;
+      return acc;
+    }, {} as Record<CardColorType, number>);
+
+    // ✅ 新增限制：如果拿了3颗，不允许有任何颜色相同
+    if (filteredGems.length === 3 && Object.keys(colorCountMap).length !== 3) {
+      return false;
+    }
+
     if (isTwoSameColorAndLowSupply(selectedGems, allGems || {})) {
       return false;
     }
+
     return true;
-  }
+  };
 
   const canPreserve = () => {
     const userID = data?.playerId;
     if (!userID || userID !== data?.roomData.currentPlayer) return false;
+    if(data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING){
+      return false;
+    }
     if (!selectedCard) return false;
-    if(selectedCard.state === 2) return false;
+    if (selectedCard.state === 2) return false;
     const playerReserved = data?.playerData?.[userID]?.reserveCard?.length;
     if (playerReserved === 3) return false;
     if (data?.roomData.gems["Gold"] === 0) return false;
     return true;
   }
-
-  const canBuy = () => {
-    const userID = data?.playerId;
-    if (!userID || userID !== data?.roomData.currentPlayer) return false;
-
-    if (!selectedCard) return false;
-
-    const required = selectedCard.cost; // card.Cost
-    const playerGems = {...data?.playerData[userID].gem};
-    const playerCard = data?.playerData[userID].card;
-    for (const color in playerCard) {
-      playerGems[color as CardColorType] = (playerGems[color as CardColorType] || 0) + (playerCard[color as CardColorType] || 0);
-    }
-    const paidGems: Record<string, number> = {};       // 实际支付的宝石数
-    let remainingGold = playerGems?.["Gold"];
-
-    let canBuy = true;
-    for (const color in required) {
-      const cost = required[color];
-      const owned = playerGems[color] || 0;
-
-      if (owned >= cost) {
-        paidGems[color] = cost;
-      } else {
-        const needGold = cost - owned;
-        if (remainingGold >= needGold) {
-          paidGems[color] = owned;
-          paidGems["Gold"] = (paidGems["Gold"] || 0) + needGold;
-          remainingGold -= needGold;
-        } else {
-          canBuy = false;
-          break;
-        }
-      }
-    }
-    return canBuy;
-  }
   return (
     <div className={styles.gemSelector}>
-      {/* 左边槽位 */}
       <div className={styles.left}>
         {selectedGems.map((color, idx) => (
           <div
@@ -146,7 +133,7 @@ const GemSelect = ({
             ref={(el) => (slotRefs.current[idx] = el)}
             onClick={() => handleRemoveGem(idx)}
           >
-            {color && <RoundCard real color={color} cost={undefined} />}
+            {color && <RoundCard color={color} cost={undefined} />}
           </div>
         ))}
       </div>
@@ -156,26 +143,27 @@ const GemSelect = ({
         {gemColors.map((color) => (
           <motion.div
             key={color}
-            whileTap={{ scale: color === "Gold" ? 1 : 0.8 }}
-            whileHover={{ scale: color === "Gold" || localGems[color as CardColorType] === 0 ? 1 : 1.1, boxShadow: color === "Gold" || localGems[color as CardColorType] === 0 ? "" : "0 0 12px 4px gold" }}
+            whileTap={userID === data?.roomData.currentPlayer ? { scale: color === "Gold" ? 1 : 0.8 } : {}}
+            whileHover={userID === data?.roomData.currentPlayer ? { scale: color === "Gold" || localGems[color as CardColorType] === 0 ? 1 : 1.1, boxShadow: color === "Gold" || localGems[color as CardColorType] === 0 ? "" : "0 0 12px 4px gold" } : {}}
             transition={{ type: "spring", stiffness: 200, damping: 30 }}
             className={styles.gemItem}
             ref={(el) => (gemRefs.current[color] = el)}
             onClick={() => {
-              if(data?.playerId !== data?.roomData.currentPlayer) return;
+              if (userID !== data?.roomData.currentPlayer) return;
               if (color === "Gold") return;
               handleClickGem(color as CardColorType)
             }}
-            style={{
-              cursor: color === "Gold" || localGems[color as CardColorType] === 0 ? "default" : "pointer",
-            }}
+            style={
+              userID === data?.roomData.currentPlayer ? {
+                cursor: color === "Gold" || localGems[color as CardColorType] === 0 ? "default" : "pointer",
+              } : {}}
           >
             {localGems[color as CardColorType] > 0 && (
               <>
-                <div className={styles.gemBadge}>
+                {/* <div className={styles.gemBadge}>
                   {localGems[color as CardColorType]}
-                </div>
-                <RoundCard real color={color} cost={undefined} />
+                </div> */}
+                <RoundCard color={color} cost={localGems[color as CardColorType]} />
               </>
             )}
           </motion.div>
@@ -205,7 +193,7 @@ const GemSelect = ({
       <Button
         className={styles.button}
         type="primary"
-        disabled={!canBuy()}
+        disabled={!canBuy(data, selectedCard)}
         onClick={() => {
           sendMessage(JSON.stringify({
             type: "buy_card",

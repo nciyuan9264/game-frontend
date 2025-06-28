@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useNavigate, useParams } from 'react-router-dom';
@@ -13,12 +13,15 @@ import PlayerData from './components/PlayerData';
 import UserData from './components/UserData';
 import GemSelect from './components/GemSelect';
 import WaitingModal from './components/Waiting';
+import { SplendorGameStatus } from '@/enum/game';
+import GameEnd from './components/GameEnd';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
-  const [data, setData] = useState<SplendorWsRoomSyncData>();
-  const [selectedCard, setSelectedCard] = useState<SplendorCard | undefined>();
   const userID = getLocalStorageUserID();
+  const [data, setData] = useState<SplendorWsRoomSyncData>();
+  const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
+  const [selectedCard, setSelectedCard] = useState<SplendorCard | undefined>();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
   const navigate = useNavigate();
   const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
@@ -40,7 +43,7 @@ export default function Room() {
     audioMapRef.current = map;
   }, []);
 
-  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: SplendorWsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
@@ -88,7 +91,6 @@ export default function Room() {
                   okText: '确认',
                   cancelText: '取消',
                   onOk: () => {
-                    // 假设 ws 是你的 WebSocket 实例
                     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                       wsRef.current.close(); // ✅ 主动关闭连接
                     }
@@ -107,9 +109,9 @@ export default function Room() {
             <Button
               type="primary"
               style={{ zIndex: 9999 }}
-              disabled={!true}
+              disabled={data?.roomData.roomInfo.gameStatus !== SplendorGameStatus.END}
               onClick={() => {
-                // setGameEndModalVisible(true);
+                setGameEndModalVisible(true);
               }}
             >
               结束清算
@@ -118,12 +120,13 @@ export default function Room() {
           <div className={styles.middle}>
             {data?.roomData.roomInfo.roomStatus ? (
               currentPlayer === userID ? (
-                <span className={styles.yourTurn}>你的回合</span>
+                <span className={styles.yourTurn}>你的回合{`${data.roomData.roomInfo.gameStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}</span>
               ) : (
                 <>
                   请等待
                   <span className={styles.playerName}>{getLocalStorageUserName(data.roomData.currentPlayer)}</span>
                   操作
+                  {`${data.roomData.roomInfo.gameStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}
                 </>
               )
             ) : (
@@ -172,6 +175,12 @@ export default function Room() {
         </div>
       </div>
       <WaitingModal content={waitingModalComtent} />
+      <GameEnd
+        data={data}
+        visible={gameEndModalVisible}
+        setGameEndModalVisible={setGameEndModalVisible}
+        sendMessage={sendMessage}
+        userID={userID} />
     </>
   );
 }

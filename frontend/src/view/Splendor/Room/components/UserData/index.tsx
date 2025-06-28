@@ -1,6 +1,7 @@
 import styles from "./index.module.less";
 import Card from "../Card/NormalCard";
 import { Empty } from "antd";
+import { canBuy } from "../CardBoard";
 
 
 export type CardColorType = "Black" | "Blue" | "Green" | "Red" | "White";
@@ -48,41 +49,21 @@ export const gemColors: GemColorType[] = ["Black", "Blue", "Green", "Red", "Whit
 export const cardColors: CardColorType[] = ["Black", "Blue", "Green", "Red", "White"];
 
 const UserData = ({ data, userID, selectedCard, setSelectedCard }: { data?: SplendorWsRoomSyncData, userID: string, selectedCard?: SplendorCard, setSelectedCard: React.Dispatch<React.SetStateAction<SplendorCard | undefined>> }) => {
-  const { card, gem, score, reserveCard } = data?.playerData[userID] ?? {};
-  const canBuy = (card: SplendorCard) => {
-    const userID = data?.playerId;
-    if (!userID || userID !== data?.roomData.currentPlayer) return false;
-
-    const required = card.cost; // card.Cost
-    const playerGems = {...data?.playerData[userID].gem};
-    const playerCard = data?.playerData[userID].card;
-    for (const color in playerCard) {
-      playerGems[color as CardColorType] = (playerGems[color as CardColorType] || 0) + (playerCard[color as CardColorType] || 0);
+  const { normalCard, gem, score, reserveCard } = data?.playerData[userID] ?? {};
+  const cardCount: Record<CardColorType, number> = {
+    Black: 0,
+    Blue: 0,
+    Green: 0,
+    Red: 0,
+    White: 0,
+  };
+  normalCard?.forEach((item: SplendorCard) =>{
+    if (!cardCount[item.bonus as CardColorType]) {
+      cardCount[item.bonus as CardColorType] = 1;
+    }else{
+      cardCount[item.bonus as CardColorType] += 1;
     }
-    const paidGems: Record<string, number> = {};       // 实际支付的宝石数
-    let remainingGold = playerGems?.["Gold"];
-
-    let canBuy = true;
-    for (const color in required) {
-      const cost = required[color];
-      const owned = playerGems[color] || 0;
-
-      if (owned >= cost) {
-        paidGems[color] = cost;
-      } else {
-        const needGold = cost - owned;
-        if (remainingGold >= needGold) {
-          paidGems[color] = owned;
-          paidGems["Gold"] = (paidGems["Gold"] || 0) + needGold;
-          remainingGold -= needGold;
-        } else {
-          canBuy = false;
-          break;
-        }
-      }
-    }
-    return canBuy;
-  }
+  })
 
   return (
     <div className={styles.userDataContainer}>
@@ -93,14 +74,14 @@ const UserData = ({ data, userID, selectedCard, setSelectedCard }: { data?: Sple
             <div key={color} className={styles.cardSlot}>
               <div className={styles.cardColor} style={{
                 backgroundColor: GemColor[color].backgroundColor,
-                opacity: Number(card?.[color] ?? 0) === 0 ? 0.3 : 1, // ✅ 设置透明度
+                opacity: Number(cardCount?.[color] ?? 0) === 0 ? 0.3 : 1, // ✅ 设置透明度
               }}>
                 <div className={styles.cardText}
                   style={{
                     color: GemColor[color].color,
                   }}
                 >
-                  {`${card?.[color]}`}
+                  {`${cardCount?.[color]}`}
                 </div>
               </div>
               <div
@@ -136,7 +117,7 @@ const UserData = ({ data, userID, selectedCard, setSelectedCard }: { data?: Sple
           return card.id ? (
             <div
               key={card.id}
-              className={`${styles.card} ${selectedCard?.id === card.id ? styles.selected : ''} ${canBuy(card) ? styles.canBuy : ''} }`}
+              className={`${styles.card} ${selectedCard?.id === card.id ? styles.selected : ''} ${canBuy(data, card) ? styles.canBuy : ''} }`}
               onClick={() => {
                 setSelectedCard(card);
               }}

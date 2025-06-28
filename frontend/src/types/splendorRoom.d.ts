@@ -1,6 +1,5 @@
-
 /** 可用的游戏状态类型 */
-// export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end' | 'setTile';
+type GameStatus = 'waiting' | 'playing' | 'last_turn' | 'end';
 
 interface SplendorCard {
   bonus: CardColorType;
@@ -18,12 +17,6 @@ interface SplendorNoble {
   state: number;
 }
 
-interface SplendorPlayerData {
-  card: map<string, number>;
-  gem: map<string, number>;
-  reserveCard: SplendorCard[];
-  score: number;
-}
 
 interface SplendorRoomData {
   card: map<string, SplendorCard[]>;
@@ -35,14 +28,14 @@ interface SplendorRoomData {
     roomStatus: boolean;
     gameStatus: GameStatus;
     round: number;
-  }
+  };
 }
 
 interface SplendorPlayerData {
-  card: map<string, number>;
-  gem: map<string, number>;
+  normalCard: SplendorCard[];
   nobleCard: SplendorNoble[];
   reserveCard: SplendorCard[];
+  gem: map<string, number>;
   score: number;
 }
 
