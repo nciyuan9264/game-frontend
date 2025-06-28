@@ -5,6 +5,7 @@ import { CardColorType } from "../UserData";
 import styles from "./index.module.less";
 
 export const canBuy = (data?: SplendorWsRoomSyncData, card?: SplendorCard) => {
+  if (!data || !card) return false;
   const userID = data?.playerId;
   if (!userID || userID !== data?.roomData.currentPlayer) return false;
 
