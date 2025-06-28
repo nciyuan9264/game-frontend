@@ -3,7 +3,7 @@ import { CardColorType, gemColors } from '../UserData';
 import RoundCard from '../Card/RoundCard';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from 'antd';
+import { Button, Modal } from 'antd';
 import { getLocalStorageUserID } from '@/util/user';
 import { canBuy } from '../CardBoard';
 import { SplendorGameStatus } from '@/enum/game';
@@ -75,7 +75,7 @@ const GemSelect = ({
     const userID = data?.playerId;
     if (!userID || userID !== data?.roomData.currentPlayer) return false;
 
-    if(data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING){
+    if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
       return false;
     }
 
@@ -113,7 +113,7 @@ const GemSelect = ({
   const canPreserve = () => {
     const userID = data?.playerId;
     if (!userID || userID !== data?.roomData.currentPlayer) return false;
-    if(data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING){
+    if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
       return false;
     }
     if (!selectedCard) return false;
@@ -156,7 +156,8 @@ const GemSelect = ({
             style={
               userID === data?.roomData.currentPlayer ? {
                 cursor: color === "Gold" || localGems[color as CardColorType] === 0 ? "default" : "pointer",
-              } : {}}
+              } : {
+              }}
           >
             {localGems[color as CardColorType] > 0 && (
               <>
@@ -182,11 +183,18 @@ const GemSelect = ({
               acc[c] = (acc[c] || 0) + 1;
               return acc;
             }, {} as Record<CardColorType, number>);
-          sendMessage(JSON.stringify({
-            type: "get_gem",
-            payload: gemCount
-          }));
-          setSelectedGems([null, null, null]);
+          Modal.confirm({
+            title: "确认拿取？",
+            okText: "确认",
+            cancelText: "取消",
+            onOk: () => {
+              sendMessage(JSON.stringify({
+                type: "get_gem",
+                payload: gemCount
+              }));
+              setSelectedGems([null, null, null]);
+            }
+          });
         }}>
         拿取
       </Button>
@@ -195,11 +203,18 @@ const GemSelect = ({
         type="primary"
         disabled={!canBuy(data, selectedCard)}
         onClick={() => {
-          sendMessage(JSON.stringify({
-            type: "buy_card",
-            payload: selectedCard?.id
-          }));
-          setSelectedGems([null, null, null]);
+          Modal.confirm({
+            title: "确认购买？",
+            okText: "确认",
+            cancelText: "取消",
+            onOk: () => {
+              sendMessage(JSON.stringify({
+                type: "buy_card",
+                payload: selectedCard?.id
+              }));
+              setSelectedGems([null, null, null]);
+            }
+          });
         }}>
         购买
       </Button>
@@ -208,10 +223,17 @@ const GemSelect = ({
         type="primary"
         disabled={!canPreserve()}
         onClick={() => {
-          sendMessage(JSON.stringify({
-            type: "preserve_card",
-            payload: selectedCard?.id
-          }));
+          Modal.confirm({
+            title: "确认预购？",
+            okText: "确认",
+            cancelText: "取消",
+            onOk: () => {
+              sendMessage(JSON.stringify({
+                type: "preserve_card",
+                payload: selectedCard?.id
+              }));
+            }
+          });
         }}>
         预购
       </Button>
