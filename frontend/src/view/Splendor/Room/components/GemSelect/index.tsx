@@ -3,7 +3,7 @@ import { CardColorType, gemColors } from '../UserData';
 import RoundCard from '../Card/RoundCard';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button, Modal } from 'antd';
+import { Button } from 'antd';
 import { getLocalStorageUserID } from '@/util/user';
 import { canBuy } from '../CardBoard';
 import { SplendorGameStatus } from '@/enum/game';
@@ -138,6 +138,15 @@ const GemSelect = ({
         ))}
       </div>
 
+      <Button
+        className={styles.cancelButton}
+        type="primary"
+        onClick={() => {
+          setSelectedGems([null, null, null]);
+        }}>
+        取消
+      </Button>
+
       {/* 右侧宝石池 */}
       <div className={styles.right}>
         {gemColors.map((color) => (
@@ -171,6 +180,7 @@ const GemSelect = ({
         ))}
       </div>
 
+
       <Button
         className={styles.button}
         type="primary"
@@ -183,18 +193,19 @@ const GemSelect = ({
               acc[c] = (acc[c] || 0) + 1;
               return acc;
             }, {} as Record<CardColorType, number>);
-          Modal.confirm({
-            title: "确认拿取？",
-            okText: "确认",
-            cancelText: "取消",
-            onOk: () => {
-              sendMessage(JSON.stringify({
-                type: "get_gem",
-                payload: gemCount
-              }));
-              setSelectedGems([null, null, null]);
-            }
-          });
+          sendMessage(JSON.stringify({
+            type: "get_gem",
+            payload: gemCount
+          }));
+          setSelectedGems([null, null, null]);
+          // Modal.confirm({
+          //   title: "确认拿取？",
+          //   okText: "确认",
+          //   cancelText: "取消",
+          //   onOk: () => {
+
+          //   }
+          // });
         }}>
         拿取
       </Button>
@@ -203,18 +214,19 @@ const GemSelect = ({
         type="primary"
         disabled={!canBuy(data, selectedCard)}
         onClick={() => {
-          Modal.confirm({
-            title: "确认购买？",
-            okText: "确认",
-            cancelText: "取消",
-            onOk: () => {
-              sendMessage(JSON.stringify({
-                type: "buy_card",
-                payload: selectedCard?.id
-              }));
-              setSelectedGems([null, null, null]);
-            }
-          });
+          sendMessage(JSON.stringify({
+            type: "buy_card",
+            payload: selectedCard?.id
+          }));
+          setSelectedGems([null, null, null]);
+          // Modal.confirm({
+          //   title: "确认购买？",
+          //   okText: "确认",
+          //   cancelText: "取消",
+          //   onOk: () => {
+
+          //   }
+          // });
         }}>
         购买
       </Button>
@@ -223,17 +235,18 @@ const GemSelect = ({
         type="primary"
         disabled={!canPreserve()}
         onClick={() => {
-          Modal.confirm({
-            title: "确认预购？",
-            okText: "确认",
-            cancelText: "取消",
-            onOk: () => {
-              sendMessage(JSON.stringify({
-                type: "preserve_card",
-                payload: selectedCard?.id
-              }));
-            }
-          });
+          sendMessage(JSON.stringify({
+            type: "preserve_card",
+            payload: selectedCard?.id
+          }));
+          // Modal.confirm({
+          //   title: "确认预购？",
+          //   okText: "确认",
+          //   cancelText: "取消",
+          //   onOk: () => {
+
+          //   }
+          // });
         }}>
         预购
       </Button>
