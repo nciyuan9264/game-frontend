@@ -1,4 +1,4 @@
-import { SetStateAction, useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useNavigate, useParams } from 'react-router-dom';

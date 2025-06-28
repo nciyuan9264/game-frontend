@@ -3,7 +3,6 @@ import styles from './index.module.less';
 import SmallCard from '../Card/SmallCard';
 import { CardColorType } from '../UserData';
 import RoundCard from '../Card/RoundCard';
-import NormalCard from '../Card/NormalCard';
 import { getLocalStorageUserName } from '@/util/user';
 
 interface PlayerDataProps {

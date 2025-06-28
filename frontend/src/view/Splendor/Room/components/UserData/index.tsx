@@ -116,7 +116,7 @@ const UserData = ({ data, userID, selectedCard, setSelectedCard }: { data?: Sple
           const card = reserveCard?.[index] ?? {};
           return card.id ? (
             <div
-              key={card.id}
+              key={index}
               className={`${styles.card} ${selectedCard?.id === card.id ? styles.selected : ''} ${canBuy(data, card) ? styles.canBuy : ''} }`}
               onClick={() => {
                 setSelectedCard(card);
@@ -130,7 +130,7 @@ const UserData = ({ data, userID, selectedCard, setSelectedCard }: { data?: Sple
                 }} />
             </div>
           ) : (
-            <div key={card.id} className={styles.cardEmpty}>
+            <div key={index} className={styles.cardEmpty}>
               <Empty description='' />
             </div>
           )
