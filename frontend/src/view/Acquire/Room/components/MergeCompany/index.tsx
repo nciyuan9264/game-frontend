@@ -4,8 +4,6 @@ import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import CustomInputNumber from '../../../../../components/CustomInputer';
 import { useThrottleFn } from 'ahooks';
-import { getLocalStorageUserName } from '@/util/user';
-import { CompanyColor } from '@/const/color';
 import { CompanyTag } from '@/components/CompanyTag';
 import Settlement from '../Settlement';
 interface CompanyStockActionModalProps {
