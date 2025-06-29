@@ -23,7 +23,6 @@ export default function Room() {
   const [data, setData] = useState<SplendorWsRoomSyncData>();
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState<SplendorCard | undefined>();
-  const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const waitingModalComtent = useMemo(() => {
@@ -48,13 +47,7 @@ export default function Room() {
     if (data.type === 'audio') {
       const audioType = data.message;
       if (audioType) {
-        const audio = audioMapRef.current[audioType];
-        if (audio) {
-          audio.currentTime = 0; // 重置到开头
-          audio.play().catch((err: any) => {
-            console.warn('音效播放失败（可能是用户未交互）', err);
-          });
-        }
+        playAudio(audioType);
       }
       return;
     }

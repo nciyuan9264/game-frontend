@@ -6,8 +6,17 @@ export enum AudioTypeEnum {
   YourTurn = 'your-turn',
   CreateCompany = 'create-company',
   BuyStock = 'buy-stock',
+  GetNobleCard = 'get-noble-card',
 }
-const audioTypes: AudioTypeEnum[] = [AudioTypeEnum.Quickily, AudioTypeEnum.Quickily2, AudioTypeEnum.Quickily1, AudioTypeEnum.YourTurn, AudioTypeEnum.CreateCompany, AudioTypeEnum.BuyStock];
+const audioTypes: AudioTypeEnum[] = [
+  AudioTypeEnum.Quickily,
+  AudioTypeEnum.Quickily2,
+  AudioTypeEnum.Quickily1,
+  AudioTypeEnum.YourTurn,
+  AudioTypeEnum.CreateCompany,
+  AudioTypeEnum.BuyStock,
+  AudioTypeEnum.GetNobleCard,
+];
 
 export const useAudio = () => {
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
@@ -21,7 +30,7 @@ export const useAudio = () => {
     audioMapRef.current = map;
   }, []);
 
-  const playAudio = ( type: string) => {
+  const playAudio = (type: string) => {
     const audio = audioMapRef.current[type];
     if (audio) {
       audio.currentTime = 0;
