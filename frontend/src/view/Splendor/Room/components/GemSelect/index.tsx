@@ -5,12 +5,32 @@ import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
 import { Button } from 'antd';
 import { getLocalStorageUserID } from '@/util/user';
-import { canBuy } from '../CardBoard';
 import { SplendorGameStatus } from '@/enum/game';
+
+export const canPreserve = (data?: SplendorWsRoomSyncData, selectedCard?: SplendorCard) => {
+  const userID = data?.playerId;
+  if (!userID || userID !== data?.roomData.currentPlayer) return false;
+  if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
+    return false;
+  }
+  if (!selectedCard) return false;
+  if (selectedCard.state === 2) return false;
+
+  let totalGem = 0;
+  Object.values(data?.playerData[userID].gem || {}).forEach((val) => {
+    const value = val as number;
+    totalGem += value;
+  });
+
+  if (totalGem >= 10) return false;
+  const playerReserved = data?.playerData?.[userID]?.reserveCard?.length;
+  if (playerReserved === 3) return false;
+  if (data?.roomData.gems["Gold"] === 0) return false;
+  return true;
+}
 const GemSelect = ({
   data,
   sendMessage,
-  selectedCard,
 }: {
   data?: SplendorWsRoomSyncData,
   sendMessage: (msg: string) => void,
@@ -109,27 +129,6 @@ const GemSelect = ({
     return true;
   };
 
-  const canPreserve = () => {
-    const userID = data?.playerId;
-    if (!userID || userID !== data?.roomData.currentPlayer) return false;
-    if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
-      return false;
-    }
-    if (!selectedCard) return false;
-    if (selectedCard.state === 2) return false;
-
-    let totalGem = 0;
-    Object.values(data?.playerData[userID].gem || {}).forEach((val) => {
-      const value = val as number;
-      totalGem += value;
-    });
-
-    if (totalGem >= 10) return false;
-    const playerReserved = data?.playerData?.[userID]?.reserveCard?.length;
-    if (playerReserved === 3) return false;
-    if (data?.roomData.gems["Gold"] === 0) return false;
-    return true;
-  }
   return (
     <div className={styles.gemSelector}>
       <div className={styles.left}>
@@ -144,36 +143,6 @@ const GemSelect = ({
           </div>
         ))}
       </div>
-
-      <Button
-        className={styles.cancelButton}
-        type="primary"
-        onClick={() => {
-          setSelectedGems([null, null, null]);
-        }}>
-        取消
-      </Button>
-      <Button
-        className={styles.cancelButton}
-        type="primary"
-        disabled={!canGet()}
-        onClick={() => {
-          const gemCount: Record<CardColorType, number> = selectedGems
-            .filter(Boolean)
-            .reduce((acc, color) => {
-              const c = color as CardColorType;
-              acc[c] = (acc[c] || 0) + 1;
-              return acc;
-            }, {} as Record<CardColorType, number>);
-          sendMessage(JSON.stringify({
-            type: "get_gem",
-            payload: gemCount
-          }));
-          setSelectedGems([null, null, null]);
-        }}
-      >
-        拿取
-      </Button>
 
       {/* 右侧宝石池 */}
       <div className={styles.right}>
@@ -209,45 +178,33 @@ const GemSelect = ({
       </div>
 
       <Button
-        className={styles.button}
+        className={styles.cancelButton}
         type="primary"
-        disabled={!canBuy(data, selectedCard)}
         onClick={() => {
-          sendMessage(JSON.stringify({
-            type: "buy_card",
-            payload: selectedCard?.id
-          }));
           setSelectedGems([null, null, null]);
-          // Modal.confirm({
-          //   title: "确认购买？",
-          //   okText: "确认",
-          //   cancelText: "取消",
-          //   onOk: () => {
-
-          //   }
-          // });
         }}>
-        购买
+        取消
       </Button>
       <Button
-        className={styles.button}
+        className={styles.cancelButton}
         type="primary"
-        disabled={!canPreserve()}
+        disabled={!canGet()}
         onClick={() => {
+          const gemCount: Record<CardColorType, number> = selectedGems
+            .filter(Boolean)
+            .reduce((acc, color) => {
+              const c = color as CardColorType;
+              acc[c] = (acc[c] || 0) + 1;
+              return acc;
+            }, {} as Record<CardColorType, number>);
           sendMessage(JSON.stringify({
-            type: "preserve_card",
-            payload: selectedCard?.id
+            type: "get_gem",
+            payload: gemCount
           }));
-          // Modal.confirm({
-          //   title: "确认预购？",
-          //   okText: "确认",
-          //   cancelText: "取消",
-          //   onOk: () => {
-
-          //   }
-          // });
-        }}>
-        预购
+          setSelectedGems([null, null, null]);
+        }}
+      >
+        拿取
       </Button>
     </div>
   );
