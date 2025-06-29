@@ -101,6 +101,7 @@ const GemSelect = ({
 
     // 过滤掉 null 或 undefined 的选择
     const filteredGems = selectedGems.filter(Boolean);
+    if (filteredGems.length === 0) return false;
 
     const allGems = data?.roomData.gems;
     const playerGems = data?.playerData[userID].gem;
@@ -180,14 +181,6 @@ const GemSelect = ({
       <Button
         className={styles.cancelButton}
         type="primary"
-        onClick={() => {
-          setSelectedGems([null, null, null]);
-        }}>
-        取消
-      </Button>
-      <Button
-        className={styles.cancelButton}
-        type="primary"
         disabled={!canGet()}
         onClick={() => {
           const gemCount: Record<CardColorType, number> = selectedGems
@@ -205,6 +198,27 @@ const GemSelect = ({
         }}
       >
         拿取
+      </Button>
+
+      <Button
+        className={styles.cancelButton}
+        type="primary"
+        onClick={() => {
+          setSelectedGems([null, null, null]);
+        }}>
+        取消
+      </Button>
+
+      <Button
+        className={styles.cancelButton}
+        type="primary"
+        onClick={() => {
+          sendMessage(JSON.stringify({
+            type: "get_gem",
+            payload: {}
+          }));
+        }}>
+        跳过
       </Button>
     </div>
   );
