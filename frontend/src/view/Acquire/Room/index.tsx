@@ -10,7 +10,7 @@ import { WsRoomSyncData } from '@/types/room';
 import BuyStock from './components/BuyStock';
 import CompanyStockActionModal from './components/MergeCompany';
 import MergeSelection from './components/MergeSelection';
-import WaitingModal from './components/Waiting';
+import WaitingModal from '../../../components/Waiting';
 import { wsUrl } from '@/const/env';
 import GameEnd from './components/GameEnd';
 import CompanyStockInfoModal from './components/StockInfo';
@@ -22,6 +22,7 @@ import Settlement from './components/Settlement';
 import TopBar from './components/TopBar';
 import { getMergingModalAvailible } from './utils/game';
 import PlayerAssets from './components/PlayerAssets';
+
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
   const userID = getLocalStorageUserID();

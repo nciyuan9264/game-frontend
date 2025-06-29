@@ -196,7 +196,7 @@ export default function GameMenu() {
           }}
           items={[
             { key: 'user', label: '用户对战' },
-            { key: 'ai', label: '人机对战' },
+            { key: 'ai', label: '人机对战', disabled: true},
           ]}
         />
 

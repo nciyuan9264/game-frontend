@@ -12,20 +12,20 @@ import { LeftOutlined } from '@ant-design/icons';
 import PlayerData from './components/PlayerData';
 import UserData from './components/UserData';
 import GemSelect from './components/GemSelect';
-import WaitingModal from './components/Waiting';
+import WaitingModal from '../../../components/Waiting';
 import { SplendorGameStatus } from '@/enum/game';
 import GameEnd from './components/GameEnd';
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 
 export default function Room() {
-  const { roomID } = useParams(); // 获取 URL 参数中的 roomID
+  const { roomID } = useParams();
   const userID = getLocalStorageUserID();
   const [data, setData] = useState<SplendorWsRoomSyncData>();
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
   const [selectedCard, setSelectedCard] = useState<SplendorCard | undefined>();
   const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
   const navigate = useNavigate();
-  const audioTypes = ['quickily', 'quickily1', 'quickily2', 'your-turn', 'create-company', 'buy-stock']; // 你可以继续扩展
-
+  const { playAudio } = useAudio();
   const waitingModalComtent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
       return '请等待其他玩家加入';
@@ -34,14 +34,10 @@ export default function Room() {
   }, [data]);
 
   useEffect(() => {
-    const map: Record<string, HTMLAudioElement> = {};
-    audioTypes.forEach((type) => {
-      const audio = new Audio(`/music/${type}.mp3`);
-      audio.load();
-      map[type] = audio;
-    });
-    audioMapRef.current = map;
-  }, []);
+    if (data?.roomData.currentPlayer === userID) {
+      playAudio(AudioTypeEnum.YourTurn);
+    }
+  }, [data?.roomData.currentPlayer, userID]);
 
   const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
     const data: SplendorWsRoomSyncData = JSON.parse(msg.data);
@@ -71,10 +67,6 @@ export default function Room() {
       setData(data);
     }
   });
-
-  const currentPlayer = useMemo(() => {
-    return data?.roomData.currentPlayer;
-  }, [data?.roomData.currentPlayer])
 
   useFullHeight(styles.roomContainer);
 
@@ -122,7 +114,7 @@ export default function Room() {
           </div>
           <div className={styles.middle}>
             {data?.roomData.roomInfo.roomStatus ? (
-              currentPlayer === userID ? (
+              data?.roomData.currentPlayer === userID ? (
                 <span className={styles.yourTurn}>你的回合{`${data.roomData.roomInfo.gameStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}</span>
               ) : (
                 <>
