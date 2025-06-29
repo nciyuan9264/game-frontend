@@ -81,7 +81,6 @@ const GemSelect = ({
 
     // 过滤掉 null 或 undefined 的选择
     const filteredGems = selectedGems.filter(Boolean);
-    if (filteredGems.length === 0) return false;
 
     const allGems = data?.roomData.gems;
     const playerGems = data?.playerData[userID].gem;
@@ -118,6 +117,14 @@ const GemSelect = ({
     }
     if (!selectedCard) return false;
     if (selectedCard.state === 2) return false;
+
+    let totalGem = 0;
+    Object.values(data?.playerData[userID].gem || {}).forEach((val) => {
+      const value = val as number;
+      totalGem += value;
+    });
+
+    if (totalGem >= 10) return false;
     const playerReserved = data?.playerData?.[userID]?.reserveCard?.length;
     if (playerReserved === 3) return false;
     if (data?.roomData.gems["Gold"] === 0) return false;
@@ -145,6 +152,27 @@ const GemSelect = ({
           setSelectedGems([null, null, null]);
         }}>
         取消
+      </Button>
+      <Button
+        className={styles.cancelButton}
+        type="primary"
+        disabled={!canGet()}
+        onClick={() => {
+          const gemCount: Record<CardColorType, number> = selectedGems
+            .filter(Boolean)
+            .reduce((acc, color) => {
+              const c = color as CardColorType;
+              acc[c] = (acc[c] || 0) + 1;
+              return acc;
+            }, {} as Record<CardColorType, number>);
+          sendMessage(JSON.stringify({
+            type: "get_gem",
+            payload: gemCount
+          }));
+          setSelectedGems([null, null, null]);
+        }}
+      >
+        拿取
       </Button>
 
       {/* 右侧宝石池 */}
@@ -180,35 +208,6 @@ const GemSelect = ({
         ))}
       </div>
 
-
-      <Button
-        className={styles.button}
-        type="primary"
-        disabled={!canGet()}
-        onClick={() => {
-          const gemCount: Record<CardColorType, number> = selectedGems
-            .filter(Boolean)
-            .reduce((acc, color) => {
-              const c = color as CardColorType;
-              acc[c] = (acc[c] || 0) + 1;
-              return acc;
-            }, {} as Record<CardColorType, number>);
-          sendMessage(JSON.stringify({
-            type: "get_gem",
-            payload: gemCount
-          }));
-          setSelectedGems([null, null, null]);
-          // Modal.confirm({
-          //   title: "确认拿取？",
-          //   okText: "确认",
-          //   cancelText: "取消",
-          //   onOk: () => {
-
-          //   }
-          // });
-        }}>
-        拿取
-      </Button>
       <Button
         className={styles.button}
         type="primary"
