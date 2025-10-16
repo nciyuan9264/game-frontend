@@ -1,5 +1,5 @@
 # 游戏前端项目 (Game Frontend)
-这是一个基于 React + TypeScript + Vite 开发的桌游前端项目，实现了两个经典桌游的在线版本： Splendor（璀璨宝石） 和 Acquire（并购风云） 。
+这是一个基于 React + TypeScript + Vite 开发的桌游前端项目，实现了两个经典桌游的在线版本： Splendor（璀璨宝石） 和 Acquire（并购） 。
 
 ## 🎮 游戏介绍
 ### Splendor（璀璨宝石）
