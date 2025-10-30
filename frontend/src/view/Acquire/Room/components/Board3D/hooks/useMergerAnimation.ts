@@ -3,6 +3,7 @@ import { getPrevData } from '../../../utils/game';
 import { CompanyColor } from '@/const/color';
 import { hexToColor3 } from '../utils/colorUtils';
 import { createFlashAnimation, sortTilesByDistance } from '../utils/animationUtils';
+import { StandardMaterial } from '@babylonjs/core';
 
 export const useMergerAnimation = (roomID: string, tilesRef?: React.MutableRefObject<Record<string, any>>, sceneRef?: React.MutableRefObject<any>) => {
   const detectAndAnimateMerger = useCallback((currentData: any) => {
@@ -37,7 +38,7 @@ export const useMergerAnimation = (roomID: string, tilesRef?: React.MutableRefOb
     }
   }, [roomID]);
 
-  const startMergeAnimation = useCallback((mergedCompanies: string[], survivingCompany: string, prevTiles: any, currentTiles: any) => {
+  const startMergeAnimation = useCallback((_: string[], survivingCompany: string, prevTiles: any, currentTiles: any) => {
     if (!tilesRef?.current || !sceneRef?.current) return;
 
     // 找出所有需要变色的tiles
@@ -58,11 +59,11 @@ export const useMergerAnimation = (roomID: string, tilesRef?: React.MutableRefOb
     if (tilesToAnimate.length > 0) {
       // 按距离排序，创建波浪效果
       const sortedTiles = sortTilesByDistance(tilesToAnimate, lastPlacedTile);
-      animateTileColorChange(sortedTiles, survivingCompany);
+      animateTileColorChange(sortedTiles, survivingCompany as keyof typeof CompanyColor);
     }
   }, [tilesRef, sceneRef]);
 
-  const animateTileColorChange = useCallback((tileIds: string[], targetCompany: string) => {
+  const animateTileColorChange = useCallback((tileIds: string[], targetCompany: keyof typeof CompanyColor) => {
     if (!tilesRef?.current || !sceneRef?.current) return;
 
     const targetColor = hexToColor3(CompanyColor[targetCompany] || '#ffffff');
@@ -71,8 +72,8 @@ export const useMergerAnimation = (roomID: string, tilesRef?: React.MutableRefOb
       setTimeout(() => {
         const tile = tilesRef.current[tileId];
         if (tile && tile.material) {
-          const material = tile.material as any;
-          createFlashAnimation(material, targetColor, sceneRef.current);
+          const material = tile.material as StandardMaterial;
+          createFlashAnimation(material, targetColor);
         }
       }, index * 100); // 每个tile间隔100ms
     });

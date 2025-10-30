@@ -59,40 +59,40 @@ const CompanyInfo3D: React.FC<CompanyInfoProps> = ({
     setIsCollapsed(!isCollapsed);
   };
 
-  // 绘制游戏风格背景
-  const drawGameBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
-    // 深色科技风背景
-    const gradient = ctx.createLinearGradient(0, 0, 0, height);
-    gradient.addColorStop(0, '#1a1a2e');
-    gradient.addColorStop(0.5, '#16213e');
-    gradient.addColorStop(1, '#0f3460');
-    ctx.fillStyle = gradient;
-    ctx.fillRect(0, 0, width, height);
+  // // 绘制游戏风格背景
+  // const drawGameBackground = (ctx: CanvasRenderingContext2D, width: number, height: number) => {
+  //   // 深色科技风背景
+  //   const gradient = ctx.createLinearGradient(0, 0, 0, height);
+  //   gradient.addColorStop(0, '#1a1a2e');
+  //   gradient.addColorStop(0.5, '#16213e');
+  //   gradient.addColorStop(1, '#0f3460');
+  //   ctx.fillStyle = gradient;
+  //   ctx.fillRect(0, 0, width, height);
 
-    // 添加网格纹理
-    ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
-    ctx.lineWidth = 1;
-    for (let i = 0; i < width; i += 20) {
-      ctx.beginPath();
-      ctx.moveTo(i, 0);
-      ctx.lineTo(i, height);
-      ctx.stroke();
-    }
-    for (let i = 0; i < height; i += 20) {
-      ctx.beginPath();
-      ctx.moveTo(0, i);
-      ctx.lineTo(width, i);
-      ctx.stroke();
-    }
+  //   // 添加网格纹理
+  //   ctx.strokeStyle = 'rgba(100, 200, 255, 0.1)';
+  //   ctx.lineWidth = 1;
+  //   for (let i = 0; i < width; i += 20) {
+  //     ctx.beginPath();
+  //     ctx.moveTo(i, 0);
+  //     ctx.lineTo(i, height);
+  //     ctx.stroke();
+  //   }
+  //   for (let i = 0; i < height; i += 20) {
+  //     ctx.beginPath();
+  //     ctx.moveTo(0, i);
+  //     ctx.lineTo(width, i);
+  //     ctx.stroke();
+  //   }
 
-    // 添加发光边框
-    ctx.strokeStyle = '#00d4ff';
-    ctx.lineWidth = 3;
-    ctx.shadowColor = '#00d4ff';
-    ctx.shadowBlur = 10;
-    ctx.strokeRect(0, 0, width, height);
-    ctx.shadowBlur = 0;
-  };
+  //   // 添加发光边框
+  //   ctx.strokeStyle = '#00d4ff';
+  //   ctx.lineWidth = 3;
+  //   ctx.shadowColor = '#00d4ff';
+  //   ctx.shadowBlur = 10;
+  //   ctx.strokeRect(0, 0, width, height);
+  //   ctx.shadowBlur = 0;
+  // };
 
   // 绘制游戏风格按钮/面板
   const drawGamePanel = (ctx: CanvasRenderingContext2D, x: number, y: number, width: number, height: number, isHeader = false) => {
@@ -203,8 +203,8 @@ const CompanyInfo3D: React.FC<CompanyInfoProps> = ({
     ctx.save();
     ctx.scale(scale, scale);
 
-    const canvasWidth = totalWidth;
-    const canvasHeight = totalHeight;
+    // const canvasWidth = totalWidth;
+    // const canvasHeight = totalHeight;
 
     // 表格居中（现在不需要居中，因为canvas就是表格大小）
     const tableX = 0;

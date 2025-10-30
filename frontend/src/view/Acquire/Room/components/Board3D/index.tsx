@@ -16,7 +16,7 @@ type Props = {
 };
 
 export default function Board3D({ roomID, hoveredTile, data }: Props) {
-  const { canvasRef, sceneRef, engineRef } = useScene();
+  const { canvasRef, sceneRef } = useScene();
   const { tilesRef, createTiles, updateTileColor } = useTiles(sceneRef);
   const { checkAndLoadCompanyModels } = useCompanyModels(sceneRef, tilesRef);
   const { detectAndAnimateMerger } = useMergerAnimation(roomID);

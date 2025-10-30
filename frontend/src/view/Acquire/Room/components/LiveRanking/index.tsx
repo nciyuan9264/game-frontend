@@ -84,7 +84,7 @@ const LiveRanking: React.FC<LiveRankingProps> = ({ data, mockMode = false }) => 
     <div className={styles.liveRanking}>
 
       <AnimatePresence>
-        {currentRankings.map((player, index) => {
+        {currentRankings.map((player, _) => {
           return (
             <motion.div
               key={player.playerId}

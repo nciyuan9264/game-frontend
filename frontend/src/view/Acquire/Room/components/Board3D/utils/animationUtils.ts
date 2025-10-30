@@ -1,8 +1,5 @@
-import { Animation, Color3, StandardMaterial, Scene } from '@babylonjs/core';
-import { CompanyColor } from '@/const/color';
-import { hexToColor3 } from './colorUtils';
-
-export const createFlashAnimation = (material: StandardMaterial, targetColor: Color3, scene: Scene) => {
+import { Animation, Color3, StandardMaterial } from '@babylonjs/core';
+export const createFlashAnimation = (material: StandardMaterial, targetColor: Color3) => {
   // 创建闪光动画
   const flashAnimation = Animation.CreateAndStartAnimation(
     'flash',

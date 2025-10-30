@@ -1,8 +1,9 @@
 import { useRef, useCallback } from 'react';
 import { Mesh, StandardMaterial, DynamicTexture, Color3, ActionManager, ExecuteCodeAction, GlowLayer, Texture, MeshBuilder } from '@babylonjs/core';
 import { CompanyColor } from '@/const/color';
-import { createBoardBorders, createTileGeometry } from '../utils/tileUtils';
+import { createTileGeometry } from '../utils/tileUtils';
 import { hexToColor3 } from '../utils/colorUtils';
+import { TileData } from '@/types/room';
 
 export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: GlowLayer) => {
   const tilesRef = useRef<Record<string, Mesh>>({});
@@ -69,7 +70,7 @@ export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: Glow
   }, [sceneRef, glowLayer]);
 
   const updateTileColor = useCallback(
-    (id: string, tileData: any, hoveredTile?: string) => {
+    (id: string, tileData: TileData, hoveredTile?: string) => {
       const tile = tilesRef.current[id];
       if (!tile || !sceneRef.current) return;
 

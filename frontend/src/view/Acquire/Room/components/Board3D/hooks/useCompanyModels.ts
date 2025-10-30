@@ -68,7 +68,7 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
       `/model/${modelName}/`, // 使用modelName而不是modelPath
       'scene.gltf',
       sceneRef.current,
-      (meshes, particleSystems, skeletons, animationGroups) => {
+      (meshes, __, _, animationGroups) => {
         if (meshes.length === 0) return;
 
         // 创建一个父容器来统一管理所有mesh
