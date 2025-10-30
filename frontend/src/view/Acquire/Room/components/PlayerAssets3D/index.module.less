@@ -1,0 +1,289 @@
+.playerAssets {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #0f3460 100%);
+  border-top: 3px solid #00d4ff;
+  box-shadow: 0 -5px 20px rgba(0, 0, 0, 0.5);
+  padding: 15px 20px;
+  z-index: 100;
+  min-height: 100px; // 减少高度，因为消息不占用底部空间
+
+  // 现金显示区域
+  .moneyDisplay {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 101;
+
+    .moneyOval {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+      border: 2px solid #00d4ff;
+      border-radius: 50px;
+      padding: 8px 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      box-shadow:
+        0 4px 15px rgba(0, 0, 0, 0.3),
+        0 0 20px rgba(0, 212, 255, 0.4);
+
+      .moneyIcon {
+        font-size: 18px;
+        filter: drop-shadow(0 0 5px rgba(255, 255, 255, 0.8));
+      }
+
+      .moneyAmount {
+        color: #ffffff;
+        font-size: 18px;
+        font-weight: bold;
+        text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);
+        font-family: 'Orbitron', monospace;
+      }
+    }
+  }
+
+  // 主要内容区域
+  .mainContent {
+    display: flex;
+    gap: 20px;
+    margin-top: 10px;
+    height: 140px; // 增加高度，给股票更多空间
+
+    // 股票区域
+    .stockSection {
+      flex: 2;
+
+      .sectionTitle {
+        color: #00d4ff;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+      }
+
+      .stockGrid {
+        display: flex;
+        align-items: center;
+        padding-left: 20px;
+        gap: 12px; // 增加间距
+        flex-wrap: wrap;
+        height: 114px;
+        overflow-y: auto;
+
+        .stockCard {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          width: 80px; // 固定宽度，拉长卡片
+          height: 100px;
+          border-radius: 10px; // 增加圆角
+          border: 2px solid rgba(255, 255, 255, 0.3);
+          transition: all 0.3s ease;
+          // cursor: default;
+
+          &:hover {
+            transform: translateY(-3px) scale(1.05); // 增强悬停效果
+            border-color: rgba(255, 255, 255, 0.8);
+          }
+
+          .stockCompany {
+            color: #ffffff;
+            font-size: 13px; // 稍微增大字体
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+          }
+
+          .stockCount {
+            color: #ffffff;
+            font-size: 16px; // 增大数量字体
+            font-weight: bold;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.8);
+          }
+        }
+
+        .emptyState {
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
+          display: flex;
+          align-items: center;
+          height: 50px;
+        }
+      }
+    }
+
+    // Tiles区域
+    .tilesSection {
+      flex: 1;
+
+      .sectionTitle {
+        color: #00d4ff;
+        font-size: 14px;
+        font-weight: bold;
+        margin-bottom: 8px;
+        text-shadow: 0 0 8px rgba(0, 212, 255, 0.8);
+      }
+
+      .tilesGrid {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 8px; // 增加间距
+        flex-wrap: wrap;
+        height: 80px;
+        width: 100%;
+        overflow-y: auto;
+
+        .tileCard {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          width: 55px; // 增大宽度
+          height: 55px; // 增大高度
+          background: linear-gradient(135deg, #2a2a3e 0%, #1e1e2e 100%);
+          border: 2px solid #00d4ff; // 增加边框宽度
+          border-radius: 6px; // 增加圆角
+          transition: all 0.3s ease;
+
+          .tileText {
+            color: #ffffff;
+            font-size: 13px; // 增大字体
+            font-weight: bold;
+            text-shadow: 0 0 5px rgba(255, 255, 255, 0.8);
+          }
+
+          &.tileClickable {
+            cursor: pointer;
+
+            &:hover {
+              background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+              transform: translateY(-3px) scale(1.05); // 增强悬停效果
+              box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+              border-color: #ffffff;
+            }
+
+            &:active {
+              transform: translateY(-1px) scale(1.05);
+            }
+          }
+        }
+
+        .emptyState {
+          color: rgba(255, 255, 255, 0.5);
+          font-style: italic;
+          display: flex;
+          align-items: center;
+          height: 35px;
+        }
+      }
+    }
+  }
+
+  // 消息区域 - 右下角浮动
+  .messageSection {
+    position: absolute;
+    bottom: 15px;
+    right: 20px;
+    z-index: 102;
+
+    // 如果MessageSender组件有特定的样式需求，可以在这里调整
+    :global(.ant-btn) {
+      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%) !important;
+      border-color: #00d4ff !important;
+      color: #ffffff !important;
+      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
+
+      &:hover {
+        background: linear-gradient(135deg, #5ba0f2 0%, #4590cd 100%) !important;
+        box-shadow: 0 4px 12px rgba(0, 212, 255, 0.5) !important;
+        transform: translateY(-1px);
+      }
+    }
+  }
+}
+
+// // 响应式设计
+// @media screen and (max-width: 1024px) {
+//   .playerAssets {
+//     .mainContent {
+//       flex-direction: column;
+//       height: auto;
+//       gap: 15px;
+
+//       .stockSection,
+//       .tilesSection {
+//         flex: none;
+
+//         .stockGrid,
+//         .tilesGrid {
+//           height: auto;
+//           max-height: 70px;
+//         }
+//       }
+
+//       .stockSection .stockGrid .stockCard {
+//         width: 100px;
+//       }
+
+//       .tilesSection .tilesGrid .tileCard {
+//         width: 50px;
+//         height: 30px;
+//       }
+//     }
+
+//     .messageSection {
+//       bottom: 10px;
+//       right: 15px;
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 768px) {
+//   .playerAssets {
+//     padding: 10px 15px;
+
+//     .moneyDisplay .moneyOval {
+//       padding: 6px 15px;
+
+//       .moneyIcon {
+//         font-size: 16px;
+//       }
+
+//       .moneyAmount {
+//         font-size: 16px;
+//       }
+//     }
+
+//     .mainContent {
+//       .stockSection .stockGrid .stockCard {
+//         width: 90px;
+//         height: 45px;
+
+//         .stockCompany {
+//           font-size: 12px;
+//         }
+
+//         .stockCount {
+//           font-size: 14px;
+//         }
+//       }
+
+//       .tilesSection .tilesGrid .tileCard {
+//         width: 45px;
+//         height: 28px;
+
+//         .tileText {
+//           font-size: 11px;
+//         }
+//       }
+//     }
+
+//     .messageSection {
+//       bottom: 8px;
+//       right: 10px;
+//     }
+//   }
+// }

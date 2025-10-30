@@ -1,0 +1,206 @@
+.liveRanking {
+  position: fixed;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 100;
+
+  .title {
+    display: flex;
+    align-items: center;
+    margin-bottom: 20px;
+    
+    .titleText {
+      color: #00d4ff;
+      font-size: 18px;
+      font-weight: bold;
+      text-shadow: 0 0 10px rgba(0, 212, 255, 0.8);
+      white-space: nowrap;
+      margin-right: 12px;
+    }
+    
+    .titleLine {
+      flex: 1;
+      height: 2px;
+      background: linear-gradient(90deg, #00d4ff, transparent);
+      box-shadow: 0 0 5px rgba(0, 212, 255, 0.5);
+    }
+  }
+
+  .rankItem {
+    display: flex;
+    align-items: flex-start;
+    margin-bottom: 16px;
+    position: relative;
+    
+    &:last-child {
+      margin-bottom: 0;
+    }
+
+    .rankCircle {
+      position: relative;
+      width: 32px;
+      height: 32px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 2px solid;
+      background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
+      box-shadow: 0 0 12px rgba(0, 0, 0, 0.3);
+      transition: all 0.3s ease;
+      flex-shrink: 0;
+      
+      .rankNumber {
+        font-size: 14px;
+        font-weight: bold;
+        text-shadow: 0 0 8px currentColor;
+      }
+      
+      // 不同排名的颜色
+      &.rank1 {
+        border-color: #ffd700;
+        color: #ffd700;
+        box-shadow: 0 0 16px rgba(255, 215, 0, 0.4);
+      }
+      
+      &.rank2 {
+        border-color: #c0c0c0;
+        color: #c0c0c0;
+        box-shadow: 0 0 16px rgba(192, 192, 192, 0.4);
+      }
+      
+      &.rank3 {
+        border-color: #cd7f32;
+        color: #cd7f32;
+        box-shadow: 0 0 16px rgba(205, 127, 50, 0.4);
+      }
+      
+      &:not(.rank1):not(.rank2):not(.rank3) {
+        border-color: #00d4ff;
+        color: #00d4ff;
+        box-shadow: 0 0 12px rgba(0, 212, 255, 0.3);
+      }
+    }
+
+    .playerInfo {
+      flex: 1;
+      margin-left: 12px;
+      
+      .playerDetails {
+        display: flex;
+        flex-direction: column;
+        
+        .playerContent {
+          display: flex;
+          justify-content: space-between;
+          align-items: baseline;
+          margin-bottom: 4px;
+          
+          .playerName {
+            color: #ffffff !important;
+            font-size: 14px !important;
+            font-weight: 600 !important;
+            text-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+            flex: 1;
+            max-width: 60px; // 设置最大宽度
+          }
+          
+          .playerScore {
+            color: #00ff88;
+            font-size: 12px;
+            font-weight: 500;
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.5);
+            margin-left: 12px;
+            flex-shrink: 0; // 防止金额被压缩
+          }
+        }
+        
+        .connectLine {
+          width: 114%;
+          height: 2px;
+          background: linear-gradient(90deg, #00d4ff, rgba(0, 212, 255, 0.3));
+          box-shadow: 0 0 5px rgba(0, 212, 255, 0.3);
+          transform-origin: left;
+        }
+      }
+    }
+  }
+
+  // Mock控制按钮样式
+  .mockControls {
+    margin-bottom: 15px;
+    text-align: center;
+    
+    .mockButton {
+      background: linear-gradient(135deg, #00d4ff, #0099cc);
+      border: none;
+      border-radius: 6px;
+      color: white;
+      padding: 6px 12px;
+      font-size: 12px;
+      cursor: pointer;
+      transition: all 0.3s ease;
+      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3);
+      
+      &:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0, 212, 255, 0.4);
+      }
+      
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+
+  // 响应式设计
+  @media screen and (max-width: 768px) {
+    right: 10px;
+    min-width: 240px;
+    
+    .title .titleText {
+      font-size: 16px;
+    }
+    
+    .rankItem {
+      .rankCircle {
+        width: 28px;
+        height: 28px;
+        
+        .rankNumber {
+          font-size: 12px;
+        }
+      }
+      
+      .playerInfo {
+        .playerDetails {
+          .playerContent {
+            .playerName {
+              font-size: 13px !important;
+              max-width: 100px; // 移动端更小的最大宽度
+            }
+            
+            .playerScore {
+              font-size: 11px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// 动画关键帧
+@keyframes rankPulse {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+}
+
+.rankItem:hover .rankCircle {
+  animation: rankPulse 1s ease-in-out infinite;
+}

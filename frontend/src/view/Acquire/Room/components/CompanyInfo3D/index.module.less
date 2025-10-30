@@ -1,0 +1,131 @@
+.companyInfo3D {
+  position: absolute;
+  top: 15%;
+  left: 0;
+  width: 35%;
+  transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+
+  // 收起状态：向左移动，只露出按钮
+  &.collapsed {
+    transform: translateX(calc(-94%)); // 向左移动，只露出50px宽度
+  }
+
+  .marketCanvas {
+    display: block;
+    width: 100%;
+    pointer-events: auto;
+    position: relative; // 添加这行，让canvas成为定位参考
+  }
+
+  // 收起/展开按钮
+  .toggleButton {
+    position: absolute;
+    // 修改定位：相对于canvas的右边缘
+    left: calc(94%); // 贴着canvas右边，留5px间距
+    top: 50%;
+    transform: translateY(-50%);
+    width: 40px;
+    height: 80px;
+    background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+    border: 2px solid #00d4ff;
+    border-radius: 0 12px 12px 0;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 
+      0 4px 12px rgba(0, 0, 0, 0.3),
+      0 0 20px rgba(0, 212, 255, 0.3);
+    transition: all 0.3s ease;
+    z-index: 11;
+    
+    &:hover {
+      background: linear-gradient(135deg, #5ba0f2 0%, #4590cd 100%);
+      box-shadow: 
+        0 6px 16px rgba(0, 0, 0, 0.4),
+        0 0 25px rgba(0, 212, 255, 0.5);
+      transform: translateY(-50%) scale(1.05);
+    }
+
+    &:active {
+      transform: translateY(-50%) scale(0.95);
+    }
+
+    .arrow {
+      color: #ffffff;
+      font-size: 16px;
+      font-weight: bold;
+      text-shadow: 0 0 8px rgba(255, 255, 255, 0.8);
+      transition: transform 0.3s ease;
+      
+      &.arrowLeft {
+
+      }
+      
+      &.arrowRight {
+        animation: pulseRight 2s ease-in-out infinite;
+      }
+    }
+  }
+}
+
+// 按钮脉冲动画
+@keyframes pulseLeft {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(-3px);
+    opacity: 0.7;
+  }
+}
+
+@keyframes pulseRight {
+  0%, 100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+  50% {
+    transform: translateX(3px);
+    opacity: 0.7;
+  }
+}
+
+// // 响应式设计
+// @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+//   .companyInfo3D {
+//     width: 45%;
+    
+//     &.collapsed {
+//       transform: translateX(calc(-100% + 60px));
+//     }
+    
+//     .toggleButton {
+//       right: -45px;
+//       width: 45px;
+//       height: 90px;
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 768px) {
+//   .companyInfo3D {
+//     width: 90%;
+    
+//     &.collapsed {
+//       transform: translateX(calc(-100% + 45px));
+//     }
+    
+//     .toggleButton {
+//       right: -35px;
+//       width: 35px;
+//       height: 70px;
+      
+//       .arrow {
+//         font-size: 14px;
+//       }
+//     }
+//   }
+// }

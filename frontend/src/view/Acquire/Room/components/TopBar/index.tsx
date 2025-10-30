@@ -122,8 +122,6 @@ const Settlement: React.FC<SettlementProps> = ({
     }
   }
 
-  debugger
-
   return (
     <div className={styles.topBar}>
       <div className={styles.left}>

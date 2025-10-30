@@ -1,0 +1,298 @@
+.topBar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 80px;
+  display: flex;
+  align-items: center;
+  padding: 0 24px;
+  background: linear-gradient(135deg, rgba(0, 21, 41, 0.65) 0%, rgba(0, 33, 64, 0.65) 100%);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid rgba(64, 169, 255, 0.3);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  z-index: 1000;
+
+  // 左侧区域
+  .leftSection {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex: 1;
+
+    .backButton {
+      color: #40a9ff;
+      border: 1px solid rgba(64, 169, 255, 0.3);
+      border-radius: 8px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: #ffffff;
+        background: rgba(64, 169, 255, 0.2);
+        border-color: #40a9ff;
+        transform: translateY(-1px);
+      }
+    }
+
+    .divider {
+      border-color: rgba(64, 169, 255, 0.3);
+      height: 32px;
+    }
+
+    .gameInfo {
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      min-width: 120px; // 设置最小宽度，确保至少能显示部分内容
+      max-width: 200px; // 最大宽度
+
+      .infoItem {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        width: 100%; // 确保占满父容器宽度
+
+        .infoIcon {
+          color: #40a9ff;
+          font-size: 14px;
+          flex-shrink: 0; // 图标不收缩
+        }
+
+        .infoText {
+          color: #e6f7ff;
+          font-size: 13px;
+          font-weight: 500;
+          flex: 1;
+          min-width: 0; // 允许收缩
+          // 移除max-width，让它自适应父容器
+        }
+      }
+    }
+
+    // 在响应式部分修改，不要隐藏gameInfo
+    @media screen and (max-width: 768px) {
+      .topBar {
+        height: 60px;
+        padding: 0 12px;
+
+        .leftSection {
+          .gameInfo {
+            min-width: 80px; // 在小屏幕上设置更小的最小宽度
+            max-width: 120px;
+
+            .infoItem .infoText {
+              font-size: 12px; // 缩小字体
+            }
+          }
+        }
+
+        .rightSection .gameDetails .lastTile {
+          display: none;
+        }
+      }
+    }
+
+    .utilButton {
+      color: #e6f7ff;
+      border-color: rgba(64, 169, 255, 0.4);
+      background: rgba(64, 169, 255, 0.1);
+      border-radius: 8px;
+      font-weight: 500;
+      transition: all 0.3s ease;
+
+      &:hover:not(:disabled) {
+        color: #ffffff;
+        border-color: #40a9ff;
+        background: rgba(64, 169, 255, 0.2);
+        transform: translateY(-1px);
+      }
+
+      &:disabled {
+        color: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.1);
+        background: rgba(255, 255, 255, 0.05);
+      }
+    }
+  }
+
+  // 中央区域
+  .centerSection {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+
+    .gameStatus {
+      padding: 12px 24px;
+      border-radius: 12px;
+      background: rgba(255, 255, 255, 0.1);
+      backdrop-filter: blur(5px);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+
+      .yourTurn {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        color: #52c41a;
+        font-size: 18px;
+        font-weight: 600;
+        animation: pulse 2s infinite;
+
+        .turnIcon {
+          font-size: 16px;
+        }
+      }
+
+      .waitingTurn {
+        color: #e6f7ff;
+        font-size: 16px;
+        font-weight: 500;
+
+        .playerName {
+          color: #40a9ff;
+          font-weight: 600;
+          padding: 2px 8px;
+          background: rgba(64, 169, 255, 0.2);
+          border-radius: 6px;
+          margin: 0 4px;
+        }
+      }
+
+      .waitingPlayers {
+        color: #faad14;
+        font-size: 16px;
+        font-weight: 500;
+      }
+    }
+  }
+
+  // 右侧区域
+  .rightSection {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    flex: 1;
+    justify-content: flex-end;
+
+    .gameDetails {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      text-align: right;
+
+      .lastTile {
+        color: #e6f7ff;
+        font-size: 13px;
+
+        .tileKey {
+          color: #40a9ff;
+          font-weight: 600;
+          background: rgba(64, 169, 255, 0.2);
+          padding: 2px 6px;
+          border-radius: 4px;
+          margin-left: 4px;
+        }
+      }
+
+      .currentStep {
+        color: #e6f7ff;
+        font-size: 14px;
+        font-weight: 500;
+
+        .stepName {
+          color: #ffffff;
+          font-weight: 600;
+        }
+      }
+    }
+
+    .actionArea {
+      .actionButton {
+        background: linear-gradient(135deg, #1890ff 0%, #40a9ff 100%);
+        border: none;
+        border-radius: 8px;
+        font-weight: 600;
+        box-shadow: 0 4px 12px rgba(24, 144, 255, 0.3);
+        transition: all 0.3s ease;
+
+        &:hover {
+          background: linear-gradient(135deg, #40a9ff 0%, #69c0ff 100%);
+          transform: translateY(-2px);
+          box-shadow: 0 6px 16px rgba(24, 144, 255, 0.4);
+        }
+
+        &:active {
+          transform: translateY(0);
+        }
+      }
+    }
+  }
+
+  @keyframes pulse {
+
+    0%,
+    100% {
+      opacity: 1;
+      transform: scale(1);
+    }
+
+    50% {
+      opacity: 0.8;
+      transform: scale(1.02);
+    }
+  }
+}
+
+// // 响应式设计
+// @media screen and (max-width: 1200px) {
+//   .topBar {
+//     height: 70px;
+//     padding: 0 16px;
+
+//     .leftSection {
+//       gap: 12px;
+
+//       .gameInfo .infoText {
+//         font-size: 12px;
+//       }
+//     }
+
+//     .centerSection .gameStatus {
+//       padding: 8px 16px;
+
+//       .yourTurn {
+//         font-size: 16px;
+//       }
+
+//       .waitingTurn {
+//         font-size: 14px;
+//       }
+//     }
+
+//     .rightSection {
+//       gap: 16px;
+
+//       .gameDetails {
+
+//         .lastTile,
+//         .currentStep {
+//           font-size: 12px;
+//         }
+//       }
+//     }
+//   }
+// }
+
+// @media screen and (max-width: 768px) {
+//   .topBar {
+//     height: 60px;
+//     padding: 0 12px;
+
+//     .leftSection .gameInfo {
+//       display: none;
+//     }
+
+//     .rightSection .gameDetails .lastTile {
+//       display: none;
+//     }
+//   }
+// }

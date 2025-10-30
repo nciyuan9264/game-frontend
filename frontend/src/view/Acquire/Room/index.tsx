@@ -3,7 +3,7 @@ import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useParams } from 'react-router-dom';
 import Board from './components/Board';
-import { Alert, message, Modal } from 'antd';
+import { Alert, Button, message, Modal } from 'antd';
 import CreateCompanyModal from './components/CreateCompany';
 import { GameStatus } from '@/enum/game';
 import { WsRoomSyncData } from '@/types/room';
@@ -20,8 +20,14 @@ import { useFullHeight } from '@/hooks/useFullHeight';
 import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import Settlement from './components/Settlement';
 import TopBar from './components/TopBar';
-import { getMergingModalAvailible } from './utils/game';
+import { getMergingModalAvailible, isDataEqual } from './utils/game';
 import PlayerAssets from './components/PlayerAssets';
+import Board3D from './components/Board3D';
+import CompanyInfo3D from './components/CompanyInfo3D';
+import TopBar3D from './components/TopBar3D';
+import PlayerAssets3D from './components/PlayerAssets3D';
+// 在imports中添加
+import LiveRanking from './components/LiveRanking';
 
 export default function Room() {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
@@ -32,6 +38,7 @@ export default function Room() {
   const [companyInfoVisible, setCompanyInfoVisible] = useState(false);
   const [mergeCompanyModalVisible, setMergeCompanyModalVisible] = useState(false);
   const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
+  const [is3DVersion, setIs3DVersion] = useState(true);
   const [data, setData] = useState<WsRoomSyncData>();
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const { playAudio } = useAudio();
@@ -58,38 +65,47 @@ export default function Room() {
   }, [data]);
 
   const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
-    const data: WsRoomSyncData = JSON.parse(msg.data);
-    if (data.type === 'error') {
-      message.error(data.message);
+    const newData: WsRoomSyncData = JSON.parse(msg.data);
+    if (newData.type === 'error') {
+      message.error(newData.message);
       return;
     }
-    if (data.type === 'audio') {
-      const audioType = data.message;
+    if (newData.type === 'audio') {
+      const audioType = newData.message;
       if (audioType) {
         playAudio(audioType);
       }
       return;
     }
-    if (data.type === 'sync') {
-      console.log('收到数据：', data);
-      setData(data);
-      if (getMergingModalAvailible(data, userID)) {
+    if (newData.type === 'sync') {
+      console.log('收到数据：', newData);
+
+      // 只有当数据真正发生变化时，才保存上一次的数据
+      if (data && !isDataEqual(data, newData)) {
+        localStorage.setItem(`room_${roomID}_prevData`, JSON.stringify(data));
+        console.log('数据发生变化，保存上一次数据到localStorage');
+      }
+
+      setData(newData);
+
+      // ... 其他逻辑保持不变
+      if (getMergingModalAvailible(newData, userID)) {
         setMergeCompanyModalVisible(true);
       } else {
         setMergeCompanyModalVisible(false);
       }
-      if (userID === data.roomData.currentPlayer) {
-        if (data.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY) {
+      if (userID === newData.roomData.currentPlayer) {
+        if (newData.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY) {
           setCreateCompanyModalVisible(true);
         } else {
           setCreateCompanyModalVisible(false);
         }
-        if (data.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
+        if (newData.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
           setBuyStockModalVisible(true);
         } else {
           setBuyStockModalVisible(false);
         }
-        if (data.roomData.roomInfo.gameStatus === GameStatus.MergingSelection) {
+        if (newData.roomData.roomInfo.gameStatus === GameStatus.MergingSelection) {
           setMergeSelectionModalVisible(true);
         } else {
           setMergeSelectionModalVisible(false);
@@ -135,34 +151,90 @@ export default function Room() {
   return (
     <>
       <div className={styles.roomContainer}>
-        <TopBar
-          data={data}
-          wsRef={wsRef}
-          setCompanyInfoVisible={setCompanyInfoVisible}
-          setGameEndModalVisible={setGameEndModalVisible}
-          setCreateCompanyModalVisible={setCreateCompanyModalVisible}
-          setBuyStockModalVisible={setBuyStockModalVisible}
-          setMergeCompanyModalVisible={setMergeCompanyModalVisible}
-          setMergeSelectionModalVisible={setMergeSelectionModalVisible}
-        />
+        <Button
+          className={styles.versionToggleBtn}
+          type="primary"
+          onClick={() => setIs3DVersion(!is3DVersion)}
+        >
+          {is3DVersion ? '切换到2D' : '切换到3D'}
+        </Button>
+        {
+          is3DVersion ? (
+            <TopBar3D
+              data={data}
+              wsRef={wsRef}
+              setCompanyInfoVisible={setCompanyInfoVisible}
+              setGameEndModalVisible={setGameEndModalVisible}
+              setCreateCompanyModalVisible={setCreateCompanyModalVisible}
+              setBuyStockModalVisible={setBuyStockModalVisible}
+              setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+              setMergeSelectionModalVisible={setMergeSelectionModalVisible}
+            />
+          ) : (
+            <TopBar
+              data={data}
+              wsRef={wsRef}
+              setCompanyInfoVisible={setCompanyInfoVisible}
+              setGameEndModalVisible={setGameEndModalVisible}
+              setCreateCompanyModalVisible={setCreateCompanyModalVisible}
+              setBuyStockModalVisible={setBuyStockModalVisible}
+              setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+              setMergeSelectionModalVisible={setMergeSelectionModalVisible}
+            />
+          )
+        }
         <div className={styles.gameBoard}>
-          <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
-          <CompanyInfo
-            setBuyStockModalVisible={setBuyStockModalVisible}
-            setMergeCompanyModalVisible={setMergeCompanyModalVisible}
-            data={data}
-            userID={userID}
-          />
+          {
+            is3DVersion ? (
+              <Board3D
+                roomID={roomID ?? ''}
+                hoveredTile={hoveredTile}
+                data={data}
+              />
+            ) : (
+              <Board tilesData={data?.roomData.tiles} hoveredTile={hoveredTile} />
+            )
+          }
+          {
+            is3DVersion ? (
+              <CompanyInfo3D
+                setBuyStockModalVisible={setBuyStockModalVisible}
+                setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+                data={data}
+                userID={userID}
+              />
+            ) : (
+              <CompanyInfo
+                setBuyStockModalVisible={setBuyStockModalVisible}
+                setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+                data={data}
+                userID={userID}
+              />
+            )
+          }
         </div>
         <div className={styles.assets}>
-          <PlayerAssets
-            data={data}
-            sendMessage={sendMessage}
-            setHoveredTile={setHoveredTile}
-            placeTile={placeTile} />
+          {
+            is3DVersion ? (
+              <PlayerAssets3D
+                data={data}
+                sendMessage={sendMessage}
+                setHoveredTile={setHoveredTile}
+                placeTile={placeTile} />
+            ) : (
+              <PlayerAssets
+                data={data}
+                sendMessage={sendMessage}
+                setHoveredTile={setHoveredTile}
+                placeTile={placeTile} />
+            )
+          }
         </div>
       </div>
       <WaitingModal content={waitingModalContent} />
+      {is3DVersion && (
+        <LiveRanking data={data} />
+      )}
       <GameEnd
         data={data}
         visible={gameEndModalVisible}
