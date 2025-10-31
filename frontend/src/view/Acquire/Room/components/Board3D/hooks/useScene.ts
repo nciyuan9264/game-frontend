@@ -1,10 +1,29 @@
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useCallback } from 'react';
 import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, GlowLayer } from '@babylonjs/core';
 
 export const useScene = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const sceneRef = useRef<Scene | null>(null);
   const engineRef = useRef<Engine | null>(null);
+  const cameraRef = useRef<ArcRotateCamera | null>(null);
+
+  // 初始相机参数
+  const initialCameraParams = {
+    alpha: -Math.PI / 2,
+    beta: Math.PI / 5.6,
+    radius: 21,
+    target: new Vector3(0, 0, 0)
+  };
+
+  // 重置相机到初始状态
+  const resetCamera = useCallback(() => {
+    if (cameraRef.current) {
+      cameraRef.current.setTarget(initialCameraParams.target);
+      cameraRef.current.alpha = initialCameraParams.alpha;
+      cameraRef.current.beta = initialCameraParams.beta;
+      cameraRef.current.radius = initialCameraParams.radius;
+    }
+  }, []);
 
   useEffect(() => {
     if (!canvasRef.current) return;
@@ -14,25 +33,40 @@ export const useScene = () => {
     const scene = new Scene(engine);
 
     // 设置场景背景为透明，让CSS背景图片显示
-    scene.clearColor.a = 0; // 设置alpha为0，使场景背景透明
+    scene.clearColor.a = 0;
 
     engineRef.current = engine;
     sceneRef.current = scene;
 
     // 设置相机
-    const camera = new ArcRotateCamera('camera', -Math.PI / 2, Math.PI / 5.6, 21, new Vector3(0, 0, 0), scene);
+    const camera = new ArcRotateCamera(
+      'camera', 
+      initialCameraParams.alpha, 
+      initialCameraParams.beta, 
+      initialCameraParams.radius, 
+      initialCameraParams.target, 
+      scene
+    );
+    
+    cameraRef.current = camera;
 
+    // 启用相机控制
     camera.attachControl(canvasRef.current, true);
     camera.inputs.addMouseWheel();
 
-    camera.inputs.attached.pointers.detachControl();
-    camera.inputs.attached.keyboard.detachControl();
+    // 移除这两行注释，启用鼠标和键盘控制
+    // camera.inputs.attached.pointers.detachControl();
+    // camera.inputs.attached.keyboard.detachControl();
 
-    // 限制缩放范围
+    // 限制相机范围，防止用户操作过度
     camera.lowerRadiusLimit = 10;
     camera.upperRadiusLimit = 30;
     camera.lowerBetaLimit = 0.1;
     camera.upperBetaLimit = Math.PI / 2.2;
+    
+    // 限制alpha角度，防止相机翻转过度
+    camera.lowerAlphaLimit = -Math.PI * 2;
+    camera.upperAlphaLimit = Math.PI * 2;
 
     // 设置光照
     const hemisphericLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), scene);
@@ -58,5 +92,5 @@ export const useScene = () => {
     };
   }, []);
 
-  return { canvasRef, sceneRef, engineRef };
+  return { canvasRef, sceneRef, engineRef, cameraRef, resetCamera };
 };

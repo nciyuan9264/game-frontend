@@ -1,5 +1,6 @@
-import { useEffect } from 'react';
-import { WsRoomSyncData } from '@/types/room';
+import  { useEffect } from 'react';
+import { Button } from 'antd';
+import { ReloadOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
 import { useScene } from './hooks/useScene';
 import { useTiles } from './hooks/useTiles';
@@ -8,6 +9,7 @@ import { useMergerAnimation } from './hooks/useMergerAnimation';
 
 // Add this import for glTF loader
 import '@babylonjs/loaders/glTF';
+import { WsRoomSyncData } from '@/types/room';
 
 type Props = {
   hoveredTile?: string;
@@ -16,7 +18,7 @@ type Props = {
 };
 
 export default function Board3D({ roomID, hoveredTile, data }: Props) {
-  const { canvasRef, sceneRef } = useScene();
+  const { canvasRef, sceneRef, resetCamera } = useScene();
   const { tilesRef, createTiles, updateTileColor } = useTiles(sceneRef);
   const { checkAndLoadCompanyModels } = useCompanyModels(sceneRef, tilesRef);
   const { detectAndAnimateMerger } = useMergerAnimation(roomID);
@@ -56,10 +58,23 @@ export default function Board3D({ roomID, hoveredTile, data }: Props) {
   }, [data?.roomData?.tiles, detectAndAnimateMerger]);
 
   return (
-    <canvas
-      ref={canvasRef}
-      className={styles.canvas}
-      style={{ width: '100vw', height: '100vh' }}
-    />
+    <div className={styles.board3DContainer}>
+      <canvas
+        ref={canvasRef}
+        className={styles.canvas}
+        style={{ width: '100vw', height: '100vh' }}
+      />
+      
+      {/* 相机重置按钮 */}
+      <Button
+        className={styles.resetCameraBtn}
+        type="primary"
+        icon={<ReloadOutlined />}
+        onClick={resetCamera}
+        title="重置视角"
+      >
+        重置视角
+      </Button>
+    </div>
   );
 }
