@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 import { Mesh, SceneLoader, TransformNode, Vector3, Animation, CubicEase, EasingFunction } from '@babylonjs/core';
-import { companyModels } from '../constants/models';
+import { companyModels, companyModelsData } from '../constants/models';
 
 export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef: React.MutableRefObject<Record<string, Mesh>>) => {
   const buildingsRef = useRef<Record<string, { meshes: Mesh[]; company: string }>>({});
@@ -40,6 +40,13 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
       sceneRef.current.beginAnimation(container, 0, animationDuration, false);
     },
     [sceneRef]
+  );
+
+  const getModelData = useCallback(
+    (modelName: string) => {
+      return companyModelsData[modelName] ;
+    },
+    []
   );
 
   const loadCompanyModel = useCallback(
@@ -104,34 +111,12 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
             }
           });
 
-          // 计算整个模型的边界框
-          let min = new Vector3(Infinity, Infinity, Infinity);
-          let max = new Vector3(-Infinity, -Infinity, -Infinity);
+          const modelData  = getModelData(modelName);
 
-          meshes.forEach(mesh => {
-            if (mesh.getBoundingInfo) {
-              const boundingInfo = mesh.getBoundingInfo();
-              const meshMin = boundingInfo.minimum;
-              const meshMax = boundingInfo.maximum;
-
-              min = Vector3.Minimize(min, meshMin);
-              max = Vector3.Maximize(max, meshMax);
-            }
-          });
-
-          // 计算模型的实际尺寸和中心点偏移
-          const size = max.subtract(min);
-          const maxDimension = Math.max(size.x, size.y, size.z);
-          const center = min.add(max).scale(0.5); // 计算模型的几何中心
-
-          // 目标大小（适合tile大小）
-          const targetSize = 2.6;
-          const scale = targetSize / maxDimension;
- 
           // 计算正确的位置偏移，确保模型底部贴合tile表面，中心对齐
-          const yOffset = -center.y * scale; // 补偿模型中心点偏移，让底部贴合tile
-          const xOffset = -center.x * scale; // 补偿X轴中心点偏移
-          const zOffset = -center.z * scale; // 补偿Z轴中心点偏移
+          const yOffset = modelData.yOffset; // 补偿模型中心点偏移，让底部贴合tile
+          const xOffset = modelData.xOffset; // 补偿X轴中心点偏移
+          const zOffset = modelData.zOffset; // 补偿Z轴中心点偏移
 
           // 设置容器的位置和缩放
           if (withAnimation) {
@@ -142,18 +127,18 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
             // 修改动画目标位置
             const finalPosition = new Vector3(
               tile.position.x + xOffset,
-              tile.position.y + yOffset + 1.4, // 稍微抬高0.01避免Z-fighting
+              tile.position.y + yOffset + 0.1, // 稍微抬高0.01避免Z-fighting
               tile.position.z + zOffset
             );
-            playConstructionAnimation(container, finalPosition, scale);
+            playConstructionAnimation(container, finalPosition, modelData.scale);
           } else {
             // 已有公司：直接展示
             container.position = new Vector3(
               tile.position.x + xOffset,
-              tile.position.y + yOffset + 1.4, // 贴合tile表面，稍微抬高避免Z-fighting
+              tile.position.y + yOffset + 0.1, // 贴合tile表面，稍微抬高避免Z-fighting
               tile.position.z + zOffset
             );
-            container.scaling = new Vector3(scale, scale, scale);
+            container.scaling = new Vector3(modelData.scale, modelData.scale, modelData.scale);
           }
 
           // 播放动画组
