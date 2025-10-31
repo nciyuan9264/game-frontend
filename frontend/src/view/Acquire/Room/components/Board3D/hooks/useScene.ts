@@ -1,5 +1,5 @@
 import { useRef, useEffect } from 'react';
-import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, CubeTexture, MeshBuilder, BackgroundMaterial, Texture, GlowLayer } from '@babylonjs/core';
+import { Engine, Scene, ArcRotateCamera, HemisphericLight, Vector3, GlowLayer } from '@babylonjs/core';
 
 export const useScene = () => {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -13,35 +13,8 @@ export const useScene = () => {
     const engine = new Engine(canvasRef.current, true);
     const scene = new Scene(engine);
 
-    // 设置天空盒环境贴图
-    scene.environmentTexture = CubeTexture.CreateFromPrefilteredData('/environment1.env', scene);
-    // 创建天空盒
-    const skydome = MeshBuilder.CreateBox(
-      'sky',
-      {
-        size: 100,
-        sideOrientation: 1, 
-      },
-      scene
-    );
-    skydome.position.y = 15;
-    skydome.isPickable = false;
-    skydome.receiveShadows = true;
-
-    // 添加这行来上下颠倒天空盒
-    skydome.scaling.y = -1;
-
-    // 设置天空盒材质
-    const sky = new BackgroundMaterial('skyMaterial', scene);
-    sky.reflectionTexture = scene.environmentTexture.clone();
-    if (sky.reflectionTexture) {
-      sky.reflectionTexture.coordinatesMode = Texture.SKYBOX_MODE;
-      sky.reflectionTexture.level = 0.2;
-    }
-    sky.reflectionBlur = 0.8;
-    sky.projectedGroundRadius = 20;
-    sky.projectedGroundHeight = 3;
-    skydome.material = sky;
+    // 设置场景背景为透明，让CSS背景图片显示
+    scene.clearColor.a = 0; // 设置alpha为0，使场景背景透明
 
     engineRef.current = engine;
     sceneRef.current = scene;
@@ -63,7 +36,7 @@ export const useScene = () => {
 
     // 设置光照
     const hemisphericLight = new HemisphericLight('hemiLight', new Vector3(0, 1, 0), scene);
-    hemisphericLight.intensity = 0.5;
+    hemisphericLight.intensity = 0.7;
 
     // 创建发光层
     const glowLayer = new GlowLayer('glow', scene);

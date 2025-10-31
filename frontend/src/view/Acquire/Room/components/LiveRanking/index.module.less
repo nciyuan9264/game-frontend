@@ -1,8 +1,8 @@
 .liveRanking {
   position: fixed;
   right: 10px;
-  top: 50%;
-  transform: translateY(-50%);
+  top: 40%;
+  transform: translateY(-60%);
   z-index: 100;
 
   .title {
@@ -155,40 +155,40 @@
   }
 
   // 响应式设计
-  @media screen and (max-width: 768px) {
-    right: 10px;
-    min-width: 240px;
+  // @media screen and (max-width: 768px) {
+  //   right: 10px;
+  //   min-width: 240px;
     
-    .title .titleText {
-      font-size: 16px;
-    }
+  //   .title .titleText {
+  //     font-size: 16px;
+  //   }
     
-    .rankItem {
-      .rankCircle {
-        width: 28px;
-        height: 28px;
+  //   .rankItem {
+  //     .rankCircle {
+  //       width: 28px;
+  //       height: 28px;
         
-        .rankNumber {
-          font-size: 12px;
-        }
-      }
+  //       .rankNumber {
+  //         font-size: 12px;
+  //       }
+  //     }
       
-      .playerInfo {
-        .playerDetails {
-          .playerContent {
-            .playerName {
-              font-size: 13px !important;
-              max-width: 100px; // 移动端更小的最大宽度
-            }
+  //     .playerInfo {
+  //       .playerDetails {
+  //         .playerContent {
+  //           .playerName {
+  //             font-size: 13px !important;
+  //             max-width: 100px; // 移动端更小的最大宽度
+  //           }
             
-            .playerScore {
-              font-size: 11px;
-            }
-          }
-        }
-      }
-    }
-  }
+  //           .playerScore {
+  //             font-size: 11px;
+  //           }
+  //         }
+  //       }
+  //     }
+  //   }
+  // }
 }
 
 // 动画关键帧

@@ -150,7 +150,7 @@ export default function Room() {
 
   return (
     <>
-      <div className={styles.roomContainer}>
+      <div className={styles.roomContainer} style={{ padding: is3DVersion ? '0' : '6px' }}>
         <Button
           className={styles.versionToggleBtn}
           type="primary"

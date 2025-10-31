@@ -6,25 +6,23 @@
   transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   z-index: 10;
 
-  // 收起状态：向左移动，只露出按钮
+  // 收起状态：改为固定像素值移动
   &.collapsed {
-    transform: translateX(calc(-94%)); // 向左移动，只露出50px宽度
+    transform: translateX(-375px); // 固定移动375px，只露出按钮区域
   }
 
   .marketCanvas {
     display: block;
     width: 100%;
     pointer-events: auto;
-    position: relative; // 添加这行，让canvas成为定位参考
+    position: relative;
   }
 
-  // 收起/展开按钮
+  // 收起/展开按钮 - 改为固定定位
   .toggleButton {
-    position: absolute;
-    // 修改定位：相对于canvas的右边缘
-    left: calc(94%); // 贴着canvas右边，留5px间距
-    top: 50%;
-    transform: translateY(-50%);
+    position: absolute; // 改为fixed定位
+    left: 375px;
+    top: calc(150px); // 相对于容器顶部偏移
     width: 40px;
     height: 80px;
     background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
@@ -40,16 +38,21 @@
     transition: all 0.3s ease;
     z-index: 11;
     
+    // 收起状态下的按钮位置
+    .companyInfo3D.collapsed & {
+      left: 35px; // 收起时固定在左侧35px位置
+    }
+    
     &:hover {
       background: linear-gradient(135deg, #5ba0f2 0%, #4590cd 100%);
       box-shadow: 
         0 6px 16px rgba(0, 0, 0, 0.4),
         0 0 25px rgba(0, 212, 255, 0.5);
-      transform: translateY(-50%) scale(1.05);
+      transform: scale(1.05);
     }
 
     &:active {
-      transform: translateY(-50%) scale(0.95);
+      transform: scale(0.95);
     }
 
     .arrow {
@@ -93,19 +96,23 @@
   }
 }
 
-// // 响应式设计
+// 响应式设计
 // @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
 //   .companyInfo3D {
 //     width: 45%;
     
 //     &.collapsed {
-//       transform: translateX(calc(-100% + 60px));
+//       transform: translateX(-450px);
 //     }
     
 //     .toggleButton {
-//       right: -45px;
+//       left: calc(45% - 5px);
 //       width: 45px;
 //       height: 90px;
+      
+//       .companyInfo3D.collapsed & {
+//         left: 40px;
+//       }
 //     }
 //   }
 // }
@@ -115,13 +122,17 @@
 //     width: 90%;
     
 //     &.collapsed {
-//       transform: translateX(calc(-100% + 45px));
+//       transform: translateX(-calc(90vw - 35px));
 //     }
     
 //     .toggleButton {
-//       right: -35px;
+//       left: calc(90% - 5px);
 //       width: 35px;
 //       height: 70px;
+      
+//       .companyInfo3D.collapsed & {
+//         left: 30px;
+//       }
       
 //       .arrow {
 //         font-size: 14px;

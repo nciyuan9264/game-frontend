@@ -25,7 +25,7 @@ const CompanyInfo3D: React.FC<CompanyInfoProps> = ({
   const prevDataRef = useRef<WsRoomSyncData>();
   const [deltas, setDeltas] = useState<CompanyDelta>({});
   const [animationFrame, setAnimationFrame] = useState<number>(0);
-  const [isCollapsed, setIsCollapsed] = useState<boolean>(false);
+  const [isCollapsed, setIsCollapsed] = useState<boolean>(true);
 
   useEffect(() => {
     if (!data) return;
