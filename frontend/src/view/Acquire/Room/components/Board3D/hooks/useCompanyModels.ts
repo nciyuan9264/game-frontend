@@ -1,6 +1,6 @@
 import { useRef, useCallback } from 'react';
 import { Mesh, SceneLoader, TransformNode, Vector3, Animation, CubicEase, EasingFunction } from '@babylonjs/core';
-import { companyModels } from '../constants/models';
+import { companyModels, companyModelsData } from '../constants/models';
 
 export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef: React.MutableRefObject<Record<string, Mesh>>) => {
   const buildingsRef = useRef<Record<string, { meshes: Mesh[]; company: string }>>({});
@@ -42,6 +42,13 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
     [sceneRef]
   );
 
+  const getModelData = useCallback(
+    (modelName: string) => {
+      return companyModelsData[modelName] ;
+    },
+    []
+  );
+
   const loadCompanyModel = useCallback(
     (company: string, tileId: string, withAnimation: boolean = false) => {
       if (!sceneRef.current || !tilesRef.current[tileId]) return;
@@ -75,67 +82,41 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
             // 增亮模型材质
             if (mesh.material) {
               // 增加环境光反射
-              if (mesh.material.ambientColor) {
-                mesh.material.ambientColor.scaleInPlace(1.5); // 增加环境光
+              if ((mesh.material as any).ambientColor) {
+                (mesh.material as any).ambientColor.scaleInPlace(1.5); // 增加环境光
               }
 
               // 增加漫反射亮度
-              if (mesh.material.diffuseColor) {
-                mesh.material.diffuseColor.scaleInPlace(1.3); // 增加漫反射
+              if ((mesh.material as any).diffuseColor) {
+                (mesh.material as any).diffuseColor.scaleInPlace(1.3); // 增加漫反射
               }
 
               // 添加自发光效果
-              if (mesh.material.emissiveColor) {
-                mesh.material.emissiveColor.scaleInPlace(0.2); // 轻微自发光
+              if ((mesh.material as any).emissiveColor) {
+                (mesh.material as any).emissiveColor.scaleInPlace(0.2); // 轻微自发光
               }
 
               // 如果是PBR材质，调整金属度和粗糙度
-              if (mesh.material.metallicFactor !== undefined) {
-                mesh.material.metallicFactor = Math.min(mesh.material.metallicFactor * 0.8, 1.0);
+              if ((mesh.material as any).metallicFactor !== undefined) {
+                (mesh.material as any).metallicFactor = Math.min((mesh.material as any).metallicFactor * 0.8, 1.0);
               }
-              if (mesh.material.roughnessFactor !== undefined) {
-                mesh.material.roughnessFactor = Math.max(mesh.material.roughnessFactor * 0.7, 0.1);
+              if ((mesh.material as any).roughnessFactor !== undefined) {
+                (mesh.material as any).roughnessFactor = Math.max((mesh.material as any).roughnessFactor * 0.7, 0.1);
               }
 
               // 增加整体亮度
-              if (mesh.material.albedoColor) {
-                mesh.material.albedoColor.scaleInPlace(1.4);
+              if ((mesh.material as any).albedoColor) {
+                (mesh.material as any).albedoColor.scaleInPlace(1.4);
               }
             }
           });
 
-          // 计算整个模型的边界框
-          let min = new Vector3(Infinity, Infinity, Infinity);
-          let max = new Vector3(-Infinity, -Infinity, -Infinity);
-
-          meshes.forEach(mesh => {
-            if (mesh.getBoundingInfo) {
-              const boundingInfo = mesh.getBoundingInfo();
-              const meshMin = boundingInfo.minimum;
-              const meshMax = boundingInfo.maximum;
-
-              min = Vector3.Minimize(min, meshMin);
-              max = Vector3.Maximize(max, meshMax);
-            }
-          });
-
-          // 计算模型的实际尺寸和中心点偏移
-          const size = max.subtract(min);
-          const maxDimension = Math.max(size.x, size.y, size.z);
-          const center = min.add(max).scale(0.5); // 计算模型的几何中心
-
-          // 目标大小（适合tile大小）
-          const targetSize = 2.6;
-          const scale = targetSize / maxDimension;
-
-          console.log(`Model ${modelName} dimensions:`, size);
-          console.log(`Model center offset:`, center);
-          console.log(`Max dimension: ${maxDimension}, calculated scale: ${scale}`);
+          const modelData  = getModelData(modelName);
 
           // 计算正确的位置偏移，确保模型底部贴合tile表面，中心对齐
-          const yOffset = -center.y * scale; // 补偿模型中心点偏移，让底部贴合tile
-          const xOffset = -center.x * scale; // 补偿X轴中心点偏移
-          const zOffset = -center.z * scale; // 补偿Z轴中心点偏移
+          const yOffset = modelData.yOffset; // 补偿模型中心点偏移，让底部贴合tile
+          const xOffset = modelData.xOffset; // 补偿X轴中心点偏移
+          const zOffset = modelData.zOffset; // 补偿Z轴中心点偏移
 
           // 设置容器的位置和缩放
           if (withAnimation) {
@@ -146,18 +127,18 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
             // 修改动画目标位置
             const finalPosition = new Vector3(
               tile.position.x + xOffset,
-              tile.position.y + yOffset + 1.4, // 稍微抬高0.01避免Z-fighting
+              tile.position.y + yOffset + 0.1, // 稍微抬高0.01避免Z-fighting
               tile.position.z + zOffset
             );
-            playConstructionAnimation(container, finalPosition, scale);
+            playConstructionAnimation(container, finalPosition, modelData.scale);
           } else {
             // 已有公司：直接展示
             container.position = new Vector3(
               tile.position.x + xOffset,
-              tile.position.y + yOffset + 1.4, // 贴合tile表面，稍微抬高避免Z-fighting
+              tile.position.y + yOffset + 0.1, // 贴合tile表面，稍微抬高避免Z-fighting
               tile.position.z + zOffset
             );
-            container.scaling = new Vector3(scale, scale, scale);
+            container.scaling = new Vector3(modelData.scale, modelData.scale, modelData.scale);
           }
 
           // 播放动画组
