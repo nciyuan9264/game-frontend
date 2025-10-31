@@ -75,31 +75,31 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
             // 增亮模型材质
             if (mesh.material) {
               // 增加环境光反射
-              if (mesh.material.ambientColor) {
-                mesh.material.ambientColor.scaleInPlace(1.5); // 增加环境光
+              if ((mesh.material as any).ambientColor) {
+                (mesh.material as any).ambientColor.scaleInPlace(1.5); // 增加环境光
               }
 
               // 增加漫反射亮度
-              if (mesh.material.diffuseColor) {
-                mesh.material.diffuseColor.scaleInPlace(1.3); // 增加漫反射
+              if ((mesh.material as any).diffuseColor) {
+                (mesh.material as any).diffuseColor.scaleInPlace(1.3); // 增加漫反射
               }
 
               // 添加自发光效果
-              if (mesh.material.emissiveColor) {
-                mesh.material.emissiveColor.scaleInPlace(0.2); // 轻微自发光
+              if ((mesh.material as any).emissiveColor) {
+                (mesh.material as any).emissiveColor.scaleInPlace(0.2); // 轻微自发光
               }
 
               // 如果是PBR材质，调整金属度和粗糙度
-              if (mesh.material.metallicFactor !== undefined) {
-                mesh.material.metallicFactor = Math.min(mesh.material.metallicFactor * 0.8, 1.0);
+              if ((mesh.material as any).metallicFactor !== undefined) {
+                (mesh.material as any).metallicFactor = Math.min((mesh.material as any).metallicFactor * 0.8, 1.0);
               }
-              if (mesh.material.roughnessFactor !== undefined) {
-                mesh.material.roughnessFactor = Math.max(mesh.material.roughnessFactor * 0.7, 0.1);
+              if ((mesh.material as any).roughnessFactor !== undefined) {
+                (mesh.material as any).roughnessFactor = Math.max((mesh.material as any).roughnessFactor * 0.7, 0.1);
               }
 
               // 增加整体亮度
-              if (mesh.material.albedoColor) {
-                mesh.material.albedoColor.scaleInPlace(1.4);
+              if ((mesh.material as any).albedoColor) {
+                (mesh.material as any).albedoColor.scaleInPlace(1.4);
               }
             }
           });
