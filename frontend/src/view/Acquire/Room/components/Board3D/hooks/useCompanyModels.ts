@@ -127,11 +127,7 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
           // 目标大小（适合tile大小）
           const targetSize = 2.6;
           const scale = targetSize / maxDimension;
-
-          console.log(`Model ${modelName} dimensions:`, size);
-          console.log(`Model center offset:`, center);
-          console.log(`Max dimension: ${maxDimension}, calculated scale: ${scale}`);
-
+ 
           // 计算正确的位置偏移，确保模型底部贴合tile表面，中心对齐
           const yOffset = -center.y * scale; // 补偿模型中心点偏移，让底部贴合tile
           const xOffset = -center.x * scale; // 补偿X轴中心点偏移
@@ -247,23 +243,39 @@ export const useCompanyModels = (sceneRef: React.MutableRefObject<any>, tilesRef
       // 收集当前所有公司及其位置
       Object.entries(data.roomData.tiles).forEach(([tileId, tileData]: [string, any]) => {
         if (tileData.belong && tileData.belong !== 'Blank' && tileData.belong !== 'undefined') {
-          if (!currentCompanies[tileData.belong]) {
-            currentCompanies[tileData.belong] = tileId; // 记录该公司的第一个tile
+          // 检查该公司是否已经有建筑物存在
+          const existingBuildingKey = Object.keys(buildingsRef.current).find(key => {
+            const building = buildingsRef.current[key];
+            return building.company === tileData.belong;
+          });
+
+          if (existingBuildingKey) {
+            // 如果已经有建筑物，使用现有建筑物的位置
+            const existingTileId = existingBuildingKey.split('_')[1]; // 从key中提取tileId
+            if (!currentCompanies[tileData.belong]) {
+              currentCompanies[tileData.belong] = existingTileId;
+            }
+          } else {
+            // 如果没有建筑物，记录该公司的第一个tile
+            if (!currentCompanies[tileData.belong]) {
+              currentCompanies[tileData.belong] = tileId;
+            }
           }
         }
       });
-      console.log('currentCompanies', currentCompanies);
 
       // 检测新增的公司和已有公司
       Object.entries(currentCompanies).forEach(([company, tileId]) => {
         const isNewCompany = !prevCompaniesRef.current[company];
+        const positionKey = `${company}_${tileId}`;
 
         if (isNewCompany) {
           // 这是新增的公司，带动画加载模型
-          loadCompanyModel(company, tileId, true);
+          if (!buildingsRef.current[positionKey]) {
+            loadCompanyModel(company, tileId, true);
+          }
         } else {
           // 已有公司，检查是否已加载模型，如果没有则直接加载（不带动画）
-          const positionKey = `${company}_${tileId}`;
           if (!buildingsRef.current[positionKey]) {
             loadCompanyModel(company, tileId, false);
           }
