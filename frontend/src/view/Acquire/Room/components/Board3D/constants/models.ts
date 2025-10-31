@@ -28,7 +28,7 @@ export const companyModelsData: Record<string, { scale: number; xOffset: number;
     zOffset: 0,
   },
   Imperial: {
-    scale: 0.0005,
+    scale: 0.0003,
     xOffset: 0,
     yOffset: 0,
     zOffset: 0,
