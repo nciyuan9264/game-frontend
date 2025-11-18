@@ -51,7 +51,6 @@ axiosInstance.interceptors.response.use(
     const isRoomApi = config?.url && ROOM_API_PATTERNS.some(pattern => config.url?.includes(pattern));
     // 如果是room相关接口且返回401错误
     if (isRoomApi && response?.status === 401) {
-      console.log('401错误，尝试刷新token');
       try {
         // 尝试刷新token
         await refreshToken();
