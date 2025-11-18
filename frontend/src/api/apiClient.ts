@@ -60,14 +60,14 @@ axiosInstance.interceptors.response.use(
         return axiosInstance.request(config as AxiosRequestConfig);
       } catch (refreshError) {
         // 如果刷新token失败，跳转到登录页面
-        // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
+        window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
         return Promise.reject(refreshError);
       }
     }
 
     // 其他错误处理保持不变
-    const errMsg = response?.data?.message || error?.message;
-    message.error(errMsg);
+    // const errMsg = response?.data?.message || error?.message;
+    // message.error(errMsg);
 
     // const status = response?.status;
     // if (status === 401) {
