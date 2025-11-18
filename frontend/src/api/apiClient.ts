@@ -1,7 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosError, type AxiosResponse } from 'axios';
 import { Status } from '@/enum/http';
 import { Result } from '@/types/http';
-import { message } from 'antd';
+// import { message } from 'antd';
 import { refreshToken } from './room'; // 导入refreshToken函数
 
 // 创建 axios 实例
