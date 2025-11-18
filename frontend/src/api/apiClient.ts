@@ -7,6 +7,7 @@ import { message } from 'antd';
 const axiosInstance = axios.create({
   baseURL: import.meta.env.VITE_API_URL,
   timeout: 50000,
+  withCredentials: true,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
 });
 
