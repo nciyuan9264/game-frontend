@@ -49,20 +49,17 @@ axiosInstance.interceptors.response.use(
 
     // 判断是否是需要处理权限的room相关接口
     const isRoomApi = config?.url && ROOM_API_PATTERNS.some(pattern => config.url?.includes(pattern));
-    console.log('isRoomApi:', isRoomApi);
     // 如果是room相关接口且返回401错误
     if (isRoomApi && response?.status === 401) {
       console.log('401错误，尝试刷新token');
       try {
         // 尝试刷新token
         await refreshToken();
-        console.log('刷新token成功');
         // 如果刷新token成功，重试原请求
         return axiosInstance.request(config as AxiosRequestConfig);
       } catch (refreshError) {
         // 如果刷新token失败，跳转到登录页面
-        // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
-        console.error('刷新token失败:', refreshError);
+        window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
         return Promise.reject(refreshError);
       }
     }
