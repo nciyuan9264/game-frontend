@@ -49,6 +49,7 @@ export const deleteSplendorRoom = async (params: DeleteRoomRequest): Promise<Del
 
 export const refreshToken = async (): Promise<void> => {
   return APIClient.post({
-    url: "/auth/refresh",
+    url: "https://auth.gamebus.online/auth/refresh", // 使用完整URL，避免添加/api/前缀
+    baseURL: "" // 清空baseURL，确保直接使用完整URL
   });
 };
