@@ -60,7 +60,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance.request(config as AxiosRequestConfig);
       } catch (refreshError) {
         // 如果刷新token失败，跳转到登录页面
-        window.location.href = 'https://auth.gamebus.online';
+        // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
         return Promise.reject(refreshError);
       }
     }
