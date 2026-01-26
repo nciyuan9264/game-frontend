@@ -52,15 +52,15 @@ jobs:
 
       - name: Configure Aliyun CLI
         run: |
-          aliyun configure set --access-key-id ${{ secrets.OSS_ACCESS_KEY_ID }} \
-                               --access-key-secret ${{ secrets.OSS_ACCESS_KEY_SECRET }} \
-                               --region cn-hangzhou \
-                               --output json
+          aliyun configure set --profile default \
+            --access-key-id ${{ secrets.OSS_ACCESS_KEY_ID }} \
+            --access-key-secret ${{ secrets.OSS_ACCESS_KEY_SECRET }} \
+            --region cn-hangzhou
 
       - name: Refresh CDN Cache
         run: |
-          # 刷新整个 CDN 域名下的缓存
           aliyun cdn RefreshObjectCaches \
+            --profile default \
             --ObjectPath "https://board.gamebus.online/*" \
             --ObjectType "File"
 
