@@ -44,6 +44,26 @@ jobs:
         run: |
           ossutil cp frontend/dist/ oss://game-frontend/ -r -f --config-file ~/.ossutilconfig
 
+      - name: Setup Aliyun CLI
+        run: |
+          curl -sSL https://aliyuncli.alicdn.com/aliyun-cli-linux-latest-amd64.tgz | tar -zx
+          sudo mv aliyun /usr/local/bin/
+          aliyun version
+
+      - name: Configure Aliyun CLI
+        run: |
+          aliyun configure set --access-key-id ${{ secrets.OSS_ACCESS_KEY_ID }} \
+                               --access-key-secret ${{ secrets.OSS_ACCESS_KEY_SECRET }} \
+                               --region cn-hangzhou \
+                               --output json
+
+      - name: Refresh CDN Cache
+        run: |
+          # 刷新整个 CDN 域名下的缓存
+          aliyun cdn RefreshObjectCaches \
+            --ObjectPath "https://board.gamebus.online/*" \
+            --ObjectType "File"
+
       - name: Send notification to Feishu
         if: success() # 只有前面步骤成功时才执行
         run: |
