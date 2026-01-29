@@ -20,7 +20,8 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
     }
   };
   useEffect(() => {
-    if (wsRef.current !== null) return;
+    console.log('url', url);
+    if (!url || wsRef.current !== null) return;
     let ws = new WebSocket(url);
     wsRef.current = ws;
 

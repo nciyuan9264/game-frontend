@@ -6,7 +6,7 @@ import { refreshToken } from './room'; // 导入refreshToken函数
 
 // 创建 axios 实例
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: import.meta.env.VITE_API_BASE_URL,
   timeout: 50000,
   withCredentials: true,
   headers: { 'Content-Type': 'application/json;charset=utf-8' },
@@ -31,17 +31,12 @@ const ROOM_API_PATTERNS = ['/acquire/room/', '/splendor/room/'];
 // 响应拦截
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<Result>) => {
-    // if (!res.data) throw new Error();
-
     const { status_code, data, message } = res.data;
 
-    // 业务请求成功
-    const hasSuccess = Reflect.has(res.data, 'status_code') && status_code === Status.Succeed;
-    if (hasSuccess) {
+    if (status_code === Status.Succeed) {
       return data;
     }
 
-    // 业务请求错误
     throw new Error(message);
   },
   async (error: AxiosError<Result>) => {
@@ -59,7 +54,7 @@ axiosInstance.interceptors.response.use(
           await refreshToken();
           return axiosInstance.request(originalRequest);
         } catch (refreshError) {
-          window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
+          // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
           return Promise.reject(refreshError);
         }
       }
