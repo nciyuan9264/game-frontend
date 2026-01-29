@@ -1,9 +1,9 @@
-name: Deploy Frontend to OSS
+name: Deploy to Aliyun OSS
 
 on:
   push:
     branches:
-      - main
+      - main # 推送到 master 分支时自动部署
 
 jobs:
   deploy:
@@ -11,38 +11,40 @@ jobs:
 
     steps:
       - name: Checkout code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
 
-      - name: Enable corepack and install dependencies
-        working-directory: frontend
-        run: |
-          corepack enable
-          pnpm install
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v2
+        with:
+          version: 9
 
-      - name: Build frontend
-        working-directory: frontend
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install dependencies
+        run: pnpm install
+
+      - name: Build project
         run: pnpm run build
 
-      - name: Install ossutil
+      - name: Setup ossutil
         run: |
-          curl -o ossutil-2.1.1-linux-amd64.zip https://gosspublic.alicdn.com/ossutil/v2/2.1.1/ossutil-2.1.1-linux-amd64.zip
-          unzip ossutil-2.1.1-linux-amd64.zip
-          cd ossutil-2.1.1-linux-amd64
-          chmod 755 ossutil
-          sudo mv ossutil /usr/local/bin/ && sudo ln -s /usr/local/bin/ossutil /usr/bin/ossutil
+          wget http://gosspublic.alicdn.com/ossutil/1.7.15/ossutil64
+          chmod +x ossutil64
+          sudo mv ossutil64 /usr/local/bin/ossutil
 
-      - name: Write ossutil config file
+      - name: Configure ossutil
         run: |
-          echo "[Credentials]" > ~/.ossutilconfig
-          echo "language=CH" >> ~/.ossutilconfig
-          echo "endpoint=oss-cn-beijing.aliyuncs.com" >> ~/.ossutilconfig
-          echo "region=cn-beijing" >> ~/.ossutilconfig
-          echo "accessKeyID=${{ secrets.OSS_ACCESS_KEY_ID }}" >> ~/.ossutilconfig
-          echo "accessKeySecret=${{ secrets.OSS_ACCESS_KEY_SECRET }}" >> ~/.ossutilconfig
+          ossutil config \
+            -e ${{ secrets.OSS_ENDPOINT }} \
+            -i ${{ secrets.OSS_ACCESS_KEY_ID }} \
+            -k ${{ secrets.OSS_ACCESS_KEY_SECRET }}
 
-      - name: Upload dist to OSS
+      - name: Upload to OSS
         run: |
-          ossutil cp frontend/dist/ oss://game-frontend/ -r -f --config-file ~/.ossutilconfig
+          ossutil cp -r dist/ oss://${{ secrets.OSS_BUCKET }}/ --force
 
       - name: Setup Aliyun CLI
         run: |
@@ -65,7 +67,7 @@ jobs:
             --ObjectType "File"
 
       - name: Send notification to Feishu
-        if: success() # 只有前面步骤成功时才执行
+        if: success()
         run: |
           curl -X POST \
             ${{ secrets.FEISHU_WEBHOOK_URL }} \
