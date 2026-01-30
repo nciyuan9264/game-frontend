@@ -1,8 +1,7 @@
 import axios, { type AxiosRequestConfig, type AxiosError, type AxiosResponse } from 'axios';
 import { Status } from '@/enum/http';
 import { Result } from '@/types/http';
-// import { message } from 'antd';
-import { refreshToken } from './room'; // 导入refreshToken函数
+import { refreshToken } from './room';
 
 // 创建 axios 实例
 const axiosInstance = axios.create({
@@ -15,8 +14,6 @@ const axiosInstance = axios.create({
 // 请求拦截
 axiosInstance.interceptors.request.use(
   config => {
-    // 在请求被发送之前做些什么
-    // config.headers.Authorization = "Bearer Token";
     return config;
   },
   error => {
@@ -45,30 +42,18 @@ axiosInstance.interceptors.response.use(
     // 判断是否是需要处理权限的room相关接口
     const isRoomApi = config?.url && ROOM_API_PATTERNS.some(pattern => config.url?.includes(pattern));
     // 如果是room相关接口且返回401错误
-    if (isRoomApi && response?.status === 401) {
-      const originalRequest = (config as AxiosRequestConfig & { _retry?: boolean });
-      if (!originalRequest._retry) {
+    const originalRequest = config as AxiosRequestConfig & { _retry?: boolean };
+    if (isRoomApi && response?.status === 401 && !originalRequest._retry) {
+      try {
+        // 尝试刷新token
         originalRequest._retry = true;
-        try {
-          // 尝试刷新token
-          await refreshToken();
-          return axiosInstance.request(originalRequest);
-        } catch (refreshError) {
-          // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
-          return Promise.reject(refreshError);
-        }
+        await refreshToken();
+        return axiosInstance.request(originalRequest);
+      } catch (refreshError) {
+        // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
+        return Promise.reject(refreshError);
       }
-      return Promise.reject(error);
     }
-
-    // 其他错误处理保持不变
-    // const errMsg = response?.data?.message || error?.message;
-    // message.error(errMsg);
-
-    // const status = response?.status;
-    // if (status === 401) {
-    // userStore.getState().actions.clearUserInfoAndToken();
-    // }
     return Promise.reject(error);
   }
 );
