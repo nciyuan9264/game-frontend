@@ -41,12 +41,21 @@ export const deleteSplendorRoom = async (params: DeleteRoomRequest): Promise<Del
   });
 };
 
-export const refreshToken = async (): Promise<void> => {
-  return APIClient.post({
-    url: 'auth/refresh',
+export async function refreshToken() {
+  // 使用 fetch 而不是 axios 实例
+  const res = await fetch(`https://auth.gamebus.online/auth/refresh`, {
+    method: 'POST',
+    credentials: 'include', // 保持 cookies
+    headers: { 'Content-Type': 'application/json' },
   });
-};
 
+  if (!res.ok) {
+    throw new Error('刷新 token 失败');
+  }
+
+  const data = await res.json();
+  return data; // 返回新的 token 或者成功标识
+}
 export const getProfile = async () => {
   return APIClient.post({
     url: 'auth/verify-token',
