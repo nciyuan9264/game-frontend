@@ -44,7 +44,7 @@ jobs:
 
       - name: Upload to OSS
         run: |
-          ossutil cp -r dist/ oss://${{ secrets.OSS_BUCKET }}/ --force
+          ossutil sync dist/ oss://${{ secrets.OSS_BUCKET }}/ --delete
 
       - name: Setup Aliyun CLI
         run: |
