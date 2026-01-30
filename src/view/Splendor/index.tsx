@@ -27,7 +27,10 @@ export default function Room() {
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const userID = profile2BackendName(userProfile);
-
+  const url = useMemo(() => {
+    if(!roomID || !userID) return '';
+    return `${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`;
+  }, [roomID, userID]);
 
   const waitingModalComtent = useMemo(() => {
     if (data?.roomData.roomInfo.roomStatus === false) {
@@ -42,7 +45,7 @@ export default function Room() {
     }
   }, [data?.roomData.currentPlayer, userID]);
 
-  const { sendMessage, wsRef } = useWebSocket(`${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`, (msg) => {
+  const { sendMessage, wsRef } = useWebSocket(url, (msg) => {
     const data: SplendorWsRoomSyncData = JSON.parse(msg.data);
     if (data.type === 'error') {
       message.error(data.message);
