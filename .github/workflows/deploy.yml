@@ -63,11 +63,11 @@ jobs:
         run: |
           aliyun cdn RefreshObjectCaches \
             --profile default \
-            --ObjectPath "https://board.gamebus.online/index.html" \
+            --ObjectPath "/index.html" \
             --ObjectType "File"
           aliyun cdn RefreshObjectCaches \
             --profile default \
-            --ObjectPath "https://board.gamebus.online/assets/*" \
+            --ObjectPath "/assets/" \
             --ObjectType "Directory"
 
       - name: Send notification to Feishu
