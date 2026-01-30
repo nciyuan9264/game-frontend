@@ -70,7 +70,10 @@ export default function Room() {
   });
 
   useFullHeight(styles.roomContainer);
-  console.log('data', data);
+  useEffect(() => {
+    console.log('data', data);
+  }, [data]);
+
   if(!data) {
     return <LoadingBlock content="正在加载游戏房间数据，请稍候..." />
   }
