@@ -17,7 +17,7 @@ export const useProfile = () => {
     id: '',
   });
 
-  const { run: handleGetProfile } = useRequest(
+  const { run: handleGetProfile, loading: profileLoading } = useRequest(
     async () => {
       return await getProfile();
     },
@@ -33,6 +33,7 @@ export const useProfile = () => {
 
   return {
     userProfile,
+    profileLoading,
     handleGetProfile,
   };
 };

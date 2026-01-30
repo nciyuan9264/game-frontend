@@ -3,10 +3,14 @@ import { useGameType } from '../useGameType';
 import { getAcquireRoomList, getSplendorRoomList } from '@/api/room';
 import { message } from 'antd';
 
-export const useRoomList = ({setOnlinePlayer}: {setOnlinePlayer: (onlinePlayer: number) => void}) => {
+export const useRoomList = ({ setOnlinePlayer }: { setOnlinePlayer: (onlinePlayer: number) => void }) => {
   const gameType = useGameType();
 
-  const { data: roomList, run: handleGetRoomList } = useRequest(
+  const {
+    data: roomList,
+    run: handleGetRoomList,
+    loading: roomListLoading,
+  } = useRequest(
     async () => {
       const getRoomListFn = gameType === 'acquire' ? getAcquireRoomList : getSplendorRoomList;
       const res = await getRoomListFn();
@@ -27,5 +31,6 @@ export const useRoomList = ({setOnlinePlayer}: {setOnlinePlayer: (onlinePlayer: 
   return {
     roomList,
     handleGetRoomList,
+    roomListLoading,
   };
 };
