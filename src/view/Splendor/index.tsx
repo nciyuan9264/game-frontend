@@ -70,9 +70,6 @@ export default function Room() {
   });
 
   useFullHeight(styles.roomContainer);
-  useEffect(() => {
-    console.log('data', data);
-  }, [data]);
 
   if(!data) {
     return <LoadingBlock content="正在加载游戏房间数据，请稍候..." />
@@ -80,7 +77,7 @@ export default function Room() {
 
   return (
     <>
-      <div className={styles.roomContainer}>
+      <div className={styles.roomContainer} style={{ height: `${window.innerHeight}px`, maxHeight: `${window.innerHeight}px` }}>
         <div className={styles.topBar}>
           <div className={styles.left}>
             <Button

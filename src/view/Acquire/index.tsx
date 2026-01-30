@@ -152,9 +152,6 @@ export default function Room() {
   }, [currentPlayer, userID]);
 
   useFullHeight(styles.roomContainer);
-  useEffect(() => {
-    console.log('data', data);
-  }, [data]);
 
   return (
     <>
