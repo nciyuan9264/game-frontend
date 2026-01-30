@@ -1,4 +1,4 @@
-import axios, { type AxiosRequestConfig, type AxiosError, type AxiosResponse } from 'axios';
+import axios, { type AxiosRequestConfig, type AxiosResponse } from 'axios';
 import { Status } from '@/enum/http';
 import { Result } from '@/types/http';
 import { refreshToken } from './room';
@@ -22,9 +22,6 @@ axiosInstance.interceptors.request.use(
   }
 );
 
-// 需要进行权限处理的接口路径模式
-const ROOM_API_PATTERNS = ['/acquire/room/', '/splendor/room/'];
-
 // 响应拦截
 axiosInstance.interceptors.response.use(
   (res: AxiosResponse<Result>) => {
@@ -36,21 +33,19 @@ axiosInstance.interceptors.response.use(
 
     throw new Error(message);
   },
-  async (error: AxiosError<Result>) => {
-    const { response, config } = error || {};
+  async (error) => {
+    const { response, config: originalRequest } = error || {};
 
-    // 判断是否是需要处理权限的room相关接口
-    const isRoomApi = config?.url && ROOM_API_PATTERNS.some(pattern => config.url?.includes(pattern));
     // 如果是room相关接口且返回401错误
-    const originalRequest = config as AxiosRequestConfig & { _retry?: boolean };
-    if (isRoomApi && response?.status === 401 && !originalRequest._retry) {
+    if (response?.status === 401 && !originalRequest?._retry) {
+      originalRequest._retry = true;
+
       try {
         // 尝试刷新token
-        originalRequest._retry = true;
         await refreshToken();
         return axiosInstance.request(originalRequest);
       } catch (refreshError) {
-        // window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
+        window.location.href = 'https://auth.gamebus.online?redirect=' + window.location.href;
         return Promise.reject(refreshError);
       }
     }
