@@ -22,7 +22,7 @@ export const useRoomList = ({ setOnlinePlayer }: { setOnlinePlayer: (onlinePlaye
       return sortList;
     },
     {
-      manual: false,
+      manual: true,
       onError: () => {
         message.error('获取房间列表失败，请重试');
       },
