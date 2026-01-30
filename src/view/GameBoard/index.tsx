@@ -48,7 +48,7 @@ export default function GameMenu() {
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {roomListLoading || profileLoading ? (
+      {(roomListLoading && !roomList?.length) || profileLoading ? (
         <div style={{
           display: 'flex',
           flexDirection: 'column',
