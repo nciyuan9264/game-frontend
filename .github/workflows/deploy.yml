@@ -61,14 +61,8 @@ jobs:
 
       - name: Refresh CDN Cache
         run: |
-          aliyun cdn RefreshObjectCaches \
-            --profile default \
-            --ObjectPath "/index.html" \
-            --ObjectType "File"
-          aliyun cdn RefreshObjectCaches \
-            --profile default \
-            --ObjectPath "/assets/" \
-            --ObjectType "Directory"
+          aliyun cdn RefreshObjectCaches --profile default --ObjectPath "https://board.gamebus.online/index.html" --ObjectType "File"
+          aliyun cdn RefreshObjectCaches --profile default --ObjectPath "https://board.gamebus.online/assets/" --ObjectType "Directory"
 
       - name: Send notification to Feishu
         if: success()
