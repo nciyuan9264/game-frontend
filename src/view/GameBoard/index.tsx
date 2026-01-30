@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { message, Card, Button, Dropdown, Modal, Spin } from 'antd';
+import { message, Card, Button, Dropdown, Modal } from 'antd';
 import styles from './index.module.less';
 import RoomCard from '@/view/GameBoard/components/RoomCard';
 import { useThrottleFn } from 'ahooks';
@@ -11,7 +11,7 @@ import { useRoomList } from '@/hooks/request/useRoomList';
 import CreateRoomModal from './components/CreateRoomModal';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useLogout } from '@/hooks/request/useLogout';
-
+import { LoadingBlock } from '@/components/LoadingBlock';
 
 export default function GameMenu() {
   const { userProfile, profileLoading } = useProfile();
@@ -49,23 +49,7 @@ export default function GameMenu() {
   return (
     <div style={{ minHeight: '100vh' }}>
       {(roomListLoading && !roomList?.length) || profileLoading ? (
-        <div style={{
-          display: 'flex',
-          flexDirection: 'column',
-          justifyContent: 'center',
-          alignItems: 'center',
-          height: window.innerHeight,
-          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-        }}>
-          <Spin
-            tip="加载中..."
-            size="large"
-            style={{ marginBottom: 20 }}
-          />
-          <div style={{ color: '#ffffff', fontSize: 16, marginTop: 16 }}>
-            正在加载游戏房间列表，请稍候...
-          </div>
-        </div>
+        <LoadingBlock content="正在加载游戏房间列表，请稍候..." />
       ) : (
         <>
           <div className={styles.gameMenu} style={{ height: window.innerHeight }}>

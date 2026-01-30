@@ -17,6 +17,7 @@ import GameEnd from './components/GameEnd';
 import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import { useProfile } from '@/hooks/request/useProfile';
 import { backendName2FrontendName, profile2BackendName } from '@/util/user';
+import { LoadingBlock } from '@/components/LoadingBlock';
 
 export default function Room() {
   const { roomID } = useParams();
@@ -69,6 +70,10 @@ export default function Room() {
   });
 
   useFullHeight(styles.roomContainer);
+
+  if(!data) {
+    return <LoadingBlock content="正在加载游戏房间数据，请稍候..." />
+  }
 
   return (
     <>
