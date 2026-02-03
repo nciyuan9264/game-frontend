@@ -43,7 +43,7 @@ export const deleteSplendorRoom = async (params: DeleteRoomRequest): Promise<Del
 
 export async function refreshToken() {
   // 使用 fetch 而不是 axios 实例
-  const res = await fetch(`https://auth.gamebus.online/auth/refresh`, {
+  const res = await fetch(`https://api.gamebus.online/auth/refresh`, {
     method: 'POST',
     credentials: 'include', // 保持 cookies
     headers: { 'Content-Type': 'application/json' },
