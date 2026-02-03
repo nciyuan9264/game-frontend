@@ -42,9 +42,11 @@ jobs:
             -i ${{ secrets.OSS_ACCESS_KEY_ID }} \
             -k ${{ secrets.OSS_ACCESS_KEY_SECRET }}
 
-      - name: Upload to OSS
+      - name: Upload to OSS (mirror deploy)
         run: |
-          ossutil sync dist/ oss://${{ secrets.OSS_BUCKET }}/ --delete --update
+          ossutil sync dist/ oss://${{ secrets.OSS_BUCKET }}/ \
+            --delete \
+            --force
 
       - name: Setup Aliyun CLI
         run: |
