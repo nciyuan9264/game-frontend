@@ -21,7 +21,8 @@ export default function GameMenu() {
   const [tabKey, setTabKey] = useState('user');
   const [aiCount, setAiCount] = useState(1);
   const gameType = useGameType();
-  const { roomList, handleGetRoomList, roomListLoading } = useRoomList({ setOnlinePlayer });
+  const { roomList, handleGetRoomList, roomListLoading, hasLoaded } = useRoomList({ setOnlinePlayer });
+  const showInitialLoading = (!hasLoaded && roomListLoading) || profileLoading;
   const { runLogout } = useLogout();
 
   const handleCreateRoom = useCreateRoom({ handleGetRoomList, setCreateRoomVisible });
@@ -48,7 +49,7 @@ export default function GameMenu() {
 
   return (
     <div style={{ minHeight: '100vh' }}>
-      {(roomListLoading && !roomList?.length) || profileLoading ? (
+      {showInitialLoading ? (
         <LoadingBlock content="正在加载游戏房间列表，请稍候..." />
       ) : (
         <>
