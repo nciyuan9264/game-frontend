@@ -9,4 +9,5 @@ export const GameStatusMap: Record<GameStatus, string> = {
   mergingSelection: '选择并购公司',
   mergingSettle: '结算并购',
   end: '已结束',
+  match: '匹配中',
 };

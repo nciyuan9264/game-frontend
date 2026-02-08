@@ -1,0 +1,150 @@
+@import "../../../../../../styles/variables.less";
+
+.companyInfo {
+  width: 45%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-evenly;
+  gap: 1rem;
+  background: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+  padding: 1rem 1.25rem;
+  border: 1px solid @color-border-subtle;
+  border-radius: 1.125rem;
+  color: @color-primary-ink;
+
+  .company {
+    display: flex;
+    flex: 1;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    border: 1px solid rgba(51, 65, 85, 0.95);
+    background-color: rgba(15, 23, 42, 0.98);
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.9);
+    font-size: 1rem;
+
+    .left {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+
+      .dot {
+        width: 0.6rem;
+        height: 0.6rem;
+        border-radius: 999px;
+        box-shadow: 0 0 0 2px rgba(15, 23, 42, 0.95);
+      }
+    }
+
+    .right {
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-evenly;
+      gap: 0.4rem;
+      color: @color-text-soft;
+      font-size: 1rem;
+
+      .top {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: 0.4rem;
+
+        .value {
+          color: @color-primary-ink;
+        }
+      }
+
+      .bottom {
+        width: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: end;
+        gap: 0.8rem;
+        font-size: 0.8rem;
+
+        .bottomvValue {
+          display: flex;
+          align-items: center;
+          justify-content: end;
+          gap: 0.4rem;
+          white-space: nowrap;
+
+
+          .value {
+            color: @color-primary-ink;
+          }
+        }
+      }
+    }
+  }
+}
+
+// @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
+//   .companyInfo {
+//     display: block;
+//     width: 45%;
+//     background: #ffffff;
+//     flex: 1;
+//     padding: 10px 20px;
+//     border-radius: 12px;
+//     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+
+//     .marketTable {
+//       width: 100%;
+//       border-collapse: collapse;
+//       margin-top: 10px;
+//       font-size: 14px;
+
+//       .companyName {
+//         font-weight: bold;
+//         padding: 8px;
+//       }
+
+//       th,
+//       td {
+//         border: 1px solid #ccc;
+//         padding: 8px 12px;
+//         text-align: center;
+//         font-size: 14px;
+//       }
+
+//       th {
+//         background-color: #f8f8f8;
+//         font-weight: bold;
+//       }
+
+//       tbody tr:hover {
+//         background-color: #f5f5f5;
+//       }
+
+//       .increase {
+//         font-size: 14px;
+//       }
+
+//       .decrease {
+//         font-size: 14px;
+//       }
+
+//       .flash {
+//         animation: flashAnim 1s ease-in-out 3;
+//       }
+
+//       @keyframes flashAnim {
+
+//         0%,
+//         100% {
+//           opacity: 1;
+//           text-shadow: 0 0 8px #00fff7;
+//         }
+
+//         50% {
+//           opacity: 0.4;
+//           text-shadow: none;
+//         }
+//       }
+//     }
+//   }
+// }

@@ -1,11 +1,11 @@
 import GameBoard from "@/view/GameBoard";
-import AcquireRoom from "@/view/Acquire";
 import Home from "@/view/Home";
 // import SplendorGame from "@/view/Splendor/GameBoard";
 import SplendorRoom from "@/view/Splendor";
 
 import React from "react";
 import { Navigate } from "react-router-dom";
+import { Acquire } from "@/view/Acquire";
 
 export interface AppRoute {
   path: string;
@@ -20,12 +20,12 @@ export const routes: AppRoute[] = [
     element: <GameBoard />
   },
   {
-    path: "/acquire/room/:roomID",
-    element: <AcquireRoom />
+    path: "/game/acquire/match",
+    element: <Acquire />
   },
   {
     path: "/game/splendor",
-    element: < GameBoard/>
+    element: <GameBoard />
   },
   {
     path: "/splendor/room/:roomID",

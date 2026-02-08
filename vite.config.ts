@@ -13,12 +13,12 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 5173,
       proxy: {
-        '/api': {
-          target: 'https://api.gamebus.online',
+        '/room': {
+          target: 'http://localhost:8000',
           changeOrigin: true,
           secure: true,
           headers: {
-            Cookie: 'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc2OTY5MTEzNiwiaWF0IjoxNzY5NjkwMjM2LCJqdGkiOiJjMTIxMjUzNC1lM2UxLTQzMjMtYjQyZC00MjA2NDIwYmEzOTAifQ.gWYCHyQbsUX5D2TE8u7Q1pH09XxSiGsudXU3drECcJgH9RCbD7FXsN-QouYyi_tfpD33daw6s0cdTJTu1WlGXBJz7JUIJOcQvfFH-YgFh7_phYoK40-COSDqsip9tIZ-9tk-VCj5SDwl8TvM9mDlb5g_PcALkTTs387Qf5LERvoRwM2q6oNSwGmguOHODkayr-tjugt4tgZyCm17CIyFgQmLgbIjUQ4GU7sTwFmd3wpvrGReN1mJ4d6A_Yl9uceq43fEN6LHwJSKZrcQ0WhHM_0v44KD3e-nSg0Xw-baHP-HRCwp3ZzGa1IM_1s5tLyw3amH1riDBNo8Es_8N-bdKQ',
+            Cookie: 'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc3MDkwMDY1OCwiaWF0IjoxNzcwMjk1ODU4LCJqdGkiOiI4OTE5ZTk1Zi04MWMzLTQ0N2ItYWQzNS1hMzIwODRmYWU0ZTMifQ.ZHfteZtEgAYFdymIYh1_9U7TT758ZLl7C4xna-9pGB3EBLE-6GXpzQurXMuw5Q2L5L8hGLKFQNcZL0CIKBACW3m3pXfiouLUIAPRBD0e1a2OKIZqRVE8j4aVvlqfQY-H4BIsa1LnvqEmtbu7kW0Z7Mn7262rlPQ23uPD9mlokRm0H20NM-p3OV66bn-DdL4Mw-I2_5OcIThbX3xOgZvsAEp6fGedL1cMdv7zeqf5aR0FemLzW8YM9q6_GCN82LljuqN1TmlLJzUYTNBRV7PhTNUS60ba22zY36TWkAaqVyVkjJC8MEtyPCxMd-yOBCcptSOM1B9W_Fa_ELAcnF0-kA',
           },
         },
         '/auth': {
@@ -26,7 +26,7 @@ export default defineConfig(({ mode }) => {
           changeOrigin: true,
           secure: true,
           headers: {
-            Cookie: 'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc2OTY5MTEzNiwiaWF0IjoxNzY5NjkwMjM2LCJqdGkiOiJjMTIxMjUzNC1lM2UxLTQzMjMtYjQyZC00MjA2NDIwYmEzOTAifQ.gWYCHyQbsUX5D2TE8u7Q1pH09XxSiGsudXU3drECcJgH9RCbD7FXsN-QouYyi_tfpD33daw6s0cdTJTu1WlGXBJz7JUIJOcQvfFH-YgFh7_phYoK40-COSDqsip9tIZ-9tk-VCj5SDwl8TvM9mDlb5g_PcALkTTs387Qf5LERvoRwM2q6oNSwGmguOHODkayr-tjugt4tgZyCm17CIyFgQmLgbIjUQ4GU7sTwFmd3wpvrGReN1mJ4d6A_Yl9uceq43fEN6LHwJSKZrcQ0WhHM_0v44KD3e-nSg0Xw-baHP-HRCwp3ZzGa1IM_1s5tLyw3amH1riDBNo8Es_8N-bdKQ',
+            Cookie: 'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc3MDkwMDY1OCwiaWF0IjoxNzcwMjk1ODU4LCJqdGkiOiI4OTE5ZTk1Zi04MWMzLTQ0N2ItYWQzNS1hMzIwODRmYWU0ZTMifQ.ZHfteZtEgAYFdymIYh1_9U7TT758ZLl7C4xna-9pGB3EBLE-6GXpzQurXMuw5Q2L5L8hGLKFQNcZL0CIKBACW3m3pXfiouLUIAPRBD0e1a2OKIZqRVE8j4aVvlqfQY-H4BIsa1LnvqEmtbu7kW0Z7Mn7262rlPQ23uPD9mlokRm0H20NM-p3OV66bn-DdL4Mw-I2_5OcIThbX3xOgZvsAEp6fGedL1cMdv7zeqf5aR0FemLzW8YM9q6_GCN82LljuqN1TmlLJzUYTNBRV7PhTNUS60ba22zY36TWkAaqVyVkjJC8MEtyPCxMd-yOBCcptSOM1B9W_Fa_ELAcnF0-kA',
           },
         },
       },

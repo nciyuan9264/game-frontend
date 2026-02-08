@@ -1,0 +1,199 @@
+@import '../../../../../../styles/variables.less';
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.75rem;
+
+  .left {
+    min-height: 2.25rem;
+    display: flex;
+    align-items: flex-start;
+    gap: 0.75rem;
+
+    .btn-tertiary {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 0.95rem;
+      border: 1px solid #d8d2c4e6;
+      border-radius: 999px;
+      color: #d8d2c4e6;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.98);
+      }
+
+      .material-symbols-outlined {
+        font-size: 1rem;
+      }
+    }
+
+    .content {
+      display: flex;
+      flex-direction: column;
+      gap: 0.25rem;
+      font-size: 1.125rem;
+
+      .titleRow {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.5rem;
+        font-size: 1.4rem;
+        font-weight: 600;
+        line-height: 2.25rem;
+        letter-spacing: -0.025em;
+        color: @color-primary-ink;
+      }
+
+      .id {
+        display: inline-flex;
+        justify-content: center;
+        align-items: center;
+        padding: 0.06rem 0.08rem;
+        border-radius: 999px;
+        background-color: @color-accent-teal-soft;
+        border: 1px solid rgba(34, 197, 167, 0.5);
+        color: @color-accent-teal;
+        font-size: 0.6rem;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+
+      }
+
+      .description {
+        font-size: 0.75rem;
+        color: @color-text-soft;
+
+        @media (min-width: 768px) {
+          font-size: 0.875rem;
+        }
+      }
+
+      .info-row {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: 0.75rem 0.25rem;
+        font-size: 0.7rem;
+        color: @color-text-soft;
+
+        @media (min-width: 768px) {
+          font-size: 0.75rem;
+        }
+
+        .info-item {
+          display: inline-flex;
+          align-items: center;
+          gap: 0.375rem;
+
+          .material-symbols-outlined {
+            font-size: 0.875rem;
+            color: @color-primary-ink;
+          }
+        }
+      }
+    }
+  }
+
+  .right {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 0.5rem;
+    flex-shrink: 0;
+
+    @media (min-width: 768px) {
+      gap: 12px;
+    }
+
+    .btn-ghost {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid transparent;
+      border-radius: 999px;
+      background: transparent;
+      color: #4b5563;
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+
+      &:hover {
+        background-color: rgba(255, 255, 255, 0.7);
+        border-color: rgba(209, 213, 219, 0.9);
+      }
+
+      .material-symbols-outlined {
+        font-size: 1rem;
+      }
+    }
+
+    .btn-secondary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.375rem;
+      padding: 0.5rem 0.75rem;
+      border: 1px solid rgba(148, 134, 104, 0.7);
+      border-radius: 999px;
+      color: var(--color-primary-ink);
+      text-decoration: none;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: background-color 140ms ease, color 140ms ease,
+        box-shadow 140ms ease, border-color 140ms ease, transform 100ms ease,
+        opacity 120ms ease;
+      box-shadow: 0 10px 26px rgba(148, 134, 104, 0.25);
+
+      &:hover {
+        background-color: #fdfaf3;
+      }
+
+      .material-symbols-outlined {
+        font-size: 1rem;
+      }
+    }
+
+    .user-info {
+      min-width: 2.25rem;
+      height: 2.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+
+      .user-avatar {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        object-fit: cover;
+      }
+
+      .avatar-skeleton {
+        width: 2.25rem;
+        height: 2.25rem;
+        border-radius: 50%;
+        background: linear-gradient(90deg, #f0f0f0 25%, #e0e0e0 50%, #f0f0f0 75%);
+        background-size: 200% 100%;
+        animation: loading 1.5s infinite;
+      }
+    }
+  }
+}
+
+@keyframes loading {
+  0% {
+    background-position: 200% 0;
+  }
+
+  100% {
+    background-position: -200% 0;
+  }
+}

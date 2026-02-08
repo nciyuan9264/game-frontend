@@ -1,0 +1,37 @@
+@import '../../styles/variables.less';
+
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35rem;
+  padding: 0.5rem 0.95rem;
+  min-height: 2.25rem;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background-color 140ms ease, color 140ms ease,
+    box-shadow 140ms ease, border-color 140ms ease, transform 100ms ease,
+    opacity 120ms ease;
+  background-color: transparent;
+  border-color: rgba(148, 163, 184, 0.6);
+  color: @color-text-soft;
+}
+
+.button:hover {
+  background-color: rgba(15, 23, 42, 0.85);
+  border-color: rgba(148, 163, 184, 0.85);
+  color: @color-text-main;
+}
+
+.button:disabled {
+  background-color: transparent;
+  border-color: rgba(148, 163, 184, 0.6);
+  color: @color-text-soft;
+  cursor: not-allowed;
+}

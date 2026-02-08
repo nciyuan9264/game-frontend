@@ -7,7 +7,7 @@ import { message } from 'antd';
 export const useRoomList = ({
   setOnlinePlayer,
 }: {
-  setOnlinePlayer: (onlinePlayer: number) => void;
+  setOnlinePlayer?: (onlinePlayer: number) => void;
 }) => {
   const gameType = useGameType();
   const hasLoadedRef = useRef(false); // ⭐ 关键
@@ -30,7 +30,7 @@ export const useRoomList = ({
           a.roomID.localeCompare(b.roomID)
         ) ?? [];
 
-      setOnlinePlayer(res?.onlinePlayer);
+      setOnlinePlayer?.(res?.onlinePlayer);
       return sortList;
     },
     {

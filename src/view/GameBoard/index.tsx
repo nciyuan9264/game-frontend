@@ -1,39 +1,29 @@
 import { useEffect, useState } from 'react';
-import { message, Card, Button, Dropdown, Modal } from 'antd';
+import { Button} from 'antd';
 import styles from './index.module.less';
 import RoomCard from '@/view/GameBoard/components/RoomCard';
-import { useThrottleFn } from 'ahooks';
 import { handleFullscreen } from '@/util/window';
 import { useGameType } from '@/hooks/useGameType';
 import { useCreateRoom } from '@/hooks/request/useCreateRoom';
 import { useDeleteRoom } from '@/hooks/request/useDeleteRoom';
 import { useRoomList } from '@/hooks/request/useRoomList';
-import CreateRoomModal from './components/CreateRoomModal';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useLogout } from '@/hooks/request/useLogout';
 import { LoadingBlock } from '@/components/LoadingBlock';
+import { Header } from '@/view/GameBoard/components/Header';
+import { profile2BackendName } from '@/util/user';
 
 export default function GameMenu() {
   const { userProfile, profileLoading } = useProfile();
-  const [createRoomVisible, setCreateRoomVisible] = useState(false);
-  const [playerCount, setPlayerCount] = useState(2);
+  const userID = profile2BackendName(userProfile);
   const [onlinePlayer, setOnlinePlayer] = useState<number>(0)
-  const [tabKey, setTabKey] = useState('user');
-  const [aiCount, setAiCount] = useState(1);
   const gameType = useGameType();
   const { roomList, handleGetRoomList, roomListLoading, hasLoaded } = useRoomList({ setOnlinePlayer });
   const showInitialLoading = (!hasLoaded && roomListLoading) || profileLoading;
   const { runLogout } = useLogout();
 
-  const handleCreateRoom = useCreateRoom({ handleGetRoomList, setCreateRoomVisible });
+  const { handleCreateRoom } = useCreateRoom();
   const handleDeleteRoom = useDeleteRoom(handleGetRoomList);
-  const { run: debouncedHandleOk } = useThrottleFn(() => {
-    handleCreateRoom({
-      playerCount,
-      aiCount: tabKey === 'user' ? 0 : aiCount,
-      userProfile,
-    });
-  }, { wait: 1000 });
 
   useEffect(() => {
     handleGetRoomList();
@@ -53,50 +43,8 @@ export default function GameMenu() {
         <LoadingBlock content="正在加载游戏房间列表，请稍候..." />
       ) : (
         <>
-          <div className={styles.gameMenu} style={{ height: window.innerHeight }}>
-            <Dropdown
-              menu={{
-                items: [
-                  {
-                    key: 'profile',
-                    label: (
-                      <a href="https://auth.gamebus.online/profile" target="_blank" rel="noopener noreferrer">
-                        Profile
-                      </a>
-                    ),
-                  },
-                  {
-                    key: 'logout',
-                    label: (
-                      <span onClick={() => {
-                        Modal.confirm({
-                          title: '确定要退出登录吗？',
-                          cancelText: '取消',
-                          onOk: runLogout,
-                        });
-                      }}>
-                        退出登录
-                      </span>
-                    ),
-                  },
-                ],
-              }}
-              trigger={['hover']}
-            >
-              <div className={styles['user-info']}>
-                {userProfile?.avatar ? (
-                  <img
-                    className={styles['user-avatar']}
-                    src={userProfile.avatar}
-                    alt="user avatar"
-                    style={{ opacity: 1, transition: 'opacity 0.3s ease-in-out' }}
-                  />
-                ) : (
-                  <div className={styles['avatar-skeleton']} />
-                )}
-              </div>
-            </Dropdown>
-            <div className={styles.title}>{gameType === 'acquire' ? 'Acquire' : 'Splendor'}</div>
+          <div className={styles.gameMenu}>
+            <Header userProfile={userProfile} runLogout={runLogout} handleCreateRoom={handleCreateRoom} />
             <div className={styles.roomGrid}>
               {roomList?.map(room => (
                 <RoomCard
@@ -107,23 +55,9 @@ export default function GameMenu() {
                   }}
                   userProfile={userProfile}
                   gameType={gameType}
+                  userID={userID}
                 />
               ))}
-              <Card
-                hoverable
-                className={styles.createRoomCard}
-                onClick={() => {
-                  if ((roomList?.length ?? 0) > 20) {
-                    message.error('房间数量已达上限');
-                    return;
-                  }
-                  setCreateRoomVisible(true)
-                }}
-              >
-                <div className={styles.createRoomInner}>
-                  <div style={{ marginTop: 8 }}>创建房间</div>
-                </div>
-              </Card>
             </div>
             <div className={styles.footer}>
               <div className={styles.left}>
@@ -141,17 +75,6 @@ export default function GameMenu() {
               </div>
             </div>
           </div>
-          <CreateRoomModal
-            createRoomVisible={createRoomVisible}
-            setCreateRoomVisible={setCreateRoomVisible}
-            playerCount={playerCount}
-            setPlayerCount={setPlayerCount}
-            tabKey={tabKey}
-            setTabKey={setTabKey}
-            debouncedHandleOk={debouncedHandleOk}
-            aiCount={aiCount}
-            setAiCount={setAiCount}
-          />
         </>
       )}
     </div>

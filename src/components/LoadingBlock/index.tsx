@@ -1,15 +1,10 @@
 import { Spin } from "antd";
+import styles from './index.module.less';
 
-export const LoadingBlock = ({content = '正在加载游戏房间列表，请稍候...'}: {content?: string}) => {
+export const LoadingBlock = ({ content = '正在加载游戏房间列表，请稍候...' }: { content?: string }) => {
   return (
-    <div style={{
-      display: 'flex',
-      flexDirection: 'column',
-      justifyContent: 'center',
-      alignItems: 'center',
-      height: window.innerHeight,
-      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)'
-    }}>
+    <div
+      className={styles['loading-block']}>
       <Spin
         tip="加载中..."
         size="large"

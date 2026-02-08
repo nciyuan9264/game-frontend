@@ -25,27 +25,26 @@ html {
   -ms-text-size-adjust: 100%;
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
-  font-size: 100%;
 }
 
 /* 小屏幕设备（如手机）*/
 @media (max-width: 600px) {
   html {
-    font-size: 90%; /* 字体稍微小一点 */
+    font-size: 12px; /* 字体稍微小一点 */
   }
 }
 
 /* 中等屏幕设备（如平板）*/
 @media (min-width: 601px) and (max-width: 1024px) {
   html {
-    font-size: 100%; /* 标准大小 */
+    font-size: 16px; /* 标准大小 */
   }
 }
 
 /* 大屏幕设备（如桌面）*/
 @media (min-width: 1025px) {
   html {
-    font-size: 110%; /* 字体稍微大一点 */
+    font-size: 20px; /* 字体稍微大一点 */
   }
 }
 

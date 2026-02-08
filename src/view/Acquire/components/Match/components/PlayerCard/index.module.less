@@ -1,0 +1,188 @@
+@import '../../../../../../styles/variables.less';
+
+.seat-card {
+  height: 8rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.9rem;
+  color: @color-text-main;
+  border: 1px solid rgba(51, 65, 85, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(15, 23, 42, 0.9);
+  background-color: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+  min-width: 0;
+
+  // 右上角角标
+  .seat-you-badge {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    background-color: @color-accent-teal;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    z-index: 10;
+    pointer-events: none; // 避免遮挡 hover
+  }
+
+  // 你也可以加一个 hover 效果，让自己的卡片颜色更醒目
+  &.seat-card-you {
+    border-color: @color-accent-teal;
+    box-shadow: 0 0 0 2px @color-accent-teal inset;
+  }
+
+  .seat-avatar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 1px solid rgba(34, 197, 167, 0.6);
+    border-radius: 999px;
+    color: @color-accent-teal;
+
+    .default-content {
+      display: flex;
+    }
+
+    .hover-content {
+      display: none;
+    }
+  }
+
+  .seat-players {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .seat-player {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.25rem;
+
+      .seat-player-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: @color-primary-ink;
+
+        .default-content {
+          display: inline;
+        }
+
+        .hover-content {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .seat-role {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    line-height: 1rem;
+    color: @color-text-soft;
+
+    .seat-role-name {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.2rem 0.6rem;
+      border-radius: 999px;
+      background-color: rgba(11, 58, 63, 0.75);
+      color: @color-text-main;
+      font-size: 0.8rem;
+    }
+
+    .seat-role-text {
+      .default-content {
+        display: inline;
+      }
+
+      .hover-content {
+        display: none;
+      }
+    }
+  }
+}
+
+.seat-card-operable {
+  cursor: pointer;
+
+  &:not(.seat-card-empty):hover {
+    background: rgba(239, 68, 68, 0.2);
+    border-color: #ef4444;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(239, 68, 68, 0.5);
+
+    .seat-avatar {
+      background: rgba(239, 68, 68, 0.2);
+      border-color: #ef4444;
+      color: #ef4444;
+
+      .default-content {
+        display: none;
+      }
+
+      .hover-content {
+        display: flex;
+      }
+    }
+
+    .seat-player-name,
+    .seat-role-text {
+      color: #ef4444;
+      font-weight: 600;
+
+      .default-content {
+        display: none;
+      }
+
+      .hover-content {
+        display: inline;
+      }
+    }
+  }
+
+  // 空位 hover
+  &.seat-card-empty:hover {
+    background: radial-gradient(circle at 0% 0%, rgba(5, 150, 105, 0.9), rgba(5, 150, 105, 0.7));
+    border-color: @color-accent-teal;
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(5, 150, 105, 0.8);
+    color: @color-accent-teal;
+
+    .seat-avatar {
+      background: rgba(0, 0, 0, 0.18);
+      border-color: @color-accent-teal;
+      color: #00b3a6;
+
+      .default-content {
+        display: none;
+      }
+
+      .hover-content {
+        display: flex;
+      }
+    }
+
+    .seat-player-name,
+    .seat-role-text {
+      color: @color-accent-teal;
+      font-weight: 600;
+
+      .default-content {
+        display: none;
+      }
+
+      .hover-content {
+        display: inline;
+      }
+    }
+  }
+}

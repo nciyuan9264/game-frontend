@@ -1,21 +1,17 @@
 import { useRequest } from 'ahooks';
 import { useGameType } from '../useGameType';
-import { createAcquireRoom, createSplendorRoom } from '@/api/room';
+import { createAcquireRoom } from '@/api/room';
 import { message } from 'antd';
-import { UserProfile } from './useProfile';
-import { profile2BackendName } from '@/util/user';
+import { useNavigate } from 'react-router-dom';
 
-export const useCreateRoom = ({handleGetRoomList, setCreateRoomVisible}: {handleGetRoomList: () => void; setCreateRoomVisible: (visible: boolean) => void}) => {
+export const useCreateRoom = () => {
   const gameType = useGameType();
+  const navigate = useNavigate();
 
-  const { run: handleCreateRoom } = useRequest(
-    async ({ playerCount, aiCount, userProfile }: { playerCount: number; aiCount: number; userProfile: UserProfile }) => {
-      const createRoomFn = gameType === 'acquire' ? createAcquireRoom : createSplendorRoom;
-      await createRoomFn({
-        MaxPlayers: playerCount,
-        AiCount: aiCount,
-        UserID: profile2BackendName(userProfile),
-      });
+  const { run: handleCreateRoom, loading: createRoomLoading } = useRequest(
+    async () => {
+      const createRoomFn = createAcquireRoom;
+      return await createRoomFn();
     },
     {
       manual: true,
@@ -23,11 +19,11 @@ export const useCreateRoom = ({handleGetRoomList, setCreateRoomVisible}: {handle
         message.error('创建失败，请重试');
       },
       refreshDeps: [gameType],
-      onSuccess: () => {
-        handleGetRoomList();
-        setCreateRoomVisible(false);
+      onSuccess: (data) => {
+        navigate(`/game/acquire/match?roomID=${data.roomID}`)
+        message.success('创建成功');
       },
     }
   );
-  return handleCreateRoom;
+  return {handleCreateRoom, createRoomLoading};
 };

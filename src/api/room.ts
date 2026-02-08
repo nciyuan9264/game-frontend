@@ -1,23 +1,22 @@
 import { CreateRoomReponse, CreateRoomRequest, DeleteRoomReponse, DeleteRoomRequest, GetRoomListReponse } from '@/types/room';
 import APIClient from './apiClient';
 
-export const createAcquireRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
+export const createAcquireRoom = async (): Promise<CreateRoomReponse> => {
   return APIClient.post({
-    url: 'api/acquire/room/create',
-    data: params,
+    url: '/room/create',
   });
 };
 
 export const deleteAcquireRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
   return APIClient.post({
-    url: 'api/acquire/room/delete',
+    url: '/room/delete',
     data: params,
   });
 };
 
 export const getAcquireRoomList = async (): Promise<GetRoomListReponse> => {
   return APIClient.get({
-    url: 'api/acquire/room/list',
+    url: '/room/list',
   });
 };
 

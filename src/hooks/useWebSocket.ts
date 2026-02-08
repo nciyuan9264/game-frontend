@@ -1,18 +1,9 @@
 import { useEffect, useRef } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
-  function sendWhenReady(data: any) {
-    const message = JSON.stringify(data);
-    const trySend = () => {
-      if (wsRef.current?.readyState === WebSocket.OPEN) {
-        wsRef.current?.send(message);
-      } else {
-        setTimeout(trySend, 50); // 每 50ms 检查一次
-      }
-    };
-    trySend();
-  }
+  const navigate = useNavigate();
   const close = () => {
     if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
       wsRef.current.close(1000, 'Component unmounted');
@@ -20,7 +11,6 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
     }
   };
   useEffect(() => {
-    console.log('url', url);
     if (!url || wsRef.current !== null) return;
     let ws = new WebSocket(url);
     wsRef.current = ws;
@@ -29,13 +19,14 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
 
     ws.onopen = () => {
       console.log('WebSocket connected');
-      sendWhenReady({ type: 'ready' });
+      // sendWhenReady({ type: 'ready' });
     };
 
     ws.onmessage = onMessage;
 
     ws.onerror = err => {
       console.error('WebSocket error:', err);
+      navigate('/game/acquire');
     };
 
     ws.onclose = event => {

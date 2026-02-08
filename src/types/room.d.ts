@@ -1,14 +1,17 @@
 /** 可用的游戏状态类型 */
-export type GameStatus = 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end' | 'setTile';
+export type GameStatus = 'match' | 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end' | 'setTile';
 
 interface ListRoomInfo {
   roomID: string;
-  userID: string;
+  ownerID: string;
   maxPlayers: number;
-  status: boolean;
+  status: GameStatus;
+  emptyTileCount: number;
   roomPlayer: {
     playerID: string;
     online: boolean;
+    ready: boolean;
+    ai: boolean;
   }[];
 }
 
@@ -24,7 +27,7 @@ interface DeleteRoomRequest {
 }
 
 interface CreateRoomReponse {
-  room_id: string;
+  roomID: string;
 }
 
 interface DeleteRoomReponse {}
@@ -94,4 +97,23 @@ interface WsRoomSyncData {
   type: string;
   message?: string;
   result?: Record<string, int>;
+}
+
+interface RoomStruct {
+  roomID: string;
+  ownerID: string;
+  status: GameStatus;
+  players: {
+    playerID: string;
+    online: boolean;
+    ready: boolean;
+    ai: boolean;
+  }[];
+}
+interface WsMatchSyncData {
+  type: string;
+  roomID: string;
+  playerID: string;
+  room: RoomStruct;
+  message?: string;
 }
