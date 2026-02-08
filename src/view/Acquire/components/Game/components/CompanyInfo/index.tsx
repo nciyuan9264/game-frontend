@@ -22,7 +22,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
   data,
 }) => {
   const prevDataRef = useRef<WsRoomSyncData>();
-  const [deltas, setDeltas] = useState<CompanyDelta>({});
+  const [_, setDeltas] = useState<CompanyDelta>({});
   useEffect(() => {
     if (!data) return;
     const prev = prevDataRef.current;
