@@ -3,20 +3,20 @@ import APIClient from './apiClient';
 
 export const createAcquireRoom = async (): Promise<CreateRoomReponse> => {
   return APIClient.post({
-    url: '/room/create',
+    url: '/api/acquire/room/create',
   });
 };
 
 export const deleteAcquireRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
   return APIClient.post({
-    url: '/room/delete',
+    url: '/api/acquire/room/delete',
     data: params,
   });
 };
 
 export const getAcquireRoomList = async (): Promise<GetRoomListReponse> => {
   return APIClient.get({
-    url: '/room/list',
+    url: '/api/acquire/room/list',
   });
 };
 
