@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button, Modal } from 'antd';
 import { WsRoomSyncData } from '@/types/room';
-import { useSearchParams } from 'react-router-dom';
 import { backendName2FrontendName } from '@/util/user';
 interface GameEndProps {
   visible: boolean;
@@ -18,8 +17,8 @@ const GameEnd: React.FC<GameEndProps> = ({
   sendMessage,
   userID
 }) => {
-  const [searchParams] = useSearchParams();
-  const roomUserID = searchParams.get('roomUserID');
+  console.log('data', data, userID);
+  const isOwner = data?.roomData.roomInfo.ownerID === userID;
   return (
     <Modal
       title="🏁 游戏结算"
@@ -27,7 +26,7 @@ const GameEnd: React.FC<GameEndProps> = ({
       closable={false}
       footer={
         <>
-          {roomUserID === userID && <Button
+          {isOwner && <Button
             type="primary"
             onClick={() => {
               setGameEndModalVisible(false);
@@ -38,7 +37,7 @@ const GameEnd: React.FC<GameEndProps> = ({
                 cancelText: '取消',
                 onOk: () => {
                   sendMessage(JSON.stringify({
-                    type: 'restart_game',
+                    type: 'game_restart_game',
                   }));
                 },
               })

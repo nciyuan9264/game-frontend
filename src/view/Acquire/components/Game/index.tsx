@@ -81,8 +81,8 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
     cancelText: '取消',
     onOk: () => {
       sendMessage(JSON.stringify({
-        type: 'place_tile',
-        payload: tileKey,
+        type: 'game_place_tile',
+        payload: { tileKey },
       }));
     },
   });
@@ -101,18 +101,11 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
     sendMessage(JSON.stringify({
       type: 'game_ready',
     }));
-  },[])
+  }, [])
 
   return (
     <>
       <div className={styles['game-container']}>
-        {/* <Button
-          className={styles.versionToggleBtn}
-          type="primary"
-          onClick={() => setIs3DVersion(!is3DVersion)}
-        >
-          {is3DVersion ? '切换到2D' : '切换到3D'}
-        </Button> */}
         {
           is3DVersion ? (
             <TopBar3D
@@ -125,20 +118,22 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
               setMergeCompanyModalVisible={setMergeCompanyModalVisible}
               setMergeSelectionModalVisible={setMergeSelectionModalVisible}
               userID={userID}
+              is3DVersion={is3DVersion}
+              setIs3DVersion={setIs3DVersion}
             />
           ) : (
             <TopBar
-            data={wsRoomSyncData}
-            wsRef={wsRef}
-            setCompanyInfoVisible={setCompanyInfoVisible}
-            setGameEndModalVisible={setGameEndModalVisible}
-            setCreateCompanyModalVisible={setCreateCompanyModalVisible}
-            setBuyStockModalVisible={setBuyStockModalVisible}
-            setMergeCompanyModalVisible={setMergeCompanyModalVisible}
-            setMergeSelectionModalVisible={setMergeSelectionModalVisible}
-            userID={userID}
-            is3DVersion={is3DVersion}
-            setIs3DVersion={setIs3DVersion}
+              data={wsRoomSyncData}
+              wsRef={wsRef}
+              setCompanyInfoVisible={setCompanyInfoVisible}
+              setGameEndModalVisible={setGameEndModalVisible}
+              setCreateCompanyModalVisible={setCreateCompanyModalVisible}
+              setBuyStockModalVisible={setBuyStockModalVisible}
+              setMergeCompanyModalVisible={setMergeCompanyModalVisible}
+              setMergeSelectionModalVisible={setMergeSelectionModalVisible}
+              userID={userID}
+              is3DVersion={is3DVersion}
+              setIs3DVersion={setIs3DVersion}
             />
           )
         }
@@ -151,7 +146,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
                 data={wsRoomSyncData}
               />
             ) : (
-              <Board tilesData={wsRoomSyncData?.roomData.tiles} hoveredTile={hoveredTile} setHoveredTile={setHoveredTile} wsRoomSyncData={wsRoomSyncData} placeTile={placeTile}/>
+              <Board tilesData={wsRoomSyncData?.roomData.tiles} hoveredTile={hoveredTile} setHoveredTile={setHoveredTile} wsRoomSyncData={wsRoomSyncData} placeTile={placeTile} />
             )
           }
           {
@@ -212,10 +207,10 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
       <BuyStock
         visible={buyStockModalVisible}
         setBuyStockModalVisible={setBuyStockModalVisible}
-        onSubmit={(modalData) => {
+        onSubmit={(stocks) => {
           sendMessage(JSON.stringify({
-            type: 'buy_stock',
-            payload: modalData,
+            type: 'game_buy_stock',
+            payload: { stocks },
           }));
           setBuyStockModalVisible(false);
         }}
@@ -223,10 +218,10 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
       <MergeSelection
         visible={mergeSelectionModalVisible}
         data={wsRoomSyncData}
-        onOk={(modalData) => {
+        onOk={(mainCompany) => {
           sendMessage(JSON.stringify({
-            type: 'merging_selection',
-            payload: modalData,
+            type: 'game_merging_selection',
+            payload: { mainCompany },
           }));
           setBuyStockModalVisible(false);
         }}
@@ -237,10 +232,10 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
       <CompanyStockActionModal
         visible={mergeCompanyModalVisible}
         data={wsRoomSyncData}
-        onOk={(modalData) => {
+        onOk={(actions) => {
           sendMessage(JSON.stringify({
-            type: 'merging_settle',
-            payload: modalData,
+            type: 'game_merging_settle',
+            payload: { actions },
           }));
           setMergeCompanyModalVisible(false);
         }}
@@ -253,8 +248,8 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
         onSelect={(company) => {
           playAudio(AudioTypeEnum.CreateCompany);
           sendMessage(JSON.stringify({
-            type: 'create_company',
-            payload: company,
+            type: 'game_create_company',
+            payload: { company },
           }));
           setCreateCompanyModalVisible(false);
         }}

@@ -97,11 +97,11 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
       {/* 消息发送器 - 右下角浮动 */}
       <div className={styles.messageSection}>
         <MessageSender
-          onMessageSend={(msg) => {
-            console.log("用户发送消息:", msg);
+          onMessageSend={(audioType) => {
+            console.log("用户发送消息:", audioType);
             sendMessage(JSON.stringify({
-              type: 'play_audio',
-              payload: msg,
+              type: 'game_play_audio',
+              payload: { audioType },
             }));
           }}
         />

@@ -4,14 +4,11 @@ import { useNavigate } from 'react-router-dom';
 import { Button, message } from 'antd';
 import { ListRoomInfo } from '@/types/room';
 import { BankOutlined, HourglassOutlined, LoginOutlined, PlayCircleOutlined, UnlockOutlined } from '@ant-design/icons';
-import { UserProfile } from '@/hooks/request/useProfile';
 import { backendName2FrontendName } from '@/util/user';
 import { GameType } from '@/hooks/useGameType';
 
 interface RoomCardProps {
   data: ListRoomInfo;
-  onDelete: (roomID: string) => void;
-  userProfile: UserProfile;
   gameType: GameType;
   userID: string;
 }
@@ -84,13 +81,13 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
                 if (hasPlayer) {
                   navigate(`/game/${gameType}/match?roomID=${data.roomID}`);
                 } else {
-                  message.error('房间已开始，无法加入');
+                  message.error('游戏已开始，无法加入');
                 }
               } else {
                 if (data.roomPlayer.length < 6) {
                   navigate(`/game/${gameType}/match?roomID=${data.roomID}`);
                 } else {
-                  message.error('房间已满，无法加入');
+                  message.error('房间已满');
                 }
               }
             }}

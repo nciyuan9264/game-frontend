@@ -1,5 +1,5 @@
 import styles from './index.module.less'
-import { ArrowLeftOutlined, CheckCircleOutlined } from '@ant-design/icons';
+import { ArrowLeftOutlined, CheckCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Button } from '../../../../../../components/Button';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Modal } from 'antd';
@@ -49,6 +49,17 @@ export const Header = ({
         </div>
       </div>
       <div className={styles.right}>
+        {isHostView && <Button
+          content={'添加人机'}
+          icon={<PlusCircleOutlined />}
+          onClick={() => {
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+              sendMessage(JSON.stringify({
+                type: 'match_add_ai',
+              }));
+            }
+          }}
+        />}
         {
           isHostView ?
             <Button
@@ -81,7 +92,9 @@ export const Header = ({
                 if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                   sendMessage(JSON.stringify({
                     type: 'match_ready',
-                    payload: !currentPlayerData?.ready,
+                    payload: {
+                      ready: !currentPlayerData?.ready
+                    },
                   }));
                 }
               }}

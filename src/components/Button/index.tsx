@@ -14,7 +14,7 @@ export const Button = ({
   ...rest
 }: IButtonProps) => {
   return (
-    <ButtonAntd  className={styles.button} {...rest} style={{gap: content ? '0.35rem' : '0'}}>
+    <ButtonAntd className={styles.button} {...rest} style={{ gap: content ? '0.35rem' : '0' }}>
       {icon}
       {content}
     </ButtonAntd>

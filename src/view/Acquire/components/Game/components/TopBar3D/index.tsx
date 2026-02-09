@@ -20,6 +20,8 @@ interface SettlementProps {
   setMergeCompanyModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   setMergeSelectionModalVisible: React.Dispatch<React.SetStateAction<boolean>>,
   userID: string;
+  is3DVersion: boolean;
+  setIs3DVersion: React.Dispatch<React.SetStateAction<boolean>>;
 }
 
 const TopBar3D: React.FC<SettlementProps> = ({
@@ -31,7 +33,9 @@ const TopBar3D: React.FC<SettlementProps> = ({
   setBuyStockModalVisible,
   setMergeCompanyModalVisible,
   setMergeSelectionModalVisible,
-  userID
+  userID,
+  is3DVersion,
+  setIs3DVersion
 }) => {
   const navigate = useNavigate();
   const { roomID } = useParams();
@@ -167,6 +171,11 @@ const TopBar3D: React.FC<SettlementProps> = ({
         <Divider type="vertical" className={styles.divider} />
 
         <Space size="middle">
+          <Button
+            content={is3DVersion ? '切换到2D' : '切换到3D'}
+            onClick={() => setIs3DVersion(!is3DVersion)}
+          >
+          </Button>
           <Button
             className={styles.utilButton}
             type="default"

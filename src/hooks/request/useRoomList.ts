@@ -4,11 +4,7 @@ import { useGameType } from '../useGameType';
 import { getAcquireRoomList, getSplendorRoomList } from '@/api/room';
 import { message } from 'antd';
 
-export const useRoomList = ({
-  setOnlinePlayer,
-}: {
-  setOnlinePlayer?: (onlinePlayer: number) => void;
-}) => {
+export const useRoomList = () => {
   const gameType = useGameType();
   const hasLoadedRef = useRef(false); // ⭐ 关键
 
@@ -29,8 +25,6 @@ export const useRoomList = ({
         res?.rooms?.sort((a: any, b: any) =>
           a.roomID.localeCompare(b.roomID)
         ) ?? [];
-
-      setOnlinePlayer?.(res?.onlinePlayer);
       return sortList;
     },
     {

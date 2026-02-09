@@ -64,6 +64,7 @@ interface RoomInfo {
   maxPlayers: string;
   gameStatus: GameStatus; // 你可以加更多状态
   roomStatus: boolean;
+  ownerID: string;
 }
 
 interface RoomData {
@@ -103,12 +104,12 @@ interface RoomStruct {
   roomID: string;
   ownerID: string;
   status: GameStatus;
-  players: {
+  players: Record<string, {
     playerID: string;
     online: boolean;
     ready: boolean;
     ai: boolean;
-  }[];
+  }>;
 }
 interface WsMatchSyncData {
   type: string;

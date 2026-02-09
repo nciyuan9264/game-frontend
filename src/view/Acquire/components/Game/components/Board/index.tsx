@@ -53,6 +53,7 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
                     background: tile?.belong ? CompanyColor[tile?.belong] : hoveredTile === id ? 'linear-gradient(135deg, #0b3a3f, #00b3a6)' : 'transparent',
                     backgroundColor: tile?.belong ? CompanyColor[tile?.belong] : hoveredTile === id ? 'rgba(45, 212, 191, 0.95)' : 'unset',
                     cursor: shouldBlink ? 'pointer' : 'default',
+                    color: tile?.belong ? '#fff' : 'var(--color-text-soft)',
                   }}
                 >
                   {id}

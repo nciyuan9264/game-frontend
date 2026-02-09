@@ -160,11 +160,11 @@ export default function Room() {
               />
               <div className={styles.message}>
                 <MessageSender
-                  onMessageSend={(msg) => {
-                    console.log("用户发送消息:", msg);
+                  onMessageSend={(audioType) => {
+                    console.log("用户发送消息:", audioType);
                     sendMessage(JSON.stringify({
                       type: 'play_audio',
-                      payload: msg,
+                      payload: { audioType },
                     }));
                   }}
                 />

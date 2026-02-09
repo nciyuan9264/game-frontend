@@ -94,7 +94,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
           onMessageSend={(msg) => {
             console.log("用户发送消息:", msg);
             sendMessage(JSON.stringify({
-              type: 'play_audio',
+              type: 'game_play_audio',
               payload: msg,
             }));
           }}

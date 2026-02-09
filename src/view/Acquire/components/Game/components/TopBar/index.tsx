@@ -9,7 +9,6 @@ import { canBuyStock, canCreateCompany, getMergeSelection, getMergingModalAvaili
 import { Button } from '@/components/Button';
 import { useUrlParams } from '@/hooks/useUrlParams';
 
-
 interface SettlementProps {
   wsRef: React.MutableRefObject<WebSocket | null>
   data?: WsRoomSyncData;
@@ -75,49 +74,45 @@ const Settlement: React.FC<SettlementProps> = ({
     if (canCreateCompany(data, userID)) {
       return (
         <Button
+          content='创建公司'
           disabled={!canCreateCompany(data, userID)}
           onClick={() => {
             setCreateCompanyModalVisible(true);
           }}
-        >
-          创建公司
-        </Button>
+        />
       )
     }
     if (canBuyStock(data, userID)) {
       return (
         <Button
+          content='购买股票'
           disabled={!canBuyStock(data, userID)}
           onClick={() => {
             setBuyStockModalVisible(true);
           }}
-        >
-          购买股票
-        </Button>
+        />
       )
     }
     if (getMergingModalAvailible(data, userID)) {
       return (
         <Button
+          content='合并清算'
           disabled={!getMergingModalAvailible(data, userID)}
           onClick={() => {
             setMergeCompanyModalVisible(true);
           }}
-        >
-          合并清算
-        </Button>
+        />
       )
     }
     if (getMergeSelection(data, userID)) {
       return (
         <Button
+          content='选择留下的公司'
           disabled={!getMergeSelection(data, userID)}
           onClick={() => {
             setMergeSelectionModalVisible(true);
           }}
-        >
-          选择留下的公司
-        </Button>
+        />
       )
     }
   }
@@ -164,12 +159,11 @@ const Settlement: React.FC<SettlementProps> = ({
           )}
         </div>
         <div className={styles.right}>
-                  <Button
-          content={is3DVersion ? '切换到2D' : '切换到3D'}
-          type="primary"
-          onClick={() => setIs3DVersion(!is3DVersion)}
-        >
-        </Button>
+          <Button
+            content={is3DVersion ? '切换到2D' : '切换到3D'}
+            onClick={() => setIs3DVersion(!is3DVersion)}
+          >
+          </Button>
           <Button
             content="公司面板"
             onClick={() => {
@@ -178,7 +172,7 @@ const Settlement: React.FC<SettlementProps> = ({
           >
           </Button>
           <Button
-            content="结束清算"
+            content="玩家排名"
             // disabled={!isGameEnd}
             onClick={() => {
               setGameEndModalVisible(true);

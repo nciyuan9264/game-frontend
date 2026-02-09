@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { WsMatchSyncData, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsMatchSyncData, WsRoomSyncData } from '@/types/room';
 import { profile2BackendName } from '@/util/user';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { message } from 'antd';
@@ -77,7 +77,19 @@ export const Acquire: React.FC = () => {
           setCreateCompanyModalVisible(false);
         }
         if (roomData.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
-          setBuyStockModalVisible(true);
+          if (Object.values(roomData.roomData.companyInfo).filter(company => company.stockPrice > 0).some(company => company.stockPrice <= roomData.playerData.info.money)) {
+            setBuyStockModalVisible(true);
+          } else {
+            const stocks = Object.keys(roomData?.roomData.companyInfo ?? {}).reduce((acc, key) => {
+              acc[key as CompanyKey] = 0;
+              return acc;
+            }, {} as Record<CompanyKey, number>);
+            sendMessage(JSON.stringify({
+              type: 'game_buy_stock',
+              payload: { stocks },
+            }));
+            setBuyStockModalVisible(false);
+          }
         } else {
           setBuyStockModalVisible(false);
         }

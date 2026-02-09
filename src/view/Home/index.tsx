@@ -2,12 +2,12 @@ import { useNavigate } from "react-router-dom";
 import styles from './index.module.less';
 
 const games = [
-  {
-    name: "Splendor",
-    description: "璀璨宝石：策略与资源管理的经典桌游",
-    path: "/game/splendor",
-    image: "/cover/splendor.jpg",
-  },
+  // {
+  //   name: "Splendor",
+  //   description: "璀璨宝石：策略与资源管理的经典桌游",
+  //   path: "/game/splendor",
+  //   image: "/cover/splendor.jpg",
+  // },
   {
     name: "Acquire",
     description: "并购风云：并购与股市对战的烧脑游戏",

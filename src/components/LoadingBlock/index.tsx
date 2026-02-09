@@ -6,7 +6,6 @@ export const LoadingBlock = ({ content = '正在加载游戏房间列表，请�
     <div
       className={styles['loading-block']}>
       <Spin
-        tip="加载中..."
         size="large"
         style={{ marginBottom: 20 }}
       />

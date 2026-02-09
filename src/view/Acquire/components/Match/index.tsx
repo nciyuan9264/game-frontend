@@ -1,9 +1,10 @@
-import { FC, useMemo } from 'react';
+import { FC, useEffect, useMemo } from 'react';
 import styles from './index.module.less';
 import { Header } from './components/Header';
 import PlayerCard from './components/PlayerCard';
 import { WsMatchSyncData } from '@/types/room';
 import { Role, Seat } from './types';
+import { useNavigate } from 'react-router-dom';
 
 interface IGameProps {
   sendMessage: (msg: string) => void;
@@ -14,8 +15,16 @@ interface IGameProps {
 
 export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, userID }: IGameProps) => {
   const isHostView = useMemo(() => wsMatchSyncData?.room?.ownerID === userID, [wsMatchSyncData, userID])
-  const currentPlayerData = useMemo(() => wsMatchSyncData?.room?.players?.find((player) => player.playerID === userID), [wsMatchSyncData, userID])
-  const isAllReady = useMemo(() => wsMatchSyncData?.room?.players?.every((player) => player.ready) && wsMatchSyncData?.room?.players?.length > 1, [wsMatchSyncData])
+  const currentPlayerData = useMemo(() => wsMatchSyncData?.room?.players?.[userID], [wsMatchSyncData, userID])
+  const isAllReady = useMemo(() => Object.values(wsMatchSyncData?.room?.players || {}).every((player) => player.ready) && Object.values(wsMatchSyncData?.room?.players || {}).length > 1, [wsMatchSyncData])
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    if (!wsMatchSyncData?.room.players?.[userID]) {
+      navigate('/game/acquire');
+      return;
+    }
+  }, [wsMatchSyncData, navigate])
 
   const seats = useMemo(() => {
     if (!wsMatchSyncData?.room?.players) {
@@ -25,8 +34,12 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
     const totalSeats = 6;
     const seatList: Seat[] = [];
 
-    // Add player seats
-    players.forEach((player, index) => {
+    // Separate players into real players and AI players
+    const realPlayers = Object.values(players).filter(player => !player.ai);
+    const aiPlayers = Object.values(players).filter(player => player.ai);
+
+    // Add real players first (keeping host at index 0)
+    realPlayers.forEach((player, index) => {
       seatList.push({
         id: `player-${index}`,
         label: player.playerID,
@@ -35,8 +48,18 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
       });
     });
 
+    // Add AI players after real players
+    aiPlayers.forEach((player, index) => {
+      seatList.push({
+        id: `ai-${index}`,
+        label: player.playerID,
+        role: Role.Player,
+        isReady: player.ready,
+      });
+    });
+
     // Add empty seats for remaining slots
-    const emptySeatsNeeded = totalSeats - players.length;
+    const emptySeatsNeeded = totalSeats - Object.values(players).length;
     for (let i = 0; i < emptySeatsNeeded; i++) {
       seatList.push({
         id: `empty-${i}`,
@@ -48,18 +71,21 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
 
     return seatList;
   }, [wsMatchSyncData])
-
+  const firstEmptySeatIndex = useMemo(() => {
+    return seats.findIndex(seat => !seat.label);
+  }, [seats]);
   return (
     <div className={styles.match}>
       <Header isHostView={isHostView} wsRef={wsRef} currentPlayerData={currentPlayerData} isAllReady={isAllReady} sendMessage={sendMessage} />
       <div className={styles.seatGrid}>
-        {seats?.map(player => (
+        {seats?.map((player, index) => (
           <PlayerCard
-            key={player.id}
+            key={index}
             data={player}
             userID={userID}
             wsMatchSyncData={wsMatchSyncData}
             sendMessage={sendMessage}
+            canAddAI={index === firstEmptySeatIndex}
           />
         ))}
       </div>

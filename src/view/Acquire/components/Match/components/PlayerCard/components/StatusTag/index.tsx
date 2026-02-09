@@ -5,9 +5,9 @@ export enum Status {
   Waiting = 'not-ready',//待准备
   Ready = 'ready',//已准备
 }
-export default ({status}: {status: Status}) => {
+export default ({className, status}: {className?: string, status: Status}) => {
   return (
-    <div className={`${styles['status-tag']} ${status === Status.Waiting ? styles.waiting : styles.ready}`}>
+    <div className={`${styles['status-tag']} ${className || ''} ${status === Status.Waiting ? styles.waiting : styles.ready}`}>
       <span className={`${styles.dot} ${status === Status.Waiting ? styles.waiting : styles.ready}`}></span>
       {status === Status.Waiting ? '待准备' : '已准备'}
     </div>

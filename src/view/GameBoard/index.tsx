@@ -1,11 +1,9 @@
-import { useEffect, useState } from 'react';
-import { Button} from 'antd';
-import styles from './index.module.less';
+import { useEffect, useMemo } from 'react';
+import { Button } from 'antd';
 import RoomCard from '@/view/GameBoard/components/RoomCard';
 import { handleFullscreen } from '@/util/window';
 import { useGameType } from '@/hooks/useGameType';
 import { useCreateRoom } from '@/hooks/request/useCreateRoom';
-import { useDeleteRoom } from '@/hooks/request/useDeleteRoom';
 import { useRoomList } from '@/hooks/request/useRoomList';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useLogout } from '@/hooks/request/useLogout';
@@ -13,29 +11,26 @@ import { LoadingBlock } from '@/components/LoadingBlock';
 import { Header } from '@/view/GameBoard/components/Header';
 import { profile2BackendName } from '@/util/user';
 
+import styles from './index.module.less';
+
 export default function GameMenu() {
   const { userProfile, profileLoading } = useProfile();
   const userID = profile2BackendName(userProfile);
-  const [onlinePlayer, setOnlinePlayer] = useState<number>(0)
   const gameType = useGameType();
-  const { roomList, handleGetRoomList, roomListLoading, hasLoaded } = useRoomList({ setOnlinePlayer });
+  const { roomList, handleGetRoomList, roomListLoading, hasLoaded } = useRoomList();
+  const onlinePlayer = useMemo(() => roomList?.reduce((acc, cur) => acc + cur.roomPlayer.filter(player => player.online && !player.ai).length, 0) || 0, [roomList]);
   const showInitialLoading = (!hasLoaded && roomListLoading) || profileLoading;
   const { runLogout } = useLogout();
 
   const { handleCreateRoom } = useCreateRoom();
-  const handleDeleteRoom = useDeleteRoom(handleGetRoomList);
 
   useEffect(() => {
     handleGetRoomList();
-    const timer = setInterval(handleGetRoomList, 10000);
-    if (!(window as any).deleteAcquireRoom) {
-      (window as any).deleteAcquireRoom = handleDeleteRoom;
-    }
+    const timer = setInterval(handleGetRoomList, 3000);
     return () => {
       clearInterval(timer);
-      delete (window as any).deleteAcquireRoom;
     };
-  }, [gameType, handleGetRoomList, handleDeleteRoom]);
+  }, [gameType, handleGetRoomList]);
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -50,10 +45,6 @@ export default function GameMenu() {
                 <RoomCard
                   key={room.roomID}
                   data={room}
-                  onDelete={(roomID: string) => {
-                    handleDeleteRoom(roomID);
-                  }}
-                  userProfile={userProfile}
                   gameType={gameType}
                   userID={userID}
                 />

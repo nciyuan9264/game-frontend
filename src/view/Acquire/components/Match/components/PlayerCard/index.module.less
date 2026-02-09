@@ -116,7 +116,7 @@
 .seat-card-operable {
   cursor: pointer;
 
-  &:not(.seat-card-empty):hover {
+  &:not(.seat-card-empty):not(.seat-card-add-locked):hover {
     background: rgba(239, 68, 68, 0.2);
     border-color: #ef4444;
     box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(239, 68, 68, 0.5);
@@ -147,6 +147,10 @@
       .hover-content {
         display: inline;
       }
+    }
+
+    .seat-status-tag {
+      display: none;
     }
   }
 
@@ -184,5 +188,133 @@
         display: inline;
       }
     }
+  }
+}
+
+.seat-card-operable.seat-card-add-locked:hover {
+  background: radial-gradient(circle at 0% 0%, rgba(5, 150, 105, 0.9), rgba(5, 150, 105, 0.7));
+  border-color: @color-accent-teal;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(5, 150, 105, 0.8);
+  color: @color-accent-teal;
+
+  .seat-avatar {
+    background: rgba(0, 0, 0, 0.18);
+    border-color: @color-accent-teal;
+    color: #00b3a6;
+
+    .default-content {
+      display: none;
+    }
+
+    .hover-content {
+      display: flex;
+    }
+  }
+
+  .seat-player-name,
+  .seat-role-text {
+    color: @color-accent-teal;
+    font-weight: 600;
+
+    .default-content {
+      display: none;
+    }
+
+    .hover-content {
+      display: inline;
+    }
+  }
+}
+
+// 禁用状态
+.seat-card-disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+
+  &:hover {
+    background: radial-gradient(circle at 0% 0%, rgba(15, 23, 42, 0.98), rgba(15, 23, 42, 0.94));
+    border-color: rgba(51, 65, 85, 0.95);
+    box-shadow: 0 18px 40px rgba(0, 0, 0, 0.9), 0 0 0 1px rgba(15, 23, 42, 0.9);
+    color: @color-text-main;
+
+    .seat-avatar {
+      background: transparent;
+      border-color: rgba(34, 197, 167, 0.6);
+      color: @color-accent-teal;
+
+      .default-content {
+        display: flex;
+      }
+
+      .hover-content {
+        display: none;
+      }
+    }
+
+    .seat-player-name,
+    .seat-role-text {
+      color: @color-primary-ink;
+      font-weight: 600;
+
+      .default-content {
+        display: inline;
+      }
+
+      .hover-content {
+        display: none;
+      }
+    }
+
+    .seat-status-tag {
+      display: block;
+    }
+  }
+}
+
+// 添加动画
+.add-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(15, 23, 42, 0.9);
+  border-radius: 999px;
+  z-index: 5;
+
+  .loading-icon {
+    font-size: 1.5rem;
+    color: @color-accent-teal;
+    animation: spin 1s linear infinite;
+  }
+
+  .success-icon {
+    font-size: 1.5rem;
+    color: @color-accent-teal;
+    animation: scale-in 0.3s ease-out;
+  }
+}
+
+// 动画效果
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
   }
 }

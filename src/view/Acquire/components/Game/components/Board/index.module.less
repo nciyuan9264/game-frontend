@@ -1,5 +1,7 @@
 @import "../../../../../../styles/variables.less";
-
+:root {
+  --color-text-soft: @color-text-soft;
+}
 .board {
   display: grid;
   width: 88%;
@@ -46,7 +48,6 @@
         padding: 0.1rem;
         font-size: 1rem;
         font-weight: 500;
-        color: @color-text-soft;
         display: flex;
         align-items: center;
         justify-content: center;
@@ -87,15 +88,3 @@
     pointer-events: none;
   }
 }
-
-
-
-// @media screen and (min-width: 768px) and (max-width: 1024px) and (orientation: landscape) {
-//   .board {
-//     width: 55%;
-
-//     .cell {
-//       height: 30px;
-//     }
-//   }
-// }
