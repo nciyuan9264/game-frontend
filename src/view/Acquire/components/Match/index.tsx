@@ -43,7 +43,7 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
       seatList.push({
         id: `player-${index}`,
         label: player.playerID,
-        role: player.playerID === wsMatchSyncData.room.ownerID ? Role.Host : Role.Player,
+        role: isHostView ? Role.Host : Role.Player,
         isReady: player.ready,
       });
     });
