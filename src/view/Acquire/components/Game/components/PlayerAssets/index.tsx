@@ -26,7 +26,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
         <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
       </div>
 
-      <div className={styles.assetGroup} style={{ flex: '3' }}>
+      <div className={`${styles.assetGroup} ${styles['asset-group-stock']}`} style={{ flex: '3' }}>
         {/* <span className={styles.assetLabel}>股票</span> */}
         {stockList.length > 0 ? (
           <div className={styles.stockList}>

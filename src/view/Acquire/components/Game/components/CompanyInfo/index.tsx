@@ -49,6 +49,9 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
     prevDataRef.current = data;
   }, [data?.roomData.currentPlayer]);
 
+  const stockList = Object.entries(data?.playerData.stocks || {})
+    .filter(([_, count]) => Number(count) > 0);
+
   if (!data) return null;
 
   return (
@@ -72,6 +75,8 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
           );
         };
 
+        const stockCount = stockList.find(([name]) => name === company.name)?.[1] || 0;
+        const stockPrice = company.stockPrice * stockCount;
         return (
           <div className={`${styles.company} ${!company.tiles ? styles.noTiles : ''}`} key={company.name}
             style={{
@@ -86,9 +91,10 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
             <div className={styles.right}>
               <div className={styles.bottom}>
-                <div className={styles.top}>股价 {renderValue(company.stockPrice)}</div>
+                <div className={styles.bottomvValue}>股价 {renderValue(company.stockPrice)}</div>
                 <div className={styles.bottomvValue}>剩余{renderValue(company.stockTotal)}股</div>
-                <div className={styles.bottomvValue}>土地{renderValue(company.tiles)}</div>
+                <div className={`${styles.bottomvValue} ${styles.tilesInfo}`}>土地{renderValue(company.tiles)}</div>
+                <div className={`${styles.bottomvValue} ${styles.stockInfo}`}>持仓{renderValue(stockCount)} 股</div>
               </div>
             </div>
           </div>
