@@ -52,7 +52,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
   if (!data) return null;
 
   return (
-    <div className={styles.companyInfo}>
+    <div className={styles.companyInfo} style={{ display: Object.values(data.roomData.companyInfo).some(company => company.tiles) ? 'flex' : 'none' }}>
       {Object.values(data.roomData.companyInfo).map((company) => {
         // const companyDelta = deltas[company.name] || { stockPrice: 0, stockTotal: 0, tiles: 0 };
         const renderValue = (value: number) => {

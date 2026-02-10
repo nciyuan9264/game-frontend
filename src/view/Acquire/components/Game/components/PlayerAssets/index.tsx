@@ -3,7 +3,6 @@ import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
-import MessageSender from '@/view/Splendor/components/MessageSender';
 
 interface PlayerAssetsProps {
   data?: WsRoomSyncData;
@@ -14,7 +13,6 @@ interface PlayerAssetsProps {
 }
 const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   data,
-  sendMessage,
   setHoveredTile,
   placeTile,
   userID
@@ -89,7 +87,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
         </div>
       </div>
 
-      <div className={styles.message}>
+      {/* <div className={styles.message}>
         <MessageSender
           onMessageSend={(msg) => {
             console.log("用户发送消息:", msg);
@@ -99,7 +97,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
             }));
           }}
         />
-      </div>
+      </div> */}
     </div>
   );
 };

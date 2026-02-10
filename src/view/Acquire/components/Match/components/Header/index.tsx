@@ -27,7 +27,7 @@ export const Header = ({
   return (
     <div className={styles.header}>
       <div className={styles.left}>
-        <Button content="" icon={<ArrowLeftOutlined />} onClick={() => {
+        <Button content="" icon={<ArrowLeftOutlined />} style={{height: '2rem'}} onClick={() => {
           Modal.confirm({
             title: '确认操作',
             content: '你确定要离开房间吗？',
@@ -50,6 +50,7 @@ export const Header = ({
       </div>
       <div className={styles.right}>
         {isHostView && <Button
+          style={{height: '2rem'}}
           content={'添加人机'}
           icon={<PlusCircleOutlined />}
           onClick={() => {
@@ -63,6 +64,7 @@ export const Header = ({
         {
           isHostView ?
             <Button
+              style={{height: '2rem'}}
               customType="primary"
               disabled={!isAllReady}
               content={'开始游戏'}
@@ -83,6 +85,7 @@ export const Header = ({
                 backgroundColor: currentPlayerData?.ready ? 'rgba(245, 158, 11, 0.26)' : 'rgba(34, 197, 167, 0.18)',
                 color: currentPlayerData?.ready ? '#f59e0b' : '#00b3a6',
                 borderColor: currentPlayerData?.ready ? '#f59e0b' : '#00b3a6',
+                height: '2rem',
               }}
               onClick={() => {
                 if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {

@@ -6,9 +6,9 @@
   justify-content: space-between;
   align-items: center;
   gap: 0.75rem;
+  min-height: 2.25rem;
 
   .left {
-    min-height: 2.25rem;
     display: flex;
     align-items: flex-start;
     gap: 0.75rem;
@@ -63,7 +63,6 @@
         font-size: 0.6rem;
         letter-spacing: 0.1em;
         text-transform: uppercase;
-
       }
 
       .description {
@@ -195,5 +194,17 @@
 
   100% {
     background-position: -200% 0;
+  }
+}
+
+@media (max-width: 600px) {
+  .header{
+    min-height: 1.75rem;
+
+    .left{
+      .content{
+        line-height: .75rem;
+      }
+    }
   }
 }
