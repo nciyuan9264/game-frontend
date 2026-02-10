@@ -15,7 +15,7 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
     let ws = new WebSocket(url);
     wsRef.current = ws;
 
-    let reconnectTimeout: NodeJS.Timeout;
+    // let reconnectTimeout: NodeJS.Timeout;
 
     ws.onopen = () => {
       console.log('WebSocket connected');
@@ -31,19 +31,19 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
 
     ws.onclose = event => {
       console.log('WebSocket closed:', event.code, event.reason);
-      // 自动重连（可选）
-      if (event.code !== 1000) {
-        reconnectTimeout = setTimeout(() => {
-          ws = new WebSocket(url);
-          wsRef.current = ws;
-        }, 1000);
-      }
+      // // 自动重连（可选）
+      // if (event.code !== 1000) {
+      //   reconnectTimeout = setTimeout(() => {
+      //     ws = new WebSocket(url);
+      //     wsRef.current = ws;
+      //   }, 1000);
+      // }
     };
     //deepscan-disable-next-line
     window.addEventListener('popstate', close);
 
     return () => {
-      clearTimeout(reconnectTimeout);
+      // clearTimeout(reconnectTimeout);
       if (ws && ws.readyState === WebSocket.OPEN) {
         ws.close(1000, 'Component unmounted');
         wsRef.current = null;
