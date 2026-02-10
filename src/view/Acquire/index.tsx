@@ -31,7 +31,7 @@ export const Acquire: React.FC = () => {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
