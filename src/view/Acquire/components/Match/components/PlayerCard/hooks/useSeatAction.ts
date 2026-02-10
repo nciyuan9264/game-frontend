@@ -23,7 +23,6 @@ export function useSeatAction({
   wsMatchSyncData,
   uiState,
   sendMessage,
-  onAddAISuccess,
   onAddAIStart,
   canAddAI,
 }: UseSeatActionParams) {
