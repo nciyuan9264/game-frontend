@@ -15,6 +15,7 @@ import { Match } from './components/Match';
 import styles from './index.module.less';
 import { wsUrl } from '@/const/env';
 import { LoadingBlock } from '@/components/LoadingBlock';
+import { useNavigate } from 'react-router-dom';
 
 export const Acquire: React.FC = () => {
   const { roomID } = useUrlParams();
@@ -26,10 +27,11 @@ export const Acquire: React.FC = () => {
   const [mergeCompanyModalVisible, setMergeCompanyModalVisible] = useState(false);
   const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
+  const navigate = useNavigate();
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
@@ -38,6 +40,9 @@ export const Acquire: React.FC = () => {
       message.error(newData.message);
       setWsMatchSyncData(undefined);
       setWsRoomSyncData(undefined);
+      if(newData.message === '你已被移出房间'){
+        navigate('/game/acquire');
+      }
       return;
     }
     if (newData.type === 'audio') {
