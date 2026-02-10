@@ -62,12 +62,12 @@ export default function GameMenu() {
               </div>}
             <div className={styles.footer}>
               <div className={styles.left}>
-                <span className={styles.userId}>当前在线人数: {onlinePlayer}</span>
+                当前在线人数: {onlinePlayer}
               </div>
               <div className={styles.right}>
                 <Button
+                  customType='primary'
                   content="全屏"
-                  className={styles.button}
                   onClick={() => {
                     handleFullscreen();
                   }}
