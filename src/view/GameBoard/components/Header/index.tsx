@@ -35,12 +35,12 @@ export const Header = ({
         }} /> */}
         <div className={styles.content}>
           <div className={styles.titleRow}>
-            <h1 className={styles.title}>Acquire 游戏大厅</h1>
+            Acquire 游戏大厅
           </div>
         </div>
       </div>
       <div className={styles.right}>
-        {Number(roomList?.length) > 0 ? <Button customType="primary" content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
+        {Number(roomList?.length) > 0 ? <Button customType="primary" style={{height: '2rem'}} content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
           handleCreateRoom();
         }}/> : null}
         <Dropdown
