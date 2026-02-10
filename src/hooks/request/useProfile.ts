@@ -1,4 +1,3 @@
-import { getProfile } from '@/api/room';
 import { useRequest } from 'ahooks';
 import { message } from 'antd';
 import { useState } from 'react';
@@ -19,11 +18,11 @@ export const useProfile = () => {
 
   const { run: handleGetProfile, loading: profileLoading } = useRequest(
     async () => {
-      // const profile = localStorage.getItem('profile');
-      // if (profile) {
-      //   return JSON.parse(profile);
-      // }
-      return await getProfile();
+      const profile = localStorage.getItem('profile');
+      if (profile) {
+        return JSON.parse(profile);
+      }
+      // return await getProfile();
     },
     {
       onError: () => {

@@ -63,14 +63,10 @@ export const Header = ({
         {
           isHostView ?
             <Button
+              customType="primary"
               disabled={!isAllReady}
               content={'开始游戏'}
               icon={<CheckCircleOutlined />}
-              style={{
-                backgroundColor: isAllReady ? 'rgba(34, 197, 167, 0.18)' : 'transparent',
-                color: isAllReady ? '#00b3a6' : '#94a3b8',
-                borderColor: isAllReady ? '#00b3a6' : '#94a3b8',
-              }}
               onClick={() => {
                 if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
                   sendMessage(JSON.stringify({

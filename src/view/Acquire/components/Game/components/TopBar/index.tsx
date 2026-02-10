@@ -1,6 +1,5 @@
-import React from 'react';
+import React, { useMemo } from 'react';
 import { WsRoomSyncData } from '@/types/room';
-import styles from './index.module.less';
 import { backendName2FrontendName } from '@/util/user';
 import { Modal } from 'antd';
 import { ArrowLeftOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
@@ -8,6 +7,9 @@ import { useNavigate } from 'react-router-dom';
 import { canBuyStock, canCreateCompany, getMergeSelection, getMergingModalAvailible } from '../../utils/game';
 import { Button } from '@/components/Button';
 import { useUrlParams } from '@/hooks/useUrlParams';
+import { GameStatus } from '@/enum/game';
+
+import styles from './index.module.less';
 
 interface SettlementProps {
   wsRef: React.MutableRefObject<WebSocket | null>
@@ -38,20 +40,20 @@ const Settlement: React.FC<SettlementProps> = ({
   const navigate = useNavigate();
   const { roomID } = useUrlParams();
 
-  // const isGameEnd = useMemo(() => {
-  //   if (!data) {
-  //     return false;
-  //   }
-  //   return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-  //     return Number(val.tiles ?? 0) < 11
-  //   }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-  //     return Number(val.tiles ?? 0) >= 41
-  //   }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-  //     return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
-  //   }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
-  //     return Number(val.tiles ?? 0) === 0
-  //   }));
-  // }, [data]);
+  const isGameEnd = useMemo(() => {
+    if (!data) {
+      return false;
+    }
+    return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) < 11
+    }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) >= 41
+    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+      return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
+    }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
+      return Number(val.tiles ?? 0) === 0
+    }));
+  }, [data]);
 
   // const currentStep = useMemo(() => {
   //   if (!data?.roomData.roomInfo.roomStatus) {
@@ -146,13 +148,16 @@ const Settlement: React.FC<SettlementProps> = ({
         <div className={styles.middle}>
           {data?.roomData.roomInfo.roomStatus ? (
             data?.roomData.currentPlayer === userID ? (
-              <span className={styles.yourTurn}>你的回合</span>
+              <Button content="你的回合" customType="primary" style={{ minWidth: '12rem', height: '3rem', fontSize: '1.2rem' }} />
             ) : (
-              <>
-                请等待
-                <span className={styles.playerName}>{backendName2FrontendName(data.roomData.currentPlayer)}</span>
-                操作
-              </>
+              <Button content={
+                `请等待
+                  ${backendName2FrontendName(data.roomData.currentPlayer)}
+                  操作`
+              }
+                customType='primary'
+                style={{ minWidth: '12rem', height: '3rem', fontSize: '1.2rem' }}
+              />
             )
           ) : (
             '等待其他玩家进入'
@@ -173,7 +178,7 @@ const Settlement: React.FC<SettlementProps> = ({
           </Button>
           <Button
             content="玩家排名"
-            // disabled={!isGameEnd}
+            disabled={!isGameEnd}
             onClick={() => {
               setGameEndModalVisible(true);
             }}

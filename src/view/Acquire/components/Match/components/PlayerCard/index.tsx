@@ -15,6 +15,7 @@ import { useSeatUIState } from './hooks/useSeatUIState';
 import { useSeatAction } from './hooks/useSeatAction';
 
 import styles from './index.module.less';
+import { backendName2FrontendName } from '@/util/user';
 
 interface PlayerCardProps {
   data: Seat;
@@ -104,9 +105,9 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <div className={styles['seat-players']}>
         <div className={styles['seat-player']}>
           <span className={styles['seat-player-name']}>
-            <Tooltip title={data.label} placement="top" arrowPointAtCenter>
+            <Tooltip title={data.label} placement="top" arrow={{ pointAtCenter: true }}>
               <span className={styles['default-content']}>
-                {data.label || '空位'}
+                {backendName2FrontendName(data.label) || '空位'}
               </span>
             </Tooltip>
             {canOperate && (

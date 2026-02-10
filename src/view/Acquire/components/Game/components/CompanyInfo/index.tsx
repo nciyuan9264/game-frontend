@@ -80,7 +80,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
           }}>
             <div className={styles.left}>
               <div className={styles.dot} style={{ backgroundColor: company.tiles ? CompanyColor[company.name as CompanyKey] : 'unset' }} />
-              <div className={styles.companyName}>{company.name}</div>
+              <div className={styles.companyName} style={{ color: company.tiles ? CompanyColor[company.name as CompanyKey] : 'unset' }}>{company.name}</div>
             </div>
             <div className={styles.right}>
               <div className={styles.bottom}>

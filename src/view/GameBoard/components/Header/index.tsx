@@ -41,7 +41,7 @@ export const Header = ({
         </div>
       </div>
       <div className={styles.right}>
-        {Number(roomList?.length) > 0 ? <Button content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
+        {Number(roomList?.length) > 0 ? <Button customType="primary" content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
           handleCreateRoom();
         }}/> : null}
         <Dropdown

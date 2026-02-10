@@ -21,7 +21,7 @@ const GameEnd: React.FC<GameEndProps> = ({
   const isOwner = data?.roomData.roomInfo.ownerID === userID;
   return (
     <Modal
-      title="🏁 游戏结算"
+      title="🏁 玩家排名"
       open={visible}
       closable={false}
       footer={

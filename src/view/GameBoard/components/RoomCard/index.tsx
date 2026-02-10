@@ -1,11 +1,12 @@
 import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
-import { Button, message } from 'antd';
+import { message } from 'antd';
 import { ListRoomInfo } from '@/types/room';
 import { BankOutlined, HourglassOutlined, LoginOutlined, PlayCircleOutlined, UnlockOutlined } from '@ant-design/icons';
 import { backendName2FrontendName } from '@/util/user';
 import { GameType } from '@/hooks/useGameType';
+import { Button } from '@/components/Button';
 
 interface RoomCardProps {
   data: ListRoomInfo;
@@ -73,7 +74,12 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
 
         <div className={styles.actions}>
           <Button
-            className={styles.btnPrimary}
+            customType="primary"
+            content="进入房间"
+            style={{
+              width: '6rem',
+              height: '2rem',
+            }}
             icon={<LoginOutlined className={styles.icon} />}
             onClick={() => {
               const hasPlayer = data.roomPlayer.find(player => player.playerID === userID);
@@ -91,9 +97,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
                 }
               }
             }}
-          >
-            进入房间
-          </Button>
+          />
         </div>
       </div>
     </article>

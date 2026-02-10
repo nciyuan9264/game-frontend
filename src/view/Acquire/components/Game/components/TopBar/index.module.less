@@ -1,5 +1,12 @@
 @import "../../../../../../styles/variables.less";
 
+/* 统一用和按钮同一条青绿色系 */
+:root {
+  /* 如果有全局变量就改成用你现有的 */
+  --turn-accent: #00b3a6;
+  --turn-accent-soft: rgba(0, 179, 166, 0.16);
+}
+
 .top-bar {
   height: 5vh;
   display: flex;
@@ -34,7 +41,6 @@
           font-weight: 600;
           letter-spacing: -0.025em;
           color: @color-primary-ink;
-
         }
 
         .description {
@@ -105,9 +111,21 @@
       width: fit-content;
 
       .yourTurn {
-        color: #52c41a;
-        font-weight: bold;
-        animation: pulse 1.2s infinite ease-in-out;
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 0.125rem 0.625rem;
+        border-radius: 999px;
+        background: var(--turn-accent-soft);
+        color: #e0fdf9;
+        /* 文案走浅色 */
+        font-weight: 600;
+        font-size: 12px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        border: 1px solid rgba(0, 179, 166, 0.6);
+        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
+        animation: yourTurn-soft-pulse 1.8s ease-in-out infinite;
       }
 
       .playerName {
