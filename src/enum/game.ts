@@ -1,4 +1,5 @@
 export enum GameStatus {
+  MATCH = 'match',
   SET_Tile = 'setTile',
   WAITING = 'waiting',
   CREATE_COMPANY= 'createCompany',

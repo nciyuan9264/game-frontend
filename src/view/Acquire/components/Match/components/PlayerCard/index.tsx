@@ -6,6 +6,7 @@ import {
   CheckOutlined,
   LoadingOutlined,
 } from '@ant-design/icons';
+import { Tooltip } from 'antd';
 
 import StatusTag, { Status } from './components/StatusTag';
 import { Role, Seat } from '../../types';
@@ -96,9 +97,11 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
       <div className={styles['seat-players']}>
         <div className={styles['seat-player']}>
           <span className={styles['seat-player-name']}>
-            <span className={styles['default-content']}>
-              {data.label || '空位'}
-            </span>
+            <Tooltip title={data.label} placement="top" arrowPointAtCenter>
+              <span className={styles['default-content']}>
+                {data.label || '空位'}
+              </span>
+            </Tooltip>
             {canOperate && (
               <span className={styles['hover-content']}>
                 {isRemove ? '移除玩家' : '添加人机'}

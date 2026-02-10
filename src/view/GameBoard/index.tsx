@@ -1,5 +1,4 @@
 import { useEffect, useMemo } from 'react';
-import { Button } from 'antd';
 import RoomCard from '@/view/GameBoard/components/RoomCard';
 import { handleFullscreen } from '@/util/window';
 import { useGameType } from '@/hooks/useGameType';
@@ -12,6 +11,8 @@ import { Header } from '@/view/GameBoard/components/Header';
 import { profile2BackendName } from '@/util/user';
 
 import styles from './index.module.less';
+import { PlusCircleOutlined } from '@ant-design/icons';
+import { Button } from '@/components/Button';
 
 export default function GameMenu() {
   const { userProfile, profileLoading } = useProfile();
@@ -39,8 +40,8 @@ export default function GameMenu() {
       ) : (
         <>
           <div className={styles.gameMenu}>
-            <Header userProfile={userProfile} runLogout={runLogout} handleCreateRoom={handleCreateRoom} />
-            <div className={styles.roomGrid}>
+            <Header roomList={roomList} userProfile={userProfile} runLogout={runLogout} handleCreateRoom={handleCreateRoom} />
+            {roomList?.length ? <div className={styles.roomGrid}>
               {roomList?.map(room => (
                 <RoomCard
                   key={room.roomID}
@@ -49,20 +50,28 @@ export default function GameMenu() {
                   userID={userID}
                 />
               ))}
-            </div>
+            </div> :
+              <div className={styles.createRoomBtn}>
+                <Button
+                  style={{ width: '12rem', height: '4rem', fontSize: '1.6rem' }}
+                  content="创建房间"
+                  icon={<PlusCircleOutlined style={{ fontSize: '1.6rem' }} />}
+                  onClick={() => {
+                    handleCreateRoom();
+                  }} />
+              </div>}
             <div className={styles.footer}>
               <div className={styles.left}>
                 <span className={styles.userId}>当前在线人数: {onlinePlayer}</span>
               </div>
               <div className={styles.right}>
                 <Button
+                  content="全屏"
                   className={styles.button}
                   onClick={() => {
                     handleFullscreen();
                   }}
-                >
-                  全屏
-                </Button>
+                />
               </div>
             </div>
           </div>

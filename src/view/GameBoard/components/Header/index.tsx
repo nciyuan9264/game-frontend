@@ -4,17 +4,20 @@ import { Dropdown, Modal } from 'antd';
 import { ArrowLeftOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Button } from '../../../../components/Button';
 import { useNavigate } from 'react-router-dom';
+import { ListRoomInfo } from '@/types/room';
 
 export interface IHeaderProps {
   userProfile: UserProfile
   runLogout: () => void
   handleCreateRoom: () => void
+  roomList?: ListRoomInfo[]
 }
 
 export const Header = ({
   userProfile,
   runLogout,
-  handleCreateRoom
+  handleCreateRoom,
+  roomList,
 }: IHeaderProps) => {
   const navigate = useNavigate();
   return (
@@ -38,9 +41,9 @@ export const Header = ({
         </div>
       </div>
       <div className={styles.right}>
-        <Button content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
+        {Number(roomList?.length) > 0 ? <Button content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
           handleCreateRoom();
-        }}></Button>
+        }}/> : null}
         <Dropdown
           menu={{
             items: [

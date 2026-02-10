@@ -5,6 +5,7 @@ import PlayerCard from './components/PlayerCard';
 import { WsMatchSyncData } from '@/types/room';
 import { Role, Seat } from './types';
 import { useNavigate } from 'react-router-dom';
+import { GameStatus } from '@/enum/game';
 
 interface IGameProps {
   sendMessage: (msg: string) => void;
@@ -14,7 +15,7 @@ interface IGameProps {
 }
 
 export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, userID }: IGameProps) => {
-  const isHostView = useMemo(() => wsMatchSyncData?.room?.ownerID === userID, [wsMatchSyncData, userID])
+  const isOwner = useMemo(() => wsMatchSyncData?.room?.ownerID === userID, [wsMatchSyncData, userID])
   const currentPlayerData = useMemo(() => wsMatchSyncData?.room?.players?.[userID], [wsMatchSyncData, userID])
   const isAllReady = useMemo(() => Object.values(wsMatchSyncData?.room?.players || {}).every((player) => player.ready) && Object.values(wsMatchSyncData?.room?.players || {}).length > 1, [wsMatchSyncData])
   const navigate = useNavigate();
@@ -25,6 +26,22 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
       return;
     }
   }, [wsMatchSyncData, navigate])
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      // 现代浏览器中无需设置 e.returnValue，直接调用 preventDefault 即可
+      return '';
+    };
+
+    if (isOwner && wsMatchSyncData?.room?.status === GameStatus.MATCH) {
+      window.addEventListener('beforeunload', handler);
+    }
+
+    return () => {
+      window.removeEventListener('beforeunload', handler);
+    };
+  }, []);
 
   const seats = useMemo(() => {
     if (!wsMatchSyncData?.room?.players) {
@@ -71,12 +88,14 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
 
     return seatList;
   }, [wsMatchSyncData])
+
   const firstEmptySeatIndex = useMemo(() => {
     return seats.findIndex(seat => !seat.label);
   }, [seats]);
+
   return (
     <div className={styles.match}>
-      <Header isHostView={isHostView} wsRef={wsRef} currentPlayerData={currentPlayerData} isAllReady={isAllReady} sendMessage={sendMessage} />
+      <Header isHostView={isOwner} wsRef={wsRef} currentPlayerData={currentPlayerData} isAllReady={isAllReady} sendMessage={sendMessage} />
       <div className={styles.seatGrid}>
         {seats?.map((player, index) => (
           <PlayerCard
