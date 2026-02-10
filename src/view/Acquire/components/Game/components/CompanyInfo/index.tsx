@@ -79,6 +79,8 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
         return (
           <div className={`${styles.company} ${!company.tiles ? styles.noTiles : ''}`} key={company.name}
             style={{
+              backgroundColor: company.tiles >= 11 ? CompanyColor[company.name as CompanyKey] : 'unset',
+              opacity: company.tiles >= 11 ? 0.2 : 1,
               boxShadow: company.tiles ? `
               0 0 0 1.5px ${CompanyColor[company.name as CompanyKey]}AA,
               0 0 10px 2px ${CompanyColor[company.name as CompanyKey]}66
