@@ -73,10 +73,7 @@ const action: SeatAction = useMemo(() => {
         })
       );
 
-      // ⚠️ 目前仍是模拟，后续改 WS 回包
-      setTimeout(() => {
-        onAddAISuccess();
-      }, 500);
+      // Success will be triggered when wsMatchSyncData updates and the AI is actually added
     }
   };
 

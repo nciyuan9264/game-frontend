@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import {
   PlusCircleOutlined,
   UserOutlined,
@@ -38,6 +38,13 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     setAdding,
     setSuccess,
   } = useSeatUIState();
+
+  // Detect when AI has been successfully added
+  useEffect(() => {
+    if (uiState === 'adding' && hasPlayer) {
+      setSuccess();
+    }
+  }, [data.label, uiState, hasPlayer, setSuccess]);
 
   const {
     canOperate,
