@@ -36,6 +36,10 @@ export const Acquire: React.FC = () => {
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
     const newData: WsMatchSyncData | WsRoomSyncData = JSON.parse(msg.data);
+    if (newData.type === 'ping') {
+      sendMessage(JSON.stringify({ type: 'pong' }));
+      return;
+    }
     if (newData.type === 'error') {
       message.error(newData.message);
       setWsMatchSyncData(undefined);
