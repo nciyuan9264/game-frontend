@@ -153,19 +153,22 @@
 
 @media (max-width: 600px) {
   .playerAssets {
-    overflow: auto;
     flex-direction: column;
+    overflow: visible;
 
-    .assetGroup{
+    .assetGroup {
       width: 100%;
 
-      .moneyAmount{
+      .moneyAmount {
         font-size: 1.6rem;
       }
     }
-  }
 
-  .playerAssets::-webkit-scrollbar {
-    display: none;
+    .asset-group-money {
+      position: absolute;
+      width: 6rem;
+      height: 2rem;
+      top: -1rem;
+    }
   }
 }

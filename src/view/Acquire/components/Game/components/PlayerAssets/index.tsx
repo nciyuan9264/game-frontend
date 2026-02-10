@@ -21,7 +21,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
     .filter(([_, count]) => Number(count) > 0);
   return (
     <div className={styles.playerAssets}>
-      <div className={styles.assetGroup} style={{ flex: '2' }}>
+      <div className={`${styles.assetGroup} ${styles['asset-group-money']}`} style={{ flex: '2' }}>
         {/* <span className={styles.assetLabel}>现金</span> */}
         <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
       </div>
