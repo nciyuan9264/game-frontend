@@ -76,7 +76,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
         };
 
         const stockCount = stockList.find(([name]) => name === company.name)?.[1] || 0;
-        const stockPrice = company.stockPrice * stockCount;
         return (
           <div className={`${styles.company} ${!company.tiles ? styles.noTiles : ''}`} key={company.name}
             style={{
