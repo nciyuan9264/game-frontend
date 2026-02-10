@@ -34,8 +34,6 @@ const Settlement: React.FC<SettlementProps> = ({
   setMergeCompanyModalVisible,
   setMergeSelectionModalVisible,
   userID,
-  is3DVersion,
-  setIs3DVersion,
 }) => {
   const navigate = useNavigate();
   const { roomID } = useUrlParams();
