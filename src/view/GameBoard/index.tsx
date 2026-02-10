@@ -68,6 +68,7 @@ export default function GameMenu() {
                 <Button
                   customType='primary'
                   content="全屏"
+                  style={{height: '2rem'}}
                   onClick={() => {
                     handleFullscreen();
                   }}
