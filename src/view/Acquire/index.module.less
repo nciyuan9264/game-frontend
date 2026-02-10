@@ -11,3 +11,16 @@
       rgba(14, 39, 46, 0.9),
       transparent 55%);
 }
+
+@media (max-width: 600px) {
+  .acquire{
+    height: unset;
+    max-height: 100vh;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .acquire::-webkit-scrollbar {
+    display: none;
+  }
+}

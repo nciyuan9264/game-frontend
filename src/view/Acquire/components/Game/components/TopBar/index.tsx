@@ -121,7 +121,9 @@ const Settlement: React.FC<SettlementProps> = ({
     <div className={styles['top-bar']}>
       <div className={styles['top-content']}>
         <div className={styles.left}>
-          <Button icon={<ArrowLeftOutlined />}
+          <Button
+            icon={<ArrowLeftOutlined />}
+            style={{ height: '2rem' }}
             onClick={() => {
               Modal.confirm({
                 title: '确认操作',
@@ -169,6 +171,7 @@ const Settlement: React.FC<SettlementProps> = ({
           </Button> */}
           <Button
             content="公司面板"
+            style={{ height: '2rem' }}
             onClick={() => {
               setCompanyInfoVisible(true);
             }}
@@ -176,6 +179,7 @@ const Settlement: React.FC<SettlementProps> = ({
           </Button>
           <Button
             content="玩家排名"
+            style={{ height: '2rem' }}
             disabled={!isGameEnd}
             onClick={() => {
               setGameEndModalVisible(true);

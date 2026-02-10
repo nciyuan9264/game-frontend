@@ -71,13 +71,15 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
           );
         };
+
         return (
-          <div className={styles.company} key={company.name} style={{
-            boxShadow: company.tiles ? `
+          <div className={`${styles.company} ${!company.tiles ? styles.noTiles : ''}`} key={company.name}
+            style={{
+              boxShadow: company.tiles ? `
               0 0 0 1.5px ${CompanyColor[company.name as CompanyKey]}AA,
               0 0 10px 2px ${CompanyColor[company.name as CompanyKey]}66
             ` : 'unset',
-          }}>
+            }}>
             <div className={styles.left}>
               <div className={styles.dot} style={{ backgroundColor: company.tiles ? CompanyColor[company.name as CompanyKey] : 'unset' }} />
               <div className={styles.companyName} style={{ color: company.tiles ? CompanyColor[company.name as CompanyKey] : 'unset' }}>{company.name}</div>

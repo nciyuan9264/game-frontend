@@ -152,14 +152,10 @@
     }
   }
 
-
   .bottom-content {
     margin-left: 3.4rem;
     color: @color-text-soft;
   }
-
-
-
 
   @keyframes pulse {
     0% {
@@ -172,6 +168,29 @@
 
     100% {
       transform: scale(1);
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .top-bar {
+    height: 3vh;
+    .top-content {
+      .left {
+        display: none;
+      }
+
+      // .middle {
+      //   position: relative;
+      //   left: 0;
+      //   transform: translateX(0);
+      // }
+    }
+
+
+
+    .bottom-content {
+      display: none;
     }
   }
 }

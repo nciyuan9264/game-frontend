@@ -150,3 +150,22 @@
     z-index: 1000;
   }
 }
+
+@media (max-width: 600px) {
+  .playerAssets {
+    overflow: auto;
+    flex-direction: column;
+
+    .assetGroup{
+      width: 100%;
+
+      .moneyAmount{
+        font-size: 1.6rem;
+      }
+    }
+  }
+
+  .playerAssets::-webkit-scrollbar {
+    display: none;
+  }
+}
