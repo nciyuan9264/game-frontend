@@ -31,6 +31,8 @@ export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void
 
     ws.onclose = event => {
       console.log('WebSocket closed:', event.code, event.reason);
+      console.log('reason:', event.reason);
+      console.log('wasClean:', event.wasClean);
       // // 自动重连（可选）
       // if (event.code !== 1000) {
       //   reconnectTimeout = setTimeout(() => {
