@@ -148,7 +148,7 @@ const Settlement: React.FC<SettlementProps> = ({
         <div className={styles.middle}>
           {data?.roomData.roomInfo.roomStatus ? (
             data?.roomData.currentPlayer === userID ? (
-              <Button content="你的回合" customType="primary" style={{ minWidth: '12rem', height: '3rem', fontSize: '1.2rem' }} />
+              <Button content="你的回合" customType="primary" style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }} />
             ) : (
               <Button content={
                 `请等待
@@ -156,7 +156,7 @@ const Settlement: React.FC<SettlementProps> = ({
                   操作`
               }
                 customType='primary'
-                style={{ minWidth: '12rem', height: '3rem', fontSize: '1.2rem' }}
+                style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }}
               />
             )
           ) : (
@@ -164,11 +164,11 @@ const Settlement: React.FC<SettlementProps> = ({
           )}
         </div>
         <div className={styles.right}>
-          <Button
+          {/* <Button
             content={is3DVersion ? '切换到2D' : '切换到3D'}
             onClick={() => setIs3DVersion(!is3DVersion)}
           >
-          </Button>
+          </Button> */}
           <Button
             content="公司面板"
             onClick={() => {
