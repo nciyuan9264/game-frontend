@@ -84,9 +84,15 @@
 @media (max-width: 600px) {
   .companyInfo {
     width: 100%;
+    max-height: 15vh;
+    overflow-y: auto;
 
     .noTiles{
       display: none;
     }
+  }
+
+  .companyInfo::-webkit-scrollbar {
+    display: none;
   }
 }

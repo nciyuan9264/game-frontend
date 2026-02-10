@@ -5,6 +5,8 @@ import CustomInputNumber from '../../../../../../components/CustomInputer';
 import { CompanyColor } from '@/const/color';
 import { useThrottleFn } from 'ahooks';
 
+import styles from './index.module.less';
+
 const BuyStock = ({
   visible,
   setBuyStockModalVisible,
@@ -75,7 +77,7 @@ const BuyStock = ({
   if (!data) return null;
   return (
     <Modal
-      width={800}
+      width={{ xs: '90%', sm: 600, md: 700, lg: 800 }}
       title="请选择要购买的股票"
       open={visible}
       closable={true}
@@ -95,7 +97,7 @@ const BuyStock = ({
           const key = k as CompanyKey; // 添加类型断言
           const disabled = Number(value.tiles ?? 0) === 0;
           return (
-            <Col span={6} key={key}>
+            <Col xs={12} sm={8} md={6} key={key} className={`${value.tiles === 0 ? styles.noTiles : ''}`}>
               <Card
                 title={key}
                 variant="outlined"
@@ -105,18 +107,29 @@ const BuyStock = ({
                   background: CompanyColor[key],
                   borderRadius: 8,
                   color: 'white',
+                  maxWidth: '100%',
+                  padding: '6px',
+                  fontSize: '11px',
+                  height: '160px',
+                  display: 'flex',
+                  flexDirection: 'column',
                 }}
+                size="small"
               >
-                <p>股价：{value.stockPrice}</p>
-                <p>地块：{value.tiles}</p>
-                <p>剩余股票：{value.stockTotal}</p>
-                <CustomInputNumber
-                  min={0}
-                  max={Math.min(value.stockTotal, 3)}
-                  value={selectedCompany[key] || 0}
-                  onChange={(val) => handleChange(key, val)}
-                  disabled={disabled}
-                />
+                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginBottom: '8px' }}>
+                  <p style={{ margin: '2px 0' }}>股价：{value.stockPrice}</p>
+                  <p style={{ margin: '2px 0' }}>地块：{value.tiles}</p>
+                  <p style={{ margin: '2px 0' }}>剩余股票：{value.stockTotal}</p>
+                </div>
+                <div style={{ display: 'flex', width: '100%', boxSizing: 'border-box' }}>
+                  <CustomInputNumber
+                    min={0}
+                    max={Math.min(value.stockTotal, 3)}
+                    value={selectedCompany[key] || 0}
+                    onChange={(val) => handleChange(key, val)}
+                    disabled={disabled}
+                  />
+                </div>
               </Card>
             </Col>
           );

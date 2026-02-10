@@ -75,6 +75,7 @@ const Settlement: React.FC<SettlementProps> = ({
       return (
         <Button
           content='创建公司'
+          style={{ height: '2rem' }}
           disabled={!canCreateCompany(data, userID)}
           onClick={() => {
             setCreateCompanyModalVisible(true);
@@ -86,6 +87,7 @@ const Settlement: React.FC<SettlementProps> = ({
       return (
         <Button
           content='购买股票'
+          style={{ height: '2rem' }}
           disabled={!canBuyStock(data, userID)}
           onClick={() => {
             setBuyStockModalVisible(true);
@@ -97,6 +99,7 @@ const Settlement: React.FC<SettlementProps> = ({
       return (
         <Button
           content='合并清算'
+          style={{ height: '2rem' }}
           disabled={!getMergingModalAvailible(data, userID)}
           onClick={() => {
             setMergeCompanyModalVisible(true);
@@ -107,6 +110,7 @@ const Settlement: React.FC<SettlementProps> = ({
     if (getMergeSelection(data, userID)) {
       return (
         <Button
+          style={{ height: '2rem' }}
           content='选择留下的公司'
           disabled={!getMergeSelection(data, userID)}
           onClick={() => {
@@ -186,7 +190,7 @@ const Settlement: React.FC<SettlementProps> = ({
             }}
           >
           </Button>
-          <div>{renderButton()}</div>
+          <div className={styles.renderButton}>{renderButton()}</div>
         </div>
       </div>
       <div className={styles['bottom-content']}><HomeOutlined /> 房间 {roomID}  <UserOutlined /> 玩家ID {backendName2FrontendName(userID)}</div>

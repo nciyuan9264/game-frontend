@@ -1,37 +1,37 @@
 .settlementModal {
   .ant-modal-body {
-    padding-top: 16px;
+    padding-top: 1rem;
     padding-bottom: 0;
   }
 }
 
 .settlementContainer {
   background: #fafafa;
-  padding: 16px 20px;
-  border-radius: 8px;
+  padding: 1rem 1.25rem;
+  border-radius: 0.5rem;
   box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
 }
 
 .sectionTitle {
   display: flex;
   align-items: center;
-  font-size: 18px;
+  font-size: 1.125rem;
   font-weight: 600;
   color: #333;
-  margin-bottom: 12px;
+  margin-bottom: 0.75rem;
 }
 
 .companyList {
   display: flex;
   flex-wrap: wrap;
-  gap: 16px;
+  gap: 1rem;
 }
 
 .companyCard {
   background: #ffffff;
   border-left: 4px solid #2f54eb;
-  padding: 12px 16px;
-  border-radius: 6px;
+  padding: 0.75rem 1rem;
+  border-radius: 0.375rem;
   min-width: 240px;
   flex: 1;
   transition: box-shadow 0.2s ease;
@@ -42,15 +42,15 @@
 
   .companyName {
     font-weight: 500;
-    font-size: 16px;
-    margin-bottom: 8px;
+    font-size: 1.25rem;
+    margin-bottom: 0.5rem;
     color: #1d39c4;
   }
 
   .dividendRow {
     display: flex;
-    font-size: 14px;
-    margin-left: 8px;
+    font-size: 1.125rem;
+    margin-left: 0.5rem;
     line-height: 1.8;
 
     .name{
@@ -60,14 +60,14 @@
     .amount {
       font-weight: bold;
       color: #fa541c;
-      margin-left: 4px;
+      margin-left: 0.25rem;
     }
   }
 }
 
 .tableHeader {
   font-weight: 600;
-  font-size: 15px;
+  font-size: 1.125rem;
   color: #595959;
   margin-bottom: 12px;
   padding-left: 4px;
@@ -89,5 +89,82 @@
     margin-left: 8px;
     font-size: 13px;
     color: #8c8c8c;
+  }
+}
+
+.fieldContainer {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+
+  .fieldLabel {
+    font-weight: 500;
+    color: #595959;
+    white-space: nowrap;
+  }
+
+  .fieldHint {
+    font-size: 0.75rem;
+    color: #8c8c8c;
+  }
+}
+
+@media (max-width: 600px) {
+  .tableHeader {
+    // 移动端隐藏原表头，因为我们会在每个股票行中显示标签
+    display: none;
+  }
+
+  .stockRow {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+    margin-bottom: 1.25rem;
+    padding: 1rem;
+    background: #fafafa;
+    border-radius: 0.5rem;
+    border-left: 4px solid #2f54eb;
+
+    .ant-col {
+      span: 24;
+      width: 100%;
+      white-space: normal;
+
+      &:not(:first-child) {
+        margin-left: 0;
+      }
+
+      // 为每个字段添加标签，使移动端显示更清晰
+      &:nth-child(1) {
+        font-weight: 600;
+        font-size: 1rem;
+        color: #1d39c4;
+        margin-bottom: 0.5rem;
+      }
+    }
+  }
+
+  .fieldContainer {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    width: 100%;
+
+    .fieldLabel {
+      font-weight: 500;
+      color: #595959;
+      font-size: 1rem;
+    }
+
+    .fieldHint {
+      font-size: 0.75rem;
+      color: #8c8c8c;
+      margin-top: 0.25rem;
+    }
+
+    .ant-input-number {
+      width: 120px;
+    }
   }
 }

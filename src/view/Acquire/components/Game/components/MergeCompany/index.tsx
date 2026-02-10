@@ -141,10 +141,11 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
 
           return (
             <Row key={company} className={styles.stockRow} gutter={16}>
-              <Col span={8}>
+              <Col span={8} style={{whiteSpace: 'nowrap', fontSize: '1rem'}}>
                 <CompanyTag company={company as CompanyKey} />（单价: ${stockPrice}）
               </Col>
-              <Col span={5}>
+              <Col span={5} className={styles.fieldContainer}>
+                <span className={styles.fieldLabel}>卖出数量</span>
                 <CustomInputNumber
                   min={0}
                   max={maxSell}
@@ -152,7 +153,8 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
                   onChange={(value) => debouncedHandleSellChange(company as CompanyKey, value)}
                 />
               </Col>
-              <Col span={8}>
+              <Col span={8} className={styles.fieldContainer}>
+                <span className={styles.fieldLabel}>兑换数量（2:1兑换）</span>
                 <CustomInputNumber
                   min={0}
                   max={maxExchange}
@@ -161,7 +163,10 @@ const CompanyStockActionModal: React.FC<CompanyStockActionModalProps> = ({
                   onChange={(value) => debouncedHandleExchangeChange(company as CompanyKey, value)}
                 />
               </Col>
-              <Col span={3}><strong>{playerStock}</strong></Col>
+              <Col span={3} className={styles.fieldContainer}>
+                <span className={styles.fieldLabel}>持有数量</span>
+                <strong>{playerStock}</strong>
+              </Col>
             </Row>
           );
         })
