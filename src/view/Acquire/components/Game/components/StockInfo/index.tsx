@@ -18,9 +18,9 @@ const stockData: StockDataMap = {
     { range: [5, 5], price: 700, majorityBonus: 7000, minorityBonus: 3500 },
     { range: [6, 10], price: 800, majorityBonus: 8000, minorityBonus: 4000 },
     { range: [11, 20], price: 900, majorityBonus: 9000, minorityBonus: 4500 },
-    { range: [21, 30], price: 1000, majorityBonus: 10000, minorityBonus: 5000 },
-    { range: [31, 40], price: 1100, majorityBonus: 11000, minorityBonus: 5500 },
-    { range: [41, 1000], price: 1200, majorityBonus: 12000, minorityBonus: 6000 },
+    { range: [21, 30], price: 1400, majorityBonus: 10000, minorityBonus: 5000 },
+    { range: [31, 40], price: 1700, majorityBonus: 11000, minorityBonus: 5500 },
+    { range: [41, 1000], price: 2000, majorityBonus: 12000, minorityBonus: 6000 },
   ],
   'American/Festival/Worldwide': [
     { range: [2, 2], price: 300, majorityBonus: 3000, minorityBonus: 1500 },
@@ -29,9 +29,9 @@ const stockData: StockDataMap = {
     { range: [5, 5], price: 600, majorityBonus: 6000, minorityBonus: 3000 },
     { range: [6, 10], price: 700, majorityBonus: 7000, minorityBonus: 3500 },
     { range: [11, 20], price: 800, majorityBonus: 8000, minorityBonus: 4000 },
-    { range: [21, 30], price: 900, majorityBonus: 9000, minorityBonus: 4500 },
-    { range: [31, 40], price: 1000, majorityBonus: 10000, minorityBonus: 5000 },
-    { range: [41, 1000], price: 1100, majorityBonus: 11000, minorityBonus: 5500 },
+    { range: [21, 30], price: 1300, majorityBonus: 9000, minorityBonus: 4500 },
+    { range: [31, 40], price: 1600, majorityBonus: 10000, minorityBonus: 5000 },
+    { range: [41, 1000], price: 1900, majorityBonus: 11000, minorityBonus: 5500 },
   ],
   'Tower/Sackson': [
     { range: [2, 2], price: 200, majorityBonus: 2000, minorityBonus: 1000 },
@@ -40,9 +40,9 @@ const stockData: StockDataMap = {
     { range: [5, 5], price: 500, majorityBonus: 5000, minorityBonus: 2500 },
     { range: [6, 10], price: 600, majorityBonus: 6000, minorityBonus: 3000 },
     { range: [11, 20], price: 700, majorityBonus: 7000, minorityBonus: 3500 },
-    { range: [21, 30], price: 800, majorityBonus: 8000, minorityBonus: 4000 },
-    { range: [31, 40], price: 900, majorityBonus: 9000, minorityBonus: 4500 },
-    { range: [41, 1000], price: 1000, majorityBonus: 10000, minorityBonus: 5000 },
+    { range: [21, 30], price: 1200, majorityBonus: 8000, minorityBonus: 4000 },
+    { range: [31, 40], price: 1500, majorityBonus: 9000, minorityBonus: 4500 },
+    { range: [41, 1000], price: 1800, majorityBonus: 10000, minorityBonus: 5000 },
   ],
 };
 
