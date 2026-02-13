@@ -180,14 +180,15 @@ const Settlement: React.FC<SettlementProps> = ({
             }}
           >
           </Button>
-          <Button
-            content="玩家排名"
-            disabled={!isGameEnd}
-            onClick={() => {
-              setGameEndModalVisible(true);
-            }}
-          >
-          </Button>
+          {isGameEnd && (
+            <Button
+              content="玩家排名"
+              onClick={() => {
+                setGameEndModalVisible(true);
+              }}
+            >
+            </Button>
+          )}
           <div className={styles.renderButton}>{renderButton()}</div>
         </div>
       </div>
