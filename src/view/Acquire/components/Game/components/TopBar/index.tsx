@@ -175,7 +175,6 @@ const Settlement: React.FC<SettlementProps> = ({
           </Button> */}
           <Button
             content="公司面板"
-            style={{ height: '2rem' }}
             onClick={() => {
               setCompanyInfoVisible(true);
             }}
@@ -183,7 +182,6 @@ const Settlement: React.FC<SettlementProps> = ({
           </Button>
           <Button
             content="玩家排名"
-            style={{ height: '2rem' }}
             disabled={!isGameEnd}
             onClick={() => {
               setGameEndModalVisible(true);

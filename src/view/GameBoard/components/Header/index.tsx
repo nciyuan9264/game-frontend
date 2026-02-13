@@ -1,7 +1,7 @@
 import { UserProfile } from '@/hooks/request/useProfile';
 import styles from './index.module.less'
 import { Dropdown, Modal } from 'antd';
-import { PlusCircleOutlined } from '@ant-design/icons';
+import { PlusCircleOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
 import { Button } from '../../../../components/Button';
 import { ListRoomInfo } from '@/types/room';
 
@@ -18,21 +18,9 @@ export const Header = ({
   handleCreateRoom,
   roomList,
 }: IHeaderProps) => {
-  // const navigate = useNavigate();
   return (
     <div className={styles.header}>
       <div className={styles.left}>
-        {/* <Button content="" icon={<ArrowLeftOutlined />} onClick={() => {
-          Modal.confirm({
-            title: '确认操作',
-            content: '你确定要返回大厅吗？',
-            okText: '确认',
-            cancelText: '取消',
-            onOk: () => {
-              navigate('/');
-            },
-          });
-        }} /> */}
         <div className={styles.content}>
           <div className={styles.titleRow}>
             Acquire 游戏大厅
@@ -48,6 +36,7 @@ export const Header = ({
             items: [
               {
                 key: 'profile',
+                icon: <UserOutlined />,
                 label: (
                   <a href="https://auth.gamebus.online/profile" target="_blank" rel="noopener noreferrer">
                     Profile
@@ -56,6 +45,7 @@ export const Header = ({
               },
               {
                 key: 'logout',
+                icon: <LogoutOutlined />,
                 label: (
                   <span onClick={() => {
                     Modal.confirm({

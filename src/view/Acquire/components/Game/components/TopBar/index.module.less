@@ -35,7 +35,7 @@
           display: flex;
           flex-wrap: wrap;
           align-items: center;
-          gap: 8px;
+          gap: 0.5rem;
           font-size: 1.4rem;
           line-height: 2.25rem;
           font-weight: 600;
@@ -44,11 +44,11 @@
         }
 
         .description {
-          font-size: 12px;
+          font-size: 0.75rem;
           color: @color-text-soft;
 
           @media (min-width: 768px) {
-            font-size: 14px;
+            font-size: 0.875rem;
           }
         }
 
@@ -56,21 +56,21 @@
           display: flex;
           flex-wrap: wrap;
           align-items: center;
-          gap: 12px 4px;
-          font-size: 11px;
+          gap: 0.75rem 0.25rem;
+          font-size: 0.75rem;
           color: @color-text-soft;
 
           @media (min-width: 768px) {
-            font-size: 12px;
+            font-size: 0.75rem;
           }
 
           .info-item {
             display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 0.375rem;
 
             .material-symbols-outlined {
-              font-size: 14px;
+              font-size: 0.875rem;
               color: @color-primary-ink;
             }
           }
@@ -107,20 +107,20 @@
       font-size: 1.4rem;
       line-height: 2.25rem;
       font-weight: 600;
-      padding: 16px 24px;
+      padding: 1rem 1.5rem;
       width: fit-content;
 
       .yourTurn {
         display: inline-flex;
         align-items: center;
-        gap: 6px;
+        gap: 0.375rem;
         padding: 0.125rem 0.625rem;
         border-radius: 999px;
         background: var(--turn-accent-soft);
         color: #e0fdf9;
         /* 文案走浅色 */
         font-weight: 600;
-        font-size: 12px;
+        font-size: 0.75rem;
         letter-spacing: 0.08em;
         text-transform: uppercase;
         border: 1px solid rgba(0, 179, 166, 0.6);
@@ -147,7 +147,7 @@
       align-items: center;
       height: 100%;
       display: flex;
-      gap: 10px;
+      gap: 0.625rem;
       align-items: center;
     }
   }
@@ -174,7 +174,7 @@
 
 @media (max-width: 600px) {
   .top-bar {
-    height: 3vh;
+    height: unset;
 
     .top-content {
       .left {
@@ -183,6 +183,7 @@
 
       .right {
         width: 100%;
+        font-size: 0.6rem;
 
         .renderButton {
           margin-left: auto;
