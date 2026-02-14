@@ -22,7 +22,6 @@ export const canBuyStock = (data: WsRoomSyncData, userID: string) => {
   return data?.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK && data?.roomData.currentPlayer === userID;
 };
 
-
 export const isDataEqual = (data1: WsRoomSyncData | undefined, data2: WsRoomSyncData) => {
   if (!data1) return false;
   return isEqual(data1, data2);

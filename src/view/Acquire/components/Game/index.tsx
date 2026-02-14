@@ -25,6 +25,7 @@ import TopBar3D from './components/TopBar3D';
 import PlayerAssets3D from './components/PlayerAssets3D';
 // 在imports中添加
 import LiveRanking from './components/LiveRanking';
+import { useGameOperate } from './utils/useGameOperate';
 
 interface IGameProps {
   sendMessage: (msg: string) => void;
@@ -49,57 +50,13 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
   const [is3DVersion, setIs3DVersion] = useState(false);
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const { playAudio } = useAudio();
-  const waitingModalContent = useMemo(() => {
-    if (wsRoomSyncData?.roomData.roomInfo.roomStatus === false) {
-      if(wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.WAITING) {
-        return '请等待其他玩家加入';
-      }
-      return '请等待掉线玩家重连，如果2min未重连将替换为ai玩家进行游戏';
-    }
-    if (wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(wsRoomSyncData, userID)) {
-      const firstHoders = Object.entries(wsRoomSyncData?.tempData.mergeSettleData || {}).find(([_, val]) => {
-        return val.hoders.length > 0;
-      });
-      return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
-          <Alert
-            message={`请等待 ${backendName2FrontendName(firstHoders?.[1].hoders[0] ?? '')} 结算`}
-            type="info"
-            showIcon
-          />
-          <Settlement data={wsRoomSyncData} />
-        </div>)
-    }
-    return '';
-  }, [wsRoomSyncData]);
-
-  const placeTile = (tileKey: string) => Modal.confirm({
-    title: '确认操作',
-    content: (
-      <div>
-        你确定要放置这个 tile 吗？
-        <div style={{ fontWeight: 'bold', marginTop: 8 }}>{tileKey}</div>
-      </div>
-    ),
-    okText: '确认',
-    cancelText: '取消',
-    onOk: () => {
-      sendMessage(JSON.stringify({
-        type: 'game_place_tile',
-        payload: { tileKey },
-      }));
-    },
-  });
-
-  const currentPlayer = useMemo(() => {
-    return wsRoomSyncData?.roomData.currentPlayer;
-  }, [wsRoomSyncData?.roomData.currentPlayer])
+  const { placeTile } = useGameOperate(sendMessage);
 
   useEffect(() => {
-    if (currentPlayer === userID) {
+    if (wsRoomSyncData?.roomData.currentPlayer === userID) {
       playAudio(AudioTypeEnum.YourTurn);
     }
-  }, [currentPlayer, userID]);
+  }, [wsRoomSyncData?.roomData.currentPlayer, userID]);
 
   useEffect(() => {
     sendMessage(JSON.stringify({
@@ -193,7 +150,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
           }
         </div>
       </div>
-      <WaitingModal content={waitingModalContent} />
+      <WaitingModal wsRoomSyncData={wsRoomSyncData} userID={userID} />
       {is3DVersion && (
         <LiveRanking data={wsRoomSyncData} />
       )}
