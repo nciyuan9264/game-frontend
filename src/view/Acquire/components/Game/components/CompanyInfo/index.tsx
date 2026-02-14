@@ -92,8 +92,8 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
             </div>
             <div className={styles.right}>
               <div className={styles.bottom}>
-                <div className={styles.bottomvValue}>股价 {renderValue(company.stockPrice)}</div>
-                <div className={styles.bottomvValue}>剩余{renderValue(company.stockTotal)}股</div>
+                <div className={`${styles.bottomvValue} ${styles.stockPriceInfo}`}>股价{renderValue(company.stockPrice)}</div>
+                <div className={`${styles.bottomvValue} ${styles.resStockInfo}`}>{renderValue(company.stockTotal)}股</div>
                 <div className={`${styles.bottomvValue} ${styles.tilesInfo}`}>土地{renderValue(company.tiles)}</div>
                 <div className={`${styles.bottomvValue} ${styles.stockInfo}`}>持仓{renderValue(stockCount)} 股</div>
               </div>

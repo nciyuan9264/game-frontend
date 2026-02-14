@@ -27,6 +27,7 @@ export const Acquire: React.FC = () => {
   const [mergeCompanyModalVisible, setMergeCompanyModalVisible] = useState(false);
   const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
+  const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
@@ -74,6 +75,11 @@ export const Acquire: React.FC = () => {
         setMergeCompanyModalVisible(true);
       } else {
         setMergeCompanyModalVisible(false);
+      }
+      if (roomData.roomData.roomInfo.gameStatus === GameStatus.END) {
+        setGameEndModalVisible(true);
+      } else {
+        setGameEndModalVisible(false);
       }
       if (userID === roomData.roomData.currentPlayer) {
         if (roomData.roomData.roomInfo.gameStatus === GameStatus.CREATE_COMPANY) {
@@ -137,6 +143,8 @@ export const Acquire: React.FC = () => {
           setMergeSelectionModalVisible={setMergeSelectionModalVisible}
           createCompanyModalVisible={createCompanyModalVisible}
           setCreateCompanyModalVisible={setCreateCompanyModalVisible}
+          gameEndModalVisible={gameEndModalVisible}
+          setGameEndModalVisible={setGameEndModalVisible}
         />
       }
     </div>

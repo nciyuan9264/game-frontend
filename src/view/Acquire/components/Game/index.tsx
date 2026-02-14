@@ -39,18 +39,22 @@ interface IGameProps {
   setMergeSelectionModalVisible: React.Dispatch<React.SetStateAction<boolean>>
   createCompanyModalVisible: boolean;
   setCreateCompanyModalVisible: React.Dispatch<React.SetStateAction<boolean>>
+  gameEndModalVisible: boolean;
+  setGameEndModalVisible: React.Dispatch<React.SetStateAction<boolean>>
 }
 
-export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userID, buyStockModalVisible, setBuyStockModalVisible, mergeCompanyModalVisible, setMergeCompanyModalVisible, mergeSelectionModalVisible, setMergeSelectionModalVisible, createCompanyModalVisible, setCreateCompanyModalVisible }: IGameProps) => {
+export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userID, buyStockModalVisible, setBuyStockModalVisible, mergeCompanyModalVisible, setMergeCompanyModalVisible, mergeSelectionModalVisible, setMergeSelectionModalVisible, createCompanyModalVisible, setCreateCompanyModalVisible, gameEndModalVisible, setGameEndModalVisible }: IGameProps) => {
   const { roomID } = useParams(); // 获取 URL 参数中的 roomID
-  const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
   const [companyInfoVisible, setCompanyInfoVisible] = useState(false);
   const [is3DVersion, setIs3DVersion] = useState(false);
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const { playAudio } = useAudio();
   const waitingModalContent = useMemo(() => {
     if (wsRoomSyncData?.roomData.roomInfo.roomStatus === false) {
-      return '请等待其他玩家加入';
+      if(wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.WAITING) {
+        return '请等待其他玩家加入';
+      }
+      return '请等待掉线玩家重连，如果2min未重连将替换为ai玩家进行游戏';
     }
     if (wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(wsRoomSyncData, userID)) {
       const firstHoders = Object.entries(wsRoomSyncData?.tempData.mergeSettleData || {}).find(([_, val]) => {

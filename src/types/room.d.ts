@@ -67,12 +67,19 @@ interface RoomInfo {
   ownerID: string;
 }
 
+interface PlayerInfo {
+  playerID: string;
+  online: boolean;
+  ai: boolean;
+}
+
 interface RoomData {
   companyInfo: Record<CompanyKey, CompanyInfoItem>;
   currentPlayer: string;
   currentStep: string;
   roomInfo: RoomInfo;
   tiles: Record<string, TileData>;
+  players: Record<string, PlayerInfo>;
 }
 
 interface TempData {
@@ -104,12 +111,15 @@ interface RoomStruct {
   roomID: string;
   ownerID: string;
   status: GameStatus;
-  players: Record<string, {
-    playerID: string;
-    online: boolean;
-    ready: boolean;
-    ai: boolean;
-  }>;
+  players: Record<
+    string,
+    {
+      playerID: string;
+      online: boolean;
+      ready: boolean;
+      ai: boolean;
+    }
+  >;
 }
 interface WsMatchSyncData {
   type: string;

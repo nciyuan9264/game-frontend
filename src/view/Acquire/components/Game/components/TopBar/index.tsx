@@ -38,34 +38,22 @@ const Settlement: React.FC<SettlementProps> = ({
   const navigate = useNavigate();
   const { roomID } = useUrlParams();
 
-  const isGameEnd = useMemo(() => {
-    if (!data) {
-      return false;
-    }
-    return !Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) < 11
-    }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) >= 41
-    }) || data?.roomData?.roomInfo?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
-      return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
-    }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
-      return Number(val.tiles ?? 0) === 0
-    }));
-  }, [data]);
+  const isGameEnd = useMemo(() => data?.roomData?.roomInfo?.gameStatus === GameStatus.END
+    , [data]);
 
-  // const currentStep = useMemo(() => {
-  //   if (!data?.roomData.roomInfo.roomStatus) {
-  //     return '等待其他玩家进入';
-  //   }
-  //   if (data?.roomData.roomInfo.gameStatus === GameStatus.END) {
-  //     return '游戏结束';
-  //   }
-  //   if (data?.roomData.currentPlayer === userID) {
-  //     return GameStatusMap[data?.roomData.roomInfo.gameStatus];
-  //   } else {
-  //     return '请等待其他玩家操作';
-  //   }
-  // }, [data, data?.roomData.currentPlayer])
+  const currentStatus = useMemo(() => {
+    if (!data?.roomData.roomInfo.roomStatus) {
+      return '等待其他玩家进入';
+    }
+    if (data?.roomData.roomInfo.gameStatus === GameStatus.END) {
+      return '游戏结束';
+    }
+    if (data?.roomData.currentPlayer === userID) {
+      return '你的回合';
+    } else {
+      return `请等待${backendName2FrontendName(data.roomData.currentPlayer)}${data.roomData.players[data.roomData.currentPlayer].ai ? '（AI玩家）' : ''}操作`;
+    }
+  }, [data, data?.roomData.currentPlayer, userID, backendName2FrontendName])
 
   const renderButton = () => {
     if (!data) {
@@ -150,22 +138,11 @@ const Settlement: React.FC<SettlementProps> = ({
           </div>
         </div>
         <div className={styles.middle}>
-          {data?.roomData.roomInfo.roomStatus ? (
-            data?.roomData.currentPlayer === userID ? (
-              <Button content="你的回合" customType="primary" style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }} />
-            ) : (
-              <Button content={
-                `请等待
-                  ${backendName2FrontendName(data.roomData.currentPlayer)}
-                  操作`
-              }
-                customType='primary'
-                style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }}
-              />
-            )
-          ) : (
-            '等待其他玩家进入'
-          )}
+          <Button
+            content={currentStatus}
+            customType='primary'
+            style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }}
+          />
         </div>
         <div className={styles.right}>
           {/* <Button

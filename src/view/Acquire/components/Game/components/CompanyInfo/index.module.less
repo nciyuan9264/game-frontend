@@ -13,6 +13,8 @@
   color: @color-primary-ink;
 
   .company {
+    position: relative;
+    overflow: hidden;
     display: flex;
     flex: 1;
     padding: 0.5rem 1rem;
@@ -54,22 +56,42 @@
         gap: 2rem;
         font-size: 0.9rem;
 
+        .icon {
+          font-size: 1.2rem;
+        }
+
         .bottomvValue {
-          width: 5rem;
+          width: 3rem;
           display: flex;
           align-items: center;
           justify-content: flex-end;
           gap: 0.4rem;
           white-space: nowrap;
+          color: #999;
 
           .value {
-            width: 2rem;
             text-align: end;
             color: @color-primary-ink;
           }
         }
-        .tilesInfo{
-          width: 4rem;
+
+        .stockPriceInfo {
+          .value {
+            width: 2rem;
+          }
+        }
+
+        .resStockInfo {
+
+          .value {
+            font-size: 1rem;
+          }
+        }
+
+        .tilesInfo {
+          .value {
+            width: 1rem;
+          }
         }
 
         .stockInfo {
@@ -85,10 +107,10 @@
     width: 100%;
     gap: 0.4rem;
 
-    .company{
-      .right{
-        .bottom{
-          .stockInfo{
+    .company {
+      .right {
+        .bottom {
+          .stockInfo {
             width: 3.6rem;
             display: flex;
           }

@@ -21,11 +21,20 @@ const GameEnd: React.FC<GameEndProps> = ({
   const isOwner = data?.roomData.roomInfo.ownerID === userID;
   return (
     <Modal
-      title="🏁 玩家排名"
+      title={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold' }}>🏁 游戏结算</div>}
       open={visible}
       closable={false}
+      maskClosable={false}
       footer={
         <>
+          <Button
+            type="default"
+            onClick={() => {
+              setGameEndModalVisible(false);
+            }}
+          >
+            关闭弹窗
+          </Button>
           {isOwner && <Button
             type="primary"
             onClick={() => {
@@ -44,15 +53,18 @@ const GameEnd: React.FC<GameEndProps> = ({
             }}
           >
             再来一局
-          </Button>}
+          </Button>
+          }
         </>
       }
       onCancel={() => setGameEndModalVisible(false)}
       centered
-      maskClosable={true}
       width={800}
     >
       <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
+        <div style={{ textAlign: 'center', color: '#666', fontSize: 14, padding: '8px 16px', backgroundColor: '#f5f5f5', borderRadius: 8 }}>
+          {isOwner ? '游戏已结束，请查看您的排名。确认玩家无异议后可点击再来一局按钮。' : '游戏已结束，请查看您的排名。请等待房主开启下一局游戏。'}
+        </div>
         {
           Object.entries(data?.result ?? {})
             .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA)) // 排序
@@ -76,7 +88,7 @@ const GameEnd: React.FC<GameEndProps> = ({
                   }}
                 >
                   <span>
-                    🏅 第{index + 1}名：<strong>{backendName2FrontendName(player)}</strong>
+                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''} 第{index + 1}名：<strong>{backendName2FrontendName(player)}</strong>
                   </span>
                   <span>总资产：${score}</span>
                 </div>
@@ -84,9 +96,7 @@ const GameEnd: React.FC<GameEndProps> = ({
             })
         }
       </div>
-
     </Modal>
-
   );
 };
 
