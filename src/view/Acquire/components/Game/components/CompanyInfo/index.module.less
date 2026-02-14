@@ -1,6 +1,6 @@
 @import "../../../../../../styles/variables.less";
 
-.companyInfo {
+.company-info {
   width: 45%;
   display: flex;
   flex-direction: column;
@@ -12,7 +12,7 @@
   border-radius: 0.75rem;
   color: @color-primary-ink;
 
-  .company {
+  .company-info__item {
     position: relative;
     overflow: hidden;
     display: flex;
@@ -24,13 +24,13 @@
     box-shadow: 0 12px 28px rgba(0, 0, 0, 0.9);
     font-size: 1.1rem;
 
-    .left {
+    .company-info__brand {
       width: 30%;
       display: flex;
       align-items: center;
       gap: 0.5rem;
 
-      .dot {
+      .company-info__dot {
         width: 0.6rem;
         height: 0.6rem;
         border-radius: 999px;
@@ -38,7 +38,7 @@
       }
     }
 
-    .right {
+    .company-info__stats {
       width: 100%;
       display: flex;
       flex-direction: column;
@@ -48,7 +48,7 @@
       color: @color-text-soft;
       font-size: 1.1rem;
 
-      .bottom {
+      .company-info__metrics {
         width: 100%;
         display: flex;
         align-items: center;
@@ -56,11 +56,11 @@
         gap: 2rem;
         font-size: 0.9rem;
 
-        .icon {
+        .company-info__icon {
           font-size: 1.2rem;
         }
 
-        .bottomvValue {
+        .company-info__metric {
           width: 3rem;
           display: flex;
           align-items: center;
@@ -69,32 +69,32 @@
           white-space: nowrap;
           color: #999;
 
-          .value {
+          .company-info__value {
             text-align: end;
             color: @color-primary-ink;
           }
         }
 
-        .stockPriceInfo {
-          .value {
+        .company-info__metric--stock-price {
+          .company-info__value {
             width: 2rem;
           }
         }
 
-        .resStockInfo {
+        .company-info__metric--remaining-stock {
 
-          .value {
+          .company-info__value {
             font-size: 1rem;
           }
         }
 
-        .tilesInfo {
-          .value {
+        .company-info__metric--tiles {
+          .company-info__value {
             width: 1rem;
           }
         }
 
-        .stockInfo {
+        .company-info__metric--position {
           display: none;
         }
       }
@@ -103,31 +103,23 @@
 }
 
 @media (max-width: 600px) {
-  .companyInfo {
+  .company-info {
     width: 100%;
     gap: 0.4rem;
 
-    .company {
-      .right {
-        .bottom {
-          .stockInfo {
+    .company-info__item {
+      .company-info__stats {
+        .company-info__metrics {
+          .company-info__metric--position {
             width: 3.6rem;
             display: flex;
           }
         }
       }
     }
-
-    .noTiles {
-      // display: none;
-    }
   }
 
-  .noTiles {
-    // display: none;
-  }
-
-  .companyInfo::-webkit-scrollbar {
+  .company-info::-webkit-scrollbar {
     display: none;
   }
 }

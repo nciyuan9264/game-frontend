@@ -11,7 +11,6 @@ import { LeftOutlined } from '@ant-design/icons';
 import PlayerData from './components/PlayerData';
 import UserData from './components/UserData';
 import GemSelect from './components/GemSelect';
-import WaitingModal from '../../components/Waiting';
 import { SplendorGameStatus } from '@/enum/game';
 import GameEnd from './components/GameEnd';
 import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
@@ -33,12 +32,12 @@ export default function Room() {
     return `${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
-  const waitingModalComtent = useMemo(() => {
-    if (data?.roomData.roomInfo.roomStatus === false) {
-      return '请等待其他玩家加入';
-    }
-    return '';
-  }, [data]);
+  // const waitingModalComtent = useMemo(() => {
+  //   if (data?.roomData.roomInfo.roomStatus === false) {
+  //     return '请等待其他玩家加入';
+  //   }
+  //   return '';
+  // }, [data]);
 
   useEffect(() => {
     if (data?.roomData.currentPlayer === userID) {
@@ -173,7 +172,7 @@ export default function Room() {
           </div>
         </div>
       </div>
-      <WaitingModal content={waitingModalComtent} />
+      {/* <WaitingModal content={waitingModalComtent} /> */}
       <GameEnd
         data={data}
         visible={gameEndModalVisible}
