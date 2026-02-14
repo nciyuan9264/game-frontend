@@ -55,7 +55,9 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
       maskClosable={false}
       width={800}
     >
-      {content}
+      <div style={{fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '10vh'}}>
+        {content}
+      </div>
     </Modal>
   );
 };
