@@ -4,6 +4,12 @@
   --color-text-soft: @color-text-soft;
 }
 
+@property --blink-alpha {
+  syntax: '<number>';
+  inherits: false;
+  initial-value: 0;
+}
+
 .board {
   display: grid;
   width: 88%;
@@ -55,14 +61,10 @@
         cursor: pointer;
         text-shadow: 0 1px 0 rgba(15, 23, 42, 0.9);
         transition: transform 90ms ease, box-shadow 120ms ease, border-color 120ms ease, background 150ms ease, color 150ms ease;
+        --blink-visible: 0;
       }
 
-      .board__cell--blink {
-        will-change: transform, opacity;
-        transform: translateZ(0);
-      }
-
-      .board__cell--blink::after {
+      .board__cell::after {
         content: "";
         position: absolute;
         inset: -1px;
@@ -70,26 +72,21 @@
         pointer-events: none;
         box-shadow: 0 0 8px rgba(34, 211, 238, 0.7), 0 0 22px rgba(34, 211, 238, 0.4);
         border: 1px solid rgba(45, 212, 191, 0.8);
-        opacity: 0;
-        transform: scale(0.98);
+        opacity: calc(var(--blink-visible, 0) * var(--blink-alpha, 0));
         animation: tileBlink 1.5s ease-in-out infinite;
       }
 
+      .board__cell--blink {
+        transform: translateZ(0);
+        --blink-visible: 1;
+      }
+
+      .board__cell--blink::after {}
+
       @keyframes tileBlink {
-        0% {
-          opacity: 0;
-          transform: scale(0.98);
-        }
-
-        50% {
-          opacity: 1;
-          transform: scale(1.03);
-        }
-
-        100% {
-          opacity: 0;
-          transform: scale(0.98);
-        }
+        0% { --blink-alpha: 0; }
+        50% { --blink-alpha: 1; }
+        100% { --blink-alpha: 0; }
       }
     }
   }
