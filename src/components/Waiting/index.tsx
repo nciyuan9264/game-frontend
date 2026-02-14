@@ -26,7 +26,10 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
         if (wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.WAITING) {
           return '请等待其他玩家加入';
         }
-        return '请等待掉线玩家重连，如果2min未重连将替换为ai玩家进行游戏';
+        const offlinePlayer = Object.entries(wsRoomSyncData?.roomData.players || {}).find(([_, player]) => {
+          return !player.online;
+        });
+        return `请等待掉线玩家${backendName2FrontendName(offlinePlayer?.[0] ?? '')}重连，如果2min未重连将替换为ai玩家进行游戏`;
       }
       if (wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(wsRoomSyncData, userID)) {
         const firstHoders = Object.entries(wsRoomSyncData?.tempData.mergeSettleData || {}).find(([_, val]) => {

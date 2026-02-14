@@ -52,7 +52,6 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
   const stockList = Object.entries(data?.playerData.stocks || {})
     .filter(([_, count]) => Number(count) > 0);
 
-    debugger
   if (!data) return null;
 
   return (
