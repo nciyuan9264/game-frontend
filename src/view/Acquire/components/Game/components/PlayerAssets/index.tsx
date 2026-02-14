@@ -19,7 +19,9 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   userID
 }) => {
   const stockList = Object.entries(data?.playerData.stocks || {})
-    .filter(([_, count]) => Number(count) > 0);
+    .filter(([_, count]) => Number(count) > 0).sort(([a], [b]) => {
+      return (data?.roomData.companyInfo?.[a as CompanyKey]?.stockTotal ?? 0) - (data?.roomData.companyInfo?.[b as CompanyKey]?.stockTotal ?? 0);
+    });
   return (
     <div className={styles['player-assets']}>
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--money']}`} style={{ flex: '2' }}>

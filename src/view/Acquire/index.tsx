@@ -87,7 +87,7 @@ export const Acquire: React.FC = () => {
           setCreateCompanyModalVisible(false);
         }
         if (roomData.roomData.roomInfo.gameStatus === GameStatus.BUY_STOCK) {
-          if (Object.values(roomData.roomData.companyInfo).filter(company => company.stockPrice > 0).some(company => company.stockPrice <= roomData.playerData.info.money)) {
+          if (Object.values(roomData.roomData.companyInfo).filter(company => company.stockPrice > 0).some(company => company.stockPrice <= roomData.playerData.info.money && company.stockTotal > 0)) {
             setBuyStockModalVisible(true);
           } else {
             const stocks = Object.keys(roomData?.roomData.companyInfo ?? {}).reduce((acc, key) => {
