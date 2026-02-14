@@ -20,43 +20,43 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   const stockList = Object.entries(data?.playerData.stocks || {})
     .filter(([_, count]) => Number(count) > 0);
   return (
-    <div className={styles.playerAssets}>
-      <div className={`${styles.assetGroup} ${styles['asset-group-money']}`} style={{ flex: '2' }}>
+    <div className={styles['player-assets']}>
+      <div className={`${styles['player-assets__group']} ${styles['player-assets__group--money']}`} style={{ flex: '2' }}>
         {/* <span className={styles.assetLabel}>现金</span> */}
-        <span className={styles.moneyAmount}>${data?.playerData.info.money}</span>
+        <span className={styles['player-assets__amount']}>${data?.playerData.info.money}</span>
       </div>
 
-      <div className={`${styles.assetGroup} ${styles['asset-group-stock']}`} style={{ flex: '3' }}>
+      <div className={`${styles['player-assets__group']} ${styles['player-assets__group--stock']}`} style={{ flex: '3' }}>
         {/* <span className={styles.assetLabel}>股票</span> */}
         {stockList.length > 0 ? (
-          <div className={styles.stockList}>
+          <div className={styles['player-assets__stock-list']}>
             {stockList
               .map(([company, count]) => (
-                <div key={company} className={styles["stock-tag"]}>
-                  <div className={styles["stock-info"]}>
-                    <span className={styles["chip-dot"]} style={{
+                <div key={company} className={styles['player-assets__stock-tag']}>
+                  <div className={styles['player-assets__stock-info']}>
+                    <span className={styles['player-assets__chip-dot']} style={{
                       backgroundColor: CompanyColor[company as CompanyKey],
                     }} />
-                    <span className={styles["company-name"]}>{company}</span>
+                    <span className={styles['player-assets__company-name']}>{company}</span>
                   </div>
-                  <div className={styles["stock-count"]}>
-                    <span className={styles.label}>{count}股 · 预估</span>
-                    <span className={styles.value}>
+                  <div className={styles['player-assets__stock-count']}>
+                    <span className={styles['player-assets__label']}>{count}股 · 预估</span>
+                    <span className={styles['player-assets__value']}>
                       ${((data?.roomData.companyInfo?.[company as CompanyKey]?.stockPrice ?? 0) * Number(count))}
                     </span>
                   </div>
                 </div>
               ))}
           </div>) :
-          <div className={styles.empty}>
+          <div className={styles['player-assets__empty']}>
             暂无股票
           </div>
         }
       </div>
 
-      <div className={styles.assetGroup} style={{ flex: '2' }}>
+      <div className={styles['player-assets__group']} style={{ flex: '2' }}>
         {/* <span className={styles.assetLabel}>tiles</span> */}
-        <div className={styles.tileList}>
+        <div className={styles['player-assets__tile-list']}>
           {(data?.playerData.tiles || [])
             .sort((a, b) => {
               const [aRow, aCol] = a.match(/^(\d+)([A-Z])$/)!.slice(1);
@@ -66,7 +66,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
             })
             .map((tileKey) => (
               <span
-                className={styles.tile}
+                className={styles['player-assets__tile']}
                 key={tileKey}
                 onMouseEnter={() => {
                   data?.roomData.currentPlayer === userID &&
@@ -87,7 +87,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
         </div>
       </div>
 
-      {/* <div className={styles.message}>
+      {/* <div className={ Klikstyles.message}>
         <MessageSender
           onMessageSend={(msg) => {
             console.log("用户发送消息:", msg);
