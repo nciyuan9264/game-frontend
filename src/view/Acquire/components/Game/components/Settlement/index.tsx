@@ -13,7 +13,7 @@ const Settlement: React.FC<SettlementProps> = ({
   const mainCompany = data?.tempData?.merge_main_company_temp;
   return (
     <div className={styles.settlementContainer}>
-      <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey} />合并的公司：</div>
+      <div className={styles.sectionTitle}>破产清算：被<CompanyTag company={mainCompany as CompanyKey} />【股价{data?.roomData.companyInfo?.[mainCompany as CompanyKey]?.stockPrice}】合并的公司：</div>
       <div className={styles.companyList}>
         {
           Object.entries(data?.tempData?.mergeSettleData ?? {}).map(([company, value]) => {
