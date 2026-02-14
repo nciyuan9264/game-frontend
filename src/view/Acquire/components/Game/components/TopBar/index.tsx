@@ -38,22 +38,34 @@ const Settlement: React.FC<SettlementProps> = ({
   const navigate = useNavigate();
   const { roomID } = useUrlParams();
 
-  const isGameEnd = useMemo(() => data?.roomData?.roomInfo?.gameStatus === GameStatus.END
-    , [data]);
-
   const currentStatus = useMemo(() => {
-    if (!data?.roomData.roomInfo.roomStatus) {
-      return '等待其他玩家进入';
-    }
-    if (data?.roomData.roomInfo.gameStatus === GameStatus.END) {
+    const roomData = data?.roomData;
+    if (!roomData) return '';
+
+    const { roomInfo, currentPlayer, players } = roomData;
+
+    // 1. 游戏结束优先级最高
+    if (roomInfo.gameStatus === GameStatus.END) {
       return '游戏结束';
     }
-    if (data?.roomData.currentPlayer === userID) {
-      return '你的回合';
-    } else {
-      return `请等待${backendName2FrontendName(data.roomData.currentPlayer)}${data.roomData.players[data.roomData.currentPlayer].ai ? '（AI玩家）' : ''}操作`;
+
+    // 2. 房间未开始
+    if (!roomInfo.roomStatus) {
+      return '等待其他玩家进入';
     }
-  }, [data, data?.roomData.currentPlayer, userID, backendName2FrontendName])
+
+    // 3. 当前是自己回合
+    if (currentPlayer === userID) {
+      return '你的回合';
+    }
+
+    // 4. 其他玩家回合
+    const player = players[currentPlayer];
+    const name = backendName2FrontendName(currentPlayer);
+
+    return `请等待${name}${player?.ai ? '（AI玩家）' : ''}操作`;
+
+  }, [data, userID, backendName2FrontendName]);
 
   const renderButton = () => {
     if (!data) {
@@ -156,7 +168,7 @@ const Settlement: React.FC<SettlementProps> = ({
             }}
           >
           </Button>
-          {isGameEnd && (
+          {data?.roomData.roomInfo.gameStatus === GameStatus.END && (
             <Button
               content="玩家排名"
               onClick={() => {

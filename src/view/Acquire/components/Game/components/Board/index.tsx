@@ -20,23 +20,23 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
   const playerTiles = wsRoomSyncData?.playerData.tiles;
 
   return (
-    <div className={styles.board}>
-      <div className={styles["board-shell"]}>
-        <div className={styles["box-grid"]}>
+    <div className={styles['board']}>
+      <div className={styles['board__shell']}>
+        <div className={styles['board__grid']}>
           {rows.map(row =>
             columns.map(col => {
               const id = `${col}${row}`;
               const tile = tilesData?.[id];
               const shouldBlink =
                 wsRoomSyncData?.roomData.currentPlayer === wsRoomSyncData?.playerId &&
-                playerTiles?.includes(id);
+                playerTiles?.includes(id) && wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile;
               return (
                 <button
                   key={id}
-                  className={`${styles.cell} ${shouldBlink ? styles.blink : ''}`}
+                  className={`${styles['board__cell']} ${shouldBlink ? styles['board__cell--blink'] : ''}`}
                   onClick={() => {
                     if (shouldBlink) {
-                      wsRoomSyncData?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile && placeTile(id)
+                      placeTile(id)
                     }
                   }}
                   onMouseEnter={() => {
