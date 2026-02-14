@@ -32,7 +32,7 @@ export const Acquire: React.FC = () => {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
@@ -55,7 +55,6 @@ export const Acquire: React.FC = () => {
     }
     if (newData.type === 'MATCH_SYNC') {
       const matchData: WsMatchSyncData = newData as WsMatchSyncData;
-      console.log('newData', matchData);
       setWsMatchSyncData(matchData)
       setWsRoomSyncData(undefined);
     }

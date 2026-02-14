@@ -17,7 +17,7 @@ const GameEnd: React.FC<GameEndProps> = ({
   sendMessage,
   userID
 }) => {
-  console.log('data', data, userID);
+
   const isOwner = data?.roomData.roomInfo.ownerID === userID;
   return (
     <Modal
