@@ -54,6 +54,7 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
                     backgroundColor: tile?.belong ? CompanyColor[tile?.belong] : hoveredTile === id ? 'rgba(45, 212, 191, 0.95)' : 'unset',
                     cursor: shouldBlink ? 'pointer' : 'default',
                     color: tile?.belong ? '#fff' : 'var(--color-text-soft)',
+                    border: tile?.belong ? 'unset' : '1px solid rgba(31, 41, 55, 0.8)',
                   }}
                 >
                   {id}
