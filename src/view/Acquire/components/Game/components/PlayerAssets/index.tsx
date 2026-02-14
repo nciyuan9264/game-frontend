@@ -1,8 +1,9 @@
 import React from 'react';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
-import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
+
+import styles from './index.module.less';
 
 interface PlayerAssetsProps {
   data?: WsRoomSyncData;
