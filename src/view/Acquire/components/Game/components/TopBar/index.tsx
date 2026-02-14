@@ -111,11 +111,10 @@ const Settlement: React.FC<SettlementProps> = ({
 
   return (
     <div className={styles['top-bar']}>
-      <div className={styles['top-content']}>
-        <div className={styles.left}>
+      <div className={styles['top-bar__header']}>
+        <div className={styles['top-bar__left']}>
           <Button
             icon={<ArrowLeftOutlined />}
-            style={{ height: '2rem' }}
             onClick={() => {
               Modal.confirm({
                 title: '确认操作',
@@ -133,18 +132,18 @@ const Settlement: React.FC<SettlementProps> = ({
               })
             }}
           />
-          <div className={styles.content}>
-            <div className={styles.titleRow}>Acquire 线上棋盘</div>
+          <div className={styles['top-bar__brand']}>
+            <div className={styles['top-bar__title']}>Acquire 线上棋盘</div>
           </div>
         </div>
-        <div className={styles.middle}>
+        <div className={styles['top-bar__status']}>
           <Button
             content={currentStatus}
             customType='primary'
             style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }}
           />
         </div>
-        <div className={styles.right}>
+        <div className={styles['top-bar__right']}>
           {/* <Button
             content={is3DVersion ? '切换到2D' : '切换到3D'}
             onClick={() => setIs3DVersion(!is3DVersion)}
@@ -166,15 +165,13 @@ const Settlement: React.FC<SettlementProps> = ({
             >
             </Button>
           )}
-          <div className={styles.renderButton}>{renderButton()}</div>
+          <div className={styles['top-bar__dynamic-action']}>{renderButton()}</div>
         </div>
       </div>
-      <div className={styles['bottom-content']}><HomeOutlined /> 房间 {roomID}  <UserOutlined /> 玩家ID {backendName2FrontendName(userID)}</div>
-      {/*
-      <div className={styles.right}>
-        {data?.tempData.last_tile_key && <div>上一个放置的地块：<span className={styles.playerName}>{data?.tempData.last_tile_key}</span></div>}
-        <div>当前阶段：{currentStep}</div>
-      </div> */}
+      <div className={styles['top-bar__footer']}>
+        <div><HomeOutlined /> 房间 {roomID}  <UserOutlined /> 玩家ID {backendName2FrontendName(userID)}</div>
+        {data?.tempData.last_tile_key && <div>上一个放置的地块：{data?.tempData.last_tile_key}</div>}
+      </div>
     </div>
   );
 };

@@ -1,12 +1,5 @@
 @import "../../../../../../styles/variables.less";
 
-/* 统一用和按钮同一条青绿色系 */
-:root {
-  /* 如果有全局变量就改成用你现有的 */
-  --turn-accent: #00b3a6;
-  --turn-accent-soft: rgba(0, 179, 166, 0.16);
-}
-
 .top-bar {
   height: 5.6vh;
   display: flex;
@@ -14,36 +7,36 @@
   flex-direction: column;
   color: @color-primary-ink;
 
-  .top-content {
+  .top-bar__header {
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
 
-    .left {
+    .top-bar__left {
       display: flex;
       gap: 0.625rem;
       align-items: flex-start;
 
-      .content {
+      .top-bar__brand {
         display: flex;
         flex-direction: column;
         gap: 4px;
         font-size: 18px;
 
-        .titleRow {
+        .top-bar__title {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
           gap: 0.5rem;
-          font-size: 1.4rem;
-          line-height: 2.25rem;
+          font-size: 1.2rem;
+          line-height: 2rem;
           font-weight: 600;
           letter-spacing: -0.025em;
           color: @color-primary-ink;
         }
 
-        .description {
+        .top-bar__description {
           font-size: 0.75rem;
           color: @color-text-soft;
 
@@ -52,7 +45,7 @@
           }
         }
 
-        .info-row {
+        .top-bar__info-row {
           display: flex;
           flex-wrap: wrap;
           align-items: center;
@@ -64,7 +57,7 @@
             font-size: 0.75rem;
           }
 
-          .info-item {
+          .top-bar__info-item {
             display: inline-flex;
             align-items: center;
             gap: 0.375rem;
@@ -77,27 +70,27 @@
         }
       }
 
-      .backButton {
+      .top-bar__back-button {
         z-index: 9999;
       }
 
-      .backButton:hover {
+      .top-bar__back-button:hover {
         color: #1890ff;
       }
 
-      .IDs {
+      .top-bar__ids {
         max-width: 30%;
         display: flex;
         flex-direction: column;
 
-        .ID {
+        .top-bar__id {
           width: 100%;
           white-space: nowrap;
         }
       }
     }
 
-    .middle {
+    .top-bar__status {
       position: absolute;
       left: 50%;
       transform: translateX(-50%);
@@ -110,38 +103,9 @@
       padding: 1rem 1.5rem;
       width: fit-content;
 
-      .yourTurn {
-        display: inline-flex;
-        align-items: center;
-        gap: 0.375rem;
-        padding: 0.125rem 0.625rem;
-        border-radius: 999px;
-        background: var(--turn-accent-soft);
-        color: #e0fdf9;
-        /* 文案走浅色 */
-        font-weight: 600;
-        font-size: 0.75rem;
-        letter-spacing: 0.08em;
-        text-transform: uppercase;
-        border: 1px solid rgba(0, 179, 166, 0.6);
-        box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.9);
-        animation: yourTurn-soft-pulse 1.8s ease-in-out infinite;
-      }
-
-      .playerName {
-        margin: 0 8px;
-        padding: 2px 6px;
-        border-radius: 6px;
-        font-weight: 600;
-        background: linear-gradient(135deg,
-            #0b3a3f,
-            @color-accent-teal );
-        font-size: 1.2rem;
-        line-height: 1.6rem;
-      }
     }
 
-    .right {
+    .top-bar__right {
       height: 100%;
       display: flex;
       align-items: center;
@@ -152,23 +116,14 @@
     }
   }
 
-  .bottom-content {
-    margin-left: 3.4rem;
+  .top-bar__footer {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.75rem;
+    padding: 0 .6rem 0 3.4rem;
     color: @color-text-soft;
-  }
-
-  @keyframes pulse {
-    0% {
-      transform: scale(1);
-    }
-
-    50% {
-      transform: scale(1.05);
-    }
-
-    100% {
-      transform: scale(1);
-    }
   }
 }
 
@@ -176,23 +131,23 @@
   .top-bar {
     height: unset;
 
-    .top-content {
-      .left {
+    .top-bar__header {
+      .top-bar__left {
         display: none;
       }
 
-      .right {
+      .top-bar__right {
         width: 100%;
         font-size: 0.6rem;
 
-        .renderButton {
+        .top-bar__dynamic-action {
           margin-left: auto;
           margin-right: 0;
         }
       }
     }
 
-    .bottom-content {
+    .top-bar__footer {
       display: none;
     }
   }
