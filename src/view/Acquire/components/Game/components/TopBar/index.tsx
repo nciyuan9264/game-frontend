@@ -45,7 +45,7 @@ const Settlement: React.FC<SettlementProps> = ({
     const { roomInfo, currentPlayer, players } = roomData;
 
     // 1. 游戏结束优先级最高
-    if (roomInfo.gameStatus === GameStatus.END) {
+    if (roomInfo.roomStatus === GameStatus.END) {
       return '游戏结束';
     }
 
@@ -168,7 +168,7 @@ const Settlement: React.FC<SettlementProps> = ({
             }}
           >
           </Button>
-          {data?.roomData.roomInfo.gameStatus === GameStatus.END && (
+          {data?.roomData.roomInfo.roomStatus === GameStatus.END && (
             <Button
               content="玩家排名"
               onClick={() => {

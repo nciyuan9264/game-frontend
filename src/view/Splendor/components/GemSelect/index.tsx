@@ -9,7 +9,7 @@ import { SplendorGameStatus } from '@/enum/game';
 export const canPreserve = (data?: SplendorWsRoomSyncData, selectedCard?: SplendorCard) => {
   const userID = data?.playerId;
   if (!userID || userID !== data?.roomData.currentPlayer) return false;
-  if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
+  if (data.roomData.roomInfo.roomStatus !== SplendorGameStatus.PLAYING) {
     return false;
   }
   if (!selectedCard) return false;
@@ -93,7 +93,7 @@ const GemSelect = ({
     const userID = data?.playerId;
     if (!userID || userID !== data?.roomData.currentPlayer) return false;
 
-    if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING) {
+    if (data.roomData.roomInfo.roomStatus !== SplendorGameStatus.PLAYING) {
       return false;
     }
 

@@ -26,7 +26,7 @@ interface SplendorRoomData {
   roomInfo: {
     maxPlayers: number;
     roomStatus: boolean;
-    gameStatus: GameStatus;
+    roomStatus: GameStatus;
     round: number;
   };
 }

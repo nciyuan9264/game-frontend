@@ -27,7 +27,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
       <div className={styles.moneyDisplay}>
         <div className={styles.moneyOval}>
           <span className={styles.moneyIcon}>💰</span>
-          <span className={styles.moneyAmount}>${data?.playerData.info.money || 0}</span>
+          <span className={styles.moneyAmount}>${data?.playerData.money || 0}</span>
         </div>
       </div>
 
@@ -73,7 +73,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
               })
               .map((tileKey) => {
                 const isCurrentPlayer = data?.roomData.currentPlayer === userID;
-                const canPlaceTile = isCurrentPlayer && data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile;
+                const canPlaceTile = isCurrentPlayer && data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile;
 
                 return (
                   <div

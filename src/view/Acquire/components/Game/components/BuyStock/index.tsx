@@ -24,7 +24,7 @@ const BuyStock = ({
   }, {} as Record<CompanyKey, number>);
 
   const [selectedCompany, setSelectedCompany] = useState<Record<CompanyKey, number>>(initialSelectedCount);
-  const money = data?.playerData.info.money ?? 0;
+  const money = data?.playerData.money ?? 0;
 
   useEffect(() => {
     if (!visible) {

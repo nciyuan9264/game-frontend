@@ -11,7 +11,7 @@ export const canBuy = (data?: SplendorWsRoomSyncData, card?: SplendorCard) => {
   const userID = data?.playerId;
   if (!userID || userID !== data?.roomData.currentPlayer) return false;
 
-  if (data.roomData.roomInfo.gameStatus !== SplendorGameStatus.PLAYING && data.roomData.roomInfo.gameStatus !== SplendorGameStatus.LAST_TURN) {
+  if (data.roomData.roomInfo.roomStatus !== SplendorGameStatus.PLAYING && data.roomData.roomInfo.roomStatus !== SplendorGameStatus.LAST_TURN) {
     return false;
   }
   const required = card?.cost; // card.Cost

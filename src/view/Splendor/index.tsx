@@ -60,7 +60,7 @@ export default function Room() {
     }
     if (data.type === 'sync') {
       console.log('收到数据：', data);
-      if (data.roomData.roomInfo.gameStatus === SplendorGameStatus.END) {
+      if (data.roomData.roomInfo.roomStatus === SplendorGameStatus.END) {
         setGameEndModalVisible(true);
       }
       setSelectedCard(undefined)
@@ -108,7 +108,7 @@ export default function Room() {
             <Button
               type="primary"
               style={{ zIndex: 9999 }}
-              disabled={data?.roomData.roomInfo.gameStatus !== SplendorGameStatus.END}
+              disabled={data?.roomData.roomInfo.roomStatus !== SplendorGameStatus.END}
               onClick={() => {
                 setGameEndModalVisible(true);
               }}
@@ -119,13 +119,13 @@ export default function Room() {
           <div className={styles.middle}>
             {data?.roomData.roomInfo.roomStatus ? (
               data?.roomData.currentPlayer === userID ? (
-                <span className={styles.yourTurn}>你的回合{`${data.roomData.roomInfo.gameStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}</span>
+                <span className={styles.yourTurn}>你的回合{`${data.roomData.roomInfo.roomStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}</span>
               ) : (
                 <>
                   请等待
                   <span className={styles.playerName}>{backendName2FrontendName(data.roomData.currentPlayer)}</span>
                   操作
-                  {`${data.roomData.roomInfo.gameStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}
+                  {`${data.roomData.roomInfo.roomStatus === SplendorGameStatus.LAST_TURN ? '(最后一回合)' : ''}`}
                 </>
               )
             ) : (

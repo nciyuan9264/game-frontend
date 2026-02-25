@@ -38,9 +38,7 @@ interface GetRoomListReponse {
 }
 
 interface PlayerData {
-  info: {
-    money: number;
-  };
+  money: number;
   stocks: Record<CompanyKey, number>;
   tiles: string[];
 }
@@ -62,7 +60,7 @@ interface TileData {
 
 interface RoomInfo {
   maxPlayers: string;
-  gameStatus: GameStatus; // 你可以加更多状态
+  roomStatus: GameStatus; // 你可以加更多状态
   roomStatus: boolean;
   ownerID: string;
 }

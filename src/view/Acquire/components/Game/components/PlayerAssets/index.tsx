@@ -26,7 +26,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
     <div className={styles['player-assets']}>
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--money']}`} style={{ flex: '2' }}>
         {/* <span className={styles.assetLabel}>现金</span> */}
-        <span className={styles['player-assets__amount']}>${data?.playerData.info.money}</span>
+        <span className={styles['player-assets__amount']}>${data?.playerData.money}</span>
       </div>
 
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--stock']}`} style={{ flex: '3' }}>
@@ -73,14 +73,14 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
                 key={tileKey}
                 onMouseEnter={() => {
                   data?.roomData.currentPlayer === userID &&
-                    data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
+                    data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile &&
                     setHoveredTile(tileKey)
                 }
                 }
                 onMouseOut={() => data?.roomData.currentPlayer === userID && setHoveredTile(undefined)}
                 onClick={() =>
                   data?.roomData.currentPlayer === userID &&
-                  data?.roomData.roomInfo.gameStatus === GameStatus.SET_Tile &&
+                  data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile &&
                   placeTile(tileKey)
                 }
               >
