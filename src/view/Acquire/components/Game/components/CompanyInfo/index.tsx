@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
+import AnimatedNumber from '@/components/AnimatedNumber';
 
 interface CompanyInfoProps {
   setBuyStockModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -65,7 +66,7 @@ const CompanyInfo: React.FC<CompanyInfoProps> = ({
 
           return (
             <div className={styles['company-info__value']}>
-              {value}
+              <AnimatedNumber value={value} />
               {/* {diff !== 0 && (
                 <span className={className}>
                   &nbsp;{diff > 0 ? `+${diff}` : diff}

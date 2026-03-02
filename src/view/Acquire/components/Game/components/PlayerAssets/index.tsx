@@ -4,6 +4,7 @@ import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
 
 import styles from './index.module.less';
+import AnimatedNumber from '@/components/AnimatedNumber';
 
 interface PlayerAssetsProps {
   data?: WsRoomSyncData;
@@ -25,8 +26,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   return (
     <div className={styles['player-assets']}>
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--money']}`} style={{ flex: '2' }}>
-        {/* <span className={styles.assetLabel}>现金</span> */}
-        <span className={styles['player-assets__amount']}>${data?.playerData.money}</span>
+        <span className={styles['player-assets__amount']}>$<AnimatedNumber value={data?.playerData.money ?? 0} /></span>
       </div>
 
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--stock']}`} style={{ flex: '3' }}>

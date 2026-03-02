@@ -1,7 +1,7 @@
 import { UserProfile } from '@/hooks/request/useProfile';
 
-export const profile2BackendName = (userProfile: UserProfile) => {
-  if(!userProfile.name || !userProfile.id) return '';
+export const profile2BackendName = (userProfile?: UserProfile) => {
+  if(!userProfile?.name || !userProfile?.id) return '';
   return `${userProfile.name}-${userProfile.id}`;
 };
 
