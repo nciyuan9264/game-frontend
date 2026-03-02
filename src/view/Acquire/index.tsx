@@ -114,7 +114,7 @@ export const Acquire: React.FC = () => {
         setMergeSelectionModalVisible(false);
       }
     }
-  });;
+  });
 
   return (
     <div className={styles.acquire}>
