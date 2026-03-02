@@ -75,18 +75,18 @@ export const Acquire: React.FC = () => {
       } else {
         setMergeCompanyModalVisible(false);
       }
-      if (roomData.roomData.roomInfo.roomStatus === GameStatus.END) {
+      if (roomData.roomData.gameStatus === GameStatus.END) {
         setGameEndModalVisible(true);
       } else {
         setGameEndModalVisible(false);
       }
       if (userID === roomData.roomData.currentPlayer) {
-        if (roomData.roomData.roomInfo.roomStatus === GameStatus.CREATE_COMPANY) {
+        if (roomData.roomData.gameStatus === GameStatus.CREATE_COMPANY) {
           setCreateCompanyModalVisible(true);
         } else {
           setCreateCompanyModalVisible(false);
         }
-        if (roomData.roomData.roomInfo.roomStatus === GameStatus.BUY_STOCK) {
+        if (roomData.roomData.gameStatus === GameStatus.BUY_STOCK) {
           if (Object.values(roomData.roomData.companyInfo).filter(company => company.stockPrice > 0).some(company => company.stockPrice <= roomData.playerData.money && company.stockTotal > 0)) {
             setBuyStockModalVisible(true);
           } else {
@@ -103,7 +103,7 @@ export const Acquire: React.FC = () => {
         } else {
           setBuyStockModalVisible(false);
         }
-        if (roomData.roomData.roomInfo.roomStatus === GameStatus.MergingSelection) {
+        if (roomData.roomData.gameStatus === GameStatus.MergingSelection) {
           setMergeSelectionModalVisible(true);
         } else {
           setMergeSelectionModalVisible(false);

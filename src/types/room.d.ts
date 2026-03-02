@@ -75,7 +75,7 @@ interface RoomData {
   companyInfo: Record<CompanyKey, CompanyInfoItem>;
   currentPlayer: string;
   currentStep: string;
-  roomInfo: RoomInfo;
+  gameStatus: GameStatus;
   tiles: Record<string, TileData>;
   players: Record<string, PlayerInfo>;
 }
@@ -105,10 +105,12 @@ interface WsRoomSyncData {
   result?: Record<string, int>;
 }
 
-interface RoomStruct {
+interface WsMatchSyncData {
+  type: string;
   roomID: string;
   ownerID: string;
   status: GameStatus;
+  playerID: string;
   players: Record<
     string,
     {
@@ -118,11 +120,5 @@ interface RoomStruct {
       ai: boolean;
     }
   >;
-}
-interface WsMatchSyncData {
-  type: string;
-  roomID: string;
-  playerID: string;
-  room: RoomStruct;
   message?: string;
 }

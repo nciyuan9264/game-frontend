@@ -3,7 +3,7 @@ import { WsRoomSyncData } from '@/types/room';
 import { isEqual } from 'lodash-es';
 
 export const canCreateCompany = (data: WsRoomSyncData, userID: string) => {
-  return data?.roomData.roomInfo.roomStatus === GameStatus.CREATE_COMPANY && userID === data.roomData.currentPlayer;
+  return data?.roomData.gameStatus === GameStatus.CREATE_COMPANY && userID === data.roomData.currentPlayer;
 };
 
 export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) => {
@@ -11,15 +11,15 @@ export const getMergingModalAvailible = (data: WsRoomSyncData, userID: string) =
     return val.hoders.length > 0;
   });
   const needSettle = firstHoders?.[1].hoders[0] === userID;
-  return data?.roomData.roomInfo.roomStatus === GameStatus.MergingSettle && needSettle;
+  return data?.roomData.gameStatus === GameStatus.MergingSettle && needSettle;
 };
 
 export const getMergeSelection = (data: WsRoomSyncData, userID: string) => {
-  return data?.roomData.roomInfo.roomStatus === GameStatus.MergingSelection && data?.roomData.currentPlayer === userID;
+  return data?.roomData.gameStatus === GameStatus.MergingSelection && data?.roomData.currentPlayer === userID;
 };
 
 export const canBuyStock = (data: WsRoomSyncData, userID: string) => {
-  return data?.roomData.roomInfo.roomStatus === GameStatus.BUY_STOCK && data?.roomData.currentPlayer === userID;
+  return data?.roomData.gameStatus === GameStatus.BUY_STOCK && data?.roomData.currentPlayer === userID;
 };
 
 export const isDataEqual = (data1: WsRoomSyncData | undefined, data2: WsRoomSyncData) => {

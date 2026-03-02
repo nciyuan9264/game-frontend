@@ -15,13 +15,13 @@ interface IGameProps {
 }
 
 export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, userID }: IGameProps) => {
-  const isOwner = useMemo(() => wsMatchSyncData?.room?.ownerID === userID, [wsMatchSyncData, userID])
-  const currentPlayerData = useMemo(() => wsMatchSyncData?.room?.players?.[userID], [wsMatchSyncData, userID])
-  const isAllReady = useMemo(() => Object.values(wsMatchSyncData?.room?.players || {}).every((player) => player.ready) && Object.values(wsMatchSyncData?.room?.players || {}).length > 1, [wsMatchSyncData])
+  const isOwner = useMemo(() => wsMatchSyncData?.ownerID === userID, [wsMatchSyncData, userID])
+  const currentPlayerData = useMemo(() => wsMatchSyncData?.players?.[userID], [wsMatchSyncData, userID])
+  const isAllReady = useMemo(() => Object.values(wsMatchSyncData?.players || {}).every((player) => player.ready) && Object.values(wsMatchSyncData?.players || {}).length > 1, [wsMatchSyncData])
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!wsMatchSyncData?.room.players?.[userID]) {
+    if (!wsMatchSyncData?.players?.[userID]) {
       navigate('/game/acquire');
       return;
     }
@@ -34,7 +34,7 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
       return '';
     };
 
-    if (isOwner && wsMatchSyncData?.room?.status === GameStatus.MATCH) {
+    if (isOwner && wsMatchSyncData?.status === GameStatus.MATCH) {
       window.addEventListener('beforeunload', handler);
     }
 
@@ -44,10 +44,10 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
   }, []);
 
   const seats = useMemo(() => {
-    if (!wsMatchSyncData?.room?.players) {
+    if (!wsMatchSyncData?.players) {
       return [];
     }
-    const players = wsMatchSyncData.room.players;
+    const players = wsMatchSyncData.players;
     const totalSeats = 6;
     const seatList: Seat[] = [];
 
@@ -60,7 +60,7 @@ export const Match: FC<IGameProps> = ({ sendMessage, wsRef, wsMatchSyncData, use
       seatList.push({
         id: `player-${index}`,
         label: player.playerID,
-        role: player.playerID === wsMatchSyncData.room.ownerID ? Role.Host : Role.Player,
+        role: player.playerID === wsMatchSyncData.ownerID ? Role.Host : Role.Player,
         isReady: player.ready,
       });
     });

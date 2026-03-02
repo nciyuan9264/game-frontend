@@ -29,7 +29,7 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
               const tile = tilesData?.[id];
               const shouldBlink =
                 wsRoomSyncData?.roomData.currentPlayer === wsRoomSyncData?.playerId &&
-                playerTiles?.includes(id) && wsRoomSyncData?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile;
+                playerTiles?.includes(id) && wsRoomSyncData?.roomData.gameStatus === GameStatus.SET_Tile;
               return (
                 <button
                   key={id}

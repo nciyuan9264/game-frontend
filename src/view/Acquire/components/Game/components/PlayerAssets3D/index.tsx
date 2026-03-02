@@ -73,7 +73,7 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
               })
               .map((tileKey) => {
                 const isCurrentPlayer = data?.roomData.currentPlayer === userID;
-                const canPlaceTile = isCurrentPlayer && data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile;
+                const canPlaceTile = isCurrentPlayer && data?.roomData.gameStatus === GameStatus.SET_Tile;
 
                 return (
                   <div

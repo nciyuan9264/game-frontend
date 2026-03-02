@@ -26,8 +26,7 @@ export function useSeatAction({
   onAddAIStart,
   canAddAI,
 }: UseSeatActionParams) {
-  const isOwner =
-    wsMatchSyncData?.playerID === wsMatchSyncData?.room.ownerID;
+  const isOwner = wsMatchSyncData?.playerID === wsMatchSyncData?.ownerID;
 
   /** 当前允许的行为 */
 const action: SeatAction = useMemo(() => {
@@ -72,7 +71,6 @@ const action: SeatAction = useMemo(() => {
         })
       );
 
-      // Success will be triggered when wsMatchSyncData updates and the AI is actually added
     }
   };
 

@@ -49,7 +49,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
       return Number(val.tiles ?? 0) < 11
     }) || Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) >= 41
-    }) || data?.roomData?.roomInfo?.roomStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
+    }) || data?.roomData?.gameStatus === GameStatus.END || (!Object.entries(data?.roomData.companyInfo ?? {}).some(([_, val]) => {
       return Number(val.tiles ?? 0) < 11 && Number(val.tiles ?? 0) !== 0
     }) && !Object.entries(data?.roomData.companyInfo ?? {}).every(([_, val]) => {
       return Number(val.tiles ?? 0) === 0
@@ -57,14 +57,14 @@ const TopBar3D: React.FC<SettlementProps> = ({
   }, [data]);
 
   const currentStep = useMemo(() => {
-    if (!data?.roomData.roomInfo.roomStatus) {
+    if (!data?.roomData.gameStatus) {
       return '等待其他玩家进入';
     }
-    if (data?.roomData.roomInfo.roomStatus === GameStatus.END) {
+    if (data?.roomData.gameStatus === GameStatus.END) {
       return '游戏结束';
     }
     if (data?.roomData.currentPlayer === userID) {
-      return GameStatusMap[data?.roomData.roomInfo.roomStatus];
+      return GameStatusMap[data?.roomData.gameStatus];
     } else {
       return '请等待其他玩家操作';
     }
@@ -198,7 +198,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
 
       <div className={styles.centerSection}>
         <div className={styles.roomStatus}>
-          {data?.roomData.roomInfo.roomStatus ? (
+          {data?.roomData.gameStatus ? (
             data?.roomData.currentPlayer === userID ? (
               <div className={styles.yourTurn}>
                 <PlayCircleOutlined className={styles.turnIcon} />

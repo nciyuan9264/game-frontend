@@ -73,14 +73,14 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
                 key={tileKey}
                 onMouseEnter={() => {
                   data?.roomData.currentPlayer === userID &&
-                    data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile &&
+                    data?.roomData.gameStatus === GameStatus.SET_Tile &&
                     setHoveredTile(tileKey)
                 }
                 }
                 onMouseOut={() => data?.roomData.currentPlayer === userID && setHoveredTile(undefined)}
                 onClick={() =>
                   data?.roomData.currentPlayer === userID &&
-                  data?.roomData.roomInfo.roomStatus === GameStatus.SET_Tile &&
+                  data?.roomData.gameStatus === GameStatus.SET_Tile &&
                   placeTile(tileKey)
                 }
               >

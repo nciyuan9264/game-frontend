@@ -19,20 +19,22 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
 }) => {
 
   const content = useMemo(() => {
-    if (wsRoomSyncData?.roomData.roomInfo.roomStatus === GameStatus.END) {
+    if (wsRoomSyncData?.roomData.gameStatus === GameStatus.END) {
       return '';
     }
 
-    if (wsRoomSyncData?.roomData.roomInfo.roomStatus === GameStatus.WAITING) {
+
+
+    if (wsRoomSyncData?.roomData.gameStatus === GameStatus.WAITING) {
       return '请等待其他玩家加入';
     }
     const offlinePlayer = Object.entries(wsRoomSyncData?.roomData.players || {}).find(([_, player]) => {
       return !player.online;
     });
-    if (!offlinePlayer) {
+    if (offlinePlayer) {
       return `请等待掉线玩家${backendName2FrontendName(offlinePlayer?.[0] ?? '')}重连，如果2min未重连将替换为ai玩家进行游戏`;
     }
-    if (wsRoomSyncData?.roomData.roomInfo.roomStatus === GameStatus.MergingSettle && !getMergingModalAvailible(wsRoomSyncData, userID)) {
+    if (wsRoomSyncData?.roomData.gameStatus === GameStatus.MergingSettle && !getMergingModalAvailible(wsRoomSyncData, userID)) {
       const firstHoders = Object.entries(wsRoomSyncData?.tempData.mergeSettleData || {}).find(([_, val]) => {
         return val.hoders.length > 0;
       });
