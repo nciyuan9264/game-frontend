@@ -3,12 +3,12 @@ import { ArrowLeftOutlined, CheckCircleOutlined, PlusCircleOutlined } from '@ant
 import { Button } from '../../../../../../components/Button';
 import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Modal } from 'antd';
-import { WsMatchSyncData } from '@/types/room';
+import { PlayerInfo } from '@/types/room';
 
 export interface IHeaderProps {
   isHostView: boolean
   wsRef: React.RefObject<WebSocket>
-  currentPlayerData?: WsMatchSyncData['room']['players'][0]
+  currentPlayerData?: PlayerInfo
   isAllReady?: boolean
   sendMessage: (message: string) => void
 }

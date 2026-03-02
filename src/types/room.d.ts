@@ -69,6 +69,7 @@ interface PlayerInfo {
   playerID: string;
   online: boolean;
   ai: boolean;
+  ready: boolean;
 }
 
 interface RoomData {
@@ -97,6 +98,7 @@ interface TempData {
 
 interface WsRoomSyncData {
   playerId: string;
+  ownerID: string;
   playerData: PlayerData;
   roomData: RoomData;
   tempData: TempData;
@@ -111,14 +113,6 @@ interface WsMatchSyncData {
   ownerID: string;
   status: GameStatus;
   playerID: string;
-  players: Record<
-    string,
-    {
-      playerID: string;
-      online: boolean;
-      ready: boolean;
-      ai: boolean;
-    }
-  >;
+  players: Record<string, PlayerInfo>;
   message?: string;
 }

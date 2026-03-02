@@ -18,7 +18,7 @@ const GameEnd: React.FC<GameEndProps> = ({
   userID
 }) => {
 
-  const isOwner = data?.roomData.roomInfo.ownerID === userID;
+  const isOwner = data?.ownerID === userID;
   return (
     <Modal
       title={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold' }}>🏁 游戏结算</div>}
