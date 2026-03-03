@@ -45,7 +45,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
   const [is3DVersion, setIs3DVersion] = useState(false);
   const [hoveredTile, setHoveredTile] = useState<string | undefined>(undefined);
   const { playAudio } = useAudio();
-  const { placeTile } = useGameOperate(sendMessage);
+  const { placeTile, PlaceTileConfirmModal } = useGameOperate(sendMessage);
 
   useEffect(() => {
     if (wsRoomSyncData?.roomData.currentPlayer === userID) {
@@ -156,6 +156,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
         sendMessage={sendMessage}
         userID={userID}
       />
+      {PlaceTileConfirmModal}
       <CompanyStockInfoModal
         visible={companyInfoVisible}
         setCompanyInfoVisible={setCompanyInfoVisible}

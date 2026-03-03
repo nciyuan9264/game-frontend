@@ -1,29 +1,39 @@
-import { Modal } from "antd";
+import { useState, useCallback } from 'react';
+import PlaceTileConfirm from '../components/PlaceTileConfirm';
 
 export const useGameOperate = (sendMessage: (message: string) => void) => {
+  const [visible, setVisible] = useState(false);
+  const [tileKey, setTileKey] = useState<string>('');
 
-  const placeTile = (tileKey: string) =>
-    Modal.confirm({
-      title: '确认操作',
-      content: (
-        <div>
-          你确定要放置这个 tile 吗？
-          <div style={{ fontWeight: 'bold', marginTop: 8 }}>{tileKey}</div>
-        </div>
-      ),
-      okText: '确认',
-      cancelText: '取消',
-      onOk: () => {
-        sendMessage(
-          JSON.stringify({
-            type: 'game_place_tile',
-            payload: { tileKey },
-          })
-        );
-      },
-    });
+  const placeTile = useCallback((key: string) => {
+    setTileKey(key);
+    setVisible(true);
+  }, []);
 
-  return { placeTile }
+  const handleConfirm = useCallback(() => {
+    sendMessage(
+      JSON.stringify({
+        type: 'game_place_tile',
+        payload: { tileKey },
+      })
+    );
+    setVisible(false);
+  }, [sendMessage, tileKey]);
+
+  const handleClose = useCallback(() => {
+    setVisible(false);
+  }, []);
+
+  const PlaceTileConfirmModal = (
+    <PlaceTileConfirm
+      visible={visible}
+      onClose={handleClose}
+      onConfirm={handleConfirm}
+      tileKey={tileKey}
+    />
+  );
+
+  return { placeTile, PlaceTileConfirmModal };
 }
 
 
