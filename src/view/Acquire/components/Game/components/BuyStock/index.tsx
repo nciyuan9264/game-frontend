@@ -170,11 +170,6 @@ const BuyStock = ({
                 <button
                   disabled={limitReached || !canAfford || isMaxed || isNoTiles}
                   onClick={() => handleChange(key, count + 1)}
-                  style={
-                    !limitReached && canAfford && !isMaxed && !isNoTiles
-                      ? { backgroundColor: CompanyColor[key], color: '#fff' }
-                      : undefined
-                  }
                 >
                   +
                 </button>
