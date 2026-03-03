@@ -46,7 +46,6 @@ const GameEnd: React.FC<GameEndProps> = ({
   return (
     <Modal
       visible={visible}
-      onClose={() => setGameEndModalVisible(false)}
     >
       <div className={styles.header}>
         <div>
