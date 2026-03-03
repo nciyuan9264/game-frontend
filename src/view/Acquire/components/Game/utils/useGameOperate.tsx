@@ -11,13 +11,15 @@ export const useGameOperate = (sendMessage: (message: string) => void) => {
   }, []);
 
   const handleConfirm = useCallback(() => {
-    sendMessage(
-      JSON.stringify({
-        type: 'game_place_tile',
-        payload: { tileKey },
-      })
-    );
     setVisible(false);
+    requestAnimationFrame(() => {
+      sendMessage(
+        JSON.stringify({
+          type: 'game_place_tile',
+          payload: { tileKey },
+        })
+      );
+    });
   }, [sendMessage, tileKey]);
 
   const handleClose = useCallback(() => {
