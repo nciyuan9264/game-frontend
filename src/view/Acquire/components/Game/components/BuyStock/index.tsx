@@ -172,7 +172,7 @@ const BuyStock = ({
                   onClick={() => handleChange(key, count + 1)}
                   style={
                     !limitReached && canAfford && !isMaxed && !isNoTiles
-                      ? { backgroundColor: CompanyColor[key] }
+                      ? { backgroundColor: CompanyColor[key], color: '#fff' }
                       : undefined
                   }
                 >
