@@ -1,7 +1,12 @@
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Modal as AntModal } from 'antd';
 import { WsRoomSyncData } from '@/types/room';
 import { backendName2FrontendName } from '@/util/user';
+import { motion } from 'motion/react';
+import Modal from '@/components/Modal';
+
+import styles from './index.module.less';
+
 interface GameEndProps {
   visible: boolean;
   setGameEndModalVisible: React.Dispatch<React.SetStateAction<boolean>>;
@@ -17,84 +22,99 @@ const GameEnd: React.FC<GameEndProps> = ({
   sendMessage,
   userID
 }) => {
-
   const isOwner = data?.ownerID === userID;
+
+  const handleRestart = () => {
+    setGameEndModalVisible(false);
+    AntModal.confirm({
+      title: '游戏即将重启',
+      content: '游戏即将重启，是否确认？',
+      okText: '确认',
+      cancelText: '取消',
+      onOk: () => {
+        sendMessage(JSON.stringify({
+          type: 'game_restart_game',
+        }));
+      },
+    });
+  };
+
+  const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
+
+  if (!data) return null;
+
   return (
     <Modal
-      title={<div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: '2.5rem', fontWeight: 'bold' }}>🏁 游戏结算</div>}
-      open={visible}
-      closable={false}
-      maskClosable={false}
-      footer={
-        <>
-          <Button
-            type="default"
-            onClick={() => {
-              setGameEndModalVisible(false);
-            }}
-          >
-            关闭弹窗
-          </Button>
-          {isOwner && <Button
-            type="primary"
-            onClick={() => {
-              setGameEndModalVisible(false);
-              Modal.confirm({
-                title: '游戏即将重启',
-                content: '游戏即将重启，是否确认？',
-                okText: '确认',
-                cancelText: '取消',
-                onOk: () => {
-                  sendMessage(JSON.stringify({
-                    type: 'game_restart_game',
-                  }));
-                },
-              })
-            }}
-          >
-            再来一局
-          </Button>
-          }
-        </>
-      }
-      onCancel={() => setGameEndModalVisible(false)}
-      centered
-      width={800}
+      visible={visible}
+      onClose={() => setGameEndModalVisible(false)}
     >
-      <div style={{ display: 'flex', flexDirection: 'column', gap: 16 }}>
-        <div style={{ textAlign: 'center', color: '#666', fontSize: 14, padding: '8px 16px', backgroundColor: '#f5f5f5', borderRadius: 8 }}>
-          {isOwner ? '游戏已结束，请查看您的排名。确认玩家无异议后可点击再来一局按钮。' : '游戏已结束，请查看您的排名。请等待房主开启下一局游戏。'}
+      <div className={styles.header}>
+        <div>
+          <h2>🏁 游戏结算</h2>
+          <p className={styles.subTitle}>
+            查看最终排名
+          </p>
         </div>
-        {
-          Object.entries(data?.result ?? {})
-            .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA)) // 排序
+      </div>
+
+      <div className={styles.content}>
+        <div className={styles.hint}>
+          {isOwner ? '游戏已结束，请查看您的排名。\n 确认玩家无异议后可点击再来一局按钮。' : '游戏已结束，请查看您的排名。\n 请等待房主开启下一局游戏。'}
+        </div>
+
+        <div className={styles.rankList}>
+          {Object.entries(data.result ?? {})
+            .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA))
             .map(([player, score], index) => {
-              const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32']; // 金 银 铜
               const bgColor = rankColors[index] || '#f0f2f5';
+              const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
 
               return (
-                <div
+                <motion.div
                   key={player}
-                  style={{
-                    padding: '16px 24px',
-                    borderRadius: 10,
-                    backgroundColor: bgColor,
-                    display: 'flex',
-                    justifyContent: 'space-between',
-                    alignItems: 'center',
-                    boxShadow: '0 2px 8px rgba(0, 0, 0, 0.1)',
-                    fontWeight: index === 0 ? 'bold' : 'normal',
-                    fontSize: 16,
-                  }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                  className={styles.rankItem}
+                  style={{ backgroundColor: bgColor }}
                 >
-                  <span>
-                    {index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : ''} 第{index + 1}名：<strong>{backendName2FrontendName(player)}</strong>
+                  <div className={styles.rankInfo}>
+                    {rankEmoji && <span className={styles.rankEmoji}>{rankEmoji}</span>}
+                    <span className={styles.rankText}>
+                      第{index + 1}名：<span className={styles.playerName}>{backendName2FrontendName(player)}</span>
+                    </span>
+                  </div>
+                  <span className={styles.score}>
+                    ${score}
                   </span>
-                  <span>总资产：${score}</span>
-                </div>
+                </motion.div>
               );
             })
-        }
+          }
+        </div>
+      </div>
+
+      <div className={styles.footer}>
+        <motion.button
+          className={styles.btn}
+          onClick={() => setGameEndModalVisible(false)}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          关闭弹窗
+        </motion.button>
+        {isOwner && (
+          <motion.button
+            className={`${styles.btn} ${styles.primaryBtn}`}
+            onClick={handleRestart}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.95 }}
+            transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+          >
+            再来一局
+          </motion.button>
+        )}
       </div>
     </Modal>
   );

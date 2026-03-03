@@ -1,29 +1,30 @@
 .settlementContainer {
   background: #fafafa;
-  padding: 16px 20px;
-  border-radius: 8px;
-  box-shadow: inset 0 0 4px rgba(0, 0, 0, 0.05);
+  padding: 1rem;
+  border-radius: 1rem;
 
   .sectionTitle {
     display: flex;
     align-items: center;
-    font-size: 18px;
+    flex-wrap: wrap;
+    font-size: 1rem;
     font-weight: 600;
     color: #333;
-    margin-bottom: 12px;
+    margin-bottom: 0.8rem;
+    line-height: 1.6;
   }
 
   .companyList {
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 0.8rem;
 
     .companyCard {
       background: #ffffff;
-      border-left: 4px solid #2f54eb;
-      padding: 12px 16px;
-      border-radius: 6px;
-      min-width: 240px;
+      border-left: 4px solid;
+      padding: 0.8rem;
+      border-radius: 0.8rem;
+      min-width: 200px;
       flex: 1;
       transition: box-shadow 0.2s ease;
 
@@ -31,27 +32,84 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
       }
 
-      .companyName {
-        font-weight: 500;
-        font-size: 16px;
-        margin-bottom: 8px;
-        color: #1d39c4;
+      .companyHeader {
+        display: flex;
+        align-items: center;
+        gap: 0.6rem;
+        margin-bottom: 0.6rem;
+
+        .logo {
+          width: 2.4rem;
+          height: 2.4rem;
+          border-radius: 0.7rem;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          color: white;
+          font-weight: bold;
+          font-size: 0.85rem;
+          flex-shrink: 0;
+        }
+
+        .companyName {
+          font-weight: 600;
+          font-size: 1rem;
+        }
       }
 
       .dividendRow {
         display: flex;
-        font-size: 14px;
-        margin-left: 8px;
+        font-size: 0.9rem;
         line-height: 1.8;
+        flex-wrap: wrap;
 
         .name {
-          width: 250px;
+          color: #666;
         }
 
         .amount {
           font-weight: bold;
           color: #fa541c;
-          margin-left: 4px;
+          margin-left: 0.4rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 600px) {
+  .settlementContainer {
+    padding: 1.2rem;
+
+    .sectionTitle {
+      font-size: 1.1rem;
+    }
+
+    .companyList {
+      gap: 1rem;
+
+      .companyCard {
+        padding: 1rem;
+        min-width: 100%;
+
+        .companyHeader {
+          gap: 0.8rem;
+          margin-bottom: 0.8rem;
+
+          .logo {
+            width: 2.8rem;
+            height: 2.8rem;
+            border-radius: 0.8rem;
+            font-size: 0.95rem;
+          }
+
+          .companyName {
+            font-size: 1.1rem;
+          }
+        }
+
+        .dividendRow {
+          font-size: 1rem;
         }
       }
     }

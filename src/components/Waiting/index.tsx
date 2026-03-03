@@ -1,12 +1,13 @@
 
 
 import React, { useMemo } from 'react';
-import { Alert, Modal } from 'antd';
+import { Alert  } from 'antd';
 import { WsRoomSyncData } from '@/types/room';
 import { GameStatus } from '@/enum/game';
 import { getMergingModalAvailible } from '@/view/Acquire/components/Game/utils/game';
 import { backendName2FrontendName } from '@/util/user';
 import Settlement from '@/view/Acquire/components/Game/components/Settlement';
+import Modal from '../Modal';
 
 interface WaitingModalProps {
   wsRoomSyncData: WsRoomSyncData | undefined;
@@ -22,9 +23,6 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
     if (wsRoomSyncData?.roomData.gameStatus === GameStatus.END) {
       return '';
     }
-
-
-
     if (wsRoomSyncData?.roomData.gameStatus === GameStatus.WAITING) {
       return '请等待其他玩家加入';
     }
@@ -53,13 +51,8 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
 
   return (
     <Modal
-      title=""
-      open={content !== ''}
-      closable={false}
-      footer={null}
-      centered
-      maskClosable={false}
-      width={800}
+      visible={content !== ''}
+      onClose={() => {}}
     >
       <div style={{ fontSize: '1.25rem', display: 'flex', justifyContent: 'center', alignItems: 'center', minHeight: '10vh' }}>
         {content}

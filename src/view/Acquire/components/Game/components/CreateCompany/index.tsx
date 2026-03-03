@@ -1,8 +1,13 @@
 import { useEffect, useState } from "react";
-import { Modal, Card, Radio, Row, Col, Button } from "antd";
+import { message } from "antd";
 import { CompanyInfoItem, CompanyKey } from "@/types/room";
 import { CompanyColor } from "@/const/color";
 import { useThrottleFn } from "ahooks";
+import { X } from "lucide-react";
+import { motion } from "motion/react";
+import Modal from "@/components/Modal";
+
+import styles from "./index.module.less";
 
 const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
   {
@@ -21,57 +26,90 @@ const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
     if (selected) {
       onSelect(selected);
     } else {
-      Modal.error({
-        title: "请选择要创建的公司",
-      });
+      message.error("请选择要创建的公司");
     }
   }, { wait: 1000 });
 
   if (!company) return null;
   return (
     <Modal
-      title="请选择要创建的公司"
-      open={visible}
-      closable={true}
-      footer={null}
-      centered
-      maskClosable={true}
-      onCancel={onCancel}
+      visible={visible}
+      onClose={onCancel}
     >
-      <Radio.Group onChange={(e) => setSelected(e.target.value)} value={selected}>
-        <Row gutter={[16, 16]}>
-          {Object.entries(company).map(([key, value]) => {
-            const isDisabled = value.tiles !== 0;
-            return (
-              <Col span={12} key={key}>
-                <Card
-                  size="small"
-                  hoverable={!isDisabled}
-                  style={{
-                    opacity: isDisabled ? 0.4 : 1,
-                    cursor: isDisabled ? "not-allowed" : "pointer",
-                    backgroundColor: CompanyColor[value.name as CompanyKey]
-                  }}
-                  onClick={() => !isDisabled && setSelected(key)}
-                >
-                  <Radio value={key} disabled={isDisabled}>
-                    <b>{value.name}</b>
-                  </Radio>
-                </Card>
-              </Col>
-            );
-          })}
-        </Row>
-      </Radio.Group>
+      <div className={styles.header}>
+        <div>
+          <h2>选择公司</h2>
+          <p className={styles.subTitle}>
+            选择要创建的公司
+          </p>
+        </div>
+        <button aria-label="Close modal" onClick={onCancel} className={styles.closeBtn}>
+          <X size={22} />
+        </button>
+      </div>
 
-      <div style={{ marginTop: 24, textAlign: "right" }}>
-        <Button
-          type="primary"
-          disabled={!selected}
+      <div className={styles.list}>
+        {Object.entries(company).map(([key, value]) => {
+          const isDisabled = value.tiles !== 0;
+          const isSelected = selected === key;
+          
+          return (
+            <motion.div
+              key={key}
+              layout
+              className={`${styles.row} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+              style={
+                isSelected
+                  ? {
+                    borderColor: CompanyColor[key as CompanyKey],
+                    backgroundColor: `${CompanyColor[key as CompanyKey]}33`,
+                  }
+                  : undefined
+              }
+              onClick={() => !isDisabled && setSelected(key)}
+            >
+              <div className={styles.left}>
+                <div
+                  className={styles.logo}
+                  style={{ backgroundColor: CompanyColor[key as CompanyKey] }}
+                >
+                  {key.slice(0, 2).toUpperCase()}
+                </div>
+
+                <div className={styles.info}>
+                  <div className={styles.title}>
+                    <span
+                      className={styles.companyName}
+                      style={
+                        isSelected
+                          ? { color: CompanyColor[key as CompanyKey] }
+                          : undefined
+                      }
+                    >
+                      {value.name}
+                    </span>
+                  </div>
+                  <div className={`${styles.meta} ${isDisabled ? styles.unavailable : styles.available}`}>
+                    {isDisabled ? '已创建' : '可创建'}
+                  </div>
+                </div>
+              </div>
+            </motion.div>
+          );
+        })}
+      </div>
+
+      <div className={styles.footer}>
+        <motion.button
+          className={styles.confirmBtn}
           onClick={debouncedHandleOk}
+          disabled={!selected}
+          whileHover={selected ? { scale: 1.02 } : {}}
+          whileTap={selected ? { scale: 0.95 } : {}}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
         >
           确认创建
-        </Button>
+        </motion.button>
       </div>
     </Modal>
   );

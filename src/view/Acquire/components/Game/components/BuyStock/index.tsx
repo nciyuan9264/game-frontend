@@ -1,11 +1,14 @@
 import { CompanyKey, WsRoomSyncData } from '@/types/room';
-import { Modal, Card, Row, Col, Button, message } from 'antd';
+import { message } from 'antd';
 import { useState, useMemo, useEffect } from 'react';
-import CustomInputNumber from '../../../../../../components/CustomInputer';
 import { CompanyColor } from '@/const/color';
 import { useThrottleFn } from 'ahooks';
+import { X } from 'lucide-react';
 
 import styles from './index.module.less';
+import { motion } from 'motion/react';
+import Modal from '@/components/Modal';
+import AnimatedNumber from '@/components/AnimatedNumber';
 
 const BuyStock = ({
   visible,
@@ -68,75 +71,139 @@ const BuyStock = ({
   };
 
   const { run: debouncedHandleOk } = useThrottleFn(() => {
-    if (selectedCompany) {
-      onSubmit(selectedCompany);
-    } else {
-      message.warning("⚠️ 请至少选择一个股票");
-    }
-  }, { wait: 1000 });
+    onSubmit(selectedCompany);
+  }, { wait: 500 });
+
   if (!data) return null;
+
   return (
     <Modal
-      width={{ xs: '90%', sm: 600, md: 700, lg: 800 }}
-      title="请选择要购买的股票"
-      open={visible}
-      closable={true}
-      footer={
-        <Button type="primary" onClick={debouncedHandleOk} disabled={totalCost > money}>
-          确定购买
-        </Button>
-      }
-      onCancel={() => {
-        setBuyStockModalVisible(false);
-      }}
-      centered
-      maskClosable={true}
+      visible={visible}
+      onClose={() => setBuyStockModalVisible(false)}
     >
-      <Row gutter={[16, 16]}>
+      {/* Header */}
+      <div className={styles.header}>
+        <div>
+          <h2>购买股票</h2>
+          <p className={styles.subTitle}>
+            每回合最多购买 3 只股票
+          </p>
+        </div>
+        <button aria-label="Close modal" onClick={() => setBuyStockModalVisible(false)} className={styles.closeBtn}>
+          <X size={22} />
+        </button>
+      </div>
+
+      {/* List */}
+      <div className={styles.list}>
         {Object.entries(data.roomData.companyInfo).map(([k, value]) => {
           const key = k as CompanyKey; // 添加类型断言
-          const disabled = Number(value.tiles ?? 0) === 0;
+          const count = selectedCompany[key] ?? 0;
+          const isSelected = count > 0;
+          const isNoTiles = Number(value.tiles ?? 0) === 0;
+          const isMaxed = count >= value.stockTotal;
+          const canAfford = totalCost + value.stockPrice <= money;
+          const limitReached = Object.values(selectedCompany).reduce((sum, v) => sum + v, 0) >= 3;
+          const isDisabled =
+            (limitReached || !canAfford || isMaxed || isNoTiles) && count === 0;
+
           return (
-            <Col xs={12} sm={8} md={6} key={key} className={`${value.tiles === 0 ? styles.noTiles : ''}`}>
-              <Card
-                title={key}
-                variant="outlined"
-                hoverable={!disabled}
-                style={{
-                  opacity: disabled ? 0.2 : 1,
-                  background: CompanyColor[key],
-                  borderRadius: 8,
-                  color: 'white',
-                  maxWidth: '100%',
-                  padding: '6px',
-                  fontSize: '11px',
-                  height: '160px',
-                  display: 'flex',
-                  flexDirection: 'column',
-                }}
-                size="small"
-              >
-                <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between', marginBottom: '8px' }}>
-                  <p style={{ margin: '2px 0' }}>股价：{value.stockPrice}</p>
-                  <p style={{ margin: '2px 0' }}>地块：{value.tiles}</p>
-                  <p style={{ margin: '2px 0' }}>剩余股票：{value.stockTotal}</p>
+            <motion.div
+              key={key}
+              layout
+              className={`${value.tiles === 0 ? styles.noTiles : ''} ${styles.row} ${isSelected ? styles.selected : ''} ${isDisabled ? styles.disabled : ''}`}
+              style={
+                isSelected
+                  ? {
+                    borderColor: CompanyColor[key],
+                    backgroundColor: `${CompanyColor[key]}33`,
+                  }
+                  : undefined
+              }
+            >
+              <div className={styles.left}>
+                <div
+                  className={styles.logo}
+                  style={{ backgroundColor: CompanyColor[key] }}
+                >
+                  {key.slice(0, 2).toUpperCase()}
                 </div>
-                <div style={{ display: 'flex', width: '100%', boxSizing: 'border-box' }}>
-                  <CustomInputNumber
-                    min={0}
-                    max={Math.min(value.stockTotal, 3)}
-                    value={selectedCompany[key] || 0}
-                    onChange={(val) => handleChange(key, val)}
-                    disabled={disabled}
-                  />
+
+                <div className={styles.info}>
+                  <div className={styles.title}>
+                    <span
+                      className={styles.companyName}
+                      style={
+                        isSelected
+                          ? { color: CompanyColor[key] }
+                          : undefined
+                      }
+                    >
+                      {key}
+                    </span>
+                  </div>
+                  <div className={styles.meta}>
+                    <span>股票价格: {value.stockPrice}</span>
+                    <span
+                      className={
+                        value.stockTotal < 5
+                          ? styles.lowStock
+                          : undefined
+                      }
+                    >
+                      股票剩余: {value.stockTotal}
+                    </span>
+                  </div>
                 </div>
-              </Card>
-            </Col>
+              </div>
+
+              <div className={styles.controls}>
+                <button
+                  disabled={count === 0}
+                  onClick={() => handleChange(key, count - 1)}
+                >
+                  -
+                </button>
+
+                <span className={styles.count}>{count}</span>
+
+                <button
+                  disabled={limitReached || !canAfford || isMaxed || isNoTiles}
+                  onClick={() => handleChange(key, count + 1)}
+                  style={
+                    !limitReached && canAfford && !isMaxed && !isNoTiles
+                      ? { backgroundColor: CompanyColor[key] }
+                      : undefined
+                  }
+                >
+                  +
+                </button>
+              </div>
+            </motion.div>
           );
         })}
-      </Row>
-      <div style={{ marginTop: 16 }}>
-        当前总价：<b>{totalCost}</b> / 可用资金：<b>{money}</b>
+      </div>
+
+      {/* Footer */}
+      <div className={styles.footer}>
+        <div className={styles.summary}>
+          <div className={styles.totalCost}>
+            <AnimatedNumber value={totalCost} /> / <AnimatedNumber value={money} />
+          </div>
+          <div className={styles.totalCost}>
+            {Object.values(selectedCompany).reduce((sum, v) => sum + v, 0)} / 3
+          </div>
+        </div>
+
+        <motion.button
+          className={styles.confirmBtn}
+          onClick={debouncedHandleOk}
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.95 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 17 }}
+        >
+          确认购买
+        </motion.button>
       </div>
     </Modal>
   );

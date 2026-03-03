@@ -1,5 +1,8 @@
-import { Modal, Tabs, Table } from 'antd';
-import React from 'react';
+import React, { useState } from 'react';
+import { X } from 'lucide-react';
+import Modal from '@/components/Modal';
+
+import styles from './index.module.less';
 
 type StockInfo = {
   range: [number, number];
@@ -46,30 +49,6 @@ const stockData: StockDataMap = {
   ],
 };
 
-const columns = [
-  {
-    title: '地块数量区间',
-    dataIndex: 'range',
-    key: 'range',
-    render: (range: [number, number]) => `${range[0]} - ${range[1]}`,
-  },
-  {
-    title: '股票价格',
-    dataIndex: 'price',
-    key: 'price',
-  },
-  {
-    title: '大股东奖励',
-    dataIndex: 'majorityBonus',
-    key: 'majorityBonus',
-  },
-  {
-    title: '二股东奖励',
-    dataIndex: 'minorityBonus',
-    key: 'minorityBonus',
-  },
-];
-
 const CompanyStockInfoModal = ({
   visible,
   setCompanyInfoVisible,
@@ -77,33 +56,61 @@ const CompanyStockInfoModal = ({
   visible: boolean;
   setCompanyInfoVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const [activeTab, setActiveTab] = useState<string>('Continental/Imperial');
+
   return (
     <Modal
-      title="公司股票信息表"
-      open={visible}
-      closable={true}
-      onCancel={() => setCompanyInfoVisible(false)}
-      footer={null}
-      centered
-      maskClosable={true}
-      width={800}
+      visible={visible}
+      onClose={() => setCompanyInfoVisible(false)}
     >
-      <Tabs
-        defaultActiveKey="Continental"
-        items={Object.entries(stockData).map(([companyName, stockList]) => ({
-          key: companyName,
-          label: companyName,
-          children: (
-            <Table
-              size="small"
-              pagination={false}
-              rowKey={(_, index) => `${companyName}-${index}`}
-              columns={columns}
-              dataSource={stockList}
-            />
-          ),
-        }))}
-      />
+      <div className={styles.header}>
+        <div>
+          <h2>公司股票信息</h2>
+          <p className={styles.subTitle}>
+            查看股票价格和奖励信息
+          </p>
+        </div>
+        <button aria-label="Close modal" onClick={() => setCompanyInfoVisible(false)} className={styles.closeBtn}>
+          <X size={22} />
+        </button>
+      </div>
+
+      <div className={styles.content}>
+        <div className={styles.tabs}>
+          {Object.keys(stockData).map((companyName) => (
+            <button
+              key={companyName}
+              className={`${styles.tab} ${activeTab === companyName ? styles.active : ''}`}
+              onClick={() => setActiveTab(companyName)}
+            >
+              {companyName}
+            </button>
+          ))}
+        </div>
+
+        <div className={styles.tableContainer}>
+          <table>
+            <thead>
+              <tr>
+                <th>地块数量区间</th>
+                <th>股票价格</th>
+                <th>大股东奖励</th>
+                <th>二股东奖励</th>
+              </tr>
+            </thead>
+            <tbody>
+              {stockData[activeTab].map((item, index) => (
+                <tr key={index}>
+                  <td>{item.range[0]} - {item.range[1]}</td>
+                  <td>${item.price}</td>
+                  <td>${item.majorityBonus}</td>
+                  <td>${item.minorityBonus}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </div>
     </Modal>
   );
 };

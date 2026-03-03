@@ -8,6 +8,7 @@ interface AnimatedNumberProps {
   minBase?: number;          // 最小基数保护
   enableFlashOnZero?: boolean;
   enableImpact?: boolean;
+  enableColorChange?: boolean;
   formatter?: (n: number) => string;
 }
 
@@ -18,6 +19,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   minBase = 10,
   enableFlashOnZero = true,
   enableImpact = true,
+  enableColorChange = true,
   formatter,
 }) => {
   const [displayValue, setDisplayValue] = useState(value);
@@ -31,7 +33,8 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   const animationStartRef = useRef(value);
 
   const frameRef = useRef<number>();
-  const timeoutRef = useRef<NodeJS.Timeout>();
+  const flashTimeoutRef = useRef<NodeJS.Timeout>();
+  const impactTimeoutRef = useRef<NodeJS.Timeout>();
 
   useEffect(() => {
     const prev = prevValueRef.current;
@@ -43,8 +46,8 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
     // 🔥 清零闪烁
     if (enableFlashOnZero && value === 0 && prev > 0) {
       setFlash(true);
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
+      clearTimeout(flashTimeoutRef.current);
+      flashTimeoutRef.current = setTimeout(() => {
         setFlash(false);
       }, 300);
     }
@@ -56,8 +59,8 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
       changeRatio > bigChangeRatio
     ) {
       setImpact(true);
-      clearTimeout(timeoutRef.current);
-      timeoutRef.current = setTimeout(() => {
+      clearTimeout(impactTimeoutRef.current);
+      impactTimeoutRef.current = setTimeout(() => {
         setImpact(false);
       }, 250);
     }
@@ -90,7 +93,8 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 
     return () => {
       cancelAnimationFrame(frameRef.current!);
-      clearTimeout(timeoutRef.current);
+      clearTimeout(flashTimeoutRef.current);
+      clearTimeout(impactTimeoutRef.current);
     };
   }, [value, duration]);
 
@@ -107,7 +111,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
         ${flash ? styles['number-flash'] : ''}
       `}
       style={{
-        color: isUp ? '#52c41a' : isDown ? '#ff4d4f' : 'inherit',
+        color: enableColorChange ? (isUp ? '#52c41a' : isDown ? '#ff4d4f' : 'inherit') : 'inherit',
         transform: impact ? 'scale(1.15)' : 'scale(1)',
         transition: 'color 0.2s, transform 0.2s',
         display: 'inline-block',
