@@ -37,7 +37,7 @@ const WaitingModal: React.FC<WaitingModalProps> = ({
         return val.hoders.length > 0;
       });
       return (
-        <div style={{ display: 'flex', flexDirection: 'column', gap: '10px' }}>
+        <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem', padding: '2rem' }}>
           <Alert
             message={`请等待 ${backendName2FrontendName(firstHoders?.[1].hoders[0] ?? '')} 结算`}
             type="info"
