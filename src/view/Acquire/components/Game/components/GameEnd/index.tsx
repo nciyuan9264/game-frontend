@@ -67,30 +67,38 @@ const GameEnd: React.FC<GameEndProps> = ({
             .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA))
             .map(([player, score], index) => {
               const bgColor = rankColors[index] || '#f0f2f5';
-              const rankEmoji = index === 0 ? '🥇' : index === 1 ? '🥈' : index === 2 ? '🥉' : '';
+              const rankEmoji =
+                index === 0 ? '🥇' :
+                  index === 1 ? '🥈' :
+                    index === 2 ? '🥉' : '';
 
               return (
                 <motion.div
                   key={player}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.2 }}
+                  layout
+                  transition={{
+                    type: 'spring',
+                    stiffness: 400,
+                    damping: 30,
+                  }}
                   className={styles.rankItem}
                   style={{ backgroundColor: bgColor }}
                 >
                   <div className={styles.rankInfo}>
-                    {rankEmoji && <span className={styles.rankEmoji}>{rankEmoji}</span>}
+                    {rankEmoji && (
+                      <span className={styles.rankEmoji}>{rankEmoji}</span>
+                    )}
                     <span className={styles.rankText}>
-                      第{index + 1}名：<span className={styles.playerName}>{backendName2FrontendName(player)}</span>
+                      第{index + 1}名：
+                      <span className={styles.playerName}>
+                        {backendName2FrontendName(player)}
+                      </span>
                     </span>
                   </div>
-                  <span className={styles.score}>
-                    ${score}
-                  </span>
+                  <span className={styles.score}>${score}</span>
                 </motion.div>
               );
-            })
-          }
+            })}
         </div>
       </div>
 
