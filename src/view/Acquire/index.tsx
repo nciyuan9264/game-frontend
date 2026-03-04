@@ -71,7 +71,9 @@ export const Acquire: React.FC = () => {
 
       // ... 其他逻辑保持不变
       if (getMergingModalAvailible(roomData, userID)) {
-        setMergeCompanyModalVisible(true);
+        setTimeout(() => {
+          setMergeCompanyModalVisible(true);
+        }, 200);
       } else {
         setMergeCompanyModalVisible(false);
       }
