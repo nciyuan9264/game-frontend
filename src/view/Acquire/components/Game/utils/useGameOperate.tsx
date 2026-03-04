@@ -19,7 +19,7 @@ export const useGameOperate = (sendMessage: (message: string) => void) => {
           payload: { tileKey },
         })
       );
-    }, 500);
+    }, 300);
   }, [sendMessage, tileKey]);
 
   const handleClose = useCallback(() => {
