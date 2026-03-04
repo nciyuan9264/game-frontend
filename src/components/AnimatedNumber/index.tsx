@@ -15,8 +15,6 @@ interface AnimatedNumberProps {
 const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
   value,
   duration = 300,
-  bigChangeRatio = 0.2,
-  minBase = 10,
   enableFlashOnZero = true,
   enableImpact = true,
   enableColorChange = true,
@@ -38,10 +36,10 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 
   useEffect(() => {
     const prev = prevValueRef.current;
-    const diff = value - prev;
+    // const diff = value - prev;
 
-    const changeRatio =
-      prev === 0 ? 1 : Math.abs(diff) / Math.abs(prev);
+    // const changeRatio =
+    //   prev === 0 ? 1 : Math.abs(diff) / Math.abs(prev);
 
     // 🔥 清零闪烁
     if (enableFlashOnZero && value === 0 && prev > 0) {
@@ -54,9 +52,7 @@ const AnimatedNumber: React.FC<AnimatedNumberProps> = ({
 
     // 🔥 比例 impact 动画
     if (
-      enableImpact &&
-      Math.abs(prev) > minBase &&
-      changeRatio > bigChangeRatio
+      enableImpact
     ) {
       setImpact(true);
       clearTimeout(impactTimeoutRef.current);
