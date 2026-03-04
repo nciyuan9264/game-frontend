@@ -108,7 +108,9 @@ export const Acquire: React.FC = () => {
           setBuyStockModalVisible(false);
         }
         if (roomData.roomData.gameStatus === GameStatus.MergingSelection) {
-          setMergeSelectionModalVisible(true);
+          setTimeout(() => {
+            setMergeSelectionModalVisible(true);
+          }, 200);
         } else {
           setMergeSelectionModalVisible(false);
         }
