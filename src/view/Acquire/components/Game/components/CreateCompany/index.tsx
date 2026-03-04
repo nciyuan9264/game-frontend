@@ -52,7 +52,7 @@ const CreateCompanyModal = ({ visible, company, onSelect, onCancel }:
         {Object.entries(company).map(([key, value]) => {
           const isDisabled = value.tiles !== 0;
           const isSelected = selected === key;
-          
+
           return (
             <motion.div
               key={key}

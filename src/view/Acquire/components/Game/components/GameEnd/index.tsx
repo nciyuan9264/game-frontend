@@ -41,7 +41,7 @@ const GameEnd: React.FC<GameEndProps> = ({
 
   const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
 
-  if (!data) return null;
+  if (!data?.result) return null;
 
   return (
     <Modal
@@ -62,8 +62,8 @@ const GameEnd: React.FC<GameEndProps> = ({
         </div>
 
         <div className={styles.rankList}>
-          {Object.entries(data.result ?? {})
-            .sort(([, scoreA], [, scoreB]) => Number(scoreB) - Number(scoreA))
+          {Object.entries(data.result)
+            .sort(([, scoreA], [, scoreB]) => Number(scoreB.total) - Number(scoreA.total))
             .map(([player, score], index) => {
               const bgColor = rankColors[index] || '#f0f2f5';
               const rankEmoji =
@@ -94,7 +94,11 @@ const GameEnd: React.FC<GameEndProps> = ({
                       </span>
                     </span>
                   </div>
-                  <span className={styles.score}>${score}</span>
+                  <div className={styles.score}>
+                    <span className={`${styles.money} ${styles.hideOnMobile}`}>现金：${score.money}</span>
+                    <span className={`${styles.stocks} ${styles.hideOnMobile}`}>股票：${score.stocks}</span>
+                    <span className={styles.total}>总得分：${score.total}</span>
+                  </div>
                 </motion.div>
               );
             })}

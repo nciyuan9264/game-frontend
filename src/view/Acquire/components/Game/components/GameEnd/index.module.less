@@ -80,6 +80,21 @@
       .score {
         font-weight: 600;
         font-size: 1rem;
+        display: flex;
+        gap: 1.5rem;
+        text-align: right;
+
+        .money {
+          min-width: 7rem;
+        }
+
+        .stocks {
+          min-width: 7rem;
+        }
+
+        .total {
+          min-width: 7rem;
+        }
       }
     }
 
@@ -130,6 +145,10 @@
 }
 
 @media (max-width: 600px) {
+  .hideOnMobile {
+    display: none;
+  }
+
   .content {
     padding: 1.6rem;
     gap: 1.2rem;

@@ -104,7 +104,7 @@ interface WsRoomSyncData {
   tempData: TempData;
   type: string;
   message?: string;
-  result?: Record<string, int>;
+  result?: Record<string, { money: number; stocks: number; total: number }>;
 }
 
 interface WsMatchSyncData {
