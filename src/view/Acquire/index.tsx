@@ -32,7 +32,7 @@ export const Acquire: React.FC = () => {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
@@ -88,7 +88,9 @@ export const Acquire: React.FC = () => {
         }
         if (roomData.roomData.gameStatus === GameStatus.BUY_STOCK) {
           if (Object.values(roomData.roomData.companyInfo).filter(company => company.stockPrice > 0).some(company => company.stockPrice <= roomData.playerData.money && company.stockTotal > 0)) {
-            setBuyStockModalVisible(true);
+            setTimeout(() => {
+              setBuyStockModalVisible(true);
+            }, 200);
           } else {
             const stocks = Object.keys(roomData?.roomData.companyInfo ?? {}).reduce((acc, key) => {
               acc[key as CompanyKey] = 0;
