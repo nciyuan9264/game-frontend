@@ -42,6 +42,7 @@ export default defineConfig(({ mode }) => {
     build: {
       target: 'es2020',
       chunkSizeWarningLimit: 1000, // 调大警告阈值（可选）
+      modulePreload: false,
       rollupOptions: {
         output: {
           manualChunks(id) {
