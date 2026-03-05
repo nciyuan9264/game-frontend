@@ -1,11 +1,10 @@
-import GameBoard from "@/view/GameBoard";
-import Home from "@/view/Home";
-// import SplendorGame from "@/view/Splendor/GameBoard";
-import SplendorRoom from "@/view/Splendor";
 
-import React from "react";
+import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
-import { Acquire } from "@/view/Acquire";
+const Home = lazy(() => import("@/view/Home"));
+const GameBoard = lazy(() => import("@/view/GameBoard"));
+const SplendorRoom = lazy(() => import("@/view/Splendor"));
+const Acquire = lazy(() => import("@/view/Acquire"));
 
 export interface AppRoute {
   path: string;

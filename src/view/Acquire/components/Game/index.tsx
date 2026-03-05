@@ -1,4 +1,4 @@
-import { FC, useEffect, useState } from 'react';
+import { FC, lazy, useEffect, useState } from 'react';
 import styles from './index.module.less';
 import { useParams } from 'react-router-dom';
 import { Board } from './components/Board';
@@ -14,12 +14,11 @@ import CompanyInfo from './components/CompanyInfo';
 import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import TopBar from './components/TopBar';
 import PlayerAssets from './components/PlayerAssets';
-import Board3D from './components/Board3D';
-import CompanyInfo3D from './components/CompanyInfo3D';
-import TopBar3D from './components/TopBar3D';
-import PlayerAssets3D from './components/PlayerAssets3D';
-// 在imports中添加
-import LiveRanking from './components/LiveRanking';
+const Board3D = lazy(() => import('./components/Board3D'));
+const CompanyInfo3D = lazy(() => import('./components/CompanyInfo3D'));
+const TopBar3D = lazy(() => import('./components/TopBar3D'));
+const PlayerAssets3D = lazy(() => import('./components/PlayerAssets3D'));
+const LiveRanking = lazy(() => import('./components/LiveRanking'));
 import { useGameOperate } from './utils/useGameOperate';
 
 interface IGameProps {

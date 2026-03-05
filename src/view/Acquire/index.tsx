@@ -17,7 +17,7 @@ import { wsUrl } from '@/const/env';
 import { LoadingBlock } from '@/components/LoadingBlock';
 import { useNavigate } from 'react-router-dom';
 
-export const Acquire: React.FC = () => {
+export default function Acquire() {
   const { roomID } = useUrlParams();
   const { userProfile, profileLoading } = useProfile();
   const userID = profile2BackendName(userProfile);

@@ -1,4 +1,4 @@
-import { useEffect, useRef } from 'react';
+import { useRef } from 'react';
 export enum AudioTypeEnum {
   Quickily = 'quickily',
   Quickily1 = 'quickily1',
@@ -18,17 +18,22 @@ const audioTypes: AudioTypeEnum[] = [
   AudioTypeEnum.GetNobleCard,
 ];
 
+let audioMap: Record<string, HTMLAudioElement> | null = null;
+
+const initAudioMap = () => {
+  if (audioMap) return audioMap;
+  const map: Record<string, HTMLAudioElement> = {};
+  audioTypes.forEach(type => {
+    const audio = new Audio(`/music/${type}.mp3`);
+    audio.load();
+    map[type] = audio;
+  });
+  audioMap = map;
+  return map;
+};
+
 export const useAudio = () => {
-  const audioMapRef = useRef<Record<string, HTMLAudioElement>>({});
-  useEffect(() => {
-    const map: Record<string, HTMLAudioElement> = {};
-    audioTypes.forEach(type => {
-      const audio = new Audio(`/music/${type}.mp3`);
-      audio.load();
-      map[type] = audio;
-    });
-    audioMapRef.current = map;
-  }, []);
+  const audioMapRef = useRef(initAudioMap());
 
   const playAudio = (type: string) => {
     const audio = audioMapRef.current[type];

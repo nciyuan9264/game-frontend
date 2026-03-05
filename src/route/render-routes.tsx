@@ -1,5 +1,7 @@
 import { Route, Routes } from 'react-router-dom';
 import { routes, AppRoute } from './routes.tsx';
+import { Suspense } from 'react';
+import { LoadingBlock } from '@/components/LoadingBlock/index.tsx';
 
 /**
  * 渲染路由
@@ -12,7 +14,9 @@ export const RenderRoutes = () => {
                 key={route.path}
                 path={route.path}
                 element={
-                    route.element
+                    <Suspense fallback={<LoadingBlock />}>
+                        {route.element}
+                    </Suspense>
                 }
             >
                 {route.children && renderRoutes(route.children)}
