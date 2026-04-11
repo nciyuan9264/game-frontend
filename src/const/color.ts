@@ -6,6 +6,6 @@ export const CompanyColor = {
   Imperial: '#c24a55',
   Sackson: '#ffbcff',
   Tower: '#17a2b8',
-  Worldwide: '#6500fdff',
+  Worldwide: '#6500fd',
   Blank: '#6c757d',
 };
