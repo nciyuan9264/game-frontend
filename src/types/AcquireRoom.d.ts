@@ -7,6 +7,7 @@ interface ListRoomInfo {
   maxPlayers: number;
   status: GameStatus;
   emptyTileCount: number;
+  boardCardCount: number;
   roomPlayer: {
     playerID: string;
     online: boolean;
