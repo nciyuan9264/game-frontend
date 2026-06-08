@@ -20,20 +20,25 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
   const maxPlayers = data.maxPlayers || 6;
   const isAcquire = gameType === 'acquire';
   const isMatching = data.status === 'match';
-  const progressText = isAcquire
-    ? isMatching
-      ? '匹配中'
-      : `${108 - data.emptyTileCount}/${108}`
-    : isMatching
-      ? '匹配中'
-      : `${26 - data.boardCardCount}/${26}`;
-  const progressPercent = isAcquire
-    ? isMatching
-      ? 0
-      : ((108 - data.emptyTileCount) / 108) * 100
-    : isMatching
-      ? 0
-      : ((26 - data.boardCardCount) / 26) * 100
+  const isEnded = data.status === 'end';
+  const progressText = isEnded
+    ? '已结束'
+    : isAcquire
+      ? isMatching
+        ? '匹配中'
+        : `${108 - data.emptyTileCount}/${108}`
+      : isMatching
+        ? '匹配中'
+        : `${26 - data.boardCardCount}/${26}`;
+  const progressPercent = isEnded
+    ? 100
+    : isAcquire
+      ? isMatching
+        ? 0
+        : ((108 - data.emptyTileCount) / 108) * 100
+      : isMatching
+        ? 0
+        : ((26 - data.boardCardCount) / 26) * 100
   return (
     <article className={styles.card}>
       {/* header */}
@@ -52,10 +57,10 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
 
         <div className={styles.headerRight}>
           <span
-            className={`${styles.chip} ${isMatching ? styles.chipWaiting : styles.chipOngoing}`}
+            className={`${styles.chip} ${isMatching || isEnded ? styles.chipWaiting : styles.chipOngoing}`}
           >
-            {isMatching ? <HourglassOutlined /> : <PlayCircleOutlined />}
-            {isMatching ? '待开始' : '进行中'}
+            {isMatching || isEnded ? <HourglassOutlined /> : <PlayCircleOutlined />}
+            {isMatching ? '待开始' : isEnded ? '已结束' : '进行中'}
           </span>
         </div>
       </div>

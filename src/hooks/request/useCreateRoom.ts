@@ -14,8 +14,8 @@ export const useCreateRoom = () => {
     },
     {
       manual: true,
-      onError: () => {
-        message.error('创建失败，请重试');
+      onError: (error) => {
+        message.error(error?.message || '创建失败，请重试');
       },
       refreshDeps: [gameType],
       onSuccess: (data) => {

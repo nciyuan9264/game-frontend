@@ -49,6 +49,12 @@ axiosInstance.interceptors.response.use(
         return Promise.reject(refreshError);
       }
     }
+
+    // 提取后端在错误响应体里返回的 message，方便上层 onError 直接展示
+    const backendMessage = response?.data?.message;
+    if (backendMessage) {
+      return Promise.reject(new Error(backendMessage));
+    }
     return Promise.reject(error);
   }
 );
