@@ -17,27 +17,23 @@ interface RoomCardProps {
 const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
   const navigate = useNavigate();
   const aiCount = data.roomPlayer.filter(player => player.ai).length;
-  const leavePlayerCount = data.roomPlayer.filter(player => !player.online).length;
   const maxPlayers = data.maxPlayers || 6;
   const isAcquire = gameType === 'acquire';
+  const isMatching = data.status === 'match';
   const progressText = isAcquire
-    ? data.status === 'match'
-      ? '暂未开始'
+    ? isMatching
+      ? '匹配中'
       : `${108 - data.emptyTileCount}/${108}`
-    : data.status === 'match'
-      ? '等待玩家准备'
-      : leavePlayerCount
-        ? '等待玩家重连'
-        : '推理进行中';
+    : isMatching
+      ? '匹配中'
+      : '进行中';
   const progressPercent = isAcquire
-    ? data.status === 'match'
+    ? isMatching
       ? 0
       : ((108 - data.emptyTileCount) / 108) * 100
-    : data.status === 'match'
+    : isMatching
       ? 18
-      : leavePlayerCount
-        ? 45
-        : 72;
+      : 72;
   return (
     <article className={styles.card}>
       {/* header */}
@@ -56,10 +52,10 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
 
         <div className={styles.headerRight}>
           <span
-            className={`${styles.chip} ${data.status === 'match' || leavePlayerCount ? styles.chipWaiting : styles.chipOngoing}`}
+            className={`${styles.chip} ${isMatching ? styles.chipWaiting : styles.chipOngoing}`}
           >
-            {data.status === 'match' || leavePlayerCount ? <HourglassOutlined /> : <PlayCircleOutlined />}
-            {data.status === 'match' ? '待开始' : leavePlayerCount ? '暂停中' : '进行中'}
+            {isMatching ? <HourglassOutlined /> : <PlayCircleOutlined />}
+            {isMatching ? '待开始' : '进行中'}
           </span>
         </div>
       </div>
