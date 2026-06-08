@@ -26,7 +26,7 @@ export default function DaVinci() {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}/davinci/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
