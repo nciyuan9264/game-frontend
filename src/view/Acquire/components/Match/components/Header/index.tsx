@@ -2,8 +2,8 @@ import styles from './index.module.less'
 import { ArrowLeftOutlined, CheckCircleOutlined, PlusCircleOutlined } from '@ant-design/icons';
 import { Button } from '../../../../../../components/Button';
 import { useNavigate, useSearchParams } from 'react-router-dom';
-import { Modal } from 'antd';
-import { PlayerInfo } from '@/types/room';
+import { PlayerInfo } from '@/types/AcquireRoom';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 export interface IHeaderProps {
   isHostView: boolean
@@ -23,25 +23,27 @@ export const Header = ({
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roomID = searchParams.get('roomID');
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
   return (
+    <>
     <div className={styles.header}>
       <div className={styles.left}>
-        <Button content="" icon={<ArrowLeftOutlined />} style={{height: '2rem'}} onClick={() => {
-          Modal.confirm({
+        <Button content="" icon={<ArrowLeftOutlined />} style={{height: '2rem'}} onClick={async () => {
+          const ok = await confirm({
             title: '确认操作',
             content: '你确定要离开房间吗？',
             okText: '确认',
             cancelText: '取消',
-            onOk: () => {
-              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                wsRef.current.close();
-              }
-              setTimeout(() => {
-                navigate('/game/acquire');
-              }, 200);
-            }
-          })
+            danger: true,
+          });
+          if (!ok) return;
+          if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+            wsRef.current.close();
+          }
+          setTimeout(() => {
+            navigate('/game/acquire');
+          }, 200);
         }} />
         <div className={styles.content}>
           <div className={styles.titleRow}>房间准备</div>
@@ -101,5 +103,7 @@ export const Header = ({
         }
       </div>
     </div>
+    {ConfirmDialogHolder}
+    </>
   )
 }

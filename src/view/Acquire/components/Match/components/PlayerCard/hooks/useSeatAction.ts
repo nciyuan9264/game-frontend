@@ -1,8 +1,8 @@
 import { useMemo } from 'react';
-import { Modal } from 'antd';
 
-import { WsMatchSyncData } from '@/types/room';
+import { WsMatchSyncData } from '@/types/AcquireRoom';
 import { Seat } from '../../../types';
+import type { ConfirmOptions } from '@/components/ConfirmDialog/useConfirmDialog';
 
 export type SeatAction = 'none' | 'add_ai' | 'remove_player';
 
@@ -15,6 +15,7 @@ interface UseSeatActionParams {
   onAddAISuccess: () => void;
   onAddAIStart: () => void;
   canAddAI: boolean;
+  confirm: (options: ConfirmOptions) => Promise<boolean>;
 }
 
 export function useSeatAction({
@@ -25,6 +26,7 @@ export function useSeatAction({
   sendMessage,
   onAddAIStart,
   canAddAI,
+  confirm,
 }: UseSeatActionParams) {
   const isOwner = wsMatchSyncData?.playerID === wsMatchSyncData?.ownerID;
 
@@ -41,24 +43,24 @@ const action: SeatAction = useMemo(() => {
 
   const canOperate = action !== 'none';
 
-  const handleClick = () => {
+  const handleClick = async () => {
     if (!canOperate) return;
 
     if (action === 'remove_player') {
-      Modal.confirm({
+      const ok = await confirm({
         title: '确认操作',
         content: '你确定要移除玩家吗？',
         okText: '确认',
         cancelText: '取消',
-        onOk: () => {
-          sendMessage(
-            JSON.stringify({
-              type: 'match_remove_player',
-              payload: { playerID: data.label },
-            })
-          );
-        },
+        danger: true,
       });
+      if (!ok) return;
+      sendMessage(
+        JSON.stringify({
+          type: 'match_remove_player',
+          payload: { playerID: data.label },
+        })
+      );
       return;
     }
 

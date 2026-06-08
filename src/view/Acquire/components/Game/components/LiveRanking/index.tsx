@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useMemo } from 'react';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import { backendName2FrontendName } from '@/util/user';
 import styles from './index.module.less';
 import { AnimatePresence, motion } from 'framer-motion';

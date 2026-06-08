@@ -2,7 +2,7 @@ import { FC, useEffect, useMemo } from 'react';
 import styles from './index.module.less';
 import { Header } from './components/Header';
 import PlayerCard from './components/PlayerCard';
-import { WsMatchSyncData } from '@/types/room';
+import { WsMatchSyncData } from '@/types/AcquireRoom';
 import { Role, Seat } from './types';
 import { useNavigate } from 'react-router-dom';
 import { GameStatus } from '@/enum/game';

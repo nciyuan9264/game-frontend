@@ -1,0 +1,49 @@
+@import "../../../styles/variables.less";
+
+.replayRoot {
+  height: 100vh;
+  width: 100vw;
+  background-color: @color-bg-slate;
+  background-image: radial-gradient(circle at 0% 0%, rgba(11, 58, 63, 0.8), transparent 82%),
+    radial-gradient(circle at 100% 100%, rgba(14, 39, 46, 0.9), transparent 50%);
+  position: relative;
+  overflow: hidden;
+}
+
+.loadingWrap {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(2, 6, 23, 0.65);
+  backdrop-filter: blur(4px);
+  z-index: 80;
+}
+
+.snapshotLoading {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 65;
+  padding: 1rem 1.5rem;
+  border-radius: 12px;
+  background: rgba(2, 6, 23, 0.7);
+  backdrop-filter: blur(6px);
+  border: 1px solid @color-border-subtle-dark;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  pointer-events: none;
+}
+
+@media (max-width: 600px) {
+  .replayRoot {
+    max-height: 100vh;
+    min-height: 100vh;
+    overflow: auto;
+  }
+
+  .replayRoot::-webkit-scrollbar {
+    display: none;
+  }
+}

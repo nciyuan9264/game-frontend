@@ -3,7 +3,7 @@ import styles from './index.module.less';
 import { useParams } from 'react-router-dom';
 import { Board } from './components/Board';
 import CreateCompanyModal from './components/CreateCompany';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import BuyStock from './components/BuyStock';
 import CompanyStockActionModal from './components/MergeCompany';
 import MergeSelection from './components/MergeSelection';

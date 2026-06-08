@@ -1,10 +1,11 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export type GameType = 'acquire' | 'splendor';
+export type GameType = 'acquire' | 'splendor' | 'davinci';
 export enum GameTypeEnum {
   Acquire = 'acquire',
   Splendor = 'splendor',
+  Davinci = 'davinci',
 }
 
 export const useGameType = () => {
@@ -17,9 +18,7 @@ export const useGameType = () => {
     const parts = pathname.split('/').filter(Boolean);
     if (parts.length > 0) {
       const lastPart = parts[parts.length - 1];
-      if (lastPart === GameTypeEnum.Acquire || lastPart === GameTypeEnum.Splendor) {
-        return lastPart;
-      }
+      return lastPart as GameType;
     }
     return GameTypeEnum.Acquire; // 默认返回acquire
   }, [location.pathname]);

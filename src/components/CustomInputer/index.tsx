@@ -1,5 +1,5 @@
-import { Button } from "antd"
 import React from 'react';
+import { Button } from '@/components/Button';
 import styles from './index.module.less';
 
 interface CustomInputNumberProps {
@@ -18,7 +18,6 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = ({ value, onChange, 
       <Button
         onClick={() => onChange(Math.max(min, value - step))}
         disabled={value <= min || disabled}
-        size="small"
       >-</Button>
 
       <div className={styles.number}>{value}</div>
@@ -27,7 +26,6 @@ const CustomInputNumber: React.FC<CustomInputNumberProps> = ({ value, onChange, 
         onClick={() => {
           onChange(Math.min(max, value + step))}}
         disabled={value >= max || disabled}
-        size="small"
       >+</Button>
     </div>
 

@@ -3,7 +3,7 @@ import { Mesh, StandardMaterial, DynamicTexture, Color3, ActionManager, ExecuteC
 import { CompanyColor } from '@/const/color';
 import { createTileGeometry } from '../utils/tileUtils';
 import { hexToColor3 } from '../utils/colorUtils';
-import { TileData } from '@/types/room';
+import { TileData } from '@/types/AcquireRoom';
 
 export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: GlowLayer) => {
   const tilesRef = useRef<Record<string, Mesh>>({});

@@ -1,42 +1,38 @@
-import { CreateRoomReponse, CreateRoomRequest, DeleteRoomReponse, DeleteRoomRequest, GetRoomListReponse } from '@/types/room';
+import {
+  CreateRoomReponse,
+  CreateRoomRequest,
+  DeleteRoomRequest,
+  DeleteRoomReponse,
+  GetRoomListReponse,
+} from '@/types/AcquireRoom';
 import APIClient from './apiClient';
+import type { GameType } from '@/hooks/useGameType';
 
-export const createAcquireRoom = async (): Promise<CreateRoomReponse> => {
+export const createRoom = async (
+  gameType: GameType,
+  params?: CreateRoomRequest
+): Promise<CreateRoomReponse> => {
   return APIClient.post({
-    url: '/api/acquire/room/create',
-  });
-};
-
-export const deleteAcquireRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
-  return APIClient.post({
-    url: '/api/acquire/room/delete',
+    url: `/api/${gameType}/room/create`,
     data: params,
   });
 };
 
-export const getAcquireRoomList = async (): Promise<GetRoomListReponse> => {
+export const deleteRoom = async (
+  gameType: GameType,
+  params: DeleteRoomRequest
+): Promise<DeleteRoomReponse> => {
+  return APIClient.post({
+    url: `/api/${gameType}/room/delete`,
+    data: params,
+  });
+};
+
+export const getRoomList = async (
+  gameType: GameType
+): Promise<GetRoomListReponse> => {
   return APIClient.get({
-    url: '/api/acquire/room/list',
-  });
-};
-
-export const createSplendorRoom = async (params: CreateRoomRequest): Promise<CreateRoomReponse> => {
-  return APIClient.post({
-    url: 'api/splendor/room/create',
-    data: params,
-  });
-};
-
-export const getSplendorRoomList = async (): Promise<GetRoomListReponse> => {
-  return APIClient.get({
-    url: 'api/splendor/room/list',
-  });
-};
-
-export const deleteSplendorRoom = async (params: DeleteRoomRequest): Promise<DeleteRoomReponse> => {
-  return APIClient.post({
-    url: 'api/splendor/room/delete',
-    data: params,
+    url: `/api/${gameType}/room/list`,
   });
 };
 

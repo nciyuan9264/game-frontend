@@ -3,7 +3,7 @@ import { useWebSocket } from '@/hooks/useWebSocket';
 import styles from './index.module.less';
 import { useNavigate, useParams } from 'react-router-dom';
 import CardBoard from './components/CardBoard';
-import { Button, message, Modal } from 'antd';
+import { message } from 'antd';
 import { wsUrl } from '@/const/env';
 import MessageSender from './components/MessageSender';
 import { useFullHeight } from '@/hooks/useFullHeight';
@@ -17,6 +17,8 @@ import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import { useProfile } from '@/hooks/request/useProfile';
 import { backendName2FrontendName, profile2BackendName } from '@/util/user';
 import { LoadingBlock } from '@/components/LoadingBlock';
+import { Button } from '@/components/Button';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 export default function Room() {
   const { roomID } = useParams();
@@ -27,6 +29,7 @@ export default function Room() {
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const userID = profile2BackendName(userProfile);
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
   const url = useMemo(() => {
     if(!roomID || !userID) return '';
     return `${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`;
@@ -81,23 +84,22 @@ export default function Room() {
           <div className={styles.left}>
             <Button
               className={styles.backButton}
-              type="text"
               icon={<LeftOutlined style={{ fontSize: 20 }} />}
-              onClick={() => {
-                Modal.confirm({
+              onClick={async () => {
+                const ok = await confirm({
                   title: '确认操作',
                   content: '你确定要离开房间吗？',
                   okText: '确认',
                   cancelText: '取消',
-                  onOk: () => {
-                    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                      wsRef.current.close(); // ✅ 主动关闭连接
-                    }
-                    setTimeout(() => {
-                      navigate('/game/splendor');
-                    }, 200);
-                  }
-                })
+                  danger: true,
+                });
+                if (!ok) return;
+                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                  wsRef.current.close(); // ✅ 主动关闭连接
+                }
+                setTimeout(() => {
+                  navigate('/game/splendor');
+                }, 200);
               }}
             >
             </Button>
@@ -106,7 +108,7 @@ export default function Room() {
               <div>用户ID：{userProfile.name}</div>
             </div>
             <Button
-              type="primary"
+              customType="primary"
               style={{ zIndex: 9999 }}
               disabled={data?.roomData.roomInfo.roomStatus !== SplendorGameStatus.END}
               onClick={() => {
@@ -179,6 +181,7 @@ export default function Room() {
         setGameEndModalVisible={setGameEndModalVisible}
         sendMessage={sendMessage}
         userID={userID} />
+      {ConfirmDialogHolder}
     </>
   );
 }

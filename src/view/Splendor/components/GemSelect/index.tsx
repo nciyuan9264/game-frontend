@@ -3,7 +3,7 @@ import { CardColorType, gemColors } from '../UserData';
 import RoundCard from '../Card/RoundCard';
 import { useEffect, useRef, useState } from 'react';
 import { motion } from 'framer-motion';
-import { Button } from 'antd';
+import { Button } from '@/components/Button';
 import { SplendorGameStatus } from '@/enum/game';
 
 export const canPreserve = (data?: SplendorWsRoomSyncData, selectedCard?: SplendorCard) => {
@@ -178,7 +178,7 @@ const GemSelect = ({
 
       <Button
         className={styles.cancelButton}
-        type="primary"
+        customType="primary"
         disabled={!canGet()}
         onClick={() => {
           const gemCount: Record<CardColorType, number> = selectedGems
@@ -200,7 +200,7 @@ const GemSelect = ({
 
       <Button
         className={styles.cancelButton}
-        type="primary"
+        customType="primary"
         onClick={() => {
           setSelectedGems([null, null, null]);
         }}>
@@ -209,7 +209,7 @@ const GemSelect = ({
 
       <Button
         className={styles.cancelButton}
-        type="primary"
+        customType="primary"
         onClick={() => {
           sendMessage(JSON.stringify({
             type: "get_gem",

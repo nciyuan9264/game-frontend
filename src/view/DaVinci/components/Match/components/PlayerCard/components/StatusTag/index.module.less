@@ -1,0 +1,42 @@
+@import '../../../../../../../../styles/variables.less';
+
+.status-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  padding: 0.1rem 0.55rem;
+  border-radius: 999px;
+  border: 1px solid rgba(148, 163, 184, 0.6);
+  font-size: 1rem;
+  line-height: 1.2;
+  background-color: rgba(15, 23, 42, 0.96);
+  color: @color-text-soft;
+
+  .dot {
+    width: 0.375rem;
+    height: 0.375rem;
+    border-radius: 999px;
+  }
+
+  .waiting {
+    background-color: @color-chip-not-text;
+    border-color: @color-chip-not-border;
+  }
+
+  .ready {
+    background-color: @color-chip-ready-text;
+    border-color: @color-chip-ready-border;
+  }
+}
+
+.waiting {
+  background-color: @color-chip-not-bg;
+  border-color: @color-chip-not-border;
+  color: @color-chip-not-text;
+}
+
+.ready {
+  background-color: @color-chip-ready-bg;
+  border-color: @color-chip-ready-border;
+  color: @color-chip-ready-text;
+}

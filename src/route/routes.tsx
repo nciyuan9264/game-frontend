@@ -1,10 +1,10 @@
-
+import DaVinci from "@/view/DaVinci";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/view/Home"));
 const GameBoard = lazy(() => import("@/view/GameBoard"));
-const SplendorRoom = lazy(() => import("@/view/Splendor"));
 const Acquire = lazy(() => import("@/view/Acquire"));
+const AcquireReplayPage = lazy(() => import("@/view/Acquire/Replay/page"));
 
 export interface AppRoute {
   path: string;
@@ -23,13 +23,25 @@ export const routes: AppRoute[] = [
     element: <Acquire />
   },
   {
-    path: "/game/splendor",
+    path: "/game/acquire/replay/:gameId",
+    element: <AcquireReplayPage />
+  },
+  {
+    path: "/game/davinci",
     element: <GameBoard />
   },
   {
-    path: "/splendor/room/:roomID",
-    element: <SplendorRoom />
+    path: "/game/davinci/match",
+    element: <DaVinci />
   },
+  // {
+  //   path: "/game/splendor",
+  //   element: <GameBoard />
+  // },
+  // {
+  //   path: "/splendor/room/:roomID",
+  //   element: <SplendorRoom />
+  // },
   {
     path: "/",
     element: <Home />

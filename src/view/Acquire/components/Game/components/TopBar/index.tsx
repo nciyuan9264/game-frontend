@@ -1,13 +1,14 @@
 import React, { useMemo } from 'react';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import { backendName2FrontendName } from '@/util/user';
-import { Modal } from 'antd';
 import { ArrowLeftOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
 import { useNavigate } from 'react-router-dom';
 import { canBuyStock, canCreateCompany, getMergeSelection, getMergingModalAvailible } from '../../utils/game';
 import { Button } from '@/components/Button';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { GameStatus } from '@/enum/game';
+import TurnCountdown from '../TurnCountdown';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 import styles from './index.module.less';
 
@@ -37,6 +38,7 @@ const Settlement: React.FC<SettlementProps> = ({
 }) => {
   const navigate = useNavigate();
   const { roomID } = useUrlParams();
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
   const currentStatus = useMemo(() => {
     const roomData = data?.roomData;
@@ -127,21 +129,21 @@ const Settlement: React.FC<SettlementProps> = ({
         <div className={styles['top-bar__left']}>
           <Button
             icon={<ArrowLeftOutlined />}
-            onClick={() => {
-              Modal.confirm({
+            onClick={async () => {
+              const ok = await confirm({
                 title: '确认操作',
                 content: '你确定要离开房间吗？',
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => {
-                  if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                    wsRef.current.close();
-                  }
-                  setTimeout(() => {
-                    navigate('/game/acquire');
-                  }, 200);
-                }
-              })
+                danger: true,
+              });
+              if (!ok) return;
+              if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+                wsRef.current.close();
+              }
+              setTimeout(() => {
+                navigate('/game/acquire');
+              }, 200);
             }}
           />
           <div className={styles['top-bar__brand']}>
@@ -150,9 +152,16 @@ const Settlement: React.FC<SettlementProps> = ({
         </div>
         <div className={styles['top-bar__status']}>
           <Button
-            content={currentStatus}
             customType='primary'
             style={{ minWidth: '12rem', height: '2rem', fontSize: '1.2rem' }}
+            content={
+              <span className={styles['top-bar__status-inner']}>
+                {currentStatus}
+                {data?.roomData.gameStatus && data.roomData.gameStatus !== GameStatus.END && (
+                  <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+                )}
+              </span>
+            }
           />
         </div>
         <div className={styles['top-bar__right']}>
@@ -184,6 +193,7 @@ const Settlement: React.FC<SettlementProps> = ({
         <div><HomeOutlined /> 房间 {roomID}  <UserOutlined /> 玩家ID {backendName2FrontendName(userID)}</div>
         {data?.tempData.last_tile_key && <div>上一个放置的地块：{data?.tempData.last_tile_key}</div>}
       </div>
+      {ConfirmDialogHolder}
     </div>
   );
 };

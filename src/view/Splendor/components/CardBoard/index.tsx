@@ -3,7 +3,7 @@ import NobleCard from "../Card/NobleCard";
 import NormalCard from "../Card/NormalCard";
 import { CardColorType } from "../UserData";
 import styles from "./index.module.less";
-import { Button } from "antd";
+import { Button } from "@/components/Button";
 import { canPreserve } from "../GemSelect";
 
 export const canBuy = (data?: SplendorWsRoomSyncData, card?: SplendorCard) => {
@@ -104,41 +104,25 @@ export default function CardBoard({ data, selectedCard, setSelectedCard, sendMes
       <div className={styles["button-column"]}>
         <Button
           className={styles.button}
-          type="primary"
+          customType="primary"
           disabled={!canBuy(data, selectedCard)}
           onClick={() => {
             sendMessage?.(JSON.stringify({
               type: "buy_card",
               payload: selectedCard?.id
             }));
-            // Modal.confirm({
-            //   title: "确认购买？",
-            //   okText: "确认",
-            //   cancelText: "取消",
-            //   onOk: () => {
-
-            //   }
-            // });
           }}>
           购买
         </Button>
         <Button
           className={styles.button}
-          type="primary"
+          customType="primary"
           disabled={!canPreserve(data, selectedCard)}
           onClick={() => {
             sendMessage(JSON.stringify({
               type: "preserve_card",
               payload: selectedCard?.id
             }));
-            // Modal.confirm({
-            //   title: "确认预购？",
-            //   okText: "确认",
-            //   cancelText: "取消",
-            //   onOk: () => {
-
-            //   }
-            // });
           }}>
           预购
         </Button>

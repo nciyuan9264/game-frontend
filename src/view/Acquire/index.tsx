@@ -1,7 +1,7 @@
 import { useMemo, useState } from 'react';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useWebSocket } from '@/hooks/useWebSocket';
-import { CompanyKey, WsMatchSyncData, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsMatchSyncData, WsRoomSyncData } from '@/types/AcquireRoom';
 import { profile2BackendName } from '@/util/user';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { message } from 'antd';
@@ -32,7 +32,7 @@ export default function Acquire() {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
+    return `${wsUrl}ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
@@ -125,7 +125,7 @@ export default function Acquire() {
   return (
     <div className={styles.acquire}>
       {
-        (!wsMatchSyncData && !wsRoomSyncData) || profileLoading && <LoadingBlock content="正在加载游戏房间列表，请稍候..." />
+        ((!wsMatchSyncData && !wsRoomSyncData) || profileLoading) && <LoadingBlock content="正在加载游戏房间列表，请稍候..." />
       }
       {
         wsMatchSyncData && <Match

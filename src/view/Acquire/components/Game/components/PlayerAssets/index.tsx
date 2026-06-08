@@ -1,10 +1,12 @@
 import React from 'react';
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import classNames from 'classnames';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
 
 import styles from './index.module.less';
 import AnimatedNumber from '@/components/AnimatedNumber';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface PlayerAssetsProps {
   data?: WsRoomSyncData;
@@ -19,10 +21,19 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   placeTile,
   userID
 }) => {
+  const { isFinePointer } = useInteractionMode();
   const stockList = Object.entries(data?.playerData.stocks || {})
     .filter(([_, count]) => Number(count) > 0).sort(([a], [b]) => {
       return (data?.roomData.companyInfo?.[a as CompanyKey]?.stockTotal ?? 0) - (data?.roomData.companyInfo?.[b as CompanyKey]?.stockTotal ?? 0);
     });
+  const handleTileKeyDown = (event: React.KeyboardEvent<HTMLSpanElement>, tileKey: string, canPlaceTile: boolean) => {
+    if (!canPlaceTile) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    event.preventDefault();
+    placeTile(tileKey);
+  };
+
   return (
     <div className={styles['player-assets']}>
       <div className={`${styles['player-assets__group']} ${styles['player-assets__group--money']}`} style={{ flex: '2' }}>
@@ -67,26 +78,46 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
               const rowDiff = Number(aRow) - Number(bRow);
               return rowDiff !== 0 ? rowDiff : aCol.charCodeAt(0) - bCol.charCodeAt(0);
             })
-            .map((tileKey) => (
-              <span
-                className={styles['player-assets__tile']}
-                key={tileKey}
-                onMouseEnter={() => {
-                  data?.roomData.currentPlayer === userID &&
-                    data?.roomData.gameStatus === GameStatus.SET_Tile &&
-                    setHoveredTile(tileKey)
-                }
-                }
-                onMouseOut={() => data?.roomData.currentPlayer === userID && setHoveredTile(undefined)}
-                onClick={() =>
-                  data?.roomData.currentPlayer === userID &&
-                  data?.roomData.gameStatus === GameStatus.SET_Tile &&
-                  placeTile(tileKey)
-                }
-              >
-                {tileKey}
-              </span>
-            ))}
+            .map((tileKey) => {
+              const canPlaceTile =
+                data?.roomData.currentPlayer === userID &&
+                data?.roomData.gameStatus === GameStatus.SET_Tile;
+              const interactiveProps = canPlaceTile
+                ? { role: 'button' as const, tabIndex: 0 }
+                : { tabIndex: -1 };
+
+              return (
+                <span
+                  className={classNames(
+                    styles['player-assets__tile'],
+                    {
+                      [styles['player-assets__tile--clickable']]: canPlaceTile,
+                    }
+                  )}
+                  key={tileKey}
+                  {...interactiveProps}
+                  aria-label={canPlaceTile ? `放置地块 ${tileKey}` : `地块 ${tileKey}`}
+                  onMouseEnter={() => {
+                    if (isFinePointer && canPlaceTile) {
+                      setHoveredTile(tileKey);
+                    }
+                  }}
+                  onMouseLeave={() => {
+                    if (isFinePointer && canPlaceTile) {
+                      setHoveredTile(undefined);
+                    }
+                  }}
+                  onClick={() => {
+                    if (canPlaceTile) {
+                      placeTile(tileKey);
+                    }
+                  }}
+                  onKeyDown={(event) => handleTileKeyDown(event, tileKey, canPlaceTile)}
+                >
+                  {tileKey}
+                </span>
+              );
+            })}
         </div>
       </div>
 

@@ -8,8 +8,17 @@
       "default",
       {
         "ignore": [
-          "backdrop-filter"
+          "backdrop-filter",
+          "overscroll-behavior",
+          "overscroll-behavior: none",
+          "text-size-adjust"
         ]
+      }
+    ],
+    "axe/name-role-value": [
+      "default",
+      {
+        "button-name": "off"
       }
     ]
   }

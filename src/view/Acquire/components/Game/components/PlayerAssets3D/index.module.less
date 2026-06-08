@@ -88,11 +88,6 @@
           transition: all 0.3s ease;
           // cursor: default;
 
-          &:hover {
-            transform: translateY(-3px) scale(1.05); // 增强悬停效果
-            border-color: rgba(255, 255, 255, 0.8);
-          }
-
           .stockCompany {
             color: #ffffff;
             font-size: 13px; // 稍微增大字体
@@ -155,6 +150,13 @@
           border: 2px solid #00d4ff; // 增加边框宽度
           border-radius: 6px; // 增加圆角
           transition: all 0.3s ease;
+          touch-action: manipulation;
+          -webkit-tap-highlight-color: transparent;
+
+          &:focus-visible {
+            outline: 2px solid #ffffff;
+            outline-offset: 3px;
+          }
 
           .tileText {
             color: #ffffff;
@@ -165,17 +167,33 @@
 
           &.tileClickable {
             cursor: pointer;
-
-            &:hover {
-              background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
-              transform: translateY(-3px) scale(1.05); // 增强悬停效果
-              box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
-              border-color: #ffffff;
-            }
+            box-shadow: 0 0 0 1px rgba(0, 212, 255, 0.35);
 
             &:active {
-              transform: translateY(-1px) scale(1.05);
+              transform: scale(0.96);
+              background: linear-gradient(135deg, #315f9e 0%, #2868a5 100%);
+              box-shadow: 0 0 10px rgba(0, 212, 255, 0.45);
             }
+          }
+        }
+
+        @media (hover: hover) and (pointer: fine) {
+          .stockCard:hover {
+            transform: translateY(-3px) scale(1.04); // 增强悬停效果
+            border-color: rgba(255, 255, 255, 0.75);
+          }
+
+          .tileCard.tileClickable:hover {
+            background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%);
+            transform: translateY(-3px) scale(1.04); // 增强悬停效果
+            box-shadow: 0 0 15px rgba(0, 212, 255, 0.5);
+            border-color: #ffffff;
+          }
+        }
+
+        @media (hover: none), (pointer: coarse) {
+          .tileCard.tileClickable:hover {
+            transform: none;
           }
         }
 
@@ -201,19 +219,6 @@
     right: 20px;
     z-index: 102;
 
-    // 如果MessageSender组件有特定的样式需求，可以在这里调整
-    :global(.ant-btn) {
-      background: linear-gradient(135deg, #4a90e2 0%, #357abd 100%) !important;
-      border-color: #00d4ff !important;
-      color: #ffffff !important;
-      box-shadow: 0 2px 8px rgba(0, 212, 255, 0.3) !important;
-
-      &:hover {
-        background: linear-gradient(135deg, #5ba0f2 0%, #4590cd 100%) !important;
-        box-shadow: 0 4px 12px rgba(0, 212, 255, 0.5) !important;
-        transform: translateY(-1px);
-      }
-    }
   }
 }
 

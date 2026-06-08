@@ -1,7 +1,9 @@
 import React from 'react';
-import { Button, Modal } from 'antd';
+import { Modal } from 'antd';
 import { useSearchParams } from 'react-router-dom';
 import { backendName2FrontendName } from '@/util/user';
+import { Button } from '@/components/Button';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 interface GameEndProps {
   visible: boolean;
@@ -20,6 +22,7 @@ const GameEnd: React.FC<GameEndProps> = ({
 }) => {
   const [searchParams] = useSearchParams();
   const roomUserID = searchParams.get('roomUserID');
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
   return (
     <Modal
       title="🏁 游戏结算"
@@ -28,20 +31,20 @@ const GameEnd: React.FC<GameEndProps> = ({
       footer={
         <>
           {roomUserID === userID && <Button
-            type="primary"
-            onClick={() => {
+            customType="primary"
+            onClick={async () => {
               setGameEndModalVisible(false);
-              Modal.confirm({
+              const ok = await confirm({
                 title: '游戏即将重启',
                 content: '游戏即将重启，是否确认？',
                 okText: '确认',
                 cancelText: '取消',
-                onOk: () => {
-                  sendMessage(JSON.stringify({
-                    type: 'restart_game',
-                  }));
-                },
-              })
+                danger: true,
+              });
+              if (!ok) return;
+              sendMessage(JSON.stringify({
+                type: 'restart_game',
+              }));
             }}
           >
             再来一局
@@ -96,6 +99,7 @@ const GameEnd: React.FC<GameEndProps> = ({
             })
         }
       </div>
+      {ConfirmDialogHolder}
     </Modal>
   );
 };

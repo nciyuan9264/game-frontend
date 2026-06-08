@@ -1,9 +1,9 @@
 import React from 'react';
-import { Modal as AntModal } from 'antd';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import { backendName2FrontendName } from '@/util/user';
 import { motion } from 'motion/react';
 import Modal from '@/components/Modal';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 import styles from './index.module.less';
 
@@ -23,20 +23,21 @@ const GameEnd: React.FC<GameEndProps> = ({
   userID
 }) => {
   const isOwner = data?.ownerID === userID;
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
-  const handleRestart = () => {
+  const handleRestart = async () => {
     setGameEndModalVisible(false);
-    AntModal.confirm({
+    const ok = await confirm({
       title: '游戏即将重启',
       content: '游戏即将重启，是否确认？',
       okText: '确认',
       cancelText: '取消',
-      onOk: () => {
-        sendMessage(JSON.stringify({
-          type: 'game_restart_game',
-        }));
-      },
+      danger: true,
     });
+    if (!ok) return;
+    sendMessage(JSON.stringify({
+      type: 'game_restart_game',
+    }));
   };
 
   const rankColors = ['#ffd700', '#c0c0c0', '#cd7f32'];
@@ -127,6 +128,7 @@ const GameEnd: React.FC<GameEndProps> = ({
           </motion.button>
         )}
       </div>
+      {ConfirmDialogHolder}
     </Modal>
   );
 };

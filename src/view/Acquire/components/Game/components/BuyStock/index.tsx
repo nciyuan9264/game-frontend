@@ -1,4 +1,4 @@
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import { message } from 'antd';
 import { useState, useMemo, useEffect } from 'react';
 import { CompanyColor } from '@/const/color';

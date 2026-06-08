@@ -1,0 +1,206 @@
+@import "../../../../../styles/variables.less";
+
+.wrapper {
+  position: fixed;
+  bottom: 24px;
+  left: 0;
+  right: 0;
+  z-index: 70;
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}
+
+.timeline {
+  pointer-events: auto;
+  width: min(720px, 92vw);
+  background: rgba(11, 18, 32, 0.92);
+  backdrop-filter: blur(8px);
+  border: 1px solid @color-border-subtle-dark;
+  border-radius: 12px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.55);
+  color: @color-text-main;
+  -webkit-user-select: none;
+  user-select: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.timelineMinimized {
+  width: auto;
+  min-width: 220px;
+}
+
+.dragHandle {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 6px 10px;
+  cursor: grab;
+  touch-action: none;
+  background: rgba(2, 6, 23, 0.5);
+  border-bottom: 1px solid @color-border-subtle-dark;
+  font-size: 12px;
+  color: @color-text-soft;
+
+  &:active {
+    cursor: grabbing;
+  }
+}
+
+.dragHandleTitle {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-weight: 600;
+}
+
+.dragHandleActions {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.iconBtn {
+  background: transparent;
+  border: 1px solid transparent;
+  color: @color-text-soft;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-size: 12px;
+  line-height: 1;
+
+  &:hover {
+    color: @color-primary-ink;
+    border-color: @color-border-subtle-dark;
+  }
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px 12px;
+}
+
+.statusRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 12px;
+  color: @color-text-soft;
+
+  .stepInfo {
+    color: @color-primary-ink;
+    font-weight: 600;
+
+    .loadingDot {
+      margin-left: 4px;
+      color: @color-accent-teal;
+    }
+  }
+}
+
+.controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+
+  button {
+    padding: 4px 10px;
+    border: 1px solid @color-border-subtle-dark;
+    background: rgba(15, 23, 42, 0.7);
+    color: @color-text-main;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 12px;
+    transition: all 0.15s;
+
+    &:hover:not(:disabled) {
+      border-color: @color-accent-teal;
+      color: @color-accent-teal;
+    }
+
+    &:disabled {
+      opacity: 0.35;
+      cursor: not-allowed;
+    }
+  }
+}
+
+.track {
+  overflow-x: auto;
+  padding-bottom: 4px;
+
+  &::-webkit-scrollbar {
+    height: 6px;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    background: rgba(148, 163, 184, 0.3);
+    border-radius: 3px;
+  }
+}
+
+.trackInner {
+  display: inline-flex;
+  gap: 4px;
+  padding: 2px 0;
+}
+
+.dot {
+  border: 1px solid @color-border-subtle-dark;
+  background: rgba(15, 23, 42, 0.6);
+  color: @color-text-soft;
+  border-radius: 6px;
+  padding: 4px 6px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+  min-width: 44px;
+  font-size: 11px;
+  transition: all 0.15s;
+
+  &:hover {
+    border-color: @color-accent-teal;
+    color: @color-primary-ink;
+  }
+
+  .dotIndex {
+    font-weight: 600;
+  }
+
+  .dotLabel {
+    font-size: 10px;
+    color: @color-text-soft;
+  }
+}
+
+.dotActive {
+  background: @color-accent-teal;
+  border-color: @color-accent-teal;
+  color: #fff;
+
+  .dotIndex,
+  .dotLabel {
+    color: #fff;
+  }
+}
+
+.minimizedBody {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 10px;
+}
+
+@media (max-width: 600px) {
+  .timeline {
+    width: min(94vw, 480px);
+  }
+}

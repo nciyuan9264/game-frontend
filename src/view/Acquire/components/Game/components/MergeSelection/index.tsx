@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { message } from 'antd';
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import { useThrottleFn } from 'ahooks';
 import { CompanyColor } from '@/const/color';
 import { X } from 'lucide-react';

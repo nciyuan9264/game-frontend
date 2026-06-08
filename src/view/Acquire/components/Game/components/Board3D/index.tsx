@@ -1,7 +1,7 @@
 import  { useEffect } from 'react';
-import { Button } from 'antd';
 import { ReloadOutlined } from '@ant-design/icons';
 import styles from './index.module.less';
+import { Button } from '@/components/Button';
 import { useScene } from './hooks/useScene';
 import { useTiles } from './hooks/useTiles';
 import { useCompanyModels } from './hooks/useCompanyModels';
@@ -9,7 +9,7 @@ import { useMergerAnimation } from './hooks/useMergerAnimation';
 
 // Add this import for glTF loader
 import '@babylonjs/loaders/glTF';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 
 type Props = {
   hoveredTile?: string;
@@ -68,7 +68,7 @@ export default function Board3D({ roomID, hoveredTile, data }: Props) {
       {/* 相机重置按钮 */}
       <Button
         className={styles.resetCameraBtn}
-        type="primary"
+        customType="primary"
         icon={<ReloadOutlined />}
         onClick={resetCamera}
         title="重置视角"

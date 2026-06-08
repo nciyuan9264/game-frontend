@@ -117,11 +117,40 @@
         border-radius: 6px;
         padding: 4px 10px;
         font-weight: bold;
-        cursor: pointer;
-        transition: background 0.2s ease;
+        cursor: default;
+        transition: background 0.2s ease, border-color 0.16s ease, box-shadow 0.16s ease, transform 90ms ease;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
 
-        &:hover {
-          background: @color-border-strong;
+        &:focus-visible {
+          outline: 2px solid @color-accent-teal;
+          outline-offset: 2px;
+        }
+      }
+
+      .player-assets__tile--clickable {
+        cursor: pointer;
+        border-color: fade(@color-accent-teal, 64%);
+        box-shadow: 0 0 0 1px fade(@color-accent-teal, 22%);
+
+        &:active {
+          transform: scale(0.96);
+          background: fade(@color-accent-teal, 16%);
+        }
+      }
+
+      @media (hover: hover) and (pointer: fine) {
+        .player-assets__tile--clickable:hover {
+          background: fade(@color-accent-teal, 18%);
+          border-color: @color-accent-teal;
+          box-shadow: 0 0 0 1px fade(@color-accent-teal, 58%), 0 6px 16px rgba(0, 0, 0, 0.35);
+          transform: translateY(-1px);
+        }
+      }
+
+      @media (hover: none), (pointer: coarse) {
+        .player-assets__tile--clickable:hover {
+          transform: none;
         }
       }
     }

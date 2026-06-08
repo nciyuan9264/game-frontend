@@ -1,4 +1,4 @@
-import { GameStatus } from '@/types/room';
+import { GameStatus } from '@/types/AcquireRoom';
 
 export const GameStatusMap: Record<GameStatus, string> = {
   waiting: '等待中',

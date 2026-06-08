@@ -1,5 +1,5 @@
 import React from 'react';
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { backendName2FrontendName } from '@/util/user';
 import { CompanyColor } from '@/const/color';

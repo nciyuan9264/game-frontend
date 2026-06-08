@@ -1,7 +1,7 @@
 import { useRequest } from 'ahooks';
 import { useRef } from 'react';
 import { useGameType } from '../useGameType';
-import { getAcquireRoomList, getSplendorRoomList } from '@/api/room';
+import { getRoomList } from '@/api/room';
 import { message } from 'antd';
 
 export const useRoomList = () => {
@@ -14,17 +14,10 @@ export const useRoomList = () => {
     loading: roomListLoading,
   } = useRequest(
     async () => {
-      const getRoomListFn =
-        gameType === 'acquire'
-          ? getAcquireRoomList
-          : getSplendorRoomList;
-
-      const res = await getRoomListFn();
+      const res = await getRoomList(gameType);
 
       const sortList =
-        res?.rooms?.sort((a: any, b: any) =>
-          a.roomID.localeCompare(b.roomID)
-        ) ?? [];
+        res?.rooms?.sort((a, b) => a.roomID.localeCompare(b.roomID)) ?? [];
       return sortList;
     },
     {

@@ -40,7 +40,7 @@ export default function GameMenu() {
       ) : (
         <>
           <div className={styles.gameMenu}>
-            <Header roomList={roomList} userProfile={userProfile} runLogout={runLogout} handleCreateRoom={handleCreateRoom} />
+            <Header roomList={roomList} userProfile={userProfile} runLogout={runLogout} handleCreateRoom={handleCreateRoom} gameType={gameType} />
             {roomList?.length ? <div className={styles.roomGrid}>
               {roomList?.map(room => (
                 <RoomCard

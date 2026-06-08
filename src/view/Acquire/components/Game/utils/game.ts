@@ -1,5 +1,5 @@
 import { GameStatus } from '@/enum/game';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import { isEqual } from 'lodash-es';
 
 export const canCreateCompany = (data: WsRoomSyncData, userID: string) => {

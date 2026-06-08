@@ -13,13 +13,13 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 5173,
       proxy: {
-        '/room': {
+        '/api': {
           target: 'http://localhost:8000',
           changeOrigin: true,
           secure: true,
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc3MDkwMDY1OCwiaWF0IjoxNzcwMjk1ODU4LCJqdGkiOiI4OTE5ZTk1Zi04MWMzLTQ0N2ItYWQzNS1hMzIwODRmYWU0ZTMifQ.ZHfteZtEgAYFdymIYh1_9U7TT758ZLl7C4xna-9pGB3EBLE-6GXpzQurXMuw5Q2L5L8hGLKFQNcZL0CIKBACW3m3pXfiouLUIAPRBD0e1a2OKIZqRVE8j4aVvlqfQY-H4BIsa1LnvqEmtbu7kW0Z7Mn7262rlPQ23uPD9mlokRm0H20NM-p3OV66bn-DdL4Mw-I2_5OcIThbX3xOgZvsAEp6fGedL1cMdv7zeqf5aR0FemLzW8YM9q6_GCN82LljuqN1TmlLJzUYTNBRV7PhTNUS60ba22zY36TWkAaqVyVkjJC8MEtyPCxMd-yOBCcptSOM1B9W_Fa_ELAcnF0-kA',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MDkxNTczMywiaWF0IjoxNzgwOTA2NzMzLCJqdGkiOiIyNWI3YjhjZi1hNzk4LTQwYmQtYmQ5Yy0wZTE4NmZjODExNWIifQ.RMId8h50XiqdYeqpGRexVXLGXGceH9w-APNmlY6MjqsIwsX2m21z_NeCAqFVvPl_lctmvcXLvW61_n5La7BugBbAqZd0QtiUA71OhKfUIBNFAyNitVqlz8uHn5qAz2RfH_ef7-c_qGmiDR5yEM8j8j6vbjEnvOT2hYz2kxPmE0BeLVK4DDfvc1qtrA8YztSNIf1AafZOo4vJoIZO1A8NnZs4MgKOw1fRc3U2ToHUO-kZSzi9Ky3qFPveobIOpgDUncvzkjO40kN8hxm8bV3FLE8zl4X4T9ooO2qQ2gzAAsTKRA0W92G-JjTtNLIhQh2wL2Vqs4EYkPY5f01oVFNWgw',
           },
         },
         '/auth': {
@@ -28,7 +28,7 @@ export default defineConfig(({ mode }) => {
           secure: true,
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc3MDkwMDY1OCwiaWF0IjoxNzcwMjk1ODU4LCJqdGkiOiI4OTE5ZTk1Zi04MWMzLTQ0N2ItYWQzNS1hMzIwODRmYWU0ZTMifQ.ZHfteZtEgAYFdymIYh1_9U7TT758ZLl7C4xna-9pGB3EBLE-6GXpzQurXMuw5Q2L5L8hGLKFQNcZL0CIKBACW3m3pXfiouLUIAPRBD0e1a2OKIZqRVE8j4aVvlqfQY-H4BIsa1LnvqEmtbu7kW0Z7Mn7262rlPQ23uPD9mlokRm0H20NM-p3OV66bn-DdL4Mw-I2_5OcIThbX3xOgZvsAEp6fGedL1cMdv7zeqf5aR0FemLzW8YM9q6_GCN82LljuqN1TmlLJzUYTNBRV7PhTNUS60ba22zY36TWkAaqVyVkjJC8MEtyPCxMd-yOBCcptSOM1B9W_Fa_ELAcnF0-kA',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MDkxNTczMywiaWF0IjoxNzgwOTA2NzMzLCJqdGkiOiIyNWI3YjhjZi1hNzk4LTQwYmQtYmQ5Yy0wZTE4NmZjODExNWIifQ.RMId8h50XiqdYeqpGRexVXLGXGceH9w-APNmlY6MjqsIwsX2m21z_NeCAqFVvPl_lctmvcXLvW61_n5La7BugBbAqZd0QtiUA71OhKfUIBNFAyNitVqlz8uHn5qAz2RfH_ef7-c_qGmiDR5yEM8j8j6vbjEnvOT2hYz2kxPmE0BeLVK4DDfvc1qtrA8YztSNIf1AafZOo4vJoIZO1A8NnZs4MgKOw1fRc3U2ToHUO-kZSzi9Ky3qFPveobIOpgDUncvzkjO40kN8hxm8bV3FLE8zl4X4T9ooO2qQ2gzAAsTKRA0W92G-JjTtNLIhQh2wL2Vqs4EYkPY5f01oVFNWgw',
           },
         },
       },

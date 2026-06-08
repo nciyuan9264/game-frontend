@@ -19,10 +19,10 @@ export const useProfile = () => {
 
   const { run: handleGetProfile, loading: profileLoading } = useRequest(
     async () => {
-      // const profile = localStorage.getItem('profile');
-      // if (profile) {
-      //   return JSON.parse(profile);
-      // }
+      const profile = localStorage.getItem('profile');
+      if (profile) {
+        return JSON.parse(profile);
+      }
       return await getProfile();
     },
     {

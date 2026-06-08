@@ -2,7 +2,7 @@
 
 import React, { useMemo } from 'react';
 import { Alert  } from 'antd';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import { GameStatus } from '@/enum/game';
 import { getMergingModalAvailible } from '@/view/Acquire/components/Game/utils/game';
 import { backendName2FrontendName } from '@/util/user';

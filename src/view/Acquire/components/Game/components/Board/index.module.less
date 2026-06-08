@@ -58,10 +58,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        cursor: pointer;
+        cursor: default;
         text-shadow: 0 1px 0 rgba(15, 23, 42, 0.9);
         transition: transform 90ms ease, box-shadow 120ms ease, border-color 120ms ease, background 150ms ease, color 150ms ease;
         --blink-visible: 0;
+        touch-action: manipulation;
+        -webkit-tap-highlight-color: transparent;
+
+        &:focus-visible {
+          outline: 2px solid @color-accent-teal;
+          outline-offset: 2px;
+        }
       }
 
       .board__cell::after {
@@ -81,7 +88,30 @@
         --blink-visible: 1;
       }
 
+      .board__cell--placeable {
+        cursor: pointer;
+      }
+
+      .board__cell--placeable:active {
+        transform: scale(0.97);
+        box-shadow: 0 1px 0 rgba(15, 23, 42, 0.9), 0 0 0 1px fade(@color-accent-teal, 65%);
+      }
+
       .board__cell--blink::after {}
+
+      @media (hover: hover) and (pointer: fine) {
+        .board__cell--placeable:hover {
+          transform: translateY(-1px);
+          border-color: fade(@color-accent-teal, 85%);
+          box-shadow: 0 5px 14px rgba(0, 0, 0, 0.55), 0 0 0 1px fade(@color-accent-teal, 60%);
+        }
+      }
+
+      @media (hover: none), (pointer: coarse) {
+        .board__cell--placeable:hover {
+          transform: none;
+        }
+      }
 
       @keyframes tileBlink {
         0% { --blink-alpha: 0; }

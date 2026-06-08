@@ -1,8 +1,10 @@
-import { TileData, WsRoomSyncData } from '@/types/room';
+import { TileData, WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
 import { FC } from 'react';
+import classNames from 'classnames';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 
 interface IBoardProps {
@@ -11,13 +13,15 @@ interface IBoardProps {
   wsRoomSyncData?: WsRoomSyncData;
   setHoveredTile: (tileID: string | undefined) => void;
   placeTile: (tileID: string) => void;
+  readonly?: boolean;
 };
 
 const rows = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I'];
 const columns = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
 
-export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile, wsRoomSyncData, placeTile }) => {
+export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile, wsRoomSyncData, placeTile, readonly }) => {
   const playerTiles = wsRoomSyncData?.playerData.tiles;
+  const { isFinePointer } = useInteractionMode();
 
   return (
     <div className={styles['board']}>
@@ -28,24 +32,32 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
               const id = `${col}${row}`;
               const tile = tilesData?.[id];
               const shouldBlink =
+                !readonly &&
                 wsRoomSyncData?.roomData.currentPlayer === wsRoomSyncData?.playerId &&
                 playerTiles?.includes(id) && wsRoomSyncData?.roomData.gameStatus === GameStatus.SET_Tile;
               return (
                 <button
                   key={id}
-                  className={`${styles['board__cell']} ${shouldBlink ? styles['board__cell--blink'] : ''}`}
+                  className={classNames(
+                    styles['board__cell'],
+                    {
+                      [styles['board__cell--blink']]: shouldBlink,
+                      [styles['board__cell--placeable']]: shouldBlink,
+                    }
+                  )}
+                  aria-label={shouldBlink ? `放置地块 ${id}` : `地块 ${id}`}
                   onClick={() => {
                     if (shouldBlink) {
                       placeTile(id)
                     }
                   }}
                   onMouseEnter={() => {
-                    if (shouldBlink) {
+                    if (isFinePointer && shouldBlink) {
                       setHoveredTile(id);
                     }
                   }}
                   onMouseLeave={() => {
-                    if (shouldBlink) {
+                    if (isFinePointer && shouldBlink) {
                       setHoveredTile(undefined);
                     }
                   }}

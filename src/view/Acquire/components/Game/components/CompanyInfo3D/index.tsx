@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 

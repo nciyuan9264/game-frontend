@@ -1,9 +1,11 @@
 import React from 'react';
-import { CompanyKey, WsRoomSyncData } from '@/types/room';
+import classNames from 'classnames';
+import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
 import MessageSender from '@/view/Splendor/components/MessageSender';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface PlayerAssetsProps {
   data?: WsRoomSyncData;
@@ -20,6 +22,14 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
   placeTile,
   userID
 }) => {
+  const { isFinePointer } = useInteractionMode();
+  const handleTileKeyDown = (event: React.KeyboardEvent<HTMLDivElement>, tileKey: string, canPlaceTile: boolean) => {
+    if (!canPlaceTile) return;
+    if (event.key !== 'Enter' && event.key !== ' ') return;
+
+    event.preventDefault();
+    placeTile(tileKey);
+  };
 
   return (
     <div className={styles.playerAssets}>
@@ -74,14 +84,25 @@ const PlayerAssets: React.FC<PlayerAssetsProps> = ({
               .map((tileKey) => {
                 const isCurrentPlayer = data?.roomData.currentPlayer === userID;
                 const canPlaceTile = isCurrentPlayer && data?.roomData.gameStatus === GameStatus.SET_Tile;
+                const interactiveProps = canPlaceTile
+                  ? { role: 'button' as const, tabIndex: 0 }
+                  : { tabIndex: -1 };
 
                 return (
                   <div
-                    className={`${styles.tileCard} ${canPlaceTile ? styles.tileClickable : ''}`}
+                    className={classNames(
+                      styles.tileCard,
+                      {
+                        [styles.tileClickable]: canPlaceTile,
+                      }
+                    )}
                     key={tileKey}
-                    onMouseEnter={() => canPlaceTile && setHoveredTile(tileKey)}
-                    onMouseLeave={() => canPlaceTile && setHoveredTile(undefined)}
+                    {...interactiveProps}
+                    aria-label={canPlaceTile ? `放置地块 ${tileKey}` : `地块 ${tileKey}`}
+                    onMouseEnter={() => isFinePointer && canPlaceTile && setHoveredTile(tileKey)}
+                    onMouseLeave={() => isFinePointer && canPlaceTile && setHoveredTile(undefined)}
                     onClick={() => canPlaceTile && placeTile(tileKey)}
+                    onKeyDown={(event) => handleTileKeyDown(event, tileKey, canPlaceTile)}
                   >
                     <span className={styles.tileText}>{tileKey}</span>
                   </div>

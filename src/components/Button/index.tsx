@@ -1,12 +1,10 @@
 import { ReactNode } from 'react'
-import { Button as ButtonAntd } from 'antd'
-import type { ButtonProps } from 'antd'
 
 import styles from './index.module.less'
 
-export interface IButtonProps extends ButtonProps {
+export interface IButtonProps extends Omit<React.ButtonHTMLAttributes<HTMLButtonElement>, 'content'> {
   icon?: ReactNode
-  content?: string
+  content?: ReactNode
   style?: React.CSSProperties
   customType?: 'primary' | 'default'
 }
@@ -15,17 +13,24 @@ export const Button = ({
   customType = 'default',
   icon,
   content,
+  children,
+  className,
   style,
+  type = 'button',
   ...rest
 }: IButtonProps) => {
+  const hasLabel = Boolean(content) || Boolean(children);
+
   return (
-    <ButtonAntd
-      className={`${styles.button} ${styles[`btn-${customType}`]}`}
-      style={{ gap: content ? '0.35rem' : '0', ...style }}
+    <button
+      type={type}
+      className={`${styles.button} ${styles[`btn-${customType}`]} ${className ?? ''}`}
+      style={{ gap: icon && hasLabel ? '0.35rem' : '0', ...style }}
       {...rest}
     >
       {icon}
       {content}
-    </ButtonAntd>
+      {children}
+    </button>
   )
 }

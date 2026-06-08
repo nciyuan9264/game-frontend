@@ -1,0 +1,120 @@
+@import '../../styles/variables.less';
+
+.wrapper {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(2, 6, 23, 0.68);
+  backdrop-filter: blur(8px);
+}
+
+.dialog {
+  position: relative;
+  width: min(24rem, 92vw);
+  color: @color-text-main;
+  background: linear-gradient(145deg, rgba(15, 23, 42, 0.98), rgba(11, 58, 63, 0.9));
+  border: 1px solid @color-border-subtle;
+  border-radius: 1.25rem;
+  box-shadow: 0 28px 70px rgba(0, 0, 0, 0.55);
+  overflow: hidden;
+}
+
+.body {
+  padding: 1.25rem 1.25rem 0.875rem;
+}
+
+.title {
+  margin: 0;
+  font-size: 1.1rem;
+  line-height: 1.4;
+  color: @color-primary-ink;
+}
+
+.content {
+  margin-top: 0.65rem;
+  color: @color-text-soft;
+  font-size: 0.92rem;
+  line-height: 1.6;
+}
+
+.actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 0.75rem;
+  padding: 0.875rem 1.25rem 1.25rem;
+}
+
+.cancelButton,
+.confirmButton {
+  min-width: 5.5rem;
+  height: 2.4rem;
+}
+
+.dangerButton {
+  color: #fee2e2;
+  background: linear-gradient(135deg, #7f1d1d, #dc2626);
+  border-color: rgba(248, 113, 113, 0.85);
+  box-shadow: 0 14px 30px rgba(127, 29, 29, 0.45);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .dangerButton:hover:not(:disabled) {
+    color: #fff1f2;
+    background: linear-gradient(135deg, #991b1b, #ef4444);
+    border-color: rgba(252, 165, 165, 0.95);
+    transform: translateY(-1px);
+    box-shadow: 0 18px 36px rgba(127, 29, 29, 0.5);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .wrapper {
+    align-items: center;
+    padding: 1rem;
+  }
+
+  .dialog {
+    width: min(24rem, calc(100vw - 2rem));
+    border: 1px solid @color-border-subtle;
+    border-radius: 1.25rem;
+  }
+
+  .body {
+    padding: 1.25rem 1rem 0.75rem;
+  }
+
+  .actions {
+    gap: 0.625rem;
+    padding: 0.75rem 1rem 1rem;
+  }
+
+  .cancelButton,
+  .confirmButton {
+    flex: 1;
+    min-width: 0;
+    height: 2.75rem;
+  }
+
+  .dangerButton:hover:not(:disabled) {
+    color: #fee2e2;
+    background: linear-gradient(135deg, #7f1d1d, #dc2626);
+    border-color: rgba(248, 113, 113, 0.85);
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .dialog,
+  .backdrop {
+    transition-duration: 80ms !important;
+  }
+}

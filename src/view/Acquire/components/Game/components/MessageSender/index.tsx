@@ -1,6 +1,7 @@
 import React, { useState, useRef, useEffect } from 'react';
-import { Popover, Button, message } from 'antd';
+import { Popover, message } from 'antd';
 import { MessageOutlined } from '@ant-design/icons';
+import { Button } from '@/components/Button';
 import styles from './index.module.less';
 
 interface MessageSenderProps {
@@ -76,8 +77,6 @@ const MessageSender: React.FC<MessageSenderProps> = ({ onMessageSend }) => {
       onOpenChange={setVisible}
     >
       <Button
-        size="large"
-        shape="circle"
         icon={cooldown <= 0 && <MessageOutlined className={styles.icon}/>}
         className={styles.messageButton}
         disabled={cooldown > 0}

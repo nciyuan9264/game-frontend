@@ -2,7 +2,7 @@ import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
-import { ListRoomInfo } from '@/types/room';
+import { ListRoomInfo } from '@/types/AcquireRoom';
 import { BankOutlined, HourglassOutlined, LoginOutlined, PlayCircleOutlined, UnlockOutlined } from '@ant-design/icons';
 import { backendName2FrontendName } from '@/util/user';
 import { GameType } from '@/hooks/useGameType';
@@ -18,13 +18,33 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
   const navigate = useNavigate();
   const aiCount = data.roomPlayer.filter(player => player.ai).length;
   const leavePlayerCount = data.roomPlayer.filter(player => !player.online).length;
+  const maxPlayers = data.maxPlayers || 6;
+  const isAcquire = gameType === 'acquire';
+  const progressText = isAcquire
+    ? data.status === 'match'
+      ? '暂未开始'
+      : `${108 - data.emptyTileCount}/${108}`
+    : data.status === 'match'
+      ? '等待玩家准备'
+      : leavePlayerCount
+        ? '等待玩家重连'
+        : '推理进行中';
+  const progressPercent = isAcquire
+    ? data.status === 'match'
+      ? 0
+      : ((108 - data.emptyTileCount) / 108) * 100
+    : data.status === 'match'
+      ? 18
+      : leavePlayerCount
+        ? 45
+        : 72;
   return (
     <article className={styles.card}>
       {/* header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.title}>
-            <BankOutlined />
+            {isAcquire ? <BankOutlined /> : <PlayCircleOutlined />}
             <span>
               房间 {data.roomID}
             </span>
@@ -47,20 +67,25 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       {/* players */}
       <div className={styles.players}>
         <div className={styles.playersMain}>
-          {data.roomPlayer.length} / {6} 人 （{aiCount} 人机）
+          {data.roomPlayer.length} / {maxPlayers} 人 （{aiCount} 人机）
         </div>
       </div>
 
       {/* progress */}
       <div className={styles.progress}>
         <div className={styles.progressLabel}>
-          <span>回合进度</span>
-          <span>{data.status === 'match' ? '暂未开始' : `${108 - data.emptyTileCount}/${108}`}</span>
+          <span>{isAcquire ? '地块进度' : '对局状态'}</span>
+          <span>{progressText}</span>
         </div>
         <div className={styles.progressTrack}>
           <div
             className={styles.progressBar}
-            style={{ width: data.status === 'match' ? '0%' : `${(108 - data.emptyTileCount) / 108 * 100}%` }}
+            style={{
+              width: `${progressPercent}%`,
+              background: isAcquire
+                ? 'linear-gradient(90deg, #0b3a3f, #00b3a6)'
+                : 'linear-gradient(90deg, #3b1d68, #f59e0b)',
+            }}
           />
         </div>
       </div>
@@ -69,7 +94,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       <div className={styles.footer}>
         <div className={styles.public}>
           <UnlockOutlined />
-          公开房 · 无需密码
+          {isAcquire ? '公开房 · 无需密码' : '推理房 · 无需密码'}
         </div>
 
         <div className={styles.actions}>

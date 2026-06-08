@@ -1,13 +1,16 @@
 import React, { useMemo } from 'react';
-import { WsRoomSyncData } from '@/types/room';
+import { WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { backendName2FrontendName } from '@/util/user';
-import { Button, Modal, Typography, Space, Divider } from 'antd';
+import { Typography, Space, Divider } from 'antd';
 import { LeftOutlined, HomeOutlined, InfoCircleOutlined, PlayCircleOutlined } from '@ant-design/icons';
 import { useNavigate, useParams } from 'react-router-dom';
 import { GameStatus } from '@/enum/game';
 import { GameStatusMap } from '@/const/game';
 import { canBuyStock, canCreateCompany, getMergeSelection, getMergingModalAvailible } from '../../utils/game';
+import TurnCountdown from '../TurnCountdown';
+import { Button } from '@/components/Button';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 const { Text } = Typography;
 
 interface SettlementProps {
@@ -39,6 +42,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
 }) => {
   const navigate = useNavigate();
   const { roomID } = useParams();
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
 
   const isGameEnd = useMemo(() => {
@@ -74,7 +78,6 @@ const TopBar3D: React.FC<SettlementProps> = ({
     if (!data) return null;
 
     const buttonProps = {
-      size: 'large' as const,
       className: styles.actionButton
     };
 
@@ -82,7 +85,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
       return (
         <Button
           {...buttonProps}
-          type="primary"
+          customType="primary"
           icon={<PlayCircleOutlined />}
           onClick={() => setCreateCompanyModalVisible(true)}
         >
@@ -94,7 +97,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
       return (
         <Button
           {...buttonProps}
-          type="primary"
+          customType="primary"
           icon={<PlayCircleOutlined />}
           onClick={() => setBuyStockModalVisible(true)}
         >
@@ -106,7 +109,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
       return (
         <Button
           {...buttonProps}
-          type="primary"
+          customType="primary"
           icon={<PlayCircleOutlined />}
           onClick={() => setMergeCompanyModalVisible(true)}
         >
@@ -118,7 +121,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
       return (
         <Button
           {...buttonProps}
-          type="primary"
+          customType="primary"
           icon={<PlayCircleOutlined />}
           onClick={() => setMergeSelectionModalVisible(true)}
         >
@@ -134,24 +137,22 @@ const TopBar3D: React.FC<SettlementProps> = ({
       <div className={styles.leftSection}>
         <Button
           className={styles.backButton}
-          type="text"
-          size="large"
           icon={<LeftOutlined />}
-          onClick={() => {
-            Modal.confirm({
+          onClick={async () => {
+            const ok = await confirm({
               title: '确认操作',
               content: '你确定要离开房间吗？',
               okText: '确认',
               cancelText: '取消',
-              onOk: () => {
-                if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-                  wsRef.current.close();
-                }
-                setTimeout(() => {
-                  navigate('/game/acquire');
-                }, 200);
-              }
+              danger: true,
             });
+            if (!ok) return;
+            if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
+              wsRef.current.close();
+            }
+            setTimeout(() => {
+              navigate('/game/acquire');
+            }, 200);
           }}
         />
 
@@ -178,16 +179,12 @@ const TopBar3D: React.FC<SettlementProps> = ({
           </Button>
           <Button
             className={styles.utilButton}
-            type="default"
-            size="large"
             onClick={() => setCompanyInfoVisible(true)}
           >
             公司面板
           </Button>
           <Button
             className={styles.utilButton}
-            type="default"
-            size="large"
             disabled={!isGameEnd}
             onClick={() => setGameEndModalVisible(true)}
           >
@@ -213,6 +210,11 @@ const TopBar3D: React.FC<SettlementProps> = ({
             <div className={styles.waitingPlayers}>等待其他玩家进入</div>
           )}
         </div>
+        {data?.roomData.gameStatus && data.roomData.gameStatus !== GameStatus.END && (
+          <div className={styles.countdownWrap}>
+            <TurnCountdown deadline={data.roomData.turnDeadline} />
+          </div>
+        )}
       </div>
 
       <div className={styles.rightSection}>
@@ -231,6 +233,7 @@ const TopBar3D: React.FC<SettlementProps> = ({
           {renderActionButton()}
         </div>
       </div>
+      {ConfirmDialogHolder}
     </div>
   );
 };

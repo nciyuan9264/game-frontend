@@ -1,15 +1,24 @@
+import { useState } from 'react';
 import { UserProfile } from '@/hooks/request/useProfile';
 import styles from './index.module.less'
-import { Dropdown, Modal } from 'antd';
-import { PlusCircleOutlined, UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { Dropdown } from 'antd';
+import { PlusCircleOutlined, UserOutlined, LogoutOutlined, HistoryOutlined, TrophyOutlined } from '@ant-design/icons';
 import { Button } from '../../../../components/Button';
-import { ListRoomInfo } from '@/types/room';
+import { ListRoomInfo } from '@/types/AcquireRoom';
+import ProfileModal from '../ProfileModal';
+import LeaderboardModal from '@/components/Leaderboard';
+import { profile2BackendName } from '@/util/user';
+import { GameType } from '@/hooks/useGameType';
+import type { HistoryGameType } from '@/types/history';
+import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 export interface IHeaderProps {
   userProfile: UserProfile
   runLogout: () => void
   handleCreateRoom: () => void
   roomList?: ListRoomInfo[]
+  gameType: GameType
 }
 
 export const Header = ({
@@ -17,50 +26,79 @@ export const Header = ({
   runLogout,
   handleCreateRoom,
   roomList,
+  gameType,
 }: IHeaderProps) => {
+  const [profileVisible, setProfileVisible] = useState(false);
+  const [leaderboardVisible, setLeaderboardVisible] = useState(false);
+  const viewerID = profile2BackendName(userProfile);
+  const lobbyTitle = gameType === 'davinci' ? '达芬奇密码 游戏大厅' : 'Acquire 游戏大厅';
+  const historyGameType: HistoryGameType = gameType === 'davinci' ? 'davinci' : 'acquire';
+  const { dropdownTrigger } = useInteractionMode();
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
+
   return (
     <div className={styles.header}>
       <div className={styles.left}>
         <div className={styles.content}>
           <div className={styles.titleRow}>
-            Acquire 游戏大厅
+            {lobbyTitle}
           </div>
         </div>
       </div>
       <div className={styles.right}>
+        <Button
+          customType="primary"
+          style={{ height: '2rem' }}
+          content="排行榜"
+          icon={<TrophyOutlined />}
+          onClick={() => setLeaderboardVisible(true)}
+        />
         {Number(roomList?.length) > 0 ? <Button customType="primary" style={{height: '2rem'}} content="创建房间" icon={<PlusCircleOutlined />} onClick={() => {
           handleCreateRoom();
         }}/> : null}
         <Dropdown
           menu={{
+            onClick: async ({ key, domEvent }) => {
+              if (key === 'history') {
+                setProfileVisible(true);
+              } else if (key === 'profile') {
+                domEvent.preventDefault();
+                window.open(
+                  'https://auth.gamebus.online/profile',
+                  '_blank',
+                  'noopener,noreferrer'
+                );
+              } else if (key === 'logout') {
+                const ok = await confirm({
+                  title: '确定要退出登录吗？',
+                  cancelText: '取消',
+                  okText: '确认',
+                  danger: true,
+                });
+                if (ok) {
+                  runLogout();
+                }
+              }
+            },
             items: [
+              {
+                key: 'history',
+                icon: <HistoryOutlined />,
+                label: '个人主页',
+              },
               {
                 key: 'profile',
                 icon: <UserOutlined />,
-                label: (
-                  <a href="https://auth.gamebus.online/profile" target="_blank" rel="noopener noreferrer">
-                    Profile
-                  </a>
-                ),
+                label: 'Profile',
               },
               {
                 key: 'logout',
                 icon: <LogoutOutlined />,
-                label: (
-                  <span onClick={() => {
-                    Modal.confirm({
-                      title: '确定要退出登录吗？',
-                      cancelText: '取消',
-                      onOk: runLogout,
-                    });
-                  }}>
-                    退出登录
-                  </span>
-                ),
+                label: '退出登录',
               },
             ],
           }}
-          trigger={['hover']}
+          trigger={dropdownTrigger}
         >
           <div className={styles['user-info']}>
             {userProfile?.avatar ? (
@@ -76,6 +114,18 @@ export const Header = ({
           </div>
         </Dropdown>
       </div>
+      <ProfileModal
+        visible={profileVisible}
+        onClose={() => setProfileVisible(false)}
+        userID={viewerID}
+        gameType={historyGameType}
+      />
+      <LeaderboardModal
+        visible={leaderboardVisible}
+        onClose={() => setLeaderboardVisible(false)}
+        gameType={historyGameType}
+      />
+      {ConfirmDialogHolder}
     </div>
   )
 }

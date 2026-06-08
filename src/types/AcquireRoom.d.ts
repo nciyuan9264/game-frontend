@@ -79,6 +79,10 @@ interface RoomData {
   gameStatus: GameStatus;
   tiles: Record<string, TileData>;
   players: Record<string, PlayerInfo>;
+  /** 当前阶段结束时间（ISO 字符串） */
+  turnDeadline?: string;
+  /** 当前阶段计划时长，单位毫秒 */
+  turnTimeoutMs?: number;
 }
 
 interface TempData {

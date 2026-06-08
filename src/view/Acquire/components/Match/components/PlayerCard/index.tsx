@@ -1,4 +1,5 @@
 import React, { useEffect } from 'react';
+import classNames from 'classnames';
 import {
   PlusCircleOutlined,
   UserOutlined,
@@ -10,12 +11,13 @@ import { Tooltip } from 'antd';
 
 import StatusTag, { Status } from './components/StatusTag';
 import { Role, Seat } from '../../types';
-import { WsMatchSyncData } from '@/types/room';
+import { WsMatchSyncData } from '@/types/AcquireRoom';
 import { useSeatUIState } from './hooks/useSeatUIState';
 import { useSeatAction } from './hooks/useSeatAction';
 
 import styles from './index.module.less';
 import { backendName2FrontendName } from '@/util/user';
+import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
 interface PlayerCardProps {
   data: Seat;
@@ -33,6 +35,7 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
   canAddAI,
 }) => {
   const hasPlayer = Boolean(data.label);
+  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
   const {
     uiState,
@@ -60,21 +63,26 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
     onAddAIStart: setAdding,
     onAddAISuccess: setSuccess,
     canAddAI,
+    confirm,
   });
+  const actionHintText = isRemove ? '点击移除玩家' : '点击添加人机';
 
   return (
-    <article
-      className={`
-        ${styles['seat-card']}
-        ${!hasPlayer ? styles['seat-card-empty'] : ''}
-        ${canOperate ? styles['seat-card-operable'] : ''}
-        ${uiState !== 'idle' ? styles['seat-card-disabled'] : ''}
-      `}
-      onClick={handleClick}
-    >
-      {data.label === userID && (
-        <div className={styles['seat-you-badge']}>你</div>
-      )}
+    <>
+      <article
+        className={classNames(
+          styles['seat-card'],
+          {
+            [styles['seat-card-empty']]: !hasPlayer,
+            [styles['seat-card-operable']]: canOperate,
+            [styles['seat-card-disabled']]: uiState !== 'idle',
+          }
+        )}
+        onClick={handleClick}
+      >
+        {data.label === userID && (
+          <div className={styles['seat-you-badge']}>你</div>
+        )}
 
       {/* 头像 */}
       <div className={styles['seat-avatar']}>
@@ -143,7 +151,15 @@ const PlayerCard: React.FC<PlayerCardProps> = ({
           </span>
         </div>
       </div>
-    </article>
+      {canOperate && (
+        <div className={`${styles['tap-hint']} ${isRemove ? styles['tap-hint-remove'] : styles['tap-hint-add']}`}>
+          {isRemove ? <CloseOutlined /> : <PlusCircleOutlined />}
+          <span>{actionHintText}</span>
+        </div>
+      )}
+      </article>
+      {ConfirmDialogHolder}
+    </>
   );
 };
 
