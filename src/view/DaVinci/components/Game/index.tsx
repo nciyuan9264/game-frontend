@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card, WsRoomSyncData } from '@/types/DaVinicRoom';
-import { CircleHelp, Cpu, RotateCcw, Trophy, User } from 'lucide-react';
+import { CircleHelp, Cpu, RotateCcw, Trophy, User, X } from 'lucide-react';
 import TurnCountdown from '@/view/Acquire/components/Game/components/TurnCountdown';
 import { GameCanvas, GameCanvasHandle } from './components/GameCanvas';
 import styles from './index.module.less';
@@ -114,6 +114,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
   const [selectedGuessTile, setSelectedGuessTile] = useState<Card | null>(null);
   const [showGuessModal, setShowGuessModal] = useState(false);
   const [showRuleModal, setShowRuleModal] = useState(false);
+  const [showEndModal, setShowEndModal] = useState(false);
   const gameCanvasRef = useRef<GameCanvasHandle>(null);
   const lastActionKeyRef = useRef<string | null | undefined>(undefined);
   const winner = useMemo<'player' | 'opponent' | null>(() => {
@@ -122,6 +123,9 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
     if (selfAll.some(c => !c.isRevealed)) return 'player';
     return 'opponent';
   }, [wsRoomSyncData]);
+  useEffect(() => {
+    setShowEndModal(Boolean(winner));
+  }, [winner]);
   const isPlayerTurn = wsRoomSyncData?.roomData.currentPlayer === userID;
   const statusLabel = useMemo(
     () => getGameStatusLabel(wsRoomSyncData?.roomData.gameStatus, Boolean(isPlayerTurn)),
@@ -324,13 +328,15 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
               )}
             </div>
           )}
-          <button
-            type="button"
-            onClick={resetGame}
-            className={styles.resetBtn}
-          >
-            <RotateCcw className={styles.resetIcon} />
-          </button>
+          {winner && (
+            <button
+              type="button"
+              onClick={() => setShowEndModal(true)}
+              className={styles.resetBtn}
+            >
+              <RotateCcw className={styles.resetIcon} />
+            </button>
+          )}
         </div>
         <AnimatePresence>
           {topbarMessageView && (
@@ -514,13 +520,14 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
 
       {/* Victory Modal */}
       <AnimatePresence>
-        {winner && (
+        {winner && showEndModal && (
           <div className={styles.modalWrapper}>
             <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className={styles.victoryBackdrop}
+              onClick={() => setShowEndModal(false)}
             />
             <motion.div
               initial={{ scale: 0.8, opacity: 0, y: 20 }}
@@ -528,6 +535,14 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
               exit={{ scale: 0.8, opacity: 0, y: 20 }}
               className={styles.victoryCard}
             >
+              <button
+                type="button"
+                onClick={() => setShowEndModal(false)}
+                className={styles.victoryClose}
+                aria-label="关闭"
+              >
+                <X className={styles.victoryCloseIcon} />
+              </button>
               <div className={styles.victoryHeader}>
                 <div className={`${styles.victoryIcon} ${winner === 'player' ? styles.victoryPlayer : styles.victoryAI}`}>
                   <Trophy className={`${styles.trophyIcon} ${winner === 'player' ? styles.trophyPlayer : styles.trophyAI}`} />

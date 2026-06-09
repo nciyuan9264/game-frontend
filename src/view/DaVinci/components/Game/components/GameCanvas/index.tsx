@@ -278,7 +278,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
     container: PIXI.Container,
     tile: Card,
     dims: { tileWidth: number; tileHeight: number; tileRadius: number },
-    clickable: boolean
+    clickable: boolean,
+    unrevealedReveal: boolean = false
   ) => {
     const oldText = container.getChildByName('valueText');
     if (oldText) container.removeChild(oldText);
@@ -343,6 +344,14 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
           .roundRect(0, 0, dims.tileWidth, dims.tileHeight, dims.tileRadius)
           .fill(tile.color ? 0xf0f0f0 : 0x2a2a2a)
           .stroke({ color: 0x10b981, width: 3 });
+      }
+    } else if (unrevealedReveal) {
+      const body = container.getChildByName('body') as PIXI.Graphics;
+      if (body) {
+        body.clear()
+          .roundRect(0, 0, dims.tileWidth, dims.tileHeight, dims.tileRadius)
+          .fill(tile.color ? 0xf0f0f0 : 0x2a2a2a)
+          .stroke({ color: 0xef4444, width: 3 });
       }
     }
   };
@@ -542,7 +551,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
         updateTileGraphic(container, tile, oppDims, false);
       }
       const canClick = isPlayerTurn && (gameStatus === 'guessCard' || gameStatus === 'setCard') && !tile.isRevealed;
-      updateTileGraphic(container, tile, oppDims, canClick);
+      const isUnguessedReveal = gameStatus === 'end' && !tile.isRevealed;
+      updateTileGraphic(container, tile, oppDims, canClick, isUnguessedReveal);
       const targetLocal = toLocalPoint(cardLayer, pos.x, pos.y);
       const animateOppRow = shouldAnimateMove(tile.id, 'opponentRow');
       if (animateOppRow) {
@@ -585,7 +595,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
           updateTileGraphic(container, tile, oppDims, false);
         }
         const canClick = isPlayerTurn && (gameStatus === 'guessCard' || gameStatus === 'setCard') && !tile.isRevealed;
-        updateTileGraphic(container, tile, oppDims, canClick);
+        const isUnguessedReveal = gameStatus === 'end' && !tile.isRevealed;
+        updateTileGraphic(container, tile, oppDims, canClick, isUnguessedReveal);
         (container as any).zIndex = 100;
         const targetLocal = toLocalPoint(cardLayer, targetX, targetY);
         const animateOppAside = shouldAnimateMove(tile.id, 'opponentAside');
