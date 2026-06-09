@@ -118,8 +118,6 @@
   }
 }
 
-.statusDesktop,
-.statusMobile,
 .headerStatus,
 .headerInfo {
   height: 32px;
@@ -133,8 +131,6 @@
   line-height: 1;
 }
 @media (min-width: @sm) {
-  .statusDesktop,
-  .statusMobile,
   .headerStatus,
   .headerInfo {
     height: 36px;
@@ -328,46 +324,6 @@
 
 .headerStatus {
   backdrop-filter: blur(12px);
-}
-
-.statusDesktop {
-  display: none;
-}
-@media (min-width: @md) {
-  .statusDesktop {
-    display: flex;
-  }
-}
-
-.iconUser,
-.iconCpu {
-  width: 16px;
-  height: 16px;
-}
-.iconUser {
-  color: #34d399;
-}
-.iconCpu {
-  color: #a78bfa;
-}
-
-.label {
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.vsMono {
-  font-size: 0.875rem;
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
-    'Courier New', monospace;
-  color: rgba(255, 255, 255, 0.6);
-}
-
-.divider {
-  width: 1px;
-  height: 16px;
-  background: rgba(255, 255, 255, 0.1);
-  margin: 0 4px;
 }
 
 .resetBtn {

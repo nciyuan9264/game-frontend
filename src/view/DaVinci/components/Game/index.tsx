@@ -1,7 +1,7 @@
 import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card, WsRoomSyncData } from '@/types/DaVinicRoom';
-import { CircleHelp, Cpu, RotateCcw, Trophy, User, X } from 'lucide-react';
+import { CircleHelp, RotateCcw, Trophy, X } from 'lucide-react';
 import TurnCountdown from '@/view/Acquire/components/Game/components/TurnCountdown';
 import { GameCanvas, GameCanvasHandle } from './components/GameCanvas';
 import styles from './index.module.less';
@@ -298,15 +298,6 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef: _wsRef, wsRoomSyncDat
             <CircleHelp className={styles.ruleTriggerIcon} />
             <span className={styles.ruleTriggerText}>规则</span>
           </button>
-          <div className={styles.statusDesktop}>
-            <User className={styles.iconUser} />
-            <span className={styles.label}>Player</span>
-            <div className={styles.divider} />
-            <span className={styles.vsMono}>VS</span>
-            <div className={styles.divider} />
-            <Cpu className={styles.iconCpu} />
-            <span className={styles.label}>AI Alpha</span>
-          </div>
           {!winner && (
             <div className={styles.headerStatus}>
               <div className={`${styles.statusDot} ${isPlayerTurn ? styles.statusDotPlayer : styles.statusDotAI}`} />

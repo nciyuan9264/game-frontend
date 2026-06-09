@@ -49,6 +49,51 @@ const stockData: StockDataMap = {
   ],
 };
 
+const ruleSections: { title: string; items: string[] }[] = [
+  {
+    title: '游戏目标',
+    items: [
+      '通过建立、扩张、合并公司并持有股票，在游戏结束时拥有最多资产者获胜。',
+    ],
+  },
+  {
+    title: '放置地块',
+    items: [
+      '每回合先在棋盘放置一块地块。',
+      '相邻地块连成片，可组建新公司或扩张已有公司。',
+    ],
+  },
+  {
+    title: '创建公司',
+    items: [
+      '当放置使两块以上地块相连且尚无公司时，可创建一家新公司。',
+      '创建者获赠 1 股创始股。',
+    ],
+  },
+  {
+    title: '购买股票',
+    items: [
+      '每回合最多购买 3 股在场公司的股票。',
+      '股票价格随公司规模（地块数）上涨。',
+    ],
+  },
+  {
+    title: '公司合并',
+    items: [
+      '当一块地块连接两家公司时，较大公司吞并较小公司。',
+      '被并方的大股东、二股东获得奖金。',
+      '所持被并方股票可兑现、保留，或按 2:1 换购存续公司的股票。',
+    ],
+  },
+  {
+    title: '游戏结束与清算',
+    items: [
+      '当某公司达到 41 格，或所有在场公司都已「安全」（≥11 格）时可结束。',
+      '结算各公司大、二股东奖金，并按持股变现，资产最高者获胜。',
+    ],
+  },
+];
+
 const CompanyStockInfoModal = ({
   visible,
   setCompanyInfoVisible,
@@ -56,6 +101,7 @@ const CompanyStockInfoModal = ({
   visible: boolean;
   setCompanyInfoVisible: React.Dispatch<React.SetStateAction<boolean>>;
 }) => {
+  const [activeSection, setActiveSection] = useState<'rules' | 'stock'>('rules');
   const [activeTab, setActiveTab] = useState<string>('Continental/Imperial');
 
   return (
@@ -65,9 +111,9 @@ const CompanyStockInfoModal = ({
     >
       <div className={styles.header}>
         <div>
-          <h2>公司股票信息</h2>
+          <h2>{activeSection === 'rules' ? '游戏规则' : '公司股票信息'}</h2>
           <p className={styles.subTitle}>
-            查看股票价格和奖励信息
+            {activeSection === 'rules' ? '了解 Acquire 玩法' : '查看股票价格和奖励信息'}
           </p>
         </div>
         <button aria-label="Close modal" onClick={() => setCompanyInfoVisible(false)} className={styles.closeBtn}>
@@ -76,40 +122,74 @@ const CompanyStockInfoModal = ({
       </div>
 
       <div className={styles.content}>
-        <div className={styles.tabs}>
-          {Object.keys(stockData).map((companyName) => (
-            <button
-              key={companyName}
-              className={`${styles.tab} ${activeTab === companyName ? styles.active : ''}`}
-              onClick={() => setActiveTab(companyName)}
-            >
-              {companyName}
-            </button>
-          ))}
+        <div className={styles.segmented}>
+          <button
+            type="button"
+            className={`${styles.segment} ${activeSection === 'rules' ? styles.segmentActive : ''}`}
+            onClick={() => setActiveSection('rules')}
+          >
+            游戏规则
+          </button>
+          <button
+            type="button"
+            className={`${styles.segment} ${activeSection === 'stock' ? styles.segmentActive : ''}`}
+            onClick={() => setActiveSection('stock')}
+          >
+            公司股票信息
+          </button>
         </div>
 
-        <div className={styles.tableContainer}>
-          <table>
-            <thead>
-              <tr>
-                <th>地块数量区间</th>
-                <th>股票价格</th>
-                <th>大股东奖励</th>
-                <th>二股东奖励</th>
-              </tr>
-            </thead>
-            <tbody>
-              {stockData[activeTab].map((item, index) => (
-                <tr key={index}>
-                  <td>{item.range[0]} - {item.range[1]}</td>
-                  <td>${item.price}</td>
-                  <td>${item.majorityBonus}</td>
-                  <td>${item.minorityBonus}</td>
-                </tr>
+        {activeSection === 'rules' ? (
+          <div className={styles.ruleSectionList}>
+            {ruleSections.map((section) => (
+              <section className={styles.ruleSection} key={section.title}>
+                <h3 className={styles.ruleSectionTitle}>{section.title}</h3>
+                <ul className={styles.ruleList}>
+                  {section.items.map((item) => (
+                    <li key={item}>{item}</li>
+                  ))}
+                </ul>
+              </section>
+            ))}
+          </div>
+        ) : (
+          <>
+            <div className={styles.tabs}>
+              {Object.keys(stockData).map((companyName) => (
+                <button
+                  key={companyName}
+                  className={`${styles.tab} ${activeTab === companyName ? styles.active : ''}`}
+                  onClick={() => setActiveTab(companyName)}
+                >
+                  {companyName}
+                </button>
               ))}
-            </tbody>
-          </table>
-        </div>
+            </div>
+
+            <div className={styles.tableContainer}>
+              <table>
+                <thead>
+                  <tr>
+                    <th>地块数量区间</th>
+                    <th>股票价格</th>
+                    <th>大股东奖励</th>
+                    <th>二股东奖励</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {stockData[activeTab].map((item, index) => (
+                    <tr key={index}>
+                      <td>{item.range[0]} - {item.range[1]}</td>
+                      <td>${item.price}</td>
+                      <td>${item.majorityBonus}</td>
+                      <td>${item.minorityBonus}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </>
+        )}
       </div>
     </Modal>
   );
