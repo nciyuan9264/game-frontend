@@ -134,57 +134,59 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <Modal visible={visible} onClose={onClose}>
-      <div className={styles.header}>
-        <div className={styles.headerLeft}>
-          <UserOutlined className={styles.headerIcon} />
-          <span className={styles.headerTitle}>{gameName} 个人主页</span>
-        </div>
-        <button
-          type="button"
-          className={styles.closeBtn}
-          onClick={onClose}
-          aria-label="关闭"
-        >
-          <CloseOutlined />
-        </button>
-      </div>
-
-      <div className={styles.content}>
-        <div className={styles.statsBar}>
-          <div className={styles.statItem}>
-            <div className={styles.statLabel}>总场次</div>
-            <div className={styles.statValue}>{stats?.totalGames ?? '-'}</div>
+      <div className={`${styles.root} ${isAcquire ? styles.themeAcquire : styles.themeDavinci}`}>
+        <div className={styles.header}>
+          <div className={styles.headerLeft}>
+            <UserOutlined className={styles.headerIcon} />
+            <span className={styles.headerTitle}>{gameName} 个人主页</span>
           </div>
-          <div className={styles.statItem}>
-            <div className={styles.statLabel}>胜场</div>
-            <div className={styles.statValue}>{stats?.wins ?? '-'}</div>
-          </div>
-          <div className={styles.statItem}>
-            <div className={styles.statLabel}>胜率</div>
-            <div className={styles.statValue}>{winRatePct}</div>
-          </div>
-          <div className={styles.statItem}>
-            <div className={styles.statLabel}>平均得分</div>
-            <div className={styles.statValue}>{avgScoreText}</div>
-          </div>
+          <button
+            type="button"
+            className={styles.closeBtn}
+            onClick={onClose}
+            aria-label="关闭"
+          >
+            <CloseOutlined />
+          </button>
         </div>
 
-        <div className={styles.listTitle}>{gameName} 历史对局（最近 20 局）</div>
-
-        {!games?.length ? (
-          <div className={styles.empty}>
-            {initialLoading ? '' : '暂无历史对局'}
+        <div className={styles.content}>
+          <div className={styles.statsBar}>
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>总场次</div>
+              <div className={styles.statValue}>{stats?.totalGames ?? '-'}</div>
+            </div>
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>胜场</div>
+              <div className={styles.statValue}>{stats?.wins ?? '-'}</div>
+            </div>
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>胜率</div>
+              <div className={styles.statValue}>{winRatePct}</div>
+            </div>
+            <div className={styles.statItem}>
+              <div className={styles.statLabel}>平均得分</div>
+              <div className={styles.statValue}>{avgScoreText}</div>
+            </div>
           </div>
-        ) : (
-          <div className={styles.list}>{games.map(renderGameRow)}</div>
-        )}
 
-        {initialLoading && (
-          <div className={styles.loadingOverlay}>
-            <Spin size="large" />
-            <div className={styles.loadingText}>加载中...</div>
-          </div>
-        )}
+          <div className={styles.listTitle}>{gameName} 历史对局（最近 20 局）</div>
+
+          {!games?.length ? (
+            <div className={styles.empty}>
+              {initialLoading ? '' : '暂无历史对局'}
+            </div>
+          ) : (
+            <div className={styles.list}>{games.map(renderGameRow)}</div>
+          )}
+
+          {initialLoading && (
+            <div className={styles.loadingOverlay}>
+              <Spin size="large" />
+              <div className={styles.loadingText}>加载中...</div>
+            </div>
+          )}
+        </div>
       </div>
     </Modal>
   );
