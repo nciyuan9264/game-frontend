@@ -1,7 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { motion, useDragControls } from 'motion/react';
 import { backendName2FrontendName } from '@/util/user';
-import type { EventMeta } from '@/types/history';
+import type { EventMeta, Snapshot, GamePlayer } from '@/types/history';
+import EconomyChart from '../EconomyChart';
 import styles from './index.module.less';
 
 interface ReplayTimelineProps {
@@ -9,6 +10,8 @@ interface ReplayTimelineProps {
   step: number;
   setStep: (s: number) => void;
   loading?: boolean;
+  snapshots: Snapshot[];
+  players?: GamePlayer[];
 }
 
 const cmdLabelMap: Record<string, string> = {
@@ -25,8 +28,11 @@ const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
   step,
   setStep,
   loading,
+  snapshots,
+  players,
 }) => {
   const [minimized, setMinimized] = useState(false);
+  const [tab, setTab] = useState<'timeline' | 'economy'>('timeline');
   const dragControls = useDragControls();
   const total = events.length;
 
@@ -104,64 +110,87 @@ const ReplayTimeline: React.FC<ReplayTimelineProps> = ({
           </div>
         </div>
       ) : (
-        <div className={styles.body}>
-          <div className={styles.statusRow}>
-            <span>对局回放</span>
-            <span className={styles.stepInfo}>
-              {step + 1} / {total}
-              {loading && <span className={styles.loadingDot}>...</span>}
-            </span>
-          </div>
-          <div className={styles.controls}>
-            <button type="button" onClick={goStart} disabled={step === -1}>
-              « 初始
-            </button>
-            <button type="button" onClick={goPrev} disabled={step <= -1}>
-              ‹ 上一步
-            </button>
-            <button type="button" onClick={goNext} disabled={step >= total - 1}>
-              下一步 ›
+        <div className={`${styles.body} ${tab === 'economy' ? styles.bodyEconomy : ''}`}>
+          <div className={styles.tabs}>
+            <button
+              type="button"
+              className={`${styles.tab} ${tab === 'timeline' ? styles.tabActive : ''}`}
+              onClick={() => setTab('timeline')}
+            >
+              时间轴
             </button>
             <button
               type="button"
-              onClick={goEnd}
-              disabled={total === 0 || step === total - 1}
+              className={`${styles.tab} ${tab === 'economy' ? styles.tabActive : ''}`}
+              onClick={() => setTab('economy')}
             >
-              终局 »
+              经济曲线
             </button>
           </div>
-          <div className={styles.track} ref={trackRef}>
-            <div className={styles.trackInner}>
-              <button
-                type="button"
-                ref={step === -1 ? activeDotRef : undefined}
-                className={`${styles.dot} ${step === -1 ? styles.dotActive : ''}`}
-                onClick={() => setStep(-1)}
-                title="初始状态"
-              >
-                <span className={styles.dotIndex}>0</span>
-                <span className={styles.dotLabel}>起</span>
-              </button>
-              {events.map((e) => {
-                const active = step === e.seq;
-                return (
+
+          {tab === 'timeline' ? (
+            <>
+              <div className={styles.statusRow}>
+                <span>对局回放</span>
+                <span className={styles.stepInfo}>
+                  {step + 1} / {total}
+                  {loading && <span className={styles.loadingDot}>...</span>}
+                </span>
+              </div>
+              <div className={styles.controls}>
+                <button type="button" onClick={goStart} disabled={step === -1}>
+                  « 初始
+                </button>
+                <button type="button" onClick={goPrev} disabled={step <= -1}>
+                  ‹ 上一步
+                </button>
+                <button type="button" onClick={goNext} disabled={step >= total - 1}>
+                  下一步 ›
+                </button>
+                <button
+                  type="button"
+                  onClick={goEnd}
+                  disabled={total === 0 || step === total - 1}
+                >
+                  终局 »
+                </button>
+              </div>
+              <div className={styles.track} ref={trackRef}>
+                <div className={styles.trackInner}>
                   <button
-                    key={e.seq}
                     type="button"
-                    ref={active ? activeDotRef : undefined}
-                    className={`${styles.dot} ${active ? styles.dotActive : ''}`}
-                    onClick={() => setStep(e.seq)}
-                    title={`#${e.seq + 1} ${backendName2FrontendName(e.playerID)} - ${e.cmdType}`}
+                    ref={step === -1 ? activeDotRef : undefined}
+                    className={`${styles.dot} ${step === -1 ? styles.dotActive : ''}`}
+                    onClick={() => setStep(-1)}
+                    title="初始状态"
                   >
-                    <span className={styles.dotIndex}>{e.seq + 1}</span>
-                    <span className={styles.dotLabel}>
-                      {cmdLabelMap[e.cmdType] ?? e.cmdType}
-                    </span>
+                    <span className={styles.dotIndex}>0</span>
+                    <span className={styles.dotLabel}>起</span>
                   </button>
-                );
-              })}
-            </div>
-          </div>
+                  {events.map((e) => {
+                    const active = step === e.seq;
+                    return (
+                      <button
+                        key={e.seq}
+                        type="button"
+                        ref={active ? activeDotRef : undefined}
+                        className={`${styles.dot} ${active ? styles.dotActive : ''}`}
+                        onClick={() => setStep(e.seq)}
+                        title={`#${e.seq + 1} ${backendName2FrontendName(e.playerID)} - ${e.cmdType}`}
+                      >
+                        <span className={styles.dotIndex}>{e.seq + 1}</span>
+                        <span className={styles.dotLabel}>
+                          {cmdLabelMap[e.cmdType] ?? e.cmdType}
+                        </span>
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+            </>
+          ) : (
+            <EconomyChart snapshots={snapshots} players={players} />
+          )}
         </div>
       )}
     </motion.div>

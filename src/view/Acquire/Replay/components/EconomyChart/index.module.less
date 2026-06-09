@@ -1,0 +1,96 @@
+@import "../../../../../styles/variables.less";
+
+.chartWrap {
+  position: relative;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.legend {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  font-size: 12px;
+  color: @color-text-soft;
+}
+
+.legendItem {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.legendDot {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+  display: inline-block;
+  flex-shrink: 0;
+}
+
+.svg {
+  width: 100%;
+  height: 200px;
+  display: block;
+}
+
+.grid {
+  stroke: rgba(148, 163, 184, 0.18);
+  stroke-width: 1;
+}
+
+.axisLabel {
+  fill: @color-text-soft;
+  font-size: 10px;
+}
+
+.hoverLine {
+  stroke: rgba(148, 163, 184, 0.5);
+  stroke-width: 1;
+  stroke-dasharray: 3 3;
+}
+
+.empty {
+  padding: 32px 0;
+  text-align: center;
+  color: @color-text-soft;
+  font-size: 13px;
+}
+
+.tooltip {
+  position: absolute;
+  top: 28px;
+  right: 8px;
+  background: rgba(2, 6, 23, 0.92);
+  border: 1px solid @color-border-subtle-dark;
+  border-radius: 8px;
+  padding: 8px 10px;
+  font-size: 12px;
+  color: @color-text-main;
+  pointer-events: none;
+  min-width: 120px;
+}
+
+.tooltipTitle {
+  font-weight: 600;
+  margin-bottom: 4px;
+  color: @color-primary-ink;
+}
+
+.tooltipRow {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  line-height: 1.6;
+}
+
+.tooltipName {
+  flex: 1;
+  color: @color-text-soft;
+}
+
+.tooltipVal {
+  font-weight: 600;
+}

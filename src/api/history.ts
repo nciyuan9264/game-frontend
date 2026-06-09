@@ -44,6 +44,15 @@ export const getSnapshot = async (
   });
 };
 
+export const getSnapshots = async (
+  id: GameID,
+  gameType: HistoryGameType = 'acquire'
+): Promise<Snapshot[]> => {
+  return APIClient.get({
+    url: `/api/${gameType}/history/game/${id}/snapshots`,
+  });
+};
+
 export const getMyStats = async (
   gameType: HistoryGameType = 'acquire'
 ): Promise<Stats> => {

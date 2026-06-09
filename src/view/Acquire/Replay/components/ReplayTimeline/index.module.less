@@ -85,6 +85,41 @@
   padding: 10px 12px;
 }
 
+.bodyEconomy {
+  min-height: 240px;
+}
+
+.tabs {
+  display: inline-flex;
+  align-self: center;
+  gap: 4px;
+  padding: 3px;
+  border-radius: 9999px;
+  background: rgba(2, 6, 23, 0.5);
+  border: 1px solid @color-border-subtle-dark;
+}
+
+.tab {
+  padding: 4px 14px;
+  border: none;
+  background: transparent;
+  color: @color-text-soft;
+  border-radius: 9999px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.15s;
+
+  &:hover {
+    color: @color-text-main;
+  }
+}
+
+.tabActive {
+  background: @color-accent-teal;
+  color: #04201d;
+  font-weight: 600;
+}
+
 .statusRow {
   display: flex;
   align-items: center;

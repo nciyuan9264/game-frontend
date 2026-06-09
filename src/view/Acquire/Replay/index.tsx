@@ -1,6 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { LoadingBlock } from '@/components/LoadingBlock';
-import { useGameDetail, useSnapshot } from '@/hooks/request/useHistory';
+import { useGameDetail, useSnapshots } from '@/hooks/request/useHistory';
 import { Board } from '@/view/Acquire/components/Game/components/Board';
 import CompanyInfo from '@/view/Acquire/components/Game/components/CompanyInfo';
 import PlayerAssets from '@/view/Acquire/components/Game/components/PlayerAssets';
@@ -29,7 +29,7 @@ const ReplayContent: React.FC<ReplayContentProps> = ({
   onExit,
 }) => {
   const { detail, runGetGameDetail, detailLoading } = useGameDetail();
-  const { snapshot, runGetSnapshot, snapshotLoading } = useSnapshot();
+  const { snapshots, runGetSnapshots, snapshotsLoading } = useSnapshots();
   const [step, setStep] = useState<number>(-1);
   const [scoreVisible, setScoreVisible] = useState(false);
 
@@ -37,17 +37,19 @@ const ReplayContent: React.FC<ReplayContentProps> = ({
     if (gameId !== undefined) {
       setStep(-1);
       runGetGameDetail(gameId, 'acquire');
+      runGetSnapshots(gameId, 'acquire');
     }
   }, [gameId]);
 
-  useEffect(() => {
-    if (gameId !== undefined) {
-      runGetSnapshot(gameId, step, 'acquire');
-    }
-  }, [gameId, step]);
-
   const events: EventMeta[] = detail?.events ?? [];
   const totalEvents = events.length;
+
+  const snapshotMap = useMemo(
+    () => new Map((snapshots ?? []).map((s) => [s.seq, s])),
+    [snapshots]
+  );
+
+  const snapshot = snapshotMap.get(step);
 
   const fakeRoomData = useMemo(() => {
     if (!snapshot) return undefined;
@@ -96,7 +98,9 @@ const ReplayContent: React.FC<ReplayContentProps> = ({
         events={events}
         step={step}
         setStep={setStep}
-        loading={snapshotLoading}
+        loading={snapshotsLoading}
+        snapshots={snapshots ?? []}
+        players={detail?.players}
       />
 
       {detailLoading && !detail && (
@@ -105,7 +109,7 @@ const ReplayContent: React.FC<ReplayContentProps> = ({
         </div>
       )}
 
-      {!!detail && snapshotLoading && (
+      {!!detail && snapshotsLoading && (
         <div className={styles.snapshotLoading}>
           <LoadingBlock content="加载快照..." />
         </div>

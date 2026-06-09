@@ -5,9 +5,10 @@ import {
   getMyStats,
   getGameDetail,
   getSnapshot,
+  getSnapshots,
   ListGamesParams,
 } from '@/api/history';
-import type { GameID, HistoryGameType } from '@/types/history';
+import type { GameID, HistoryGameType, Snapshot } from '@/types/history';
 
 export const useMyGames = () => {
   const {
@@ -102,5 +103,30 @@ export const useSnapshot = () => {
     snapshot,
     runGetSnapshot,
     snapshotLoading,
+  };
+};
+
+export const useSnapshots = () => {
+  const {
+    data: snapshots,
+    run: runGetSnapshots,
+    loading: snapshotsLoading,
+  } = useRequest(
+    async (id: GameID, gameType: HistoryGameType = 'acquire') => {
+      const res = await getSnapshots(id, gameType);
+      return (Array.isArray(res) ? res : (res as { snapshots: Snapshot[] }).snapshots) ?? [];
+    },
+    {
+      manual: true,
+      onError: () => {
+        message.error('获取快照失败');
+      },
+    }
+  );
+
+  return {
+    snapshots,
+    runGetSnapshots,
+    snapshotsLoading,
   };
 };
