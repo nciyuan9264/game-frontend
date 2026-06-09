@@ -198,17 +198,22 @@ const EconomyChart: React.FC<EconomyChartProps> = ({ snapshots, players }) => {
       {hoverTurn !== null && (
         <div className={styles.tooltip}>
           <div className={styles.tooltipTitle}>回合 {hoverTurn}</div>
-          {series.map((s) => (
-            <div key={s.playerID} className={styles.tooltipRow}>
-              <span className={styles.legendDot} style={{ background: s.color }} />
-              <span className={styles.tooltipName}>
-                {backendName2FrontendName(s.playerID)}
-              </span>
-              <span className={styles.tooltipVal}>
-                ${s.points[hoverTurn]?.total ?? 0}
-              </span>
-            </div>
-          ))}
+          {[...series]
+            .sort(
+              (a, b) =>
+                (b.points[hoverTurn]?.total ?? 0) - (a.points[hoverTurn]?.total ?? 0)
+            )
+            .map((s) => (
+              <div key={s.playerID} className={styles.tooltipRow}>
+                <span className={styles.legendDot} style={{ background: s.color }} />
+                <span className={styles.tooltipName}>
+                  {backendName2FrontendName(s.playerID)}
+                </span>
+                <span className={styles.tooltipVal}>
+                  ${s.points[hoverTurn]?.total ?? 0}
+                </span>
+              </div>
+            ))}
         </div>
       )}
     </div>
