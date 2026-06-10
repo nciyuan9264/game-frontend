@@ -164,6 +164,7 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
         visible={buyStockModalVisible}
         setBuyStockModalVisible={setBuyStockModalVisible}
         onSubmit={(stocks) => {
+          playAudio(AudioTypeEnum.BuyStock);
           sendMessage(JSON.stringify({
             type: 'game_buy_stock',
             payload: { stocks },

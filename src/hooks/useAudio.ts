@@ -7,6 +7,7 @@ export enum AudioTypeEnum {
   CreateCompany = 'create-company',
   BuyStock = 'buy-stock',
   GetNobleCard = 'get-noble-card',
+  HoverButton = 'hover-button',
 }
 const audioTypes: AudioTypeEnum[] = [
   AudioTypeEnum.Quickily,
@@ -16,6 +17,7 @@ const audioTypes: AudioTypeEnum[] = [
   AudioTypeEnum.CreateCompany,
   AudioTypeEnum.BuyStock,
   AudioTypeEnum.GetNobleCard,
+  AudioTypeEnum.HoverButton,
 ];
 
 let audioMap: Record<string, HTMLAudioElement> | null = null;

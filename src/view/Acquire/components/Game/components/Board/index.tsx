@@ -5,6 +5,7 @@ import { GameStatus } from '@/enum/game';
 import { FC } from 'react';
 import classNames from 'classnames';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 
 
 interface IBoardProps {
@@ -22,6 +23,7 @@ const columns = Array.from({ length: 12 }, (_, i) => `${i + 1}`);
 export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile, wsRoomSyncData, placeTile, readonly }) => {
   const playerTiles = wsRoomSyncData?.playerData.tiles;
   const { isFinePointer } = useInteractionMode();
+  const { playAudio } = useAudio();
 
   return (
     <div className={styles['board']}>
@@ -48,12 +50,16 @@ export const Board: FC<IBoardProps> = ({ tilesData, hoveredTile, setHoveredTile,
                   aria-label={shouldBlink ? `放置地块 ${id}` : `地块 ${id}`}
                   onClick={() => {
                     if (shouldBlink) {
+                      if (!isFinePointer) {
+                        playAudio(AudioTypeEnum.HoverButton);
+                      }
                       placeTile(id)
                     }
                   }}
                   onMouseEnter={() => {
                     if (isFinePointer && shouldBlink) {
                       setHoveredTile(id);
+                      playAudio(AudioTypeEnum.HoverButton);
                     }
                   }}
                   onMouseLeave={() => {
