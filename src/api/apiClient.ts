@@ -45,7 +45,9 @@ axiosInstance.interceptors.response.use(
         await refreshToken();
         return axiosInstance.request(originalRequest);
       } catch (refreshError) {
-        // window.location.href = 'https://auth.gamebus.online/login?redirect=' + window.location.href;
+        window.location.href =
+          'https://auth.gamebus.online/login?redirect=' +
+          encodeURIComponent(window.location.href);
         return Promise.reject(refreshError);
       }
     }
