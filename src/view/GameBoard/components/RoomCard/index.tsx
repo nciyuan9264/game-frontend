@@ -30,15 +30,13 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       : isMatching
         ? '匹配中'
         : `${26 - data.boardCardCount}/${26}`;
-  const progressPercent = isEnded
-    ? 100
-    : isAcquire
-      ? isMatching
-        ? 0
-        : ((108 - data.emptyTileCount) / 108) * 100
-      : isMatching
-        ? 0
-        : ((26 - data.boardCardCount) / 26) * 100
+  const progressPercent = isAcquire
+    ? isMatching
+      ? 0
+      : ((108 - data.emptyTileCount) / 108) * 100
+    : isMatching
+      ? 0
+      : ((26 - data.boardCardCount) / 26) * 100
   return (
     <article className={styles.card}>
       {/* header */}
