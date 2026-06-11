@@ -197,12 +197,15 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
     const initPixi = async () => {
       if (!containerRef.current) return;
 
+      const getResolution = () => Math.min(window.devicePixelRatio || 1, 2);
       const app = new PIXI.Application();
       await app.init({
         resizeTo: containerRef.current,
         backgroundColor: 0x1a1a1a,
         antialias: true,
-        resolution: 1,
+        autoDensity: true,
+        resolution: getResolution(),
+        roundPixels: true,
       });
 
       containerRef.current.appendChild(app.canvas);
@@ -224,6 +227,10 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
       app.stage.setChildIndex(uiLayer, app.stage.children.length - 1);
 
       app.renderer.on('resize', () => {
+        const nextResolution = getResolution();
+        if (app.renderer.resolution !== nextResolution) {
+          app.renderer.resolution = nextResolution;
+        }
         renderGame(app);
       });
 
@@ -320,8 +327,11 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
       bar.name = 'jokerBar';
       container.addChild(bar);
     } else {
+      const textResolution = appRef.current?.renderer.resolution ?? Math.min(window.devicePixelRatio || 1, 2);
       const text = new PIXI.Text({
         text: tile.num ?? '',
+        resolution: textResolution,
+        roundPixels: true,
         style: {
           fontFamily: 'Arial, sans-serif',
           fontSize: fontSize,
