@@ -9,6 +9,7 @@ import type { HistoryGameType } from '@/types/history';
 import type {
   AcquireLeaderboardEntry,
   DavinciLeaderboardEntry,
+  SplendorLeaderboardEntry,
   LeaderboardEntry,
   LeaderboardSortDim,
 } from '@/types/leaderboard';
@@ -34,16 +35,21 @@ const sortEntries = (
   if (gameType === 'acquire') {
     list.sort(
       (a, b) =>
-        (a as AcquireLeaderboardEntry).avgRank -
-        (b as AcquireLeaderboardEntry).avgRank
+        ((a as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
+        ((b as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY)
     );
-  } else {
-    list.sort(
-      (a, b) =>
-        (b as DavinciLeaderboardEntry).winRate -
-        (a as DavinciLeaderboardEntry).winRate
-    );
+    return list;
   }
+  list.sort((a, b) => {
+    const aw = (a as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate;
+    const bw = (b as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate;
+    if (typeof aw === 'number' && typeof bw === 'number') {
+      return bw - aw;
+    }
+    if (typeof bw === 'number') return 1;
+    if (typeof aw === 'number') return -1;
+    return b.totalGames - a.totalGames;
+  });
   return list;
 };
 
@@ -53,8 +59,19 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   gameType,
 }) => {
   const isAcquire = gameType === 'acquire';
-  const title = isAcquire ? 'Acquire 排行榜' : '达芬奇密码 排行榜';
+  const titleMap: Record<HistoryGameType, string> = {
+    acquire: 'Acquire 排行榜',
+    davinci: '达芬奇密码 排行榜',
+    splendor: '璀璨宝石 排行榜',
+  };
+  const title = titleMap[gameType];
   const metricLabel = isAcquire ? '战绩（平均排名）' : '战绩（胜率）';
+  const themeClass =
+    gameType === 'acquire'
+      ? styles.themeAcquire
+      : gameType === 'davinci'
+        ? styles.themeDavinci
+        : styles.themeSplendor;
 
   const [sortDim, setSortDim] = useState<LeaderboardSortDim>('metric');
   const { data, run, loading } = useLeaderboard();
@@ -120,15 +137,21 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
         <div className={styles.colNum}>{entry.totalGames}</div>
         {isAcquire ? (
           <div className={styles.colNum}>
-            {(entry as AcquireLeaderboardEntry).avgRank.toFixed(2)}
+            {typeof (entry as AcquireLeaderboardEntry).avgRank === 'number'
+              ? (entry as AcquireLeaderboardEntry).avgRank.toFixed(2)
+              : '-'}
           </div>
         ) : (
           <>
             <div className={styles.colNum}>
-              {(entry as DavinciLeaderboardEntry).wins}
+              {typeof (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).wins === 'number'
+                ? (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).wins
+                : '-'}
             </div>
             <div className={styles.colNum}>
-              {((entry as DavinciLeaderboardEntry).winRate * 100).toFixed(1)}%
+              {typeof (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate === 'number'
+                ? `${(((entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate as number) * 100).toFixed(1)}%`
+                : '-'}
             </div>
           </>
         )}
@@ -140,7 +163,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
   return (
     <Modal visible={visible} onClose={onClose}>
-      <div className={`${styles.root} ${isAcquire ? styles.themeAcquire : styles.themeDavinci}`}>
+      <div className={`${styles.root} ${themeClass}`}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <TrophyOutlined className={styles.headerIcon} />

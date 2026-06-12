@@ -190,6 +190,8 @@ export const canGetGems = (
 export interface LastActionView {
   badge: string;
   text: string;
+  /** 拿取宝石时，按数量展开的颜色列表，用于渲染彩色圆点 */
+  gems?: GemColorType[];
 }
 
 /** 将 lastData 解析成顶栏可读的上一步动作描述 */
@@ -201,11 +203,11 @@ export const formatLastAction = (lastData?: SplendorLastAction | null): LastActi
   switch (lastData.action) {
     case 'get_gem': {
       const payload = (lastData.payload ?? {}) as Record<string, number>;
-      const parts = Object.entries(payload)
+      const gems = Object.entries(payload)
         .filter(([, num]) => num > 0)
-        .map(([color, num]) => `${GemColor[color as GemColorType]?.label ?? color}×${num}`);
-      if (parts.length === 0) return { badge: '跳过', text: `${who} 放弃了拿取宝石` };
-      return { badge: '拿宝石', text: `${who} 拿取了 ${parts.join('、')}` };
+        .flatMap(([color, num]) => Array.from({ length: num }, () => color as GemColorType));
+      if (gems.length === 0) return { badge: '跳过', text: `${who} 放弃了拿取宝石` };
+      return { badge: '拿宝石', text: `${who} 拿取了`, gems };
     }
     case 'buy_card': {
       const card = lastData.payload as SplendorNormalCard | undefined;

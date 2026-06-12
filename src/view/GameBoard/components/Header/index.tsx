@@ -44,6 +44,7 @@ export const Header = ({
   };
   const lobbyTitle = lobbyTitleMap[gameType];
   const historyGameType: HistoryGameType = historyGameTypeMap[gameType];
+  const leaderboardGameType: HistoryGameType = gameType;
   const { dropdownTrigger } = useInteractionMode();
   const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
@@ -134,7 +135,7 @@ export const Header = ({
       <LeaderboardModal
         visible={leaderboardVisible}
         onClose={() => setLeaderboardVisible(false)}
-        gameType={historyGameType}
+        gameType={leaderboardGameType}
       />
       {ConfirmDialogHolder}
     </div>

@@ -65,13 +65,29 @@
     flex: 1 1 0;
     min-width: 0;
 
-    .backButton {
-      width: 2rem;
-      height: 2rem;
-      padding: 0;
+    .scoreBadge {
+      display: inline-flex;
+      align-items: baseline;
+      gap: 0.2rem;
       flex-shrink: 0;
-      font-size: 1rem;
-      z-index: 1;
+      padding: 0.25rem 0.85rem;
+      border-radius: 999px;
+      background: radial-gradient(circle at 30% 25%, #ffe7a0, @gold 60%, #c8941f);
+      border: 1px solid rgba(255, 255, 255, 0.45);
+      box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.45), 0 0 8px rgba(245, 196, 81, 0.4);
+
+      .scoreValue {
+        font-size: 1.15rem;
+        font-weight: 800;
+        line-height: 1;
+        color: #3a2c08;
+      }
+
+      .scoreLabel {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: #6b4e0a;
+      }
     }
 
     .rulesButton {
@@ -145,30 +161,6 @@
       align-items: center;
       gap: 1rem;
 
-      .scoreBadge {
-        display: inline-flex;
-        align-items: baseline;
-        gap: 0.2rem;
-        padding: 0.1rem 0.7rem;
-        border-radius: 999px;
-        background: radial-gradient(circle at 30% 25%, #ffe7a0, @gold 60%, #c8941f);
-        border: 1px solid rgba(255, 255, 255, 0.45);
-        box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.45), 0 0 8px rgba(245, 196, 81, 0.4);
-
-        .scoreValue {
-          font-size: 1rem;
-          font-weight: 800;
-          line-height: 1;
-          color: #3a2c08;
-        }
-
-        .scoreLabel {
-          font-size: 0.66rem;
-          font-weight: 600;
-          color: #6b4e0a;
-        }
-      }
-
       .footerItem {
         display: inline-flex;
         align-items: center;
@@ -198,6 +190,13 @@
         background: rgba(168, 85, 247, 0.2);
         border: 1px solid rgba(168, 85, 247, 0.36);
         border-radius: 6px;
+      }
+
+      .lastActionGems {
+        flex-shrink: 0;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.2rem;
       }
     }
   }

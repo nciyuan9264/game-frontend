@@ -1,7 +1,7 @@
 import { FC, useEffect, useState } from 'react';
 import styles from './index.module.less';
-import { ArrowLeftOutlined, HomeOutlined, UserOutlined } from '@ant-design/icons';
-import { useNavigate, useSearchParams } from 'react-router-dom';
+import { HomeOutlined, UserOutlined } from '@ant-design/icons';
+import { useSearchParams } from 'react-router-dom';
 
 import { SplendorWsRoomSyncData, SplendorNormalCard } from '@/types/SplendorRoom';
 import { SplendorGameStatus } from '@/enum/game';
@@ -15,6 +15,7 @@ import TurnCountdown from '@/view/Acquire/components/Game/components/TurnCountdo
 import { getGameStatus, isCurrentPlayer, formatLastAction } from './utils/game';
 import CardBoard from './components/CardBoard';
 import GemSelect from './components/GemSelect';
+import GemToken from './components/Card/GemToken';
 import PlayerData from './components/PlayerData';
 import UserData from './components/UserData';
 import GameEnd from './components/GameEnd';
@@ -31,18 +32,16 @@ interface IGameProps {
 
 export const Game: FC<IGameProps> = ({
   sendMessage,
-  wsRef,
   wsRoomSyncData,
   userID,
   gameEndModalVisible,
   setGameEndModalVisible,
 }: IGameProps) => {
-  const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const roomID = searchParams.get('roomID');
   const { playAudio } = useAudio();
   const { isFinePointer } = useInteractionMode();
-  const { confirm, ConfirmDialogHolder } = useConfirmDialog();
+  const { ConfirmDialogHolder } = useConfirmDialog();
 
   const [selectedCard, setSelectedCard] = useState<SplendorNormalCard | undefined>();
   const [rulesVisible, setRulesVisible] = useState(false);
@@ -71,23 +70,6 @@ export const Game: FC<IGameProps> = ({
     setSelectedCard(undefined);
   }, [wsRoomSyncData]);
 
-  const handleLeave = async () => {
-    const ok = await confirm({
-      title: '确认操作',
-      content: '你确定要离开房间吗？',
-      okText: '确认',
-      cancelText: '取消',
-      danger: true,
-    });
-    if (!ok) return;
-    if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {
-      wsRef.current.close();
-    }
-    setTimeout(() => {
-      navigate('/game/splendor');
-    }, 200);
-  };
-
   const statusContent = () => {
     if (isEnded) return <span className={styles.ended}>游戏已结束</span>;
     if (myTurn) {
@@ -112,11 +94,10 @@ export const Game: FC<IGameProps> = ({
       <div className={styles.topBar}>
         <div className={styles.header}>
           <div className={styles.left}>
-            <Button
-              className={styles.backButton}
-              icon={<ArrowLeftOutlined />}
-              onClick={handleLeave}
-            />
+            <span className={styles.scoreBadge}>
+              <span className={styles.scoreValue}>{data.playerData[userID]?.score ?? 0}</span>
+              <span className={styles.scoreLabel}>分</span>
+            </span>
             <Button
               className={styles.rulesButton}
               content="规则说明"
@@ -154,6 +135,13 @@ export const Game: FC<IGameProps> = ({
             <span className={styles.lastAction}>
               <span className={styles.lastActionBadge}>{lastAction.badge}</span>
               {lastAction.text}
+              {lastAction.gems && (
+                <span className={styles.lastActionGems}>
+                  {lastAction.gems.map((color, i) => (
+                    <GemToken key={i} color={color} size="sm" />
+                  ))}
+                </span>
+              )}
             </span>
           )}
         </div>

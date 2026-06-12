@@ -11,11 +11,16 @@ export interface DavinciLeaderboardEntry extends LeaderboardEntryBase {
   winRate: number;
 }
 
+export interface SplendorLeaderboardEntry extends LeaderboardEntryBase {
+  wins: number;
+  winRate: number;
+}
+
 export interface AcquireLeaderboardEntry extends LeaderboardEntryBase {
   avgRank: number;
 }
 
-export type LeaderboardEntry = DavinciLeaderboardEntry | AcquireLeaderboardEntry;
+export type LeaderboardEntry = DavinciLeaderboardEntry | SplendorLeaderboardEntry | AcquireLeaderboardEntry;
 
 export interface LeaderboardData {
   gameType: HistoryGameType;
