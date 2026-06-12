@@ -13,7 +13,7 @@ import { Game } from './components/Game';
 import { Match } from './components/Match';
 
 import styles from './index.module.less';
-import { wsUrl } from '@/const/env';
+import { acquireWsUrl } from '@/const/env';
 import { LoadingBlock } from '@/components/LoadingBlock';
 import { useNavigate } from 'react-router-dom';
 
@@ -32,7 +32,7 @@ export default function Acquire() {
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
     if (!roomID || !userID) return '';
-    return `${wsUrl}/acquire/ws?roomID=${roomID}&userID=${userID}`;
+    return `${acquireWsUrl}/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   const { wsRef, sendMessage } = useWebSocket(url, (msg) => {
