@@ -26,12 +26,12 @@ export interface GemVisual {
 }
 
 export const GemColor: Record<GemColorType, GemVisual> = {
-  White: { main: '#e8edf5', light: '#ffffff', dark: '#b9c2d4', text: '#1f2430', label: '钻石' },
+  White: { main: '#e8edf5', light: '#ffffff', dark: '#b9c2d4', text: '#1f2430', label: '白宝石' },
   Blue: { main: '#3b82f6', light: '#7db1ff', dark: '#1d4ed8', text: '#ffffff', label: '蓝宝石' },
-  Green: { main: '#10b981', light: '#5ee3b2', dark: '#047857', text: '#ffffff', label: '祖母绿' },
+  Green: { main: '#10b981', light: '#5ee3b2', dark: '#047857', text: '#ffffff', label: '绿宝石' },
   Red: { main: '#ef4444', light: '#ff8a8a', dark: '#b91c1c', text: '#ffffff', label: '红宝石' },
-  Black: { main: '#4b5563', light: '#8b94a3', dark: '#1f2530', text: '#ffffff', label: '玛瑙' },
-  Gold: { main: '#f5c451', light: '#ffe7a0', dark: '#c8941f', text: '#3a2c08', label: '黄金' },
+  Black: { main: '#4b5563', light: '#8b94a3', dark: '#1f2530', text: '#ffffff', label: '黑宝石' },
+  Gold: { main: '#f5c451', light: '#ffe7a0', dark: '#c8941f', text: '#3a2c08', label: '金宝石' },
 };
 
 /** 拿宝石时可选的全部颜色（含 Gold，Gold 不可主动拿） */
