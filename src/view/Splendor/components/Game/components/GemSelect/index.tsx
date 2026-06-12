@@ -3,7 +3,8 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/Button';
 import { CardColorType, SplendorWsRoomSyncData } from '@/types/SplendorRoom';
-import { canGetGems, canSkipGetGems, gemColors, GemColor } from '../../utils/game';
+import { SplendorGameStatus } from '@/enum/game';
+import { canGetGems, canSkipGetGems, gemColors, GemColor, getGameStatus } from '../../utils/game';
 import GemToken from '../Card/GemToken';
 
 interface GemSelectProps {
@@ -23,8 +24,10 @@ const GemSelect = ({ data, sendMessage, userID }: GemSelectProps) => {
   }, [data.roomData?.gems]);
 
   const isMyTurn = userID === data.roomData.currentPlayer;
+  const canInteractWithGems = isMyTurn && getGameStatus(data) === SplendorGameStatus.PLAYING;
 
   const handleClickGem = (color: CardColorType) => {
+    if (!canInteractWithGems) return;
     if (selectedGems.filter(Boolean).length >= 3) return;
     if ((localGems[color] ?? 0) <= 0) return;
 
@@ -38,6 +41,7 @@ const GemSelect = ({ data, sendMessage, userID }: GemSelectProps) => {
   };
 
   const handleRemoveGem = (index: number) => {
+    if (!canInteractWithGems) return;
     const color = selectedGems[index];
     if (!color) return;
     const updated = [...selectedGems];
@@ -66,7 +70,7 @@ const GemSelect = ({ data, sendMessage, userID }: GemSelectProps) => {
           {gemColors.map((color) => {
             const stock = localGems[color as CardColorType] ?? 0;
             const isGold = color === 'Gold';
-            const clickable = isMyTurn && !isGold && stock > 0;
+            const clickable = canInteractWithGems && !isGold && stock > 0;
             return (
               <motion.div
                 key={color}

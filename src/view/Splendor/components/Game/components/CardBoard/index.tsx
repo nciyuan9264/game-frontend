@@ -1,4 +1,5 @@
-import { useMemo } from 'react';
+import { useEffect, useMemo, useState } from 'react';
+import { motion } from 'motion/react';
 import styles from './index.module.less';
 import classNames from 'classnames';
 import { SplendorNormalCard, SplendorWsRoomSyncData } from '@/types/SplendorRoom';
@@ -15,13 +16,71 @@ interface CardBoardProps {
   isFinePointer: boolean;
 }
 
-const LEVELS = [3, 2, 1];
+type Level = 1 | 2 | 3;
+type CardSlots = Record<Level, (SplendorNormalCard | null)[]>;
+
+const LEVELS: Level[] = [3, 2, 1];
+const SLOT_COUNT = 4;
+
+const createInitialSlots = (cards: SplendorNormalCard[] = []) => {
+  const slots = Array(SLOT_COUNT).fill(null) as (SplendorNormalCard | null)[];
+  cards.slice(0, SLOT_COUNT).forEach((card, index) => {
+    slots[index] = card;
+  });
+  return slots;
+};
+
+const syncCardSlots = (
+  prevSlots: (SplendorNormalCard | null)[],
+  incomingCards: SplendorNormalCard[] = []
+) => {
+  const incoming = incomingCards.slice(0, SLOT_COUNT);
+  const incomingById = new Map(incoming.map((card) => [card.id, card]));
+  const retainedIds = new Set<number>();
+  const nextSlots = prevSlots.slice(0, SLOT_COUNT).map((card) => {
+    if (card && incomingById.has(card.id)) {
+      retainedIds.add(card.id);
+      return incomingById.get(card.id)!;
+    }
+    return null;
+  });
+
+  incoming
+    .filter((card) => !retainedIds.has(card.id))
+    .forEach((card) => {
+      const emptyIndex = nextSlots.findIndex((slot) => slot === null);
+      if (emptyIndex >= 0) {
+        nextSlots[emptyIndex] = card;
+      }
+    });
+
+  while (nextSlots.length < SLOT_COUNT) {
+    nextSlots.push(null);
+  }
+
+  return nextSlots;
+};
+
+const createSlotsFromData = (data: SplendorWsRoomSyncData): CardSlots => ({
+  1: createInitialSlots(data.roomData.card?.[1] || []),
+  2: createInitialSlots(data.roomData.card?.[2] || []),
+  3: createInitialSlots(data.roomData.card?.[3] || []),
+});
 
 const CardBoard = ({ data, sendMessage, selectedCard, setSelectedCard }: CardBoardProps) => {
+  const [slotsByLevel, setSlotsByLevel] = useState<CardSlots>(() => createSlotsFromData(data));
   const nobles = useMemo(
     () => [...(data.roomData.nobles || [])].sort((a, b) => a.id.localeCompare(b.id)),
     [data.roomData.nobles]
   );
+
+  useEffect(() => {
+    setSlotsByLevel((prev) => ({
+      1: syncCardSlots(prev[1], data.roomData.card?.[1] || []),
+      2: syncCardSlots(prev[2], data.roomData.card?.[2] || []),
+      3: syncCardSlots(prev[3], data.roomData.card?.[3] || []),
+    }));
+  }, [data.roomData.card]);
 
   const buyable = canBuy(data, selectedCard);
   const preservable = canPreserve(data, selectedCard);
@@ -40,21 +99,34 @@ const CardBoard = ({ data, sendMessage, selectedCard, setSelectedCard }: CardBoa
         {/* 三级发展卡阵 */}
         <div className={styles.cardRows}>
           {LEVELS.map((level) => {
-            const cards = [...(data.roomData.card?.[level] || [])].sort((a, b) => a.id - b.id);
             return (
               <div key={level} className={styles.cardRow}>
                 <div className={styles.cards}>
-                  {cards.map((card) => (
-                    <div
-                      key={card.id}
+                  {slotsByLevel[level].map((card, slotIndex) => (
+                    <motion.div
+                      layout
+                      key={`${level}-${slotIndex}`}
                       className={classNames(styles.cardSlot, {
-                        [styles.selected]: selectedCard?.id === card.id,
-                        [styles.buyable]: canBuy(data, card),
+                        [styles.selected]: card && selectedCard?.id === card.id,
+                        [styles.buyable]: card && canBuy(data, card),
+                        [styles.emptySlot]: !card,
                       })}
-                      onClick={() => setSelectedCard(card)}
+                      onClick={() => {
+                        if (card) setSelectedCard(card);
+                      }}
                     >
-                      <NormalCard card={card} size="md" />
-                    </div>
+                      {card && (
+                        <motion.div
+                          key={card.id}
+                          className={styles.cardSlotInner}
+                          initial={{ opacity: 0, y: -10, scale: 0.94, rotateZ: -2 }}
+                          animate={{ opacity: 1, y: 0, scale: 1, rotateZ: 0 }}
+                          transition={{ type: 'spring', stiffness: 360, damping: 26 }}
+                        >
+                          <NormalCard card={card} size="md" />
+                        </motion.div>
+                      )}
+                    </motion.div>
                   ))}
                 </div>
               </div>
