@@ -3,7 +3,7 @@ import { useEffect, useState } from 'react';
 import { motion } from 'motion/react';
 import { Button } from '@/components/Button';
 import { CardColorType, SplendorWsRoomSyncData } from '@/types/SplendorRoom';
-import { canGetGems, gemColors, GemColor } from '../../utils/game';
+import { canGetGems, canSkipGetGems, gemColors, GemColor } from '../../utils/game';
 import GemToken from '../Card/GemToken';
 
 interface GemSelectProps {
@@ -47,6 +47,7 @@ const GemSelect = ({ data, sendMessage, userID }: GemSelectProps) => {
   };
 
   const getEnabled = canGetGems(data, userID, selectedGems);
+  const skipEnabled = canSkipGetGems(data, userID);
 
   return (
     <div className={styles.gemSelector}>
@@ -108,14 +109,15 @@ const GemSelect = ({ data, sendMessage, userID }: GemSelectProps) => {
           }}
         />
         <Button content="取消" onClick={() => setSelectedGems([null, null, null])} />
-        <Button
-          disabled={!isMyTurn}
-          content="跳过"
-          onClick={() => {
-            sendMessage(JSON.stringify({ type: 'game_get_gem', payload: {} }));
-            setSelectedGems([null, null, null]);
-          }}
-        />
+        {skipEnabled && (
+          <Button
+            content="跳过"
+            onClick={() => {
+              sendMessage(JSON.stringify({ type: 'game_get_gem', payload: {} }));
+              setSelectedGems([null, null, null]);
+            }}
+          />
+        )}
       </div>
     </div>
   );

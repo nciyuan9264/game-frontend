@@ -113,6 +113,37 @@ export const canBuy = (data?: SplendorWsRoomSyncData, card?: SplendorNormalCard)
   return true;
 };
 
+export const getPlayerGemTotal = (
+  data?: SplendorWsRoomSyncData,
+  userID?: string
+): number => {
+  if (!data || !userID) return 0;
+  const player = data.playerData[userID];
+  return Object.values(player?.gem || {}).reduce(
+    (sum, count) => sum + (count as number),
+    0
+  );
+};
+
+export const getBoardCards = (
+  data?: SplendorWsRoomSyncData
+): SplendorNormalCard[] => {
+  if (!data) return [];
+  return Object.values(data.roomData.card || {}).flat();
+};
+
+export const canSkipGetGems = (
+  data?: SplendorWsRoomSyncData,
+  userID?: string
+): boolean => {
+  if (!data || !userID) return false;
+  if (userID !== data.roomData.currentPlayer) return false;
+  if (getGameStatus(data) !== SplendorGameStatus.PLAYING) return false;
+  if (getPlayerGemTotal(data, userID) !== 10) return false;
+
+  return !getBoardCards(data).some((card) => canBuy(data, card));
+};
+
 /** 判断当前玩家是否可预留某张卡 */
 export const canPreserve = (data?: SplendorWsRoomSyncData, card?: SplendorNormalCard): boolean => {
   if (!data || !card) return false;
