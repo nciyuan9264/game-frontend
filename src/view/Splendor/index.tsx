@@ -4,7 +4,7 @@ import styles from './index.module.less';
 import { useNavigate, useParams } from 'react-router-dom';
 import CardBoard from './components/CardBoard';
 import { message } from 'antd';
-import { wsUrl } from '@/const/env';
+import { splendorWsUrl } from '@/const/env';
 import MessageSender from './components/MessageSender';
 import { useFullHeight } from '@/hooks/useFullHeight';
 import { LeftOutlined } from '@ant-design/icons';
@@ -32,7 +32,7 @@ export default function Room() {
   const { confirm, ConfirmDialogHolder } = useConfirmDialog();
   const url = useMemo(() => {
     if(!roomID || !userID) return '';
-    return `${wsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`;
+    return `${splendorWsUrl}/splendor/ws?roomID=${roomID}&userID=${userID}`;
   }, [roomID, userID]);
 
   // const waitingModalComtent = useMemo(() => {
