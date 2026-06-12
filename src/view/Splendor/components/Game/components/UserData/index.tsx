@@ -49,7 +49,14 @@ const UserData = ({ data, userID, selectedCard, setSelectedCard }: UserDataProps
           })}
           <div className={styles.colorColumn}>
             <div className={styles.cardCountPlaceholder} />
-            <GemToken color="Gold" count={gem?.['Gold'] ?? 0} size="sm" className={styles.gemToken} />
+            <GemToken
+              color="Gold"
+              count={gem?.['Gold'] ?? 0}
+              size="sm"
+              className={classNames(styles.gemToken, {
+                [styles.dim]: (gem?.['Gold'] ?? 0) === 0,
+              })}
+            />
           </div>
         </div>
 
