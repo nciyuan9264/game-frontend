@@ -4,7 +4,7 @@ import { CompanyKey, WsRoomSyncData } from '@/types/AcquireRoom';
 import styles from './index.module.less';
 import { CompanyColor } from '@/const/color';
 import { GameStatus } from '@/enum/game';
-import MessageSender from '@/view/Splendor/components/MessageSender';
+import MessageSender from '@/view/Splendor/components/Game/components/MessageSender';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 
 interface PlayerAssetsProps {

@@ -5,6 +5,7 @@ const Home = lazy(() => import("@/view/Home"));
 const GameBoard = lazy(() => import("@/view/GameBoard"));
 const Acquire = lazy(() => import("@/view/Acquire"));
 const AcquireReplayPage = lazy(() => import("@/view/Acquire/Replay/page"));
+const Splendor = lazy(() => import("@/view/Splendor"));
 
 export interface AppRoute {
   path: string;
@@ -34,14 +35,14 @@ export const routes: AppRoute[] = [
     path: "/game/davinci/match",
     element: <DaVinci />
   },
-  // {
-  //   path: "/game/splendor",
-  //   element: <GameBoard />
-  // },
-  // {
-  //   path: "/splendor/room/:roomID",
-  //   element: <SplendorRoom />
-  // },
+  {
+    path: "/game/splendor",
+    element: <GameBoard />
+  },
+  {
+    path: "/game/splendor/match",
+    element: <Splendor />
+  },
   {
     path: "/",
     element: <Home />

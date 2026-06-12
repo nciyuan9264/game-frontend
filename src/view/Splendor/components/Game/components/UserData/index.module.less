@@ -1,0 +1,125 @@
+@gold: #f5c451;
+@accent: #a855f7;
+
+.userData {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+
+  .topRow {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    min-width: 0;
+  }
+
+  .cardGemSection {
+    display: flex;
+    gap: 10px;
+
+    .colorColumn {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+
+      .cardCount {
+        width: 2rem;
+        height: 2.6rem;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        border-radius: 0.35rem;
+        font-weight: 700;
+        font-size: 1rem;
+        border: 1px solid rgba(255, 255, 255, 0.2);
+      }
+
+      .cardCountPlaceholder {
+        width: 2rem;
+        height: 2.6rem;
+      }
+
+      .dim {
+        opacity: 0.35;
+      }
+    }
+  }
+
+  .reserveSection {
+    margin-left: auto;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+
+    .reserveSlot {
+      cursor: pointer;
+      border-radius: 0.6rem;
+      padding: 2px;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+
+      &.selected {
+        box-shadow: 0 0 0 2px @accent, 0 0 10px rgba(168, 85, 247, 0.6);
+      }
+
+      &.buyable {
+        box-shadow: 0 0 0 2px #34d399;
+      }
+
+      &.selected.buyable {
+        box-shadow: 0 0 0 2px #34d399, 0 0 10px rgba(52, 211, 153, 0.6);
+      }
+    }
+
+    .reserveEmpty {
+      width: 3.4rem;
+      height: 4.8rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border: 1px dashed rgba(168, 85, 247, 0.4);
+      border-radius: 0.6rem;
+      opacity: 0.5;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .userData {
+    gap: 10px;
+
+    .topRow {
+      gap: 10px;
+      flex-wrap: nowrap;
+    }
+
+    .cardGemSection {
+      gap: 8px;
+
+      .colorColumn .cardCount,
+      .colorColumn .cardCountPlaceholder {
+        width: 3rem;
+        height: 4.2rem;
+        font-size: 1.5rem;
+      }
+
+      .colorColumn .gemToken {
+        width: 2.4rem;
+        height: 2.4rem;
+        font-size: 1.25rem;
+      }
+    }
+
+    .reserveSection {
+      margin-left: auto;
+      gap: 6px;
+
+      .reserveEmpty {
+        width: 4.6rem;
+        height: 6.4rem;
+      }
+    }
+  }
+}

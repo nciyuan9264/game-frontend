@@ -1,0 +1,96 @@
+@gold: #f5c451;
+@accent: #a855f7;
+
+.playerList {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 10px;
+  background: rgba(28, 16, 48, 0.72);
+  border: 1px solid rgba(124, 58, 237, 0.32);
+  border-radius: 12px;
+  overflow-y: auto;
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  .playerCard {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    padding: 8px 10px;
+    background: rgba(40, 24, 66, 0.7);
+    border: 1px solid rgba(124, 58, 237, 0.25);
+    border-radius: 10px;
+
+    &.current {
+      border-color: @gold;
+      box-shadow: 0 0 0 1px @gold, 0 0 10px rgba(245, 196, 81, 0.35);
+    }
+
+    .header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+
+      .name {
+        font-size: 0.95rem;
+        font-weight: 600;
+        color: #ede9f7;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+        max-width: 70%;
+      }
+
+      .score {
+        font-size: 1.2rem;
+        font-weight: 800;
+        color: @gold;
+      }
+    }
+
+    .cardRow,
+    .gemRow {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 5px;
+      align-items: center;
+      min-height: 1.2rem;
+    }
+
+    .cardRow .cardCount {
+      width: 1.4rem;
+      height: 1.9rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 0.3rem;
+      font-weight: 700;
+      font-size: 0.8rem;
+      border: 1px solid rgba(255, 255, 255, 0.2);
+    }
+
+    .footer {
+      font-size: 0.75rem;
+      color: #b8a9d6;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .playerList {
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+    padding: 8px;
+
+    .playerCard {
+      min-width: 9.5rem;
+    }
+  }
+}

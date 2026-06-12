@@ -1,0 +1,43 @@
+@import "../../../../styles/variables.less";
+
+@splendor-gold: #f5c451;
+
+.match {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  min-height: 100%;
+  font-family: "Noto Sans SC", system-ui, -apple-system, BlinkMacSystemFont,
+    "Segoe UI", sans-serif;
+  color: #f1ecff;
+  margin: 0 auto;
+  padding: 1.5rem 2rem;
+  flex-direction: column;
+  gap: 3rem;
+
+  .seatGrid {
+    padding: 1rem;
+    margin: 0 auto;
+    width: 80%;
+    display: grid;
+    grid-template-columns: repeat(1, minmax(0, 1fr));
+    gap: 12px;
+    overflow-y: auto;
+
+    @media (min-width: 768px) {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+    }
+  }
+
+  .seatGrid::-webkit-scrollbar {
+    display: none;
+  }
+}
+
+@media (max-width: 768px) {
+  .match {
+    gap: 1rem;
+    padding: 1rem;
+  }
+}

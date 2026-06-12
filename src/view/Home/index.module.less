@@ -46,6 +46,13 @@
   --accent-border: rgba(245, 158, 11, 0.35);
 }
 
+.themeSplendor {
+  --accent-primary: #a855f7;
+  --accent-secondary: #ec4899;
+  --accent-soft: rgba(168, 85, 247, 0.15);
+  --accent-border: rgba(168, 85, 247, 0.38);
+}
+
 .backgroundDecor {
   position: fixed;
   inset: 0;
@@ -124,7 +131,7 @@
 .gameSwitcher {
   min-height: 72px;
   display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0.65rem;
   padding: 0.85rem;
   background:
@@ -135,7 +142,7 @@
   @media (max-width: 640px) {
     min-height: initial;
     padding: 0.7rem;
-    gap: 0.5rem;
+    gap: 0.4rem;
   }
 }
 
@@ -225,6 +232,19 @@
       radial-gradient(circle at 20% 35%, rgba(245, 158, 11, 0.22), transparent 28%),
       radial-gradient(circle at 82% 70%, rgba(124, 58, 237, 0.18), transparent 30%),
       repeating-linear-gradient(45deg, transparent 0 12px, rgba(255, 255, 255, 0.05) 12px 13px);
+  }
+}
+
+.gameTabSplendor {
+  --tab-primary: #a855f7;
+  --tab-secondary: #ec4899;
+  --tab-border: rgba(168, 85, 247, 0.5);
+
+  &::before {
+    background-image:
+      radial-gradient(circle at 22% 30%, rgba(168, 85, 247, 0.24), transparent 30%),
+      radial-gradient(circle at 80% 72%, rgba(236, 72, 153, 0.2), transparent 32%),
+      repeating-linear-gradient(135deg, transparent 0 13px, rgba(255, 255, 255, 0.05) 13px 14px);
   }
 }
 
@@ -820,6 +840,176 @@
     left: 0.2rem;
     color: white;
     background: linear-gradient(160deg, #7c3aed, #312e81);
+  }
+}
+
+.splendorMockup {
+  background: linear-gradient(180deg, #251a36, #0d0814);
+  border-color: #3a2c52;
+}
+
+.splendorUI {
+  height: 100%;
+  padding: 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  background:
+    radial-gradient(circle at 50% 18%, rgba(245, 196, 81, 0.14), transparent 38%),
+    linear-gradient(180deg, rgba(168, 85, 247, 0.12), transparent);
+}
+
+.splendorHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.scoreBadge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.24rem 0.6rem;
+  border-radius: 999px;
+  color: #211705;
+  font-size: 0.78rem;
+  font-weight: 900;
+  background: linear-gradient(160deg, #ffe9a8, #f5c451);
+  box-shadow: 0 10px 18px rgba(245, 196, 81, 0.22);
+}
+
+.gemRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.4rem;
+
+  .gemToken {
+    flex: 1;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    box-shadow:
+      inset 0 0 6px rgba(255, 255, 255, 0.5),
+      0 2px 6px rgba(0, 0, 0, 0.45);
+  }
+}
+
+.cardGrid {
+  flex: 1;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  grid-template-rows: repeat(2, 1fr);
+  gap: 0.45rem;
+}
+
+.devCard {
+  position: relative;
+  border-radius: 0.55rem;
+  border: 1px solid rgba(255, 255, 255, 0.16);
+  box-shadow: inset 0 0 10px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+
+  &.active {
+    border-color: rgba(245, 196, 81, 0.7);
+    box-shadow:
+      0 0 0 1px rgba(245, 196, 81, 0.6),
+      0 10px 18px -8px rgba(245, 196, 81, 0.5);
+  }
+
+  .devPoint {
+    position: absolute;
+    top: 0.25rem;
+    right: 0.35rem;
+    font-size: 0.8rem;
+    font-weight: 900;
+    color: #fff;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .devCost {
+    position: absolute;
+    left: 0.3rem;
+    bottom: 0.3rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.18rem;
+
+    i {
+      width: 0.5rem;
+      height: 0.5rem;
+      border-radius: 50%;
+      background: rgba(255, 255, 255, 0.8);
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    }
+  }
+}
+
+.nobleRow {
+  display: flex;
+  gap: 0.45rem;
+
+  .nobleTile {
+    flex: 1;
+    aspect-ratio: 1.4;
+    border-radius: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1rem;
+    color: rgba(245, 196, 81, 0.85);
+    background: linear-gradient(150deg, #2a2038 0%, #6b4f23 130%);
+    border: 1.5px solid rgba(245, 196, 81, 0.55);
+    box-shadow: inset 0 0 10px rgba(245, 196, 81, 0.2);
+  }
+}
+
+.floatingGem {
+  position: absolute;
+  z-index: 2;
+  top: 4.5rem;
+  right: 0.4rem;
+  width: 4rem;
+  height: 4rem;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.6rem;
+  font-weight: 900;
+  color: #fff;
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.5);
+  background: radial-gradient(circle at 32% 28%, #e9b8ff, #a855f7 52%, #6b21a8);
+  box-shadow:
+    inset 0 0 12px rgba(255, 255, 255, 0.5),
+    0 18px 32px -10px rgba(168, 85, 247, 0.65);
+}
+
+.floatingNoble {
+  position: absolute;
+  z-index: 2;
+  bottom: 5rem;
+  left: 0.2rem;
+  width: 6rem;
+  height: 8rem;
+  border-radius: 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  color: #f5c451;
+  background: linear-gradient(160deg, #3c2c1a, #6b4f23);
+  border: 1.5px solid rgba(245, 196, 81, 0.6);
+  box-shadow: 0 24px 42px rgba(0, 0, 0, 0.4), inset 0 0 16px rgba(245, 196, 81, 0.22);
+
+  span {
+    font-size: 2.4rem;
+    line-height: 1;
+  }
+
+  strong {
+    font-size: 1.4rem;
+    font-weight: 900;
   }
 }
 

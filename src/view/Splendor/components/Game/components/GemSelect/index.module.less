@@ -1,0 +1,142 @@
+@accent: #a855f7;
+
+.gemSelector {
+  height: 100%;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .gemRow {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .slots {
+    display: flex;
+    gap: 8px;
+
+    .slot {
+      width: 3rem;
+      height: 3rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      border-radius: 50%;
+      border: 1px dashed rgba(168, 85, 247, 0.6);
+      cursor: pointer;
+
+      .slotPlaceholder {
+        width: 1.1rem;
+        height: 1.1rem;
+        border-radius: 50%;
+        background: rgba(168, 85, 247, 0.15);
+      }
+
+      .slotGem {
+        width: 2.4rem;
+        height: 2.4rem;
+        font-size: 1.2rem;
+      }
+    }
+  }
+
+  .pool {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 14px;
+
+    .poolItem {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 2.8rem;
+      min-height: 2.8rem;
+
+      .emptyGem {
+        width: 3.2rem;
+        height: 3.2rem;
+        border-radius: 50%;
+        border: 1px dashed rgba(148, 163, 184, 0.3);
+        opacity: 0.4;
+      }
+
+      .poolGem {
+        width: 3.2rem;
+        height: 3.2rem;
+        font-size: 1.5rem;
+      }
+    }
+  }
+
+  .actions {
+    height: 100%;
+    display: flex;
+    gap: 8px;
+    flex-shrink: 0;
+    justify-content: flex-end;
+    align-items: flex-end;
+
+    button {
+      height: 2.4rem;
+      padding: 0.6rem 1.4rem;
+      font-size: 1.05rem;
+    }
+  }
+}
+
+@media (max-width: 768px) {
+  .gemSelector {
+    align-items: flex-end;
+    gap: 8px;
+
+    .gemRow {
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .slots {
+      gap: 5px;
+
+      .slot {
+        width: 2rem;
+        height: 2rem;
+
+        .slotGem {
+          width: 1.8rem;
+          height: 1.8rem;
+          font-size: 0.95rem;
+        }
+      }
+    }
+
+    .pool {
+      gap: 8px;
+
+      .poolItem {
+        min-width: 1.8rem;
+        min-height: 1.8rem;
+
+        .emptyGem {
+          width: 2.4rem;
+          height: 2.4rem;
+        }
+
+        .poolGem {
+          width: 2.4rem;
+          height: 2.4rem;
+          font-size: 1.15rem;
+        }
+      }
+    }
+
+    .actions {
+      justify-content: flex-end;
+      align-items: flex-end;
+    }
+  }
+}

@@ -4,12 +4,16 @@ import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowRight,
   Brain,
+  Coins,
   Cpu,
+  Crown,
   EyeOff,
+  Gem,
   Hash,
   Monitor,
   Puzzle,
   Smartphone,
+  Sparkles,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -52,6 +56,25 @@ const gameConfigs = [
       { icon: <Brain size={20} />, title: '逻辑推理', desc: '排除猜测，锁定真实数字' },
       { icon: <Puzzle size={20} />, title: '心理博弈', desc: '诱导对手，保护自身密码' },
       { icon: <Hash size={20} />, title: '快速开局', desc: '轻量规则，几分钟进入状态' },
+    ],
+  },
+  {
+    key: 'splendor',
+    tabTitle: '璀璨宝石',
+    tabSubtitle: 'SPLENDOR',
+    tabStatus: '资源引擎',
+    badge: '宝石商人 · 文艺复兴争锋',
+    title: 'SPLENDOR',
+    subtitle: '璀璨宝石',
+    description: '收集五色宝石，购入发展卡，赢得贵族青睐。步步积累引擎，率先夺取 15 分声望，加冕最闪耀的珠宝巨匠。',
+    route: '/game/splendor',
+    cta: '进入宝石大厅',
+    footer: 'Gem Merchant Guild',
+    features: [
+      { icon: <Gem size={20} />, title: '五色宝石', desc: '钻石/蓝宝/祖母绿/红宝/玛瑙' },
+      { icon: <Coins size={20} />, title: '引擎构筑', desc: '发展卡叠加，越滚越强' },
+      { icon: <Crown size={20} />, title: '贵族加冕', desc: '满足条件，坐拥额外声望' },
+      { icon: <Sparkles size={20} />, title: '15 分制胜', desc: '率先达成者赢得对局' },
     ],
   },
 ] as const;
@@ -186,11 +209,111 @@ const DaVinciVisual = () => (
   </>
 );
 
+const gemPalette = [
+  { light: '#ffffff', main: '#d7dde6', dark: '#9aa3b2' },
+  { light: '#7cc2ff', main: '#3b82f6', dark: '#1d4ed8' },
+  { light: '#5be0a6', main: '#10b981', dark: '#047857' },
+  { light: '#ff9b9b', main: '#ef4444', dark: '#b91c1c' },
+  { light: '#6b7280', main: '#374151', dark: '#111827' },
+];
+
+const SplendorVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: 0.82, opacity: 0, rotate: 4 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: 0.92, opacity: 0, rotate: -4 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.splendorMockup}`}
+    >
+      <div className={styles.splendorUI}>
+        <div className={styles.splendorHeader}>
+          <div className={styles.signalDots}>
+            <span />
+            <span />
+            <span />
+          </div>
+          <div className={styles.scoreBadge}>
+            <Sparkles size={11} />
+            15
+          </div>
+        </div>
+
+        <div className={styles.gemRow}>
+          {gemPalette.map((gem, i) => (
+            <div
+              key={i}
+              className={styles.gemToken}
+              style={{
+                background: `radial-gradient(circle at 32% 28%, ${gem.light}, ${gem.main} 52%, ${gem.dark})`,
+              }}
+            />
+          ))}
+        </div>
+
+        <div className={styles.cardGrid}>
+          {[0, 1, 2, 3, 4, 5].map(i => {
+            const gem = gemPalette[i % gemPalette.length];
+            return (
+              <div
+                key={i}
+                className={`${styles.devCard} ${[0, 4].includes(i) ? styles.active : ''}`}
+                style={{
+                  background: `linear-gradient(150deg, ${gem.dark} 0%, ${gem.main} 130%)`,
+                }}
+              >
+                <span className={styles.devPoint}>{(i % 3) + 1}</span>
+                <div className={styles.devCost}>
+                  <i />
+                  <i />
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        <div className={styles.nobleRow}>
+          {[0, 1, 2].map(i => (
+            <div key={i} className={styles.nobleTile}>♛</div>
+          ))}
+        </div>
+      </div>
+    </motion.div>
+
+    <motion.div
+      animate={{ y: [0, -12, 0] }}
+      transition={{ duration: 4.4, repeat: Infinity, ease: 'easeInOut' }}
+      className={styles.floatingGem}
+    >
+      3
+    </motion.div>
+
+    <motion.div
+      animate={{ y: [0, 12, 0], rotate: [8, 4, 8] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: 0.4 }}
+      className={styles.floatingNoble}
+    >
+      <span>♛</span>
+      <strong>3</strong>
+    </motion.div>
+  </>
+);
+
 export default function Home() {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState<GameKey>('acquire');
   const activeGame = useMemo(() => gameConfigs.find(game => game.key === activeKey) ?? gameConfigs[0], [activeKey]);
-  const themeClass = activeGame.key === 'acquire' ? styles.themeAcquire : styles.themeDavinci;
+  const themeMap = {
+    acquire: styles.themeAcquire,
+    davinci: styles.themeDavinci,
+    splendor: styles.themeSplendor,
+  } as const;
+  const tabThemeMap = {
+    acquire: styles.gameTabAcquire,
+    davinci: styles.gameTabDavinci,
+    splendor: styles.gameTabSplendor,
+  } as const;
+  const themeClass = themeMap[activeGame.key];
 
   return (
     <div className={`${styles.posterContainer} ${themeClass}`}>
@@ -212,7 +335,7 @@ export default function Home() {
               <button
                 key={game.key}
                 type="button"
-                className={`${styles.gameTab} ${game.key === 'acquire' ? styles.gameTabAcquire : styles.gameTabDavinci} ${selected ? styles.active : ''}`}
+                className={`${styles.gameTab} ${tabThemeMap[game.key]} ${selected ? styles.active : ''}`}
                 onClick={() => setActiveKey(game.key)}
               >
                 <span className={styles.tabText}>
@@ -279,7 +402,7 @@ export default function Home() {
           <div className={styles.visualArea}>
             <AnimatePresence mode="wait">
               <motion.div key={`${activeGame.key}-visual`} className={styles.visualMotion}>
-                {activeGame.key === 'acquire' ? <AcquireVisual /> : <DaVinciVisual />}
+                {activeGame.key === 'acquire' ? <AcquireVisual /> : activeGame.key === 'davinci' ? <DaVinciVisual /> : <SplendorVisual />}
               </motion.div>
             </AnimatePresence>
           </div>

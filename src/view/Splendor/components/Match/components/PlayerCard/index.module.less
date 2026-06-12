@@ -1,0 +1,290 @@
+@import '../../../../../../styles/variables.less';
+
+@accent: #a855f7;
+@accent-strong: #c4b5fd;
+@gold: #f5c451;
+
+.seat-card {
+  height: 8rem;
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 1rem 1rem 0.9rem;
+  color: @color-text-main;
+  border: 1px solid rgba(76, 51, 110, 0.95);
+  border-radius: 1rem;
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.7), 0 0 0 1px rgba(20, 10, 36, 0.9);
+  background: radial-gradient(circle at 0% 0%, rgba(40, 22, 66, 0.98), rgba(20, 10, 36, 0.94));
+  min-width: 0;
+
+  .seat-you-badge {
+    position: absolute;
+    top: -0.5rem;
+    right: -0.5rem;
+    background-color: @accent;
+    color: #fff;
+    font-size: 1rem;
+    font-weight: 600;
+    padding: 0.2rem 0.5rem;
+    border-radius: 999px;
+    z-index: 10;
+    pointer-events: none;
+  }
+
+  .seat-avatar {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 3.5rem;
+    height: 3.5rem;
+    border: 1px solid rgba(168, 85, 247, 0.6);
+    border-radius: 999px;
+    color: @accent-strong;
+
+    .default-content {
+      display: flex;
+    }
+
+    .hover-content {
+      display: none;
+    }
+  }
+
+  .seat-players {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+
+    .seat-player {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 0.25rem;
+
+      .seat-player-name {
+        font-size: 1.4rem;
+        font-weight: 600;
+        color: @gold;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        max-width: 8rem;
+
+        .default-content {
+          display: inline;
+        }
+
+        .hover-content {
+          display: none;
+        }
+      }
+    }
+  }
+
+  .seat-role {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1rem;
+    line-height: 1rem;
+    color: @color-text-soft;
+
+    .seat-role-text {
+      .default-content {
+        display: inline;
+      }
+
+      .hover-content {
+        display: none;
+      }
+    }
+  }
+}
+
+.seat-card-operable {
+  cursor: pointer;
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    transform: scale(0.99);
+  }
+}
+
+.seat-card-disabled {
+  cursor: not-allowed;
+  opacity: 0.8;
+}
+
+.tap-hint {
+  position: absolute;
+  right: 0.75rem;
+  bottom: 0.65rem;
+  display: none;
+  align-items: center;
+  gap: 0.25rem;
+  padding: 0.18rem 0.5rem;
+  border-radius: 999px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  pointer-events: none;
+}
+
+.tap-hint-add {
+  color: @accent-strong;
+  border: 1px solid fade(@accent, 70%);
+  background: fade(@accent, 12%);
+}
+
+.tap-hint-remove {
+  color: #f87171;
+  border: 1px solid rgba(248, 113, 113, 0.7);
+  background: rgba(239, 68, 68, 0.12);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .seat-card-operable {
+    &:not(.seat-card-empty):hover {
+      background: rgba(239, 68, 68, 0.16);
+      border-color: #ef4444;
+
+      .seat-avatar {
+        background: rgba(239, 68, 68, 0.18);
+        border-color: #ef4444;
+        color: #ef4444;
+
+        .default-content {
+          display: none;
+        }
+
+        .hover-content {
+          display: flex;
+        }
+      }
+
+      .seat-player-name,
+      .seat-role-text {
+        color: #ef4444;
+        font-weight: 600;
+
+        .default-content {
+          display: none;
+        }
+
+        .hover-content {
+          display: inline;
+        }
+      }
+    }
+
+    &.seat-card-empty:hover {
+      background: radial-gradient(circle at 0% 0%, rgba(168, 85, 247, 0.22), rgba(20, 10, 36, 0.92));
+      border-color: @accent;
+      color: @accent-strong;
+
+      .seat-avatar {
+        background: fade(@accent, 14%);
+        border-color: @accent;
+        color: @accent-strong;
+
+        .default-content {
+          display: none;
+        }
+
+        .hover-content {
+          display: flex;
+        }
+      }
+
+      .seat-player-name,
+      .seat-role-text {
+        color: @accent-strong;
+        font-weight: 600;
+
+        .default-content {
+          display: none;
+        }
+
+        .hover-content {
+          display: inline;
+        }
+      }
+    }
+  }
+
+  .seat-card-disabled:hover {
+    background: radial-gradient(circle at 0% 0%, rgba(40, 22, 66, 0.98), rgba(20, 10, 36, 0.94));
+    border-color: rgba(76, 51, 110, 0.95);
+  }
+}
+
+@media (hover: none), (pointer: coarse) {
+  .seat-card-operable {
+    padding-bottom: 1.45rem;
+  }
+
+  .seat-card-operable .hover-content {
+    display: none;
+  }
+
+  .seat-card-operable .default-content {
+    display: inline;
+  }
+
+  .seat-card-operable .seat-avatar .default-content {
+    display: flex;
+  }
+
+  .tap-hint {
+    display: inline-flex;
+  }
+}
+
+.add-animation {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(20, 10, 36, 0.9);
+  border-radius: 999px;
+  z-index: 5;
+
+  .loading-icon {
+    font-size: 1.5rem;
+    color: @accent-strong;
+    animation: spin 1s linear infinite;
+  }
+
+  .success-icon {
+    font-size: 1.5rem;
+    color: @accent-strong;
+    animation: scale-in 0.3s ease-out;
+  }
+}
+
+@keyframes spin {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@keyframes scale-in {
+  from {
+    transform: scale(0);
+    opacity: 0;
+  }
+  to {
+    transform: scale(1);
+    opacity: 1;
+  }
+}

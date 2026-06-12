@@ -1,0 +1,82 @@
+.noble {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  border-radius: 0.6rem;
+  background: linear-gradient(150deg, #2a2038 0%, #3c2c1a 60%, #6b4f23 130%);
+  border: 2px solid #f5c451;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.5), inset 0 0 14px rgba(245, 196, 81, 0.25);
+  overflow: hidden;
+  padding: 0.35rem;
+
+  .points {
+    font-size: 1.5rem;
+    font-weight: 800;
+    line-height: 1;
+    color: #f5c451;
+    text-shadow: 0 1px 3px rgba(0, 0, 0, 0.6);
+  }
+
+  .crest {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 2rem;
+    color: rgba(245, 196, 81, 0.35);
+    pointer-events: none;
+  }
+
+  .costList {
+    display: flex;
+    gap: 0.18rem;
+    align-items: flex-end;
+  }
+}
+
+.md {
+  width: 6.2rem;
+  height: 6.2rem;
+
+  .points {
+    font-size: 1.7rem;
+  }
+
+  .crest {
+    font-size: 2.4rem;
+  }
+}
+
+.sm {
+  width: 3.6rem;
+  height: 3.6rem;
+
+  .points {
+    font-size: 1.1rem;
+  }
+
+  .crest {
+    font-size: 1.4rem;
+  }
+}
+
+@media (max-width: 768px) {
+  .md {
+    width: 5rem;
+    height: 5rem;
+
+    .points {
+      font-size: 1.5rem;
+    }
+
+    .crest {
+      font-size: 2rem;
+    }
+  }
+
+  .sm {
+    width: 3rem;
+    height: 3rem;
+  }
+}

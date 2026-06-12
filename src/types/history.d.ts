@@ -2,7 +2,7 @@
 export type GameID = number;
 
 /** 支持历史战绩的游戏类型 */
-export type HistoryGameType = 'acquire' | 'davinci';
+export type HistoryGameType = 'acquire' | 'davinci' | 'splendor';
 
 /** 后端 RoomStatus 枚举 */
 export type HistoryGameStatus = string;

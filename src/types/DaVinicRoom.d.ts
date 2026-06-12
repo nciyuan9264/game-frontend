@@ -1,48 +1,6 @@
 /** 可用的游戏状态类型 */
 export type GameStatus = 'match' | 'waiting' | 'getCard' | 'guessCard' | 'setCard' | 'end';
 
-interface ListRoomInfo {
-  roomID: string;
-  ownerID: string;
-  maxPlayers: number;
-  status: GameStatus;
-  emptyTileCount: number;
-  roomPlayer: {
-    playerID: string;
-    online: boolean;
-    ready: boolean;
-    ai: boolean;
-  }[];
-}
-
-interface CreateRoomRequest {
-  RoomID?: string;
-  MaxPlayers: number;
-  AiCount: number;
-  UserID: string;
-}
-
-interface DeleteRoomRequest {
-  RoomID: string;
-}
-
-interface CreateRoomReponse {
-  roomID: string;
-}
-
-interface DeleteRoomReponse {}
-
-interface GetRoomListReponse {
-  rooms: ListRoomInfo[];
-  onlinePlayer: number;
-}
-
-interface RoomInfo {
-  maxPlayers: number;
-  roomStatus: GameStatus;
-  ownerID: string;
-}
-
 interface PlayerInfo {
   playerID: string;
   online: boolean;

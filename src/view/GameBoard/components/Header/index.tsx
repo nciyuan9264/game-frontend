@@ -4,7 +4,7 @@ import styles from './index.module.less'
 import { Dropdown } from 'antd';
 import { PlusCircleOutlined, UserOutlined, LogoutOutlined, HistoryOutlined, TrophyOutlined } from '@ant-design/icons';
 import { Button } from '../../../../components/Button';
-import { ListRoomInfo } from '@/types/AcquireRoom';
+import { ListRoomInfo } from '@/types/room';
 import ProfileModal from '../ProfileModal';
 import LeaderboardModal from '@/components/Leaderboard';
 import { profile2BackendName } from '@/util/user';
@@ -31,8 +31,19 @@ export const Header = ({
   const [profileVisible, setProfileVisible] = useState(false);
   const [leaderboardVisible, setLeaderboardVisible] = useState(false);
   const viewerID = profile2BackendName(userProfile);
-  const lobbyTitle = gameType === 'davinci' ? '达芬奇密码 游戏大厅' : 'Acquire 游戏大厅';
-  const historyGameType: HistoryGameType = gameType === 'davinci' ? 'davinci' : 'acquire';
+  const lobbyTitleMap: Record<GameType, string> = {
+    acquire: 'Acquire 游戏大厅',
+    davinci: '达芬奇密码 游戏大厅',
+    splendor: '璀璨宝石 游戏大厅',
+  };
+  // Splendor 暂无历史战绩，回退到 acquire
+  const historyGameTypeMap: Record<GameType, HistoryGameType> = {
+    acquire: 'acquire',
+    davinci: 'davinci',
+    splendor: 'acquire',
+  };
+  const lobbyTitle = lobbyTitleMap[gameType];
+  const historyGameType: HistoryGameType = historyGameTypeMap[gameType];
   const { dropdownTrigger } = useInteractionMode();
   const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 

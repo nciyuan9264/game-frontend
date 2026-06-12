@@ -4,7 +4,7 @@ import {
   DeleteRoomRequest,
   DeleteRoomReponse,
   GetRoomListReponse,
-} from '@/types/AcquireRoom';
+} from '@/types/room';
 import APIClient from './apiClient';
 import type { GameType } from '@/hooks/useGameType';
 

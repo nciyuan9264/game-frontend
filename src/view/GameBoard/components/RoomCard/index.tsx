@@ -2,8 +2,8 @@ import React from 'react';
 import styles from './index.module.less';
 import { useNavigate } from 'react-router-dom';
 import { message } from 'antd';
-import { ListRoomInfo } from '@/types/AcquireRoom';
-import { BankOutlined, HourglassOutlined, LoginOutlined, PlayCircleOutlined, UnlockOutlined } from '@ant-design/icons';
+import { ListRoomInfo } from '@/types/room';
+import { BankOutlined, GoldOutlined, HourglassOutlined, LoginOutlined, PlayCircleOutlined, UnlockOutlined } from '@ant-design/icons';
 import { backendName2FrontendName } from '@/util/user';
 import { GameType } from '@/hooks/useGameType';
 import { Button } from '@/components/Button';
@@ -19,31 +19,43 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
   const aiCount = data.roomPlayer.filter(player => player.ai).length;
   const maxPlayers = data.maxPlayers || 6;
   const isAcquire = gameType === 'acquire';
+  const isDavinci = gameType === 'davinci';
+  const isSplendor = gameType === 'splendor';
   const isMatching = data.status === 'match';
   const isEnded = data.status === 'end';
-  const progressText = isEnded
-    ? '已结束'
-    : isAcquire
-      ? isMatching
-        ? '匹配中'
-        : `${108 - data.emptyTileCount}/${108}`
-      : isMatching
-        ? '匹配中'
-        : `${26 - data.boardCardCount}/${26}`;
-  const progressPercent = isAcquire
-    ? isMatching
-      ? 0
-      : ((108 - data.emptyTileCount) / 108) * 100
-    : isMatching
-      ? 0
-      : ((26 - data.boardCardCount) / 26) * 100
+
+  // 各游戏进度展示：acquire 用地块进度，davinci 用牌量进度，splendor 用最高分进度（满分 15）
+  const getProgress = (): { text: string; percent: number } => {
+    if (isEnded) return { text: '已结束', percent: 100 };
+    if (isMatching) return { text: '匹配中', percent: 0 };
+    if (isAcquire) {
+      const empty = data.emptyTileCount ?? 0;
+      return { text: `${108 - empty}/${108}`, percent: ((108 - empty) / 108) * 100 };
+    }
+    if (isDavinci) {
+      const board = data.boardCardCount ?? 0;
+      return { text: `${26 - board}/${26}`, percent: ((26 - board) / 26) * 100 };
+    }
+    // splendor：用房间最高分 / 15 表示进度
+    const maxScore = data.maxScore ?? 0;
+    return { text: `${maxScore}/15`, percent: Math.min(maxScore / 15, 1) * 100 };
+  };
+  const { text: progressText, percent: progressPercent } = getProgress();
+
+  const progressLabel = isAcquire ? '地块进度' : isDavinci ? '对局状态' : '分数进度';
+  const progressBackground = isAcquire
+    ? 'linear-gradient(90deg, #0b3a3f, #00b3a6)'
+    : isDavinci
+      ? 'linear-gradient(90deg, #3b1d68, #f59e0b)'
+      : 'linear-gradient(90deg, #4c1d95, #f5c451)';
+  const footerText = isAcquire ? '公开房 · 无需密码' : isDavinci ? '推理房 · 无需密码' : '宝石房 · 无需密码';
   return (
     <article className={styles.card}>
       {/* header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.title}>
-            {isAcquire ? <BankOutlined /> : <PlayCircleOutlined />}
+            {isAcquire ? <BankOutlined /> : isSplendor ? <GoldOutlined /> : <PlayCircleOutlined />}
             <span>
               房间 {data.roomID}
             </span>
@@ -73,7 +85,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       {/* progress */}
       <div className={styles.progress}>
         <div className={styles.progressLabel}>
-          <span>{isAcquire ? '地块进度' : '对局状态'}</span>
+          <span>{progressLabel}</span>
           <span>{progressText}</span>
         </div>
         <div className={styles.progressTrack}>
@@ -81,9 +93,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
             className={styles.progressBar}
             style={{
               width: `${progressPercent}%`,
-              background: isAcquire
-                ? 'linear-gradient(90deg, #0b3a3f, #00b3a6)'
-                : 'linear-gradient(90deg, #3b1d68, #f59e0b)',
+              background: progressBackground,
             }}
           />
         </div>
@@ -93,7 +103,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       <div className={styles.footer}>
         <div className={styles.public}>
           <UnlockOutlined />
-          {isAcquire ? '公开房 · 无需密码' : '推理房 · 无需密码'}
+          {footerText}
         </div>
 
         <div className={styles.actions}>
@@ -114,7 +124,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
                   message.error('游戏已开始，无法加入');
                 }
               } else {
-                if (data.roomPlayer.length < 6) {
+                if (data.roomPlayer.length < maxPlayers) {
                   navigate(`/game/${gameType}/match?roomID=${data.roomID}`);
                 } else {
                   message.error('房间已满');

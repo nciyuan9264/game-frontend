@@ -1,0 +1,318 @@
+@import "../../../../styles/variables.less";
+
+@panel-bg: rgba(28, 16, 48, 0.72);
+@panel-border: rgba(124, 58, 237, 0.32);
+@gold: #f5c451;
+@accent: #a855f7;
+
+// Acquire 同款手法：分层渐变 + 毛玻璃 + 实线外框 + 内描边 + 大投影
+.panel-surface() {
+  background:
+    radial-gradient(circle at 0% 0%, rgba(124, 58, 237, 0.18), transparent 60%),
+    linear-gradient(135deg, rgba(40, 24, 72, 0.85), rgba(20, 10, 36, 0.92));
+  backdrop-filter: blur(18px) saturate(105%);
+  border: 1px solid @panel-border;
+  border-radius: 12px;
+  box-shadow:
+    inset 0 0 0 1px rgba(124, 58, 237, 0.12),
+    0 18px 40px rgba(0, 0, 0, 0.55);
+}
+
+// 金色虚线内框，与实线外框形成虚实混用质感
+.dashed-inset() {
+  content: "";
+  position: absolute;
+  inset: 0.5rem;
+  border-radius: inherit;
+  border: 1px dashed rgba(245, 196, 81, 0.28);
+  pointer-events: none;
+}
+
+.gameRoot {
+  width: 100%;
+  height: 100vh;
+  max-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding: 8px;
+  box-sizing: border-box;
+  color: #ede9f7;
+  overflow: hidden;
+}
+
+.topBar {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding: 10px 16px;
+  .panel-surface();
+
+  .header {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex: 1 1 0;
+    min-width: 0;
+
+    .backButton {
+      width: 2rem;
+      height: 2rem;
+      padding: 0;
+      flex-shrink: 0;
+      font-size: 1rem;
+      z-index: 1;
+    }
+
+    .rulesButton {
+      flex-shrink: 0;
+    }
+  }
+
+  .status {
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    padding: 0.3rem 1rem;
+    font-size: 1.05rem;
+    white-space: nowrap;
+    background: rgba(124, 58, 237, 0.16);
+    border: 1px solid rgba(124, 58, 237, 0.42);
+    border-radius: 999px;
+    box-shadow: inset 0 0 12px rgba(168, 85, 247, 0.18);
+
+    .yourTurn {
+      color: #7ee0b0;
+      font-weight: 700;
+      animation: pulse 1.2s infinite ease-in-out;
+    }
+
+    .waiting {
+      color: #d9cef0;
+    }
+
+    .ended {
+      color: @gold;
+      font-weight: 700;
+    }
+
+    .playerName {
+      margin: 0 6px;
+      padding: 2px 8px;
+      background-color: rgba(168, 85, 247, 0.22);
+      border-radius: 6px;
+      font-weight: 600;
+      color: #d8b4fe;
+    }
+  }
+
+  .right {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    flex: 1 1 0;
+    min-width: 0;
+    z-index: 1;
+
+    .countdown {
+      flex-shrink: 0;
+    }
+  }
+
+  .footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding-top: 6px;
+    border-top: 1px dashed rgba(124, 58, 237, 0.28);
+    font-size: 0.72rem;
+    color: @color-text-soft;
+
+    .footerInfo {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+
+      .scoreBadge {
+        display: inline-flex;
+        align-items: baseline;
+        gap: 0.2rem;
+        padding: 0.1rem 0.7rem;
+        border-radius: 999px;
+        background: radial-gradient(circle at 30% 25%, #ffe7a0, @gold 60%, #c8941f);
+        border: 1px solid rgba(255, 255, 255, 0.45);
+        box-shadow: inset 0 0 6px rgba(255, 255, 255, 0.45), 0 0 8px rgba(245, 196, 81, 0.4);
+
+        .scoreValue {
+          font-size: 1rem;
+          font-weight: 800;
+          line-height: 1;
+          color: #3a2c08;
+        }
+
+        .scoreLabel {
+          font-size: 0.66rem;
+          font-weight: 600;
+          color: #6b4e0a;
+        }
+      }
+
+      .footerItem {
+        display: inline-flex;
+        align-items: center;
+        gap: 0.35rem;
+
+        .anticon {
+          color: @gold;
+        }
+      }
+    }
+
+    .lastAction {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      color: #b8a9d6;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+
+      .lastActionBadge {
+        flex-shrink: 0;
+        padding: 1px 7px;
+        font-size: 0.66rem;
+        font-weight: 600;
+        color: #d8b4fe;
+        background: rgba(168, 85, 247, 0.2);
+        border: 1px solid rgba(168, 85, 247, 0.36);
+        border-radius: 6px;
+      }
+    }
+  }
+}
+
+.board {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  gap: 8px;
+
+  .cardBoardArea {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+  }
+
+  .playerDataArea {
+    width: 24%;
+    max-width: 320px;
+    min-width: 180px;
+    display: flex;
+  }
+}
+
+.gemSelectArea {
+  flex-shrink: 0;
+  position: relative;
+  padding: 10px 16px;
+  .panel-surface();
+
+}
+
+.assetsArea {
+  flex-shrink: 0;
+  position: relative;
+  display: flex;
+  gap: 8px;
+  padding: 10px 14px;
+  .panel-surface();
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.05);
+  }
+  100% {
+    transform: scale(1);
+  }
+}
+
+/* ===== 移动端：单页紧凑布局，对手区横向滚动 ===== */
+@media (max-width: 768px) {
+  .gameRoot {
+    height: auto;
+    min-height: 100vh;
+    max-height: none;
+    overflow: visible;
+    gap: 6px;
+    padding: 6px;
+  }
+
+  .topBar {
+    padding: 6px 10px;
+
+    .header {
+      gap: 6px;
+    }
+
+    .left {
+      gap: 8px;
+    }
+
+    .status {
+      padding: 0.25rem 0.7rem;
+      font-size: 0.85rem;
+    }
+
+    .footer {
+      flex-wrap: wrap;
+      gap: 4px 10px;
+
+      .footerInfo {
+        gap: 0.75rem;
+      }
+
+      .lastAction {
+        max-width: 100%;
+      }
+    }
+  }
+
+  .board {
+    flex: none;
+    flex-direction: column;
+
+    .cardBoardArea {
+      order: 1;
+      flex: none;
+    }
+
+    .playerDataArea {
+      order: 2;
+      width: 100%;
+      max-width: none;
+    }
+  }
+
+  .assetsArea {
+    flex-direction: column;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 10px;
+  }
+}

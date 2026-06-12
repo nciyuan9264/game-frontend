@@ -1,0 +1,51 @@
+.messageButton {
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  background-color: #a855f7;
+  border: none;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+  color: #fff;
+  transition: background 0.2s, transform 90ms ease, box-shadow 160ms ease;
+
+  .icon {
+    color: #fff;
+  }
+
+  &:active:not(:disabled) {
+    transform: scale(0.96);
+    background-color: #9333ea;
+  }
+}
+
+.popoverContent {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.messageItem {
+  padding: 6px 12px;
+  background-color: #fafafa;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  -webkit-tap-highlight-color: transparent;
+
+  &:active {
+    background-color: #ede9fe;
+  }
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .messageButton:hover:not(:disabled) {
+    background-color: #9333ea;
+    box-shadow: 0 4px 12px rgba(168, 85, 247, 0.4);
+    transform: translateY(-1px);
+  }
+
+  .messageItem:hover {
+    background-color: #f3e8ff;
+  }
+}

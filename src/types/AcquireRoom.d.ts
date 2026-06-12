@@ -1,43 +1,6 @@
 /** 可用的游戏状态类型 */
 export type GameStatus = 'match' | 'waiting' | 'createCompany' | 'buyStock' | 'merging' | 'mergingSelection' | 'mergingSettle' | 'end' | 'setTile';
 
-interface ListRoomInfo {
-  roomID: string;
-  ownerID: string;
-  maxPlayers: number;
-  status: GameStatus;
-  emptyTileCount: number;
-  boardCardCount: number;
-  roomPlayer: {
-    playerID: string;
-    online: boolean;
-    ready: boolean;
-    ai: boolean;
-  }[];
-}
-
-interface CreateRoomRequest {
-  RoomID?: string;
-  MaxPlayers: number;
-  AiCount: number;
-  UserID: string;
-}
-
-interface DeleteRoomRequest {
-  RoomID: string;
-}
-
-interface CreateRoomReponse {
-  roomID: string;
-}
-
-interface DeleteRoomReponse {}
-
-interface GetRoomListReponse {
-  rooms: ListRoomInfo[];
-  onlinePlayer: number;
-}
-
 interface PlayerData {
   money: number;
   stocks: Record<CompanyKey, number>;
@@ -57,13 +20,6 @@ interface CompanyInfoItem {
 interface TileData {
   id: string;
   belong: CompanyKey;
-}
-
-interface RoomInfo {
-  maxPlayers: string;
-  roomStatus: GameStatus; // 你可以加更多状态
-  roomStatus: boolean;
-  ownerID: string;
 }
 
 interface PlayerInfo {
