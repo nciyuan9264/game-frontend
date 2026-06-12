@@ -12,8 +12,7 @@ export interface DavinciLeaderboardEntry extends LeaderboardEntryBase {
 }
 
 export interface SplendorLeaderboardEntry extends LeaderboardEntryBase {
-  wins: number;
-  winRate: number;
+  avgRank: number;
 }
 
 export interface AcquireLeaderboardEntry extends LeaderboardEntryBase {

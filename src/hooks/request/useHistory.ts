@@ -16,7 +16,7 @@ export const useMyGames = () => {
     run: runListMyGames,
     loading: gamesLoading,
   } = useRequest(
-    async (params: ListGamesParams = {}) => {
+    async (params: ListGamesParams) => {
       return await listMyGames(params);
     },
     {
@@ -40,7 +40,7 @@ export const useMyStats = () => {
     run: runGetMyStats,
     loading: statsLoading,
   } = useRequest(
-    async (gameType: HistoryGameType = 'acquire') => {
+    async (gameType: HistoryGameType) => {
       return await getMyStats(gameType);
     },
     {
@@ -64,7 +64,7 @@ export const useGameDetail = () => {
     run: runGetGameDetail,
     loading: detailLoading,
   } = useRequest(
-    async (id: GameID, gameType: HistoryGameType = 'acquire') => {
+    async (id: GameID, gameType: HistoryGameType) => {
       return await getGameDetail(id, gameType);
     },
     {
@@ -88,7 +88,7 @@ export const useSnapshot = () => {
     run: runGetSnapshot,
     loading: snapshotLoading,
   } = useRequest(
-    async (id: GameID, seq: number, gameType: HistoryGameType = 'acquire') => {
+    async (id: GameID, seq: number, gameType: HistoryGameType) => {
       return await getSnapshot(id, seq, gameType);
     },
     {
@@ -112,7 +112,7 @@ export const useSnapshots = () => {
     run: runGetSnapshots,
     loading: snapshotsLoading,
   } = useRequest(
-    async (id: GameID, gameType: HistoryGameType = 'acquire') => {
+    async (id: GameID, gameType: HistoryGameType) => {
       const res = await getSnapshots(id, gameType);
       return (Array.isArray(res) ? res : (res as { snapshots: Snapshot[] }).snapshots) ?? [];
     },

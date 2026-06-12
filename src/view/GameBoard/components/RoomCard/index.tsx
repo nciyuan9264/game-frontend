@@ -14,48 +14,67 @@ interface RoomCardProps {
   userID: string;
 }
 
+type RoomProgress = { text: string; percent: number };
+
 const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
   const navigate = useNavigate();
   const aiCount = data.roomPlayer.filter(player => player.ai).length;
   const maxPlayers = data.maxPlayers || 6;
-  const isAcquire = gameType === 'acquire';
-  const isDavinci = gameType === 'davinci';
-  const isSplendor = gameType === 'splendor';
   const isMatching = data.status === 'match';
   const isEnded = data.status === 'end';
+  const roomCardMetaMap: Record<GameType, {
+    icon: React.ReactNode;
+    progressLabel: string;
+    progressBackground: string;
+    footerText: string;
+    getProgress: (room: ListRoomInfo) => RoomProgress;
+  }> = {
+    acquire: {
+      icon: <BankOutlined />,
+      progressLabel: '地块进度',
+      progressBackground: 'linear-gradient(90deg, #0b3a3f, #00b3a6)',
+      footerText: '公开房 · 无需密码',
+      getProgress: (room) => {
+        const empty = room.emptyTileCount ?? 0;
+        return { text: `${108 - empty}/${108}`, percent: ((108 - empty) / 108) * 100 };
+      },
+    },
+    davinci: {
+      icon: <PlayCircleOutlined />,
+      progressLabel: '对局状态',
+      progressBackground: 'linear-gradient(90deg, #3b1d68, #f59e0b)',
+      footerText: '推理房 · 无需密码',
+      getProgress: (room) => {
+        const board = room.boardCardCount ?? 0;
+        return { text: `${26 - board}/${26}`, percent: ((26 - board) / 26) * 100 };
+      },
+    },
+    splendor: {
+      icon: <GoldOutlined />,
+      progressLabel: '分数进度',
+      progressBackground: 'linear-gradient(90deg, #4c1d95, #f5c451)',
+      footerText: '宝石房 · 无需密码',
+      getProgress: (room) => {
+        const maxScore = room.maxScore ?? 0;
+        return { text: `${maxScore}/15`, percent: Math.min(maxScore / 15, 1) * 100 };
+      },
+    },
+  };
+  const meta = roomCardMetaMap[gameType];
 
-  // 各游戏进度展示：acquire 用地块进度，davinci 用牌量进度，splendor 用最高分进度（满分 15）
-  const getProgress = (): { text: string; percent: number } => {
+  const getProgress = (): RoomProgress => {
     if (isEnded) return { text: '已结束', percent: 100 };
     if (isMatching) return { text: '匹配中', percent: 0 };
-    if (isAcquire) {
-      const empty = data.emptyTileCount ?? 0;
-      return { text: `${108 - empty}/${108}`, percent: ((108 - empty) / 108) * 100 };
-    }
-    if (isDavinci) {
-      const board = data.boardCardCount ?? 0;
-      return { text: `${26 - board}/${26}`, percent: ((26 - board) / 26) * 100 };
-    }
-    // splendor：用房间最高分 / 15 表示进度
-    const maxScore = data.maxScore ?? 0;
-    return { text: `${maxScore}/15`, percent: Math.min(maxScore / 15, 1) * 100 };
+    return meta.getProgress(data);
   };
   const { text: progressText, percent: progressPercent } = getProgress();
-
-  const progressLabel = isAcquire ? '地块进度' : isDavinci ? '对局状态' : '分数进度';
-  const progressBackground = isAcquire
-    ? 'linear-gradient(90deg, #0b3a3f, #00b3a6)'
-    : isDavinci
-      ? 'linear-gradient(90deg, #3b1d68, #f59e0b)'
-      : 'linear-gradient(90deg, #4c1d95, #f5c451)';
-  const footerText = isAcquire ? '公开房 · 无需密码' : isDavinci ? '推理房 · 无需密码' : '宝石房 · 无需密码';
   return (
     <article className={styles.card}>
       {/* header */}
       <div className={styles.header}>
         <div className={styles.headerLeft}>
           <div className={styles.title}>
-            {isAcquire ? <BankOutlined /> : isSplendor ? <GoldOutlined /> : <PlayCircleOutlined />}
+            {meta.icon}
             <span>
               房间 {data.roomID}
             </span>
@@ -85,7 +104,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       {/* progress */}
       <div className={styles.progress}>
         <div className={styles.progressLabel}>
-          <span>{progressLabel}</span>
+          <span>{meta.progressLabel}</span>
           <span>{progressText}</span>
         </div>
         <div className={styles.progressTrack}>
@@ -93,7 +112,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
             className={styles.progressBar}
             style={{
               width: `${progressPercent}%`,
-              background: progressBackground,
+              background: meta.progressBackground,
             }}
           />
         </div>
@@ -103,7 +122,7 @@ const RoomCard: React.FC<RoomCardProps> = ({ data, gameType, userID }) => {
       <div className={styles.footer}>
         <div className={styles.public}>
           <UnlockOutlined />
-          {footerText}
+          {meta.footerText}
         </div>
 
         <div className={styles.actions}>

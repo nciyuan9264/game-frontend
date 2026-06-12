@@ -51,6 +51,21 @@ const getAcquireRank = (game: Game, currentPlayerID: string) => {
   return rankIndex >= 0 ? `第${rankIndex + 1}名` : '-';
 };
 
+const getWinnerName = (game: Game) =>
+  game.winnerPlayerID ? backendName2FrontendName(game.winnerPlayerID) : '-';
+
+const getWinLoseText = (game: Game, currentPlayerID: string) => {
+  const me = game.players?.find((p) => p.playerID === currentPlayerID);
+  if (!me) return '-';
+  return me.isWinner ? '胜利' : '失败';
+};
+
+const formatMoneyScore = (score?: number | null) =>
+  score === undefined || score === null ? '-' : `$${score}`;
+
+const formatPointScore = (score?: number | null) =>
+  score === undefined || score === null ? '-' : `${score}`;
+
 const ProfileModal: React.FC<ProfileModalProps> = ({
   visible,
   onClose,
@@ -60,8 +75,52 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   const navigate = useNavigate();
   const { games, runListMyGames, gamesLoading } = useMyGames();
   const { stats, runGetMyStats, statsLoading } = useMyStats();
-  const isAcquire = gameType === 'acquire';
-  const gameName = isAcquire ? 'Acquire' : '达芬奇密码';
+  const profileMetaMap: Record<HistoryGameType, {
+    name: string;
+    themeClass: string;
+    avgScoreFormatter: (score?: number | null) => string;
+    rowClickableClass: string;
+    metaLabel: string;
+    getMetaValue: (game: Game, currentPlayerID: string) => string;
+    secondaryLabel: string;
+    getSecondaryValue: (game: Game, currentPlayerID: string) => string;
+    replayPath?: (gameId: GameID) => string;
+  }> = {
+    acquire: {
+      name: 'Acquire',
+      themeClass: styles.themeAcquire,
+      avgScoreFormatter: formatMoneyScore,
+      rowClickableClass: styles.rowClickable,
+      metaLabel: '排名',
+      getMetaValue: getAcquireRank,
+      secondaryLabel: '我的得分',
+      getSecondaryValue: (game, currentPlayerID) =>
+        formatMoneyScore(game.players?.find((p) => p.playerID === currentPlayerID)?.finalScore),
+      replayPath: (gameId) => `/game/acquire/replay/${gameId}`,
+    },
+    davinci: {
+      name: '达芬奇密码',
+      themeClass: styles.themeDavinci,
+      avgScoreFormatter: () => '-',
+      rowClickableClass: styles.rowStatic,
+      metaLabel: '胜者',
+      getMetaValue: getWinnerName,
+      secondaryLabel: '结果',
+      getSecondaryValue: getWinLoseText,
+    },
+    splendor: {
+      name: '璀璨宝石',
+      themeClass: styles.themeSplendor,
+      avgScoreFormatter: formatPointScore,
+      rowClickableClass: styles.rowStatic,
+      metaLabel: '胜者',
+      getMetaValue: getWinnerName,
+      secondaryLabel: '我的得分',
+      getSecondaryValue: (game, currentPlayerID) =>
+        formatPointScore(game.players?.find((p) => p.playerID === currentPlayerID)?.finalScore),
+    },
+  };
+  const meta = profileMetaMap[gameType];
 
   useEffect(() => {
     if (visible) {
@@ -71,29 +130,21 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
   }, [visible, gameType]);
 
   const winRatePct = stats ? `${(stats.winRate * 100).toFixed(1)}%` : '-';
-  const avgScoreText = isAcquire && stats?.avgScore !== undefined
-    ? `$${stats.avgScore}`
-    : '-';
+  const avgScoreText = meta.avgScoreFormatter(stats?.avgScore);
 
   const handleRowClick = (gameId: GameID) => {
-    if (!isAcquire) return;
+    if (!meta.replayPath) return;
     onClose();
-    navigate(`/game/acquire/replay/${gameId}`);
+    navigate(meta.replayPath(gameId));
   };
 
   const renderGameRow = (game: Game) => {
     const me = game.players?.find((p) => p.playerID === userID);
     const isWin = !!me?.isWinner;
-    const myScore = me?.finalScore;
-    const resultText = me ? (isWin ? '胜利' : '失败') : '-';
-    const acquireRank = getAcquireRank(game, userID);
-    const winnerName = game.winnerPlayerID
-      ? backendName2FrontendName(game.winnerPlayerID)
-      : '-';
     return (
       <div
         key={game.id}
-        className={`${styles.row} ${isAcquire ? styles.rowClickable : styles.rowStatic}`}
+        className={`${styles.row} ${meta.rowClickableClass}`}
         onClick={() => handleRowClick(game.id)}
       >
         <div className={`${styles.col} ${styles.colTime}`}>
@@ -107,16 +158,12 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
           </span>
         </div>
         <div className={`${styles.col} ${styles.colMeta}`}>
-          <span className={styles.label}>{isAcquire ? '排名' : '胜者'}</span>
-          <span className={styles.value}>{isAcquire ? acquireRank : winnerName}</span>
+          <span className={styles.label}>{meta.metaLabel}</span>
+          <span className={styles.value}>{meta.getMetaValue(game, userID)}</span>
         </div>
         <div className={`${styles.col} ${styles.colSecondary}`}>
-          <span className={styles.label}>{isAcquire ? '我的得分' : '结果'}</span>
-          <span className={styles.value}>
-            {isAcquire
-              ? myScore !== undefined && myScore !== null ? `$${myScore}` : '-'
-              : resultText}
-          </span>
+          <span className={styles.label}>{meta.secondaryLabel}</span>
+          <span className={styles.value}>{meta.getSecondaryValue(game, userID)}</span>
         </div>
         <div className={`${styles.col} ${styles.colTag}`}>
           <span
@@ -134,11 +181,11 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
 
   return (
     <Modal visible={visible} onClose={onClose}>
-      <div className={`${styles.root} ${isAcquire ? styles.themeAcquire : styles.themeDavinci}`}>
+      <div className={`${styles.root} ${meta.themeClass}`}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <UserOutlined className={styles.headerIcon} />
-            <span className={styles.headerTitle}>{gameName} 个人主页</span>
+            <span className={styles.headerTitle}>{meta.name} 个人主页</span>
           </div>
           <button
             type="button"
@@ -170,7 +217,7 @@ const ProfileModal: React.FC<ProfileModalProps> = ({
             </div>
           </div>
 
-          <div className={styles.listTitle}>{gameName} 历史对局（最近 20 局）</div>
+          <div className={styles.listTitle}>{meta.name} 历史对局（最近 20 局）</div>
 
           {!games?.length ? (
             <div className={styles.empty}>

@@ -9,7 +9,6 @@ import ProfileModal from '../ProfileModal';
 import LeaderboardModal from '@/components/Leaderboard';
 import { profile2BackendName } from '@/util/user';
 import { GameType } from '@/hooks/useGameType';
-import type { HistoryGameType } from '@/types/history';
 import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 
@@ -36,15 +35,7 @@ export const Header = ({
     davinci: '达芬奇密码 游戏大厅',
     splendor: '璀璨宝石 游戏大厅',
   };
-  // Splendor 暂无历史战绩，回退到 acquire
-  const historyGameTypeMap: Record<GameType, HistoryGameType> = {
-    acquire: 'acquire',
-    davinci: 'davinci',
-    splendor: 'acquire',
-  };
   const lobbyTitle = lobbyTitleMap[gameType];
-  const historyGameType: HistoryGameType = historyGameTypeMap[gameType];
-  const leaderboardGameType: HistoryGameType = gameType;
   const { dropdownTrigger } = useInteractionMode();
   const { confirm, ConfirmDialogHolder } = useConfirmDialog();
 
@@ -130,12 +121,12 @@ export const Header = ({
         visible={profileVisible}
         onClose={() => setProfileVisible(false)}
         userID={viewerID}
-        gameType={historyGameType}
+        gameType={gameType}
       />
       <LeaderboardModal
         visible={leaderboardVisible}
         onClose={() => setLeaderboardVisible(false)}
-        gameType={leaderboardGameType}
+        gameType={gameType}
       />
       {ConfirmDialogHolder}
     </div>

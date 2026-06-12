@@ -9,15 +9,15 @@ import type {
 } from '@/types/history';
 
 export interface ListGamesParams {
-  gameType?: HistoryGameType;
+  gameType: HistoryGameType;
   limit?: number;
   offset?: number;
 }
 
 export const listMyGames = async (
-  params: ListGamesParams = {}
+  params: ListGamesParams
 ): Promise<ListGamesData> => {
-  const { gameType = 'acquire', limit = 20, offset = 0 } = params;
+  const { gameType, limit = 20, offset = 0 } = params;
   return APIClient.get({
     url: `/api/${gameType}/history/games`,
     params: { limit, offset },
@@ -26,7 +26,7 @@ export const listMyGames = async (
 
 export const getGameDetail = async (
   id: GameID,
-  gameType: HistoryGameType = 'acquire'
+  gameType: HistoryGameType
 ): Promise<GameDetailData> => {
   return APIClient.get({
     url: `/api/${gameType}/history/game/${id}`,
@@ -36,7 +36,7 @@ export const getGameDetail = async (
 export const getSnapshot = async (
   id: GameID,
   seq: number,
-  gameType: HistoryGameType = 'acquire'
+  gameType: HistoryGameType
 ): Promise<Snapshot> => {
   return APIClient.get({
     url: `/api/${gameType}/history/game/${id}/snapshot`,
@@ -46,7 +46,7 @@ export const getSnapshot = async (
 
 export const getSnapshots = async (
   id: GameID,
-  gameType: HistoryGameType = 'acquire'
+  gameType: HistoryGameType
 ): Promise<Snapshot[]> => {
   return APIClient.get({
     url: `/api/${gameType}/history/game/${id}/snapshots`,
@@ -54,7 +54,7 @@ export const getSnapshots = async (
 };
 
 export const getMyStats = async (
-  gameType: HistoryGameType = 'acquire'
+  gameType: HistoryGameType
 ): Promise<Stats> => {
   return APIClient.get({
     url: `/api/${gameType}/history/stats`,

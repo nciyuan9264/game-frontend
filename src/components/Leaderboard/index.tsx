@@ -22,6 +22,23 @@ interface LeaderboardModalProps {
   gameType: HistoryGameType;
 }
 
+type LeaderboardMetricKind = 'avgRank' | 'winRate';
+
+const formatAvgRank = (entry: LeaderboardEntry) => {
+  const avgRank = (entry as AcquireLeaderboardEntry | SplendorLeaderboardEntry).avgRank;
+  return typeof avgRank === 'number' ? avgRank.toFixed(2) : '-';
+};
+
+const formatWins = (entry: LeaderboardEntry) => {
+  const wins = (entry as DavinciLeaderboardEntry).wins;
+  return typeof wins === 'number' ? wins : '-';
+};
+
+const formatWinRate = (entry: LeaderboardEntry) => {
+  const winRate = (entry as DavinciLeaderboardEntry).winRate;
+  return typeof winRate === 'number' ? `${(winRate * 100).toFixed(1)}%` : '-';
+};
+
 const sortEntries = (
   entries: LeaderboardEntry[],
   gameType: HistoryGameType,
@@ -32,24 +49,25 @@ const sortEntries = (
     list.sort((a, b) => b.totalGames - a.totalGames);
     return list;
   }
-  if (gameType === 'acquire') {
-    list.sort(
-      (a, b) =>
-        ((a as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
-        ((b as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY)
-    );
-    return list;
-  }
-  list.sort((a, b) => {
-    const aw = (a as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate;
-    const bw = (b as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate;
-    if (typeof aw === 'number' && typeof bw === 'number') {
-      return bw - aw;
-    }
-    if (typeof bw === 'number') return 1;
-    if (typeof aw === 'number') return -1;
-    return b.totalGames - a.totalGames;
-  });
+  const sortByMetricMap: Record<HistoryGameType, (a: LeaderboardEntry, b: LeaderboardEntry) => number> = {
+    acquire: (a, b) =>
+      ((a as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
+      ((b as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY),
+    davinci: (a, b) => {
+      const aw = (a as DavinciLeaderboardEntry).winRate;
+      const bw = (b as DavinciLeaderboardEntry).winRate;
+      if (typeof aw === 'number' && typeof bw === 'number') {
+        return bw - aw;
+      }
+      if (typeof bw === 'number') return 1;
+      if (typeof aw === 'number') return -1;
+      return b.totalGames - a.totalGames;
+    },
+    splendor: (a, b) =>
+      ((a as SplendorLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
+      ((b as SplendorLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY),
+  };
+  list.sort(sortByMetricMap[gameType]);
   return list;
 };
 
@@ -58,20 +76,50 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   onClose,
   gameType,
 }) => {
-  const isAcquire = gameType === 'acquire';
-  const titleMap: Record<HistoryGameType, string> = {
-    acquire: 'Acquire 排行榜',
-    davinci: '达芬奇密码 排行榜',
-    splendor: '璀璨宝石 排行榜',
+  const leaderboardMetaMap: Record<HistoryGameType, {
+    title: string;
+    themeClass: string;
+    metricLabel: string;
+    metricKind: LeaderboardMetricKind;
+  }> = {
+    acquire: {
+      title: 'Acquire 排行榜',
+      themeClass: styles.themeAcquire,
+      metricLabel: '战绩（平均排名）',
+      metricKind: 'avgRank',
+    },
+    davinci: {
+      title: '达芬奇密码 排行榜',
+      themeClass: styles.themeDavinci,
+      metricLabel: '战绩（胜率）',
+      metricKind: 'winRate',
+    },
+    splendor: {
+      title: '璀璨宝石 排行榜',
+      themeClass: styles.themeSplendor,
+      metricLabel: '战绩（平均排名）',
+      metricKind: 'avgRank',
+    },
   };
-  const title = titleMap[gameType];
-  const metricLabel = isAcquire ? '战绩（平均排名）' : '战绩（胜率）';
-  const themeClass =
-    gameType === 'acquire'
-      ? styles.themeAcquire
-      : gameType === 'davinci'
-        ? styles.themeDavinci
-        : styles.themeSplendor;
+  const meta = leaderboardMetaMap[gameType];
+  const headerCellsMap: Record<LeaderboardMetricKind, React.ReactNode> = {
+    avgRank: <div className={styles.colNum}>平均排名</div>,
+    winRate: (
+      <>
+        <div className={styles.colNum}>胜场</div>
+        <div className={styles.colNum}>胜率</div>
+      </>
+    ),
+  };
+  const metricCellsMap: Record<LeaderboardMetricKind, (entry: LeaderboardEntry) => React.ReactNode> = {
+    avgRank: (entry) => <div className={styles.colNum}>{formatAvgRank(entry)}</div>,
+    winRate: (entry) => (
+      <>
+        <div className={styles.colNum}>{formatWins(entry)}</div>
+        <div className={styles.colNum}>{formatWinRate(entry)}</div>
+      </>
+    ),
+  };
 
   const [sortDim, setSortDim] = useState<LeaderboardSortDim>('metric');
   const { data, run, loading } = useLeaderboard();
@@ -94,14 +142,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
       <div className={styles.colRank}>#</div>
       <div className={styles.colPlayer}>玩家</div>
       <div className={styles.colNum}>总场次</div>
-      {isAcquire ? (
-        <div className={styles.colNum}>平均排名</div>
-      ) : (
-        <>
-          <div className={styles.colNum}>胜场</div>
-          <div className={styles.colNum}>胜率</div>
-        </>
-      )}
+      {headerCellsMap[meta.metricKind]}
     </div>
   );
 
@@ -135,26 +176,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
           {isMe ? <span className={styles.meBadge}>我</span> : null}
         </div>
         <div className={styles.colNum}>{entry.totalGames}</div>
-        {isAcquire ? (
-          <div className={styles.colNum}>
-            {typeof (entry as AcquireLeaderboardEntry).avgRank === 'number'
-              ? (entry as AcquireLeaderboardEntry).avgRank.toFixed(2)
-              : '-'}
-          </div>
-        ) : (
-          <>
-            <div className={styles.colNum}>
-              {typeof (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).wins === 'number'
-                ? (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).wins
-                : '-'}
-            </div>
-            <div className={styles.colNum}>
-              {typeof (entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate === 'number'
-                ? `${(((entry as DavinciLeaderboardEntry | SplendorLeaderboardEntry).winRate as number) * 100).toFixed(1)}%`
-                : '-'}
-            </div>
-          </>
-        )}
+        {metricCellsMap[meta.metricKind](entry)}
       </div>
     );
   };
@@ -163,11 +185,11 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
 
   return (
     <Modal visible={visible} onClose={onClose}>
-      <div className={`${styles.root} ${themeClass}`}>
+      <div className={`${styles.root} ${meta.themeClass}`}>
         <div className={styles.header}>
           <div className={styles.headerLeft}>
             <TrophyOutlined className={styles.headerIcon} />
-            <span className={styles.headerTitle}>{title}</span>
+            <span className={styles.headerTitle}>{meta.title}</span>
           </div>
           <button
             type="button"
@@ -186,7 +208,7 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
               className={`${styles.sortTab} ${sortDim === 'metric' ? styles.sortTabActive : ''}`}
               onClick={() => setSortDim('metric')}
             >
-              {metricLabel}
+              {meta.metricLabel}
             </button>
             <button
               type="button"

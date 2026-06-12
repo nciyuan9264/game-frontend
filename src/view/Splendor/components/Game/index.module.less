@@ -18,16 +18,6 @@
     0 18px 40px rgba(0, 0, 0, 0.55);
 }
 
-// 金色虚线内框，与实线外框形成虚实混用质感
-.dashed-inset() {
-  content: "";
-  position: absolute;
-  inset: 0.5rem;
-  border-radius: inherit;
-  border: 1px dashed rgba(245, 196, 81, 0.28);
-  pointer-events: none;
-}
-
 .gameRoot {
   width: 100%;
   height: 100vh;
@@ -152,7 +142,7 @@
     justify-content: space-between;
     gap: 10px;
     padding-top: 6px;
-    border-top: 1px dashed rgba(124, 58, 237, 0.28);
+    border-top: 1px solid rgba(124, 58, 237, 0.24);
     font-size: 0.72rem;
     color: @color-text-soft;
 

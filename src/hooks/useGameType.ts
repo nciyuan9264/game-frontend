@@ -8,6 +8,12 @@ export enum GameTypeEnum {
   Davinci = 'davinci',
 }
 
+const gameTypes: GameType[] = [
+  GameTypeEnum.Acquire,
+  GameTypeEnum.Splendor,
+  GameTypeEnum.Davinci,
+];
+
 export const useGameType = () => {
   const [gameType, setGameType] = useState<GameType>('acquire');
   const location = useLocation();
@@ -16,9 +22,11 @@ export const useGameType = () => {
   const currentGameType = useMemo<GameType>(() => {
     const pathname = location.pathname;
     const parts = pathname.split('/').filter(Boolean);
-    if (parts.length > 0) {
-      const lastPart = parts[parts.length - 1];
-      return lastPart as GameType;
+    const matchedGameType = parts.find((part): part is GameType =>
+      gameTypes.includes(part as GameType)
+    );
+    if (matchedGameType) {
+      return matchedGameType;
     }
     return GameTypeEnum.Acquire; // 默认返回acquire
   }, [location.pathname]);
