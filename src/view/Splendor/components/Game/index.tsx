@@ -120,10 +120,6 @@ export const Game: FC<IGameProps> = ({
         </div>
         <div className={styles.footer}>
           <div className={styles.footerInfo}>
-            <span className={styles.scoreBadge}>
-              <span className={styles.scoreValue}>{data.playerData[userID]?.score ?? 0}</span>
-              <span className={styles.scoreLabel}>分</span>
-            </span>
             <span className={styles.footerItem}>
               <HomeOutlined /> 房间 {roomID}
             </span>
