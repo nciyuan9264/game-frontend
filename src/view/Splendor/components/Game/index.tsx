@@ -60,10 +60,10 @@ export const Game: FC<IGameProps> = ({
 
   // 轮到自己时播放音效
   useEffect(() => {
-    if (myTurn) {
+    if (myTurn && gameStatus !== SplendorGameStatus.END) {
       playAudio(AudioTypeEnum.YourTurn);
     }
-  }, [data.roomData.currentPlayer, myTurn]);
+  }, [data.roomData.currentPlayer, myTurn, gameStatus]);
 
   // 每次同步清空选中卡
   useEffect(() => {

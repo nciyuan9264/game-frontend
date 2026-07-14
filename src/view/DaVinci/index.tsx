@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import {  WsMatchSyncData, WsRoomSyncData } from '@/types/DaVinicRoom';
 import { profile2BackendName } from '@/util/user';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { message } from 'antd';
-import { useAudio } from '@/hooks/useAudio';
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 
 import { Game } from './components/Game';
 import { Match } from './components/Match';
@@ -22,6 +22,7 @@ export default function DaVinci() {
   const [wsMatchSyncData, setWsMatchSyncData] = useState<WsMatchSyncData>();
   const [wsRoomSyncData, setWsRoomSyncData] = useState<WsRoomSyncData>();
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
+  const gameEndedRef = useRef(false);
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
@@ -42,6 +43,9 @@ export default function DaVinci() {
     }
     if (newData.type === 'audio') {
       const audioType = newData.message;
+      if (audioType === AudioTypeEnum.YourTurn && gameEndedRef.current) {
+        return;
+      }
       if (audioType) {
         playAudio(audioType);
       }
@@ -51,14 +55,17 @@ export default function DaVinci() {
       const matchData: WsMatchSyncData = newData as WsMatchSyncData;
       setWsMatchSyncData(matchData)
       setWsRoomSyncData(undefined);
+      gameEndedRef.current = false;
     }
     if (newData.type === 'ROOM_SYNC') {
       setWsMatchSyncData(undefined);
       const roomData: WsRoomSyncData = newData as WsRoomSyncData;
       setWsRoomSyncData(roomData);
       if (roomData.roomData.gameStatus === 'end') {
+        gameEndedRef.current = true;
         setGameEndModalVisible(true);
       } else {
+        gameEndedRef.current = false;
         setGameEndModalVisible(false);
       }
     }

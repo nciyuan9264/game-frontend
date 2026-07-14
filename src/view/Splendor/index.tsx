@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { SplendorWsMatchSyncData, SplendorWsRoomSyncData } from '@/types/SplendorRoom';
 import { profile2BackendName } from '@/util/user';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { message } from 'antd';
-import { useAudio } from '@/hooks/useAudio';
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import { SplendorGameStatus } from '@/enum/game';
 
 import { Game } from './components/Game';
@@ -23,6 +23,7 @@ export default function Splendor() {
   const [wsMatchSyncData, setWsMatchSyncData] = useState<SplendorWsMatchSyncData>();
   const [wsRoomSyncData, setWsRoomSyncData] = useState<SplendorWsRoomSyncData>();
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
+  const gameEndedRef = useRef(false);
   const navigate = useNavigate();
   const { playAudio } = useAudio();
 
@@ -44,6 +45,9 @@ export default function Splendor() {
     }
     if (newData.type === 'audio') {
       const audioType = newData.message;
+      if (audioType === AudioTypeEnum.YourTurn && gameEndedRef.current) {
+        return;
+      }
       if (audioType) {
         playAudio(audioType);
       }
@@ -59,8 +63,10 @@ export default function Splendor() {
       const roomData = newData as SplendorWsRoomSyncData;
       setWsRoomSyncData(roomData);
       if (roomData.roomData.roomInfo.gameStatus === SplendorGameStatus.END) {
+        gameEndedRef.current = true;
         setGameEndModalVisible(true);
       } else {
+        gameEndedRef.current = false;
         setGameEndModalVisible(false);
       }
     }

@@ -20,7 +20,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/acquire/, ''),
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTI3ODU3MywiaWF0IjoxNzgxMjY5NTczLCJqdGkiOiI5N2E5ZmJjNS02NDYwLTRlOTMtODI5ZS03MTNjZDk3ZGE0NGQifQ.qpyrJ0hpeGEEtPaw9_yb4APFXHo_kLZdOG1j8qecLksBRlrZXJVo_MEXPw1WZWpRfwwdcZI4uN4KlBoNtz8R3mlUlItoWql_6JgTuHzZalSCEI6aRA30GLI7fS373Kd0HItHLjQemwhtnX_es6jI6TbXjgFDpbLNLGKwV7NA8qyxq6_J9mwQ_DOKLXLKLCzHshA6rm0-UQOBqwmwVSzoobGVIm217QECV5OzAjrUZsCRHYHsPBBqpDqS6Z15Yt5cExrmo1KKBBTRrL4-VhfP1z36meExcPNyyIvZ-cZx_rU-VY4M_W314ETEPUX9ydKmycjHyU1Du5dmZpS7kGvuDw',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTM2NjA3MywiaWF0IjoxNzgxMzU3MDczLCJqdGkiOiI0MzgzMmM2ZS1mZDRkLTRjNGItYTI0ZC0wMzAwNzM0NGExZTIifQ.QhYi2e4x0j09gnhT7OpMmkafe8BirnFK-7NNuedA8QXBzKCtAyz_a9XLBcW7k-JlUyYaMtYkf4EVOnWkNFEz5oHJGQp3OVp7BniKc50p4ukuvv7dA82peOUpCIzbTFPG2LtM_BmFwo_N3HJYthPYHleGhgLFWLPCycGkDfS6yngKBrxeMyCDxkVhsuXjJD8dpLzJBVMrOIA39Jq0eQvjuS5umPBmznseqfH28D_J0mjq_w7Ul1nfJ4i9S_kK5iA0QvCxPKQYmjFCg7TqAcM_zHRU1fadPcnJrcQkGK53pmMUIy-QjDe2mFOq8J13bZda8EnWdstLwCsmkCb826KcFg',
           },
         },
         '/api/davinci': {
@@ -30,7 +30,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/davinci/, ''),
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTI3ODU3MywiaWF0IjoxNzgxMjY5NTczLCJqdGkiOiI5N2E5ZmJjNS02NDYwLTRlOTMtODI5ZS03MTNjZDk3ZGE0NGQifQ.qpyrJ0hpeGEEtPaw9_yb4APFXHo_kLZdOG1j8qecLksBRlrZXJVo_MEXPw1WZWpRfwwdcZI4uN4KlBoNtz8R3mlUlItoWql_6JgTuHzZalSCEI6aRA30GLI7fS373Kd0HItHLjQemwhtnX_es6jI6TbXjgFDpbLNLGKwV7NA8qyxq6_J9mwQ_DOKLXLKLCzHshA6rm0-UQOBqwmwVSzoobGVIm217QECV5OzAjrUZsCRHYHsPBBqpDqS6Z15Yt5cExrmo1KKBBTRrL4-VhfP1z36meExcPNyyIvZ-cZx_rU-VY4M_W314ETEPUX9ydKmycjHyU1Du5dmZpS7kGvuDw',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTM2NjA3MywiaWF0IjoxNzgxMzU3MDczLCJqdGkiOiI0MzgzMmM2ZS1mZDRkLTRjNGItYTI0ZC0wMzAwNzM0NGExZTIifQ.QhYi2e4x0j09gnhT7OpMmkafe8BirnFK-7NNuedA8QXBzKCtAyz_a9XLBcW7k-JlUyYaMtYkf4EVOnWkNFEz5oHJGQp3OVp7BniKc50p4ukuvv7dA82peOUpCIzbTFPG2LtM_BmFwo_N3HJYthPYHleGhgLFWLPCycGkDfS6yngKBrxeMyCDxkVhsuXjJD8dpLzJBVMrOIA39Jq0eQvjuS5umPBmznseqfH28D_J0mjq_w7Ul1nfJ4i9S_kK5iA0QvCxPKQYmjFCg7TqAcM_zHRU1fadPcnJrcQkGK53pmMUIy-QjDe2mFOq8J13bZda8EnWdstLwCsmkCb826KcFg',
           },
         },
         '/api/splendor': {
@@ -40,7 +40,7 @@ export default defineConfig(({ mode }) => {
           rewrite: (path) => path.replace(/^\/api\/splendor/, ''),
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTI3ODU3MywiaWF0IjoxNzgxMjY5NTczLCJqdGkiOiI5N2E5ZmJjNS02NDYwLTRlOTMtODI5ZS03MTNjZDk3ZGE0NGQifQ.qpyrJ0hpeGEEtPaw9_yb4APFXHo_kLZdOG1j8qecLksBRlrZXJVo_MEXPw1WZWpRfwwdcZI4uN4KlBoNtz8R3mlUlItoWql_6JgTuHzZalSCEI6aRA30GLI7fS373Kd0HItHLjQemwhtnX_es6jI6TbXjgFDpbLNLGKwV7NA8qyxq6_J9mwQ_DOKLXLKLCzHshA6rm0-UQOBqwmwVSzoobGVIm217QECV5OzAjrUZsCRHYHsPBBqpDqS6Z15Yt5cExrmo1KKBBTRrL4-VhfP1z36meExcPNyyIvZ-cZx_rU-VY4M_W314ETEPUX9ydKmycjHyU1Du5dmZpS7kGvuDw',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTM2NjA3MywiaWF0IjoxNzgxMzU3MDczLCJqdGkiOiI0MzgzMmM2ZS1mZDRkLTRjNGItYTI0ZC0wMzAwNzM0NGExZTIifQ.QhYi2e4x0j09gnhT7OpMmkafe8BirnFK-7NNuedA8QXBzKCtAyz_a9XLBcW7k-JlUyYaMtYkf4EVOnWkNFEz5oHJGQp3OVp7BniKc50p4ukuvv7dA82peOUpCIzbTFPG2LtM_BmFwo_N3HJYthPYHleGhgLFWLPCycGkDfS6yngKBrxeMyCDxkVhsuXjJD8dpLzJBVMrOIA39Jq0eQvjuS5umPBmznseqfH28D_J0mjq_w7Ul1nfJ4i9S_kK5iA0QvCxPKQYmjFCg7TqAcM_zHRU1fadPcnJrcQkGK53pmMUIy-QjDe2mFOq8J13bZda8EnWdstLwCsmkCb826KcFg',
           },
         },
         '/auth': {
@@ -49,7 +49,7 @@ export default defineConfig(({ mode }) => {
           secure: true,
           headers: {
             Cookie:
-              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTI3ODU3MywiaWF0IjoxNzgxMjY5NTczLCJqdGkiOiI5N2E5ZmJjNS02NDYwLTRlOTMtODI5ZS03MTNjZDk3ZGE0NGQifQ.qpyrJ0hpeGEEtPaw9_yb4APFXHo_kLZdOG1j8qecLksBRlrZXJVo_MEXPw1WZWpRfwwdcZI4uN4KlBoNtz8R3mlUlItoWql_6JgTuHzZalSCEI6aRA30GLI7fS373Kd0HItHLjQemwhtnX_es6jI6TbXjgFDpbLNLGKwV7NA8qyxq6_J9mwQ_DOKLXLKLCzHshA6rm0-UQOBqwmwVSzoobGVIm217QECV5OzAjrUZsCRHYHsPBBqpDqS6Z15Yt5cExrmo1KKBBTRrL4-VhfP1z36meExcPNyyIvZ-cZx_rU-VY4M_W314ETEPUX9ydKmycjHyU1Du5dmZpS7kGvuDw',
+              'access_token=eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOjMsImV4cCI6MTc4MTM2NjA3MywiaWF0IjoxNzgxMzU3MDczLCJqdGkiOiI0MzgzMmM2ZS1mZDRkLTRjNGItYTI0ZC0wMzAwNzM0NGExZTIifQ.QhYi2e4x0j09gnhT7OpMmkafe8BirnFK-7NNuedA8QXBzKCtAyz_a9XLBcW7k-JlUyYaMtYkf4EVOnWkNFEz5oHJGQp3OVp7BniKc50p4ukuvv7dA82peOUpCIzbTFPG2LtM_BmFwo_N3HJYthPYHleGhgLFWLPCycGkDfS6yngKBrxeMyCDxkVhsuXjJD8dpLzJBVMrOIA39Jq0eQvjuS5umPBmznseqfH28D_J0mjq_w7Ul1nfJ4i9S_kK5iA0QvCxPKQYmjFCg7TqAcM_zHRU1fadPcnJrcQkGK53pmMUIy-QjDe2mFOq8J13bZda8EnWdstLwCsmkCb826KcFg',
           },
         },
       },

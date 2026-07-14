@@ -14,6 +14,7 @@ import CompanyInfo from './components/CompanyInfo';
 import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import TopBar from './components/TopBar';
 import PlayerAssets from './components/PlayerAssets';
+import { GameStatus } from '@/enum/game';
 const Board3D = lazy(() => import('./components/Board3D'));
 const CompanyInfo3D = lazy(() => import('./components/CompanyInfo3D'));
 const TopBar3D = lazy(() => import('./components/TopBar3D'));
@@ -47,10 +48,13 @@ export const Game: FC<IGameProps> = ({ sendMessage, wsRef, wsRoomSyncData, userI
   const { placeTile, PlaceTileConfirmModal } = useGameOperate(sendMessage);
 
   useEffect(() => {
-    if (wsRoomSyncData?.roomData.currentPlayer === userID) {
+    if (
+      wsRoomSyncData?.roomData.currentPlayer === userID &&
+      wsRoomSyncData.roomData.gameStatus !== GameStatus.END
+    ) {
       playAudio(AudioTypeEnum.YourTurn);
     }
-  }, [wsRoomSyncData?.roomData.currentPlayer, userID]);
+  }, [wsRoomSyncData?.roomData.currentPlayer, wsRoomSyncData?.roomData.gameStatus, userID]);
 
   useEffect(() => {
     sendMessage(JSON.stringify({

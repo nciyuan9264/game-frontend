@@ -1,11 +1,11 @@
-import { useMemo, useState } from 'react';
+import { useMemo, useRef, useState } from 'react';
 import { useProfile } from '@/hooks/request/useProfile';
 import { useWebSocket } from '@/hooks/useWebSocket';
 import { CompanyKey, WsMatchSyncData, WsRoomSyncData } from '@/types/AcquireRoom';
 import { profile2BackendName } from '@/util/user';
 import { useUrlParams } from '@/hooks/useUrlParams';
 import { message } from 'antd';
-import { useAudio } from '@/hooks/useAudio';
+import { AudioTypeEnum, useAudio } from '@/hooks/useAudio';
 import { getMergingModalAvailible, isDataEqual } from './components/Game/utils/game';
 import { GameStatus } from '@/enum/game';
 
@@ -28,6 +28,7 @@ export default function Acquire() {
   const [mergeSelectionModalVisible, setMergeSelectionModalVisible] = useState(false);
   const [createCompanyModalVisible, setCreateCompanyModalVisible] = useState(false);
   const [gameEndModalVisible, setGameEndModalVisible] = useState(false);
+  const gameEndedRef = useRef(false);
   const navigate = useNavigate();
   const { playAudio } = useAudio();
   const url: string = useMemo(() => {
@@ -48,6 +49,9 @@ export default function Acquire() {
     }
     if (newData.type === 'audio') {
       const audioType = newData.message;
+      if (audioType === AudioTypeEnum.YourTurn && gameEndedRef.current) {
+        return;
+      }
       if (audioType) {
         playAudio(audioType);
       }
@@ -57,6 +61,7 @@ export default function Acquire() {
       const matchData: WsMatchSyncData = newData as WsMatchSyncData;
       setWsMatchSyncData(matchData)
       setWsRoomSyncData(undefined);
+      gameEndedRef.current = false;
     }
     if (newData.type === 'ROOM_SYNC') {
       setWsMatchSyncData(undefined);
@@ -78,8 +83,10 @@ export default function Acquire() {
         setMergeCompanyModalVisible(false);
       }
       if (roomData.roomData.gameStatus === GameStatus.END) {
+        gameEndedRef.current = true;
         setGameEndModalVisible(true);
       } else {
+        gameEndedRef.current = false;
         setGameEndModalVisible(false);
       }
       if (userID === roomData.roomData.currentPlayer) {
