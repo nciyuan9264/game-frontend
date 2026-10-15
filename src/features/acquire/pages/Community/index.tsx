@@ -16,7 +16,9 @@ import styles from './index.module.less';
 import type { Game } from '@/types/history';
 import type { LeaderboardEntry } from '@/types/leaderboard';
 
-const PAGE_SIZE = 20;
+const RANKING_PAGE_SIZE = 8;
+const HISTORY_PAGE_SIZE = 20;
+const LOAD_MORE_MARGIN = 180;
 const loadStats = () => getMyStats('acquire');
 const guideSteps = [
   {
@@ -77,6 +79,62 @@ function InfiniteFooter({ loading, error, hasMore, retry, anchorRef }: {
     {!loading && !error && !hasMore && <span>已经到底了</span>}
   </div>;
 }
+
+function findScrollParent(element: HTMLElement): HTMLElement | Window {
+  let parent = element.parentElement;
+  while (parent) {
+    const style = window.getComputedStyle(parent);
+    if (/(auto|scroll|overlay)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return window;
+}
+
+function useInfiniteLoad(
+  anchorRef: RefObject<HTMLDivElement>,
+  enabled: boolean,
+  loadMore: () => void
+) {
+  const loadMoreRef = useRef(loadMore);
+  useEffect(() => { loadMoreRef.current = loadMore; }, [loadMore]);
+
+  useEffect(() => {
+    const anchor = anchorRef.current;
+    if (!anchor || !enabled) return;
+
+    let frame = 0;
+    const checkNearEnd = () => {
+      if (frame) return;
+      frame = window.requestAnimationFrame(() => {
+        frame = 0;
+        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+        if (anchor.getBoundingClientRect().top <= viewportHeight + LOAD_MORE_MARGIN) {
+          loadMoreRef.current();
+        }
+      });
+    };
+
+    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
+      if (entry.isIntersecting) loadMoreRef.current();
+    }, { rootMargin: `${LOAD_MORE_MARGIN}px 0px` });
+    observer?.observe(anchor);
+
+    const scrollParent = findScrollParent(anchor);
+    scrollParent.addEventListener('scroll', checkNearEnd, { passive: true });
+    window.addEventListener('resize', checkNearEnd);
+    checkNearEnd();
+
+    return () => {
+      if (frame) window.cancelAnimationFrame(frame);
+      observer?.disconnect();
+      scrollParent.removeEventListener('scroll', checkNearEnd);
+      window.removeEventListener('resize', checkNearEnd);
+    };
+  }, [anchorRef, enabled]);
+}
+
 export function Rankings() {
   const profile = useAcquireResource(getProfile);
   const [mode, setMode] = useState<'score' | 'games'>('score');
@@ -88,7 +146,9 @@ export function Rankings() {
   const [revision, setRevision] = useState(0);
   const requestSeq = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingNextRef = useRef(false);
   const retry = useCallback(() => {
+    loadingNextRef.current = false;
     setEntries([]);
     setHasMore(true);
     setPage(0);
@@ -98,7 +158,7 @@ export function Rankings() {
     const requestID = ++requestSeq.current;
     setLoading(true);
     setError('');
-    getLeaderboard({ gameType: 'acquire', limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    getLeaderboard({ gameType: 'acquire', limit: RANKING_PAGE_SIZE, offset: page * RANKING_PAGE_SIZE })
       .then(result => {
         if (requestID !== requestSeq.current) return;
         const next = result.entries ?? [];
@@ -106,38 +166,35 @@ export function Rankings() {
           ...current,
           ...next.filter(entry => !current.some(item => item.userID === entry.userID)),
         ]);
-        setHasMore(next.length === PAGE_SIZE);
+        setHasMore(next.length === RANKING_PAGE_SIZE);
       })
       .catch(reason => {
         if (requestID === requestSeq.current) setError(reason instanceof Error ? reason.message : '加载失败，请重试');
       })
       .finally(() => {
-        if (requestID === requestSeq.current) setLoading(false);
+        if (requestID === requestSeq.current) {
+          loadingNextRef.current = false;
+          setLoading(false);
+        }
       });
     return () => { requestSeq.current = requestID + 1; };
   }, [page, revision]);
-  useEffect(() => {
-    const element = sentinelRef.current;
-    if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && hasMore && !loading && !error) {
-        setLoading(true);
-        setPage(value => value + 1);
-      }
-    }, { rootMargin: '160px 0px' });
-    observer.observe(element);
-    return () => observer.disconnect();
+  const loadNextPage = useCallback(() => {
+    if (!hasMore || loading || error || loadingNextRef.current) return;
+    loadingNextRef.current = true;
+    setLoading(true);
+    setPage(value => value + 1);
   }, [error, hasMore, loading]);
+  useInfiniteLoad(sentinelRef, entries.length > 0 && hasMore && !loading && !error, loadNextPage);
   const sorted = useMemo(() => [...entries].sort((a, b) => mode === 'games' ? b.totalGames - a.totalGames
     : ('avgRank' in a && 'avgRank' in b ? a.avgRank - b.avgRank : 0)), [entries, mode]);
   const myIndex = sorted.findIndex(entry => String(entry.userID) === String(profile.data?.id));
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page + ' ' + styles.rankPage}>
     <header className={styles.communityHeading}><div><small>THE CITY'S FINEST</small><h1>每一局，都算数。</h1></div><span className={styles.outlineTag}>真实对局记录</span></header>
     <section className={styles.rankHero}><Trophy size={39} /><div><small>ACQUIRE LEADERBOARD</small><h2>城市合伙人榜</h2><p>用平均名次衡量稳定发挥，也记录每一张完成的桌。</p></div>
-      <div className={styles.myRank}><span>我的排名</span><b>{myIndex >= 0 ? '#' + (page * PAGE_SIZE + myIndex + 1) : '—'}</b><small>{myIndex >= 0 && 'avgRank' in sorted[myIndex] ? '平均名次 ' + sorted[myIndex].avgRank.toFixed(2) : '完成对局后进入排行'}</small></div>
+      <div className={styles.myRank}><span>我的排名</span><b>{myIndex >= 0 ? '#' + (myIndex + 1) : '—'}</b><small>{myIndex >= 0 && 'avgRank' in sorted[myIndex] ? '平均名次 ' + sorted[myIndex].avgRank.toFixed(2) : '完成对局后进入排行'}</small></div>
     </section>
     <section className={styles.rankPanel}><div className={styles.rankTabs}><button className={mode === 'score' ? styles.activeTab : ''} onClick={() => setMode('score')}>战绩榜</button><button className={mode === 'games' ? styles.activeTab : ''} onClick={() => setMode('games')}>场次榜</button></div>
-      <p className={styles.rankExplain}>{mode === 'score' ? '按平均名次升序排列，名次越小越靠前。' : '按完成对局场次降序排列。'} 数据来自服务端已结束对局。</p>
       <div className={styles.rankRow + ' ' + styles.rankHead}><span>名次</span><span>玩家</span><span>完成对局</span><span>平均名次</span></div>
       <Status resource={{ loading: loading && !entries.length, error: error && !entries.length ? error : '', retry }} />{sorted.map((entry, index) => { const mine = String(entry.userID) === String(profile.data?.id); return <div className={styles.rankRow + (mine ? ' ' + styles.rankSelf : '')} key={entry.userID}>
         <span className={styles.rankNumber}>{index === 0 ? <Trophy size={22} /> : String(index + 1).padStart(2, '0')}</span>
@@ -160,7 +217,9 @@ export function My() {
   const [revision, setRevision] = useState(0);
   const requestSeq = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
+  const loadingNextRef = useRef(false);
   const retryHistory = useCallback(() => {
+    loadingNextRef.current = false;
     setGames([]);
     setHasMore(true);
     setPage(0);
@@ -170,7 +229,7 @@ export function My() {
     const requestID = ++requestSeq.current;
     setHistoryLoading(true);
     setHistoryError('');
-    listMyGames({ gameType: 'acquire', limit: PAGE_SIZE, offset: page * PAGE_SIZE })
+    listMyGames({ gameType: 'acquire', limit: HISTORY_PAGE_SIZE, offset: page * HISTORY_PAGE_SIZE })
       .then(result => {
         if (requestID !== requestSeq.current) return;
         const next = result.games ?? [];
@@ -178,28 +237,26 @@ export function My() {
           ...current,
           ...next.filter(game => !current.some(item => item.id === game.id)),
         ]);
-        setHasMore(next.length === PAGE_SIZE);
+        setHasMore(next.length === HISTORY_PAGE_SIZE);
       })
       .catch(reason => {
         if (requestID === requestSeq.current) setHistoryError(reason instanceof Error ? reason.message : '加载失败，请重试');
       })
       .finally(() => {
-        if (requestID === requestSeq.current) setHistoryLoading(false);
+        if (requestID === requestSeq.current) {
+          loadingNextRef.current = false;
+          setHistoryLoading(false);
+        }
       });
     return () => { requestSeq.current = requestID + 1; };
   }, [page, revision]);
-  useEffect(() => {
-    const element = sentinelRef.current;
-    if (!element) return;
-    const observer = new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting && hasMore && !historyLoading && !historyError) {
-        setHistoryLoading(true);
-        setPage(value => value + 1);
-      }
-    }, { rootMargin: '160px 0px' });
-    observer.observe(element);
-    return () => observer.disconnect();
+  const loadNextHistoryPage = useCallback(() => {
+    if (!hasMore || historyLoading || historyError || loadingNextRef.current) return;
+    loadingNextRef.current = true;
+    setHistoryLoading(true);
+    setPage(value => value + 1);
   }, [hasMore, historyError, historyLoading]);
+  useInfiniteLoad(sentinelRef, games.length > 0 && hasMore && !historyLoading && !historyError, loadNextHistoryPage);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
   return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page + ' ' + styles.profilePage}>
     <header className={styles.communityHeading}><div><small>YOUR PLAYER IDENTITY</small><h1>让这张筹码，代表你。</h1></div></header>
