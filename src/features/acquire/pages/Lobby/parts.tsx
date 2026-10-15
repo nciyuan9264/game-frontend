@@ -32,7 +32,7 @@ export function LobbyHero({ onCreate, onCompany }: Pick<LobbyViewProps, 'onCreat
     <div className={styles.heroCopy}><Eyebrow>YOUR NEXT CITY STARTS HERE</Eyebrow>
       <h1>落下一块地，<br />下一座城属于你。</h1>
       <p>开一张桌，邀请朋友。从第一块地开始，经营你们的城市。</p>
-      <ActionButton variant="primary" onClick={onCreate}><Plus size={17} />创建房间<ArrowRight size={16} /></ActionButton>
+      <ActionButton className={styles.heroCreateButton} variant="primary" onClick={onCreate}><Plus size={17} />创建房间<ArrowRight size={16} /></ActionButton>
     </div><span className={styles.caption}>BUILD. MERGE. ACQUIRE.</span>
   </section><div className={styles.companies} aria-label="七家公司">
     <span>七家公司<small>THE HOTEL COLLECTION</small></span>

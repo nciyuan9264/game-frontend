@@ -4,17 +4,19 @@
   .aside { position: sticky; top: 20px; }
   .page { padding: 0 0 30px; }
   .guidePage, .rankPage, .profilePage { max-width: none; }
-  .guideLayout { display: grid; grid-template-columns: minmax(230px, .7fr) minmax(0, 1fr); gap: 20px;
-    > aside { align-self: start; overflow: hidden; border: 1px solid #52665d80; border-radius: 12px; background: #172d35;
-      > img { width: 100%; aspect-ratio: 1.28; object-fit: cover; filter: saturate(.8); }
+  .guideLayout { display: grid; grid-template-columns: minmax(250px, 360px) minmax(0, 1fr); align-items: stretch; justify-content: center; max-width: 1040px; gap: 22px;
+    > aside { display: flex; min-height: 520px; overflow: hidden; flex-direction: column; border: 1px solid #52665d80; border-radius: 12px; background: #172d35;
+      > img { width: 100%; flex: 1; min-height: 0; object-fit: cover; filter: saturate(.8); }
     }
   }
-  .guidePanel { padding: 25px; h2 { font-size: 22px; } }
+  .guidePanel { min-height: 520px; padding: 25px; h2 { font-size: 22px; } }
   .profileDisplay, .profileHistory { min-height: 485px; }
 }
 @media (min-width: 1200px) {
-  .guideLayout { grid-template-columns: minmax(280px, .75fr) minmax(0, 1fr); gap: 28px; }
-  .guidePanel { padding: 30px; h2 { font-size: 25px; } }
+  .guideLayout { grid-template-columns: minmax(340px, 430px) minmax(0, 650px); max-width: 1120px; gap: 26px;
+    > aside { min-height: 560px; }
+  }
+  .guidePanel { min-height: 560px; padding: 30px; h2 { font-size: 25px; } }
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
