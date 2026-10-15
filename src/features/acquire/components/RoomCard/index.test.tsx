@@ -21,5 +21,27 @@ describe('Acquire room card', () => {
 
     expect(screen.getByText('仅你可见')).toBeTruthy();
     expect(screen.getByRole('button', { name: '返回房间 private-room' })).toBeTruthy();
+    const progress = screen.getByRole('progressbar', { name: '对局进度' });
+    expect(progress.getAttribute('aria-valuenow')).toBe('0');
+    expect(progress.getAttribute('aria-valuemax')).toBe('108');
+  });
+
+  it('renders acquire game progress from remaining empty tiles', () => {
+    const room: AcquireRoom = {
+      roomID: 'playing-room',
+      ownerID: 'Alice-42',
+      ownerName: 'Alice',
+      maxPlayers: 6,
+      visibility: 'public',
+      status: 'setTile',
+      emptyTileCount: 81,
+      roomPlayer: [{ playerID: 'Alice-42', online: true, ai: false, ready: true }],
+    };
+
+    render(<RoomCard room={room} playerID="Alice-42" onEnter={() => {}} />);
+
+    const progress = screen.getByRole('progressbar', { name: '对局进度' });
+    expect(progress.getAttribute('aria-valuenow')).toBe('27');
+    expect(progress.getAttribute('aria-valuemax')).toBe('108');
   });
 });

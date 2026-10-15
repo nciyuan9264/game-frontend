@@ -12,6 +12,9 @@
 .host { display: flex; align-items: center; gap: 7px; min-width: 0; > span { flex-shrink: 0; } strong { min-width: 0; color: #ccd7d9; font-size: 12px; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
 .mode { display: flex; gap: 5px; align-items: center; flex-shrink: 0; color: #7d9aa6; font-size: 10px; white-space: nowrap; svg { opacity: .8; } }
 .private { color: #c7a96f; }
+.progress { height: 4px; margin-top: 15px; overflow: hidden; border-radius: 999px; background: #0e222d; box-shadow: inset 0 0 0 1px #2e465254;
+  > i { display: block; height: 100%; border-radius: inherit; background: linear-gradient(90deg,#6f8f8f,#d6bc7f); transition: width .2s ease; }
+}
 .bottom { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 16px; padding-top: 14px; border-top: 1px solid #637b7930;
   > button { min-width: 111px; min-height: 38px; flex-shrink: 0; padding: 0 14px; gap: 12px; border-color: #71866a70; background: #71896116; color: #e1dbbf !important; font-size: 11px; box-shadow: none; }
 }
