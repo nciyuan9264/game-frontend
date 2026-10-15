@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
 import type { TouchEvent as ReactTouchEvent } from 'react';
 import { Link, useParams } from 'react-router-dom';
-import { ArrowLeft, GripHorizontal, Maximize2 } from 'lucide-react';
+import { ArrowLeft, ChevronDown, ChevronUp, GripHorizontal, Maximize2 } from 'lucide-react';
 import { snapshotToWsRoomSyncData } from './snapshotAdapter';
 import EconomyChart from './EconomyChart';
 import { AppShell } from '../../components/AppShell';
@@ -32,6 +32,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const [scorePending, setScorePending] = useState(false);
   const [scoreError, setScoreError] = useState('');
   const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
+  const [timelineCollapsed, setTimelineCollapsed] = useState(false);
   const timelineRef = useRef<HTMLElement>(null);
   const drag = useRef<{
     pointerID: number; startX: number; startY: number; originX: number; originY: number; rect: DOMRect;
@@ -79,7 +80,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       y: state.originY + next.top - state.rect.top,
     });
   };
-  const beginDrag = (event: PointerEvent<HTMLButtonElement>) => {
+  const beginDrag = (event: PointerEvent<HTMLElement>) => {
     if (event.pointerType === 'touch') return;
     const rect = timelineRef.current?.getBoundingClientRect();
     if (!rect) return;
@@ -110,7 +111,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
     window.addEventListener('pointerup', end);
     window.addEventListener('pointercancel', end);
   };
-  const beginTouchDrag = (event: ReactTouchEvent<HTMLButtonElement>) => {
+  const beginTouchDrag = (event: ReactTouchEvent<HTMLElement>) => {
     const rect = timelineRef.current?.getBoundingClientRect();
     const touch = event.touches[0];
     if (!rect || !touch) return;
@@ -143,7 +144,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
     window.addEventListener('touchend', end, { passive: false });
     window.addEventListener('touchcancel', end, { passive: false });
   };
-  const moveWithKeyboard = (event: KeyboardEvent<HTMLButtonElement>) => {
+  const moveWithKeyboard = (event: KeyboardEvent<HTMLElement>) => {
     if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home'].includes(event.key)) return;
     event.preventDefault();
     if (event.key === 'Home') { setPanelPosition({ x: 0, y: 0 }); return; }
@@ -200,7 +201,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
         {replay.pendingIndex != null && <small className={styles.frameStatus}>正在加载第 {replay.pendingIndex} 步</small>}</span><div className={styles.boardTools}><button type="button" className={styles.zoomButton} onClick={() => setPanel('zoom')}><Maximize2 size={13} />放大棋盘</button></div></div>
         <Board data={display} mode="replay" /><p className={styles.note}>你的手牌：{display.playerData.tiles.join(' · ') || '无'}。回放不会发送对局操作。</p></section>
       <aside className={styles.portfolioColumn}><Portfolio data={display} /></aside></div>
-      <section ref={timelineRef} className={styles.timeline}
+      <section ref={timelineRef} className={`${styles.timeline} ${timelineCollapsed ? styles.timelineCollapsed : ''}`}
         style={{ '--replay-panel-x': `${panelPosition.x}px`, '--replay-panel-y': `${panelPosition.y}px` } as CSSProperties}>
         <button type="button" className={styles.dragHandle} aria-label="移动回放面板" title="移动回放面板"
           draggable={false} onDragStart={event => event.preventDefault()}
@@ -211,7 +212,18 @@ function ReplayContent({ gameID }: { gameID: number }) {
           {replay.detail?.game.endedAt && <ActionButton pending={scorePending} onClick={openResults}>最终结算</ActionButton>}</header>
           <div className={styles.loadTrack} role="progressbar" aria-label="回放载入进度" aria-valuemin={0} aria-valuemax={total} aria-valuenow={replay.loadedCount}><i style={{ width: `${total ? replay.loadedCount / total * 100 : 0}%` }} /></div>
           {(replay.progressError || scoreError) && <div className={styles.progressStatus} role="alert">{scoreError || '加载暂停'}{replay.progressError && <ActionButton variant="quiet" onClick={replay.retryProgress}>继续加载</ActionButton>}</div>}
-          <div className={styles.controls}><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(0)}>初始</ActionButton><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(replay.selectedIndex - 1)}>上一步</ActionButton><span>{replay.selectedIndex} / {Math.max(0, total - 1)}</span><ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(replay.selectedIndex + 1)}>下一步</ActionButton><ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(total - 1)}>末步</ActionButton></div>
+          <div className={styles.controls}><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(0)}>初始</ActionButton><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(replay.selectedIndex - 1)}>上一步</ActionButton>{timelineCollapsed
+            ? <button type="button" className={styles.stepCounter} aria-label="移动折叠回放面板" title="拖动移动回放面板"
+              draggable={false} onDragStart={event => event.preventDefault()}
+              onPointerDown={beginDrag} onTouchStart={beginTouchDrag} onKeyDown={moveWithKeyboard}>{replay.selectedIndex} / {Math.max(0, total - 1)}</button>
+            : <span className={styles.stepCounter}>{replay.selectedIndex} / {Math.max(0, total - 1)}</span>}<ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(replay.selectedIndex + 1)}>下一步</ActionButton><ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(total - 1)}>末步</ActionButton>
+            <button type="button" className={styles.collapseToggle}
+              aria-label={timelineCollapsed ? '展开回放面板' : '收起回放面板'}
+              aria-expanded={!timelineCollapsed}
+              title={timelineCollapsed ? '展开回放面板' : '收起回放面板'}
+              onClick={() => setTimelineCollapsed(current => !current)}>
+              {timelineCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+            </button></div>
           <input className={styles.range} type="range" min={0} max={Math.max(0, total - 1)} value={previewIndex}
             onChange={changeEvent => setPreviewIndex(Number(changeEvent.target.value))}
             onPointerUp={() => replay.selectIndex(previewIndex)}

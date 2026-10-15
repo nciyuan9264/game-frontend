@@ -136,4 +136,31 @@ describe('Acquire replay layout', () => {
     fireEvent.keyDown(handle, { key: 'ArrowDown' });
     await waitFor(() => expect(panel.getAttribute('style')).toContain('--replay-panel-y: 0px'));
   });
+
+  it('toggles the mobile replay dock between expanded and collapsed controls', async () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+
+    render(<MemoryRouter initialEntries={['/game/acquire/replay/1']}><Routes>
+      <Route path="/game/acquire/replay/:gameId" element={<Replay />} />
+    </Routes></MemoryRouter>);
+
+    const collapse = await screen.findByRole('button', { name: '收起回放面板' });
+    expect(collapse.getAttribute('aria-expanded')).toBe('true');
+
+    fireEvent.click(collapse);
+    const expand = await screen.findByRole('button', { name: '展开回放面板' });
+    expect(expand.getAttribute('aria-expanded')).toBe('false');
+    const collapsedHandle = screen.getByRole('button', { name: '移动折叠回放面板' });
+    const panel = collapsedHandle.closest('section');
+
+    fireEvent.keyDown(collapsedHandle, { key: 'ArrowRight' });
+    await waitFor(() => expect(panel?.getAttribute('style')).toContain('--replay-panel-x: 24px'));
+
+    fireEvent.click(expand);
+    await waitFor(() => expect(screen.getByRole('button', { name: '收起回放面板' }).getAttribute('aria-expanded')).toBe('true'));
+  });
 });

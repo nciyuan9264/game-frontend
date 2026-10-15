@@ -15,6 +15,7 @@
   .layout { grid-template-columns: minmax(0,1fr); gap: 10px; }
   .marketColumn, .portfolioColumn { display: none; }
   .timeline { left: 50%; bottom: calc(8px + env(safe-area-inset-bottom)); width: calc(100vw - 28px); min-height: 190px; max-height: calc(100dvh - 28px); border-radius: 9px; }
+  .timelineCollapsed { height: 56px; min-height: 56px; max-height: 56px; }
   .dragHandle { height: 20px; svg { width: 16px; height: 16px; } }
   .timelineContent { height: calc(100% - 20px); padding: 6px 10px 9px;
     > header { gap: 6px;
@@ -31,7 +32,16 @@
   }
   .controls { gap: 3px; margin: 5px 0 2px;
     button { min-height: 30px; padding: 0 4px; flex: 1; font-size: 9px; }
-    span { min-width: 39px; font-size: 9px; }
+    .stepCounter { min-width: 39px; flex: 0 0 39px; color: var(--acq-gold); font-size: 9px; }
+  }
+  .collapseToggle { display: grid; width: 30px; min-width: 30px; flex: 0 0 30px; place-items: center; color: #91aab5 !important;
+    svg { pointer-events: none; }
+  }
+  .timelineCollapsed {
+    .dragHandle, .timelineContent > header, .loadTrack, .progressStatus, .range, .timelineViewport { display: none; }
+    .timelineContent { height: 100%; padding: 7px 10px; }
+    .controls { height: 100%; margin: 0; }
+    .stepCounter { cursor: move; touch-action: none; user-select: none; }
   }
   .range { margin: 5px 0; }
   .timelineViewport { overflow-x: auto; overflow-y: hidden; }
