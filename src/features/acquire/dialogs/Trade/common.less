@@ -1,0 +1,138 @@
+.dialogHint { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding: 12px 13px; border: 1px solid #29414e7a; border-radius: 6px; background: #0e1f2a; color: #8ea6b4; font-size: 11px; line-height: 1.8;
+  > svg { margin-top: 2px; }
+}
+.wallet { display: flex; align-items: center; gap: 12px; margin-bottom: 18px; padding: 12px 14px; border: 1px solid #42595c57; border-radius: 7px; background: #263b3a50;
+  > span { display: flex; align-items: center; gap: 7px; color: #9faf9f; font-size: 11px; }
+  > b { color: #e3c68d; font-size: 23px; font-weight: 500; line-height: 1.2; }
+}
+.stockShop .row { display: grid; grid-template-columns: minmax(0,1fr) 73px 108px; align-items: center; gap: 11px; min-height: 79px; padding: 15px 6px; border-bottom: 1px solid #3c535c67; border-radius: 5px; color: #c6d8dc;
+  > div:first-child > small { display: block; margin-top: 7px; margin-left: 35px; color: #779aa9; font-size: 9px; }
+}
+.row { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 14px 0; border-bottom: 1px solid var(--acq-line);
+  small { display: block; color: var(--acq-muted); font-size: 11px; }
+}
+.companyLabel { display: flex; align-items: center; gap: 9px;
+  b { color: currentColor; font-size: 13px; font-weight: 500; }
+}
+.price { color: #b8ccd3; font-size: 11px; text-align: right; white-space: nowrap;
+  b { display: block; color: #d8dfdb; font-size: 15px; font-weight: 500; }
+  small { color: #658b9c; font-size: 8px; }
+}
+.counter { display: flex; align-items: center; height: 33px; flex-shrink: 0; overflow: hidden; border: 1px solid #4a647269; border-radius: 5px; background: #0d222e;
+  button { display: grid; place-items: center; width: 29px; height: 31px; flex-shrink: 0; padding: 0; border: 0; background: #28404b; color: #bccfd8; font-size: 18px; }
+  output { min-width: 36px; flex: 1; color: #e1e6e0; font-size: 15px; font-weight: 500; text-align: center; }
+}
+.total { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; width: 100%; margin-bottom: 17px;
+  > span { color: #7797a8; font-size: 10px; line-height: 1.5; }
+  > span:not(:first-child) { text-align: right; }
+  strong { display: block; margin-top: 5px; color: #e4c997; font-size: 21px; font-weight: 500; letter-spacing: .01em; white-space: nowrap; }
+  small { color: #7f9a9f; font-size: 10px; font-weight: 400; }
+}
+.footerActions { display: grid; grid-template-columns: 1fr 1.6fr; gap: 12px; width: 100%;
+  > button { min-height: 43px; }
+}
+.unavailable { display: flex; align-items: center; gap: 6px; margin-top: 16px !important; color: #5f8394; font-size: 10px; }
+.mergeCompany { padding: 16px; border: 1px solid var(--acq-line); border-radius: 10px; margin: 14px 0;
+  header { display: flex; justify-content: space-between; gap: 12px; }
+}
+.keep { margin-top: 12px !important; color: var(--acq-gold); font-size: 12px; text-align: right; }
+.mergerOverview { display: grid; grid-template-columns: minmax(0,1fr) 42px minmax(0,1fr); align-items: center; gap: 12px; padding: 5px 10px 8px; }
+.mergerSources { display: grid; gap: 8px;
+  > div { display: flex; align-items: center; gap: 9px; height: 82px; padding: 14px; border: 1px solid color-mix(in srgb,currentColor 30%,transparent); border-radius: 8px; background: linear-gradient(135deg,color-mix(in srgb,currentColor 10%,transparent),transparent); }
+  b, small, em { display: block; } b { font-size: 13px; font-weight: 500; } small { margin-top: 3px; color: #7796a0; font-size: 8px; }
+}
+.mergerArrow { display: flex; align-items: center; flex-direction: column; gap: 5px; color: #9b9676;
+  small { color: #6f8c92; font-size: 9px; }
+}
+.mergerSurvivor { display: flex; align-items: center; gap: 9px; height: 82px; padding: 14px; border: 1px solid color-mix(in srgb,currentColor 38%,transparent); border-radius: 8px; background: linear-gradient(135deg,color-mix(in srgb,currentColor 14%,transparent),transparent);
+  b, small, em { display: block; } b { font-size: 15px; font-weight: 500; } small { margin-top: 3px; color: #8ca0a3; font-size: 8px; }
+}
+.mergerSources em, .mergerSurvivor em { margin-top: 2px; color: #a8b8ae; font-size: 8px; font-style: normal; white-space: nowrap; }
+.mergeCompany { margin: 18px 0 0; padding: 18px 2px 0; border: 0; border-top: 1px solid #3b535b6e; border-radius: 0;
+}
+.dividendSummary { margin-top: 16px; border-top: 1px solid #3b535b6e; border-bottom: 1px solid #3b535b6e;
+  > header { display: flex; align-items: center; justify-content: space-between; min-height: 48px; color: #9fb7aa;
+    > span { display: flex; align-items: center; gap: 8px; } b { color: #c5d1bd; font-size: 12px; font-weight: 500; }
+    small { color: #78928d; font-size: 9px; }
+  }
+  > div { border-top: 1px solid #304a5366; }
+}
+.dividendCompany { display: grid; grid-template-columns: 112px minmax(0,1fr); align-items: center; gap: 14px; min-height: 54px; padding: 9px 2px;
+  & + & { border-top: 1px solid #304a5366; }
+}
+.dividendCompanyName { display: flex; align-items: center; gap: 8px;
+  b { overflow: hidden; font-size: 11px; font-weight: 500; text-overflow: ellipsis; white-space: nowrap; }
+}
+.dividendRecipients { display: grid; gap: 6px;
+  > span { display: grid; grid-template-columns: 27px minmax(0,1fr) auto; align-items: center; gap: 8px; min-width: 0; }
+  b { overflow: hidden; color: #a9bdbc; font-size: 10px; font-weight: 400; text-overflow: ellipsis; white-space: nowrap; }
+  strong { color: #d8c486; font-size: 13px; font-weight: 500; white-space: nowrap; }
+}
+.noDividend { color: #718d95; font-size: 9px; text-align: right; }
+.mergerHoldings { display: flex; align-items: center; justify-content: space-between; gap: 15px; padding: 18px 0; border-bottom: 1px solid #3b535b6e; color: #809eaa; font-size: 10px;
+  > span { display: flex; align-items: center; gap: 9px; } b { color: #c8d1cc; font-size: 12px; font-weight: 500; }
+}
+.allocationHeading { display: flex; align-items: center; margin: 19px 0 5px; h3 { flex: 1; font-size: 13px; } }
+.allocation > div { display: flex; align-items: center; gap: 11px; padding: 14px 2px; border-bottom: 1px solid #38525c6b;
+  > div:not(.counter) { flex: 1; min-width: 0; } strong { color: #cbd8d8; font-size: 13px; font-weight: 500; }
+  em { margin-left: 6px; padding: 2px 4px; border-radius: 3px; background: #879a6140; color: #c0c997; font-size: 9px; font-style: normal; }
+  small { display: block; margin-top: 5px; color: #7b9aa6; font-size: 9px; line-height: 1.7; }
+}
+.allocationIcon { display: grid; place-items: center; width: 32px; height: 35px; flex-shrink: 0; border-radius: 5px; background: #2d45454f; color: #8dabac; }
+.allocation .retain { border-bottom: 0;
+  > span:last-child { padding-right: 14px; color: #7b9aa6; font-size: 10px; } > span:last-child b { margin-right: 5px; color: #c3cdb8; font-size: 22px; font-weight: 500; }
+}
+.allocationTotal { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border: 1px solid #2f4b5761; border-radius: 5px; background: #0d202a; color: #7a9daa; font-size: 10px;
+  b { color: #acc3c4; font-weight: 500; white-space: nowrap; }
+}
+.submitted { padding: 4px 5px 24px; text-align: center;
+  > span { display: grid; place-items: center; width: 52px; height: 52px; margin: 0 auto 15px; border: 1px solid #7ea07a8a; border-radius: 50%; background: #7b9a6817; color: #b4ce9c; }
+  h3 { color: #d4dec8; font-size: 19px; } p { margin-top: 7px; color: #90aaa3; font-size: 12px; }
+}
+.mergeReceipt { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); padding: 18px 8px; border: 1px solid #3d53576b; border-radius: 8px; background: #20383d75;
+  > span { border-right: 1px solid #4f62624f; text-align: center; &:last-child { border: 0; } }
+  small { display: block; color: #829f9f; font-size: 10px; } b { display: block; margin: 8px 0 5px; color: #d6c997; font-size: 22px; font-weight: 500; }
+  em { color: #799996; font-size: 9px; font-style: normal; }
+}
+.settlementPlayers { margin: 21px 0 4px;
+  > div { display: flex; align-items: center; gap: 10px; min-height: 59px; border-bottom: 1px solid #34505a68; font-size: 12px; }
+  > div > span:nth-child(2) { flex: 1; } b { display: flex; align-items: center; gap: 6px; color: #a6c89d; font-size: 10px; font-weight: 400; }
+}
+.pendingSettlement { color: #c6b675 !important; svg { animation: tradeSpin 1s linear infinite; } }
+.waitFooter { display: flex; align-items: center; gap: 8px; margin-right: auto; color: #8da3aa; font-size: 10px; svg { animation: tradeSpin 1s linear infinite; } }
+@keyframes tradeSpin { to { transform: rotate(360deg); } }
+.foundSummary { display: flex; align-items: center; gap: 8px; margin-right: auto; color: #8da3aa; font-size: 10px; }
+.foundIntro { display: flex; align-items: center; gap: 17px; margin-bottom: 25px;
+  > span { display: grid; place-items: center; width: 58px; height: 61px; flex-shrink: 0; border: 1px solid #ead49b; border-radius: 5px; background: linear-gradient(145deg,#e7cf97,#bfb57f); box-shadow: inset 0 0 0 3px #8a945259,0 3px 0 #6779476e; color: #32473b; font-size: 23px; font-weight: 600; }
+  h3 { color: #d6ddcd; font-size: 15px; }
+  p { margin-top: 6px; color: #809fa9; font-size: 11px; line-height: 1.9; }
+}
+.foundCompanies { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px;
+  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 8px; min-height: 148px; padding: 20px 10px 14px; border: 1px solid color-mix(in srgb,var(--co) 30%,transparent); border-radius: 8px; background: linear-gradient(140deg,color-mix(in srgb,var(--co) 9%,transparent),#132a3433); color: var(--co);
+    > strong { font-size: 13px; font-weight: 500; }
+    > span { margin-top: -4px; font-size: 9px; opacity: .7; }
+    > small { margin-top: 3px; padding: 4px 8px; border-radius: 3px; background: #0d25328a; color: #88a8ab; font-size: 9px; }
+    > svg:last-child { position: absolute; top: 11px; right: 11px; color: #f0d19a; }
+  }
+}
+.foundSelected { border-color: #dabb79 !important; background: linear-gradient(145deg,#b3974c22,#61745725) !important; box-shadow: inset 0 0 0 1px #bca76722;
+  small { color: #cfbf94 !important; }
+}
+.foundUnavailable { opacity: .27; }
+.survivorDescription { margin-bottom: 22px !important; color: #98adb7; font-size: 12px; line-height: 1.9; }
+.survivorChoices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px;
+  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 9px; min-height: 166px; padding: 27px 13px; border: 1px solid #47647288; border-radius: 8px; background: #1b3540;
+    > span { display: flex; align-items: center; gap: 10px; color: var(--co);
+      b { font-size: 14px; font-weight: 500; }
+    }
+    > strong { margin-top: 12px; color: #a7c1cb; font-size: 14px; font-weight: 500; }
+    > small { color: #6c98a9; font-size: 10px; }
+    > svg { position: absolute; top: 14px; right: 14px; color: #dbc081; }
+  }
+}
+.survivorSelected { border-color: #c5a774 !important; background: #7e673628 !important; }
+@media (hover: hover) and (pointer: fine) {
+  .foundCompanies > button:not(:disabled):hover { border-color: var(--co); background: linear-gradient(140deg,color-mix(in srgb,var(--co) 14%,transparent),#132a3433); }
+  .survivorChoices > button:not(:disabled):hover { border-color: #81959c; background: #203b46; }
+  .counter button:hover:not(:disabled) { background: #405865; color: #f3d099; }
+}

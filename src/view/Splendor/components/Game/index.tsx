@@ -10,7 +10,7 @@ import { useInteractionMode } from '@/hooks/useInteractionMode';
 import { useConfirmDialog } from '@/components/ConfirmDialog/useConfirmDialog';
 import { Button } from '@/components/Button';
 import { backendName2FrontendName } from '@/util/user';
-import TurnCountdown from '@/view/Acquire/components/Game/components/TurnCountdown';
+import TurnCountdown from '@/components/TurnCountdown';
 
 import { getGameStatus, isCurrentPlayer, formatLastAction } from './utils/game';
 import CardBoard from './components/CardBoard';

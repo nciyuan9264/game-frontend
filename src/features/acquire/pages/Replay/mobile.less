@@ -1,0 +1,48 @@
+@media (max-width: 767px) {
+  .page { --replay-panel-height: 190px; height: calc(100dvh - 12px); padding-bottom: 0; overflow: hidden; }
+  .economyPage { --replay-panel-height: 220px; }
+  .heading { gap: 8px; margin: 0 0 8px; }
+  .headingIdentity { gap: 8px;
+    small { gap: 4px; font-size: 5px; letter-spacing: .1em; white-space: nowrap;
+      &::before { width: 10px; }
+    }
+    h1 { max-width: 221px; margin-top: 4px; gap: 7px; overflow: hidden; font-size: 17px; line-height: 1.08; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  .backButton { width: 29px; height: 32px;
+    svg { width: 17px; height: 17px; }
+  }
+  .headingTools { display: none; }
+  .layout { grid-template-columns: minmax(0,1fr); gap: 10px; }
+  .marketColumn, .portfolioColumn { display: none; }
+  .timeline { left: 50%; bottom: calc(8px + env(safe-area-inset-bottom)); width: calc(100vw - 28px); min-height: 190px; max-height: calc(100dvh - 28px); border-radius: 9px; }
+  .dragHandle { height: 20px; svg { width: 16px; height: 16px; } }
+  .timelineContent { height: calc(100% - 20px); padding: 6px 10px 9px;
+    > header { gap: 6px;
+      > div { gap: 4px; }
+      button { min-height: 32px; padding: 0 9px; font-size: 10px; }
+    }
+  }
+  .loadMeta { gap: 4px; }
+  .loadCount { font-size: 9px; b { display: none; } i { display: inline; } }
+  .loadSpinner { width: 9px; height: 9px; }
+  .loadTrack { margin-top: 4px; }
+  .progressStatus { min-height: 20px; font-size: 9px;
+    button { min-height: 20px; }
+  }
+  .controls { gap: 3px; margin: 5px 0 2px;
+    button { min-height: 30px; padding: 0 4px; flex: 1; font-size: 9px; }
+    span { min-width: 39px; font-size: 9px; }
+  }
+  .range { margin: 5px 0; }
+  .timelineViewport { overflow-x: auto; overflow-y: hidden; }
+  .events { gap: 4px; height: 46px; padding-bottom: 0; overflow-y: hidden;
+    button { min-width: 52px; height: 42px; padding: 4px 5px; font-size: 10px; small { margin-top: 2px; font-size: 8px; line-height: 1.15; } }
+  }
+  .boardHeading { gap: 6px; font-size: 12px;
+    > span { align-items: flex-start; flex-direction: column; gap: 1px; }
+  }
+  .boardTools { gap: 6px; }
+  .zoomButton { gap: 4px; padding: 5px 1px; font-size: 9px; svg { width: 12px; height: 12px; } }
+  .frameStatus { font-size: 9px; }
+  .note { display: none; }
+}

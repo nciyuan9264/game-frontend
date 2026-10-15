@@ -1,0 +1,42 @@
+.tabs { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 8px; margin-bottom: 20px;
+  button { min-height: 59px; padding: 12px 7px; border: 1px solid #3b566265; border-radius: 6px; background: #1a344066;
+    b { display: block; color: #99b4bf; font-size: 12px; font-weight: 500; }
+    small { display: block; margin-top: 6px; color: #648b9b; font-size: 8px; }
+  }
+  .active { border-color: #ba986167; background: #91733c19;
+    b { color: #e2c78c; } small { color: #acac8c; }
+  }
+}
+.table { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums;
+  tr { min-height: 43px; }
+  td, th { height: 43px; padding: 0 12px; border-bottom: 1px solid #344d595c; color: #adbec5; font-size: 12px; font-weight: 400; text-align: right; }
+  th:first-child { text-align: left; }
+  thead th { height: 34px; color: #7899a8; font-size: 10px; }
+  tbody th { color: #d8dfdb; font-weight: 500; }
+  .isCurrent { background: linear-gradient(90deg,#ae945c23,#a08e5d05); td, th { color: #e1c99b; } th:first-child { border-left: 2px solid #d4b578; padding-left: 10px; } }
+}
+.current { margin-top: 15px !important; color: #9ba78e; font-size: 10px; line-height: 1.7; }
+.hint { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding: 12px 13px; border: 1px solid #29414e7a; border-radius: 6px; background: #0e1f2a; color: #8ea6b4; font-size: 11px; line-height: 1.8;
+  > svg { margin-top: 2px; }
+}
+.footerNote { display: flex; align-items: center; gap: 8px; margin-right: auto; color: #8da3aa; font-size: 10px; }
+@media (min-width: 768px) {
+  .tabs button { b { font-size: 14px; } small { font-size: 11px; } }
+  .table { td, th { font-size: 14px; } thead th { font-size: 12px; } }
+  .current { font-size: 13px; }
+  .hint { font-size: 14px; }
+  .footerNote { font-size: 13px; }
+}
+@media (max-width: 767px) {
+  .tabs { gap: 6px; margin-bottom: 18px;
+    button { min-height: 64px; padding: 10px 5px; }
+    b { font-size: 11px; } small { min-height: 18px; margin-top: 5px; font-size: 6px; line-height: 1.5; white-space: normal; }
+  }
+  .table {
+    td, th { height: 40px; padding: 0 5px; font-size: 10px; }
+    thead th { height: 35px; font-size: 8px; }
+  }
+  .current { margin-top: 14px !important; font-size: 9px; line-height: 1.8; }
+  .hint { gap: 8px; margin-top: 17px; padding: 11px 12px; font-size: 10px; line-height: 1.8; > svg { width: 14px; height: 14px; } }
+  .footerNote { font-size: 9px; line-height: 1.7; }
+}

@@ -1,0 +1,43 @@
+@import './tokens.less';
+
+.root {
+  .theme();
+  color-scheme: dark;
+  color: var(--acq-text);
+  font: 13px/1.5 'DM Sans', 'Noto Sans SC', 'PingFang SC', sans-serif;
+  font-variant-numeric: tabular-nums;
+  cursor: auto;
+  * { box-sizing: border-box; }
+  &, * { scrollbar-width: thin; scrollbar-color: #4d676d #0b1d27; }
+  &::-webkit-scrollbar, *::-webkit-scrollbar { width: 8px; height: 8px; }
+  &::-webkit-scrollbar-track, *::-webkit-scrollbar-track { border-radius: 8px; background: #0b1d27; }
+  &::-webkit-scrollbar-thumb, *::-webkit-scrollbar-thumb {
+    min-width: 34px; min-height: 34px; border: 2px solid #0b1d27; border-radius: 8px;
+    background: #4d676d; background-clip: padding-box;
+  }
+  &::-webkit-scrollbar-thumb:hover, *::-webkit-scrollbar-thumb:hover { background: #71898a; background-clip: padding-box; }
+  &::-webkit-scrollbar-thumb:active, *::-webkit-scrollbar-thumb:active { background: #b59b69; background-clip: padding-box; }
+  &::-webkit-scrollbar-corner, *::-webkit-scrollbar-corner { background: #0b1d27; }
+  &::-webkit-scrollbar-button, *::-webkit-scrollbar-button { display: none; }
+  h1, h2, h3, p { margin: 0; }
+  h1, h2, h3 { font-weight: 600; line-height: 1.4; }
+  h1 { font-size: 26px; }
+  h2 { font-size: 20px; }
+  h3 { font-size: 15px; }
+  button, input, select, textarea { font: inherit; color: inherit; }
+  button, a { touch-action: manipulation; }
+  button { cursor: pointer; line-height: 1.4; }
+  button:disabled { cursor: not-allowed; opacity: .4; }
+  input, select, textarea { font-size: 16px; min-width: 0; }
+  input::placeholder { color: #78919f; }
+  :focus-visible { outline: 2px solid var(--acq-gold); outline-offset: 3px; }
+  img { display: block; }
+  svg { flex-shrink: 0; }
+  a { text-decoration: none; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
+  }
+  @media (max-width: 767px) {
+    &::-webkit-scrollbar, *::-webkit-scrollbar { width: 6px; height: 6px; }
+  }
+}

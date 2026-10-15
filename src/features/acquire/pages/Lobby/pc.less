@@ -1,0 +1,20 @@
+@media (min-width: @acq-desktop-min) {
+  .hero { height: 252px; }
+  .heroCopy { padding: 25px 34px; max-width: 690px; h1 { font-size: 34px; } }
+  .companies { min-height: 71px; padding: 12px 4px; margin-bottom: 24px; }
+  .layout { display: grid; grid-template-columns: minmax(0,1fr) 302px; gap: 25px; }
+  .cards { grid-template-columns: repeat(2,minmax(0,1fr)); }
+  .search { width: 224px; }
+}
+@media (min-width: @acq-desktop-min) and (max-width: 1199px) {
+  .layout { grid-template-columns: minmax(0,1fr); }
+  .aside { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); margin-top: 4px; }
+  .guide { display: none; }
+  .companies > div b { display: none; }
+}
+@media (min-width: 1200px) and (max-width: 1439px) {
+  .layout { grid-template-columns: minmax(0,1fr) 250px; gap: 20px; }
+  .filters { gap: 12px; }
+  .tabs { gap: 16px; }
+  .search { width: 210px; }
+}

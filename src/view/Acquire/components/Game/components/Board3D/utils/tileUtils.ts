@@ -17,6 +17,7 @@ export const createTileGeometry = (id: string, tileSize: number, scene: Scene): 
   // 先加载背景图片
   const backgroundImage = new Image();
   backgroundImage.onload = () => {
+    if (scene.isDisposed || tile.isDisposed()) return;
     // 绘制背景图片
     tileCtx.drawImage(backgroundImage, 0, 0, 512, 512);
 

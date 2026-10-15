@@ -1,0 +1,58 @@
+.dialog { width: min(590px, calc(100% - 48px)); }
+
+.condition {
+  display: flex; align-items: center; justify-content: center; gap: 28px; min-height: 130px; padding: 20px;
+  margin-bottom: 18px; border: 1px solid #6c71524f; border-radius: 8px; background: #3441374f;
+  > div { min-width: 0; }
+  b { display: block; margin-bottom: 4px; color: #b8c8c2; font-size: 11px; font-weight: 500; }
+  strong { display: block; color: #dacda5; font-size: 34px; font-weight: 500; line-height: 1.2;
+    small { color: #91a296; font-size: 11px; font-weight: 400; }
+  }
+  div > span { display: flex; align-items: center; gap: 6px; margin-top: 9px; color: #9bbb99; font-size: 11px; line-height: 1.6; }
+}
+.conditionIcon {
+  display: grid; place-items: center; width: 70px; height: 70px; flex: 0 0 auto;
+  border: 1px solid #9c8e6259; border-radius: 50%; background: #b1995710; color: #d5bd82;
+}
+.progress {
+  display: flex; align-items: center; gap: 12px; padding: 13px 14px; margin-bottom: 20px;
+  border: 1px solid #3f5a5f78; border-radius: 7px; background: #10242e; color: #88a5ae;
+  > svg { flex: 0 0 auto; color: #b9a879; }
+  > span { font-size: 11px; line-height: 1.55; }
+  b { color: #ded0a8; font-size: 13px; font-weight: 600; }
+  small { display: block; margin-top: 2px; color: #708e98; font-size: 9px; }
+}
+.steps {
+  display: flex; flex-direction: column; gap: 14px; margin-bottom: 20px;
+  > span { display: flex; align-items: center; gap: 11px; color: #a1bcc6; font-size: 12px; }
+  i {
+    display: grid; place-items: center; width: 22px; height: 22px; flex: 0 0 auto; border: 1px solid #62715a88;
+    border-radius: 50%; background: #8d865316; color: #c2b78b; font-size: 10px; font-style: normal;
+  }
+}
+.hint {
+  display: flex; align-items: flex-start; gap: 9px; padding: 12px 13px; border: 1px solid #917c4e59;
+  border-radius: 6px; background: #9c814914; color: #aaa986; font-size: 10px; line-height: 1.8;
+  > svg { flex: 0 0 auto; margin-top: 1px; color: #cdb47b; }
+}
+
+@media (max-width: 767px) {
+  .dialog { width: 100%; }
+  .condition { min-height: 117px; gap: 19px; padding: 18px 12px; margin-bottom: 16px;
+    b { font-size: 10px; }
+    strong { font-size: 29px; small { font-size: 9px; } }
+    div > span { max-width: 190px; font-size: 9px; }
+  }
+  .conditionIcon { width: 58px; height: 58px;
+    > svg { width: 34px; height: 34px; }
+  }
+  .progress { padding: 12px; margin-bottom: 18px;
+    > span { font-size: 10px; }
+    b { font-size: 12px; }
+    small { font-size: 8px; }
+  }
+  .steps { gap: 13px; margin-bottom: 18px;
+    > span { font-size: 11px; }
+  }
+  .hint { font-size: 9px; }
+}

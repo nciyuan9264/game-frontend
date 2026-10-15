@@ -1,0 +1,93 @@
+@media (max-width: 767px) {
+  .heading { flex-direction: column; align-items: stretch; gap: 16px; margin: 0 2px 17px;
+    .headingIdentity { gap: 10px; }
+    small { gap: 6px; font-size: 6px; letter-spacing: .12em; &::before { width: 17px; } }
+    h1 { gap: 10px; margin-top: 4px; font-size: 21px; }
+    h1 span { padding: 3px 6px; font-size: 8px; }
+    > div:last-child { justify-content: space-between; gap: 8px;
+      > button { flex: 1; min-height: 35px; padding: 0 10px; gap: 5px; font-size: 10px; }
+      svg { width: 13px; height: 13px; }
+    }
+  }
+  .mobile { display: flex; flex-direction: column; gap: 17px; margin: 0 2px; }
+  .tablePanel { min-width: 0; overflow: hidden; border: 1px solid #3a5157; border-radius: 9px; background: #142d31;
+    > header { display: flex; align-items: center; justify-content: space-between; height: 42px; padding: 0 13px; gap: 5px; border-bottom: 1px solid #3650548c; background: #182e36;
+      > span { display: flex; align-items: center; gap: 6px; color: #a8bdbb; font-size: 10px; }
+      > span > svg { width: 14px; height: 14px; color: #c4b38a; }
+      > span > i { width: 3px; height: 3px; border-radius: 50%; background: #59787b; }
+    }
+    > footer { display: flex; justify-content: space-around; gap: 0; padding: 13px 9px; border-top: 1px solid #41605344; background: #173039;
+      > span { display: flex; align-items: center; gap: 5px; color: #9db5b5; font-size: 10px; }
+      svg { width: 14px; height: 14px; color: #91ab9c; }
+      small { display: none; }
+      b { color: #d0d6c4; font-weight: 500; }
+    }
+  }
+  .preparation { display: flex; align-items: center; gap: 4px; color: #5f7d86; font-size: 6px;
+    > span { display: flex; align-items: center; gap: 2px; white-space: nowrap; }
+    > span > svg { width: 10px; height: 10px; }
+    > i { width: 9px; height: 1px; background: #3d555b; }
+    .done { color: #8db99e; } .active { color: #ddbb80; }
+  }
+  .tableStage { position: relative; isolation: isolate; height: auto; min-height: 0; padding: 18px 15px 20px; overflow: hidden; background: radial-gradient(ellipse at 50% 25%,#38514766,transparent 75%),#173236;
+    &::before { content: ''; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(#c3d5b117 .6px,transparent .6px); background-size: 5px 5px; }
+    &::after { content: ''; position: absolute; inset: 8px; border: 1px solid #b6b98a14; border-radius: 8px; pointer-events: none; }
+  }
+  .orbit { position: absolute; inset: 0 5%; z-index: -1; border: 1px solid #b7b38326; border-radius: 50%; opacity: .45; transform: rotate(-9deg); }
+  .orbitSecond { inset: 9% 10%; border-style: dashed; border-color: #a4bf9a17; }
+  .tableArt { position: absolute; left: 50%; top: 32%; z-index: -1; width: 125%; height: 100%; object-fit: contain; opacity: .12; mix-blend-mode: lighten; transform: translate(-50%,-50%); }
+  .coordinates { display: none; }
+  .seats { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
+  .seat { position: relative; left: auto; top: auto; width: 100%; height: 128px; min-height: 0; padding: 14px 9px 11px; gap: 6px; border-radius: 8px; background: #213e3ef2; transform: none;
+    &:active:not(:disabled) { transform: none; }
+    > strong { font-size: 12px; gap: 5px; }
+    &:not(.empty) > span:nth-child(2) { width: 48px !important; height: 48px !important; }
+  }
+  .seatNumber { position: absolute; top: 6px; left: 8px; font-size: 5px; }
+  .ready, .muted { font-size: 8px; gap: 3px; }
+  .remove { top: 3px; right: 4px; width: 25px; height: 25px; svg { width: 15px; height: 15px; } }
+  .empty { gap: 10px; background: #102a3430;
+    > strong { font-size: 10px; font-weight: 400; } > small { font-size: 8px; }
+  }
+  .emptyAvatar { width: 36px; height: 36px; margin-top: 1px; svg { width: 18px; } }
+  .facts { display: block; padding: 21px 18px;
+    h2 { margin-top: 10px; font-size: 18px; }
+    .visibility { margin-top: 8px; padding: 12px 0 17px; }
+    dl { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 13px 20px; margin: 19px 0 20px; }
+    dl > div { margin: 0; font-size: 11px; }
+    > button { min-height: 41px; }
+    .startNote, > button + .startNote { margin-top: 21px; padding-top: 18px; }
+  }
+  .startBar { position: fixed; right: 0; bottom: 0; left: 0; z-index: 60; flex-direction: column; align-items: stretch; gap: 11px; margin: 0; padding: 13px 16px calc(14px + env(safe-area-inset-bottom)); border-top: 1px solid #5261568c; background: #0e222df7; backdrop-filter: blur(15px);
+    > div:first-child { gap: 9px; }
+    strong { font-size: 11px; } small { margin-top: 3px; font-size: 9px; }
+    .readinessIcon { width: 27px; height: 27px; svg { width: 15px; } }
+    .startActions { display: block; > button { width: 100%; min-width: 0; min-height: 39px; height: 39px; font-size: 12px; } }
+  }
+  .mobile { padding-bottom: calc(131px + env(safe-area-inset-bottom)); }
+  .dialogDescription { font-size: 11px; line-height: 1.9; }
+  .dialogHint { gap: 8px; margin-top: 17px; padding: 11px 12px; font-size: 10px; line-height: 1.8;
+    > svg { width: 14px; height: 14px; }
+  }
+  .invitePlayers { margin-top: 0; margin-bottom: 21px; }
+  .inviteCode { padding: 21px 13px;
+    > input { margin: 12px 0; font-size: 25px; letter-spacing: .03em; }
+    > small { font-size: 9px; }
+  }
+  .roomForm { gap: 19px; }
+  .roomCodeSummary { padding: 11px 12px; b { font-size: 15px; } }
+  .accessChoices { gap: 11px;
+    button { padding: 15px 12px; gap: 8px; }
+    button > svg:first-child { width: 20px; height: 20px; }
+    strong { font-size: 12px; }
+    small { font-size: 8px; line-height: 1.7; }
+  }
+  .startPlayers { gap: 22px; padding-bottom: 23px;
+    > div { min-width: 73px; gap: 8px; }
+  }
+  .startFacts { padding: 20px 2px;
+    > span { gap: 8px; }
+    small { font-size: 8px; }
+    b { font-size: 15px; }
+  }
+}

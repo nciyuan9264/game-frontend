@@ -1,0 +1,23 @@
+@media (min-width: @acq-desktop-min) {
+  .main { margin-left: 76px; }
+  .header { height: 72px; padding: 0 32px; max-width: 1700px; margin: auto; }
+  .content { padding: 24px 32px 20px; }
+  .rail { position: fixed; inset: 0 auto 0 0; width: 76px; padding: 23px 9px 22px; display: flex; flex-direction: column; align-items: center; background: #091620; border-right: 1px solid #26394480; z-index: 10;
+    nav { width: 100%; display: grid; gap: 13px; }
+    nav a { position: relative; height: 62px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 7px; border-radius: 8px; color: var(--acq-muted); font-size: 10px; }
+  }
+  .monogram { padding: 0 6px; color: var(--acq-gold); margin-bottom: 35px;
+    svg { display: block; width: 37px; height: 42px; }
+  }
+  .active::before { content: ''; position: absolute; left: -9px; width: 2px; height: 24px; border-radius: 2px; background: var(--acq-gold); }
+  .railBottom { margin-top: auto; display: flex; flex-direction: column; align-items: center; gap: 27px; }
+  .onlineDot { width: 5px; height: 5px; border-radius: 50%; background: #91bda5; box-shadow: 0 0 0 4px #91bda50b; }
+  .mobileNav { display: none; }
+  .hideRail .rail { display: none; }
+  .hideRail .main { margin-left: 0; }
+  .hideHeader .content { padding-bottom: 0; }
+}
+@media (min-width: @acq-desktop-min) and (max-width: 1199px) {
+  .header { padding: 0 22px; }
+  .content { padding: 22px; }
+}

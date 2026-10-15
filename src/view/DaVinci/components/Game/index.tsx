@@ -2,7 +2,7 @@ import { FC, useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { Card, WsRoomSyncData } from '@/types/DaVinicRoom';
 import { CircleHelp, RotateCcw, Trophy, X } from 'lucide-react';
-import TurnCountdown from '@/view/Acquire/components/Game/components/TurnCountdown';
+import TurnCountdown from '@/components/TurnCountdown';
 import { GameCanvas, GameCanvasHandle } from './components/GameCanvas';
 import styles from './index.module.less';
 

@@ -96,9 +96,26 @@ export interface Snapshot {
     gameStatus: HistoryGameStatus;
     tiles: Record<string, SnapshotTile>;
     players: Record<string, { playerID: string; online: boolean; ai: boolean }>;
+    endGame?: {
+      eligible: boolean;
+      condition: '' | 'company_size' | 'all_companies_safe';
+      company: string;
+      tileCount: number;
+      votes: Record<string, boolean>;
+    };
   };
   playersData: Record<string, PlayerStateLike>;
   result: PlayerResultMap;
+}
+
+export interface SnapshotPageData {
+  snapshots: Snapshot[];
+  totalEvents: number;
+  totalSnapshots: number;
+  offset: number;
+  limit: number;
+  nextOffset: number;
+  hasMore: boolean;
 }
 
 /** 玩家整体胜率统计 */

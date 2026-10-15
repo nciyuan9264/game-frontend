@@ -1,0 +1,49 @@
+@media (max-width: @acq-mobile-max) {
+  .hero { height: 227px; border-radius: 9px;
+    > img { width: 100%; object-position: 63% 51%; opacity: .78; }
+    &::after { background: linear-gradient(90deg,#10242aed 0%,#10242abd 39%,#10242a10 100%),linear-gradient(0deg,#10242a96,transparent 65%); }
+  }
+  .heroCopy { height: 100%; max-width: 100%; padding: 21px 20px;
+    h1 { margin-top: 11px; font-size: 27px; line-height: 1.42; letter-spacing: .02em; }
+    > span { color: #b8ab88; font-size: 6px; letter-spacing: .14em; }
+    p { max-width: 225px; color: #a2b6ba; font-size: 10px; line-height: 1.8; }
+    > button { min-height: 39px; margin-top: 17px; padding: 0 18px; font-size: 12px; gap: 7px; }
+  }
+  .caption { display: none; }
+  .companies { min-height: 63px; margin-bottom: 19px; padding: 8px 0; gap: 0; overflow: hidden;
+    > span { display: none; }
+    > div { justify-content: flex-start; gap: 15px; padding: 0 2px; overflow-x: auto; scrollbar-width: none;
+      &::-webkit-scrollbar { display: none; }
+      button { flex-direction: column; flex-shrink: 0; min-width: 40px; padding: 4px 0; gap: 5px; }
+      b { display: block; font-size: 5px; letter-spacing: .09em; }
+      svg { width: 23px; height: 23px; }
+    }
+  }
+  .heading { align-items: center; gap: 8px; margin-bottom: 13px;
+    h2 { max-width: 230px; margin-top: 5px; font-size: 16px; line-height: 1.6; }
+    > div > span { font-size: 6px; letter-spacing: .12em; }
+    > span { padding: 4px 7px; font-size: 8px; }
+  }
+  .filters { flex-wrap: wrap; gap: 12px; margin-bottom: 14px; }
+  .tabs { gap: 23px; width: 100%; > button { padding: 8px 0; font-size: 12px; } }
+  .search { width: 100%; height: 39px; input { font-size: 11px; } }
+  .cards { grid-template-columns: minmax(0,1fr); gap: 12px; }
+  .mobileJoin { margin-top: 13px; .join { padding: 18px; form { height: 40px; } input { font-size: 12px; } button { width: 42px; } } }
+  .empty { min-height: 340px; padding: 28px 19px; h3 { font-size: 19px; } p { font-size: 11px; } }
+  .pageFooter { align-items: center; gap: 10px; padding: 21px 1px 0; font-size: 8px; > span:last-child { font-size: 7px; letter-spacing: 0; } }
+  .createForm { gap: 19px; }
+  .createDescription { font-size: 11px; line-height: 1.9; }
+  .visibility { gap: 11px;
+    button { padding: 15px 12px; gap: 8px; }
+    button > svg:first-child { width: 20px; height: 20px; }
+    strong { font-size: 12px; }
+    small { font-size: 8px; line-height: 1.7; }
+  }
+  .createHint { gap: 8px; padding: 11px 12px; font-size: 10px; line-height: 1.8; > svg { width: 14px; height: 14px; } }
+  .joinForm { gap: 19px; input { padding: 0 11px; font-size: 13px; } }
+  .joinHint { gap: 8px; margin-top: 17px; padding: 11px 12px; font-size: 10px; line-height: 1.8; > svg { width: 14px; height: 14px; } }
+}
+@media (max-width: 359px) {
+  .heroCopy { padding: 20px 16px; h1 { font-size: 24px; } }
+  .companies { gap: 8px; > div { gap: 6px; } }
+}

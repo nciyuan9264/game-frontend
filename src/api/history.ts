@@ -5,6 +5,7 @@ import type {
   ListGamesData,
   GameDetailData,
   Snapshot,
+  SnapshotPageData,
   Stats,
 } from '@/types/history';
 
@@ -44,13 +45,35 @@ export const getSnapshot = async (
   });
 };
 
-export const getSnapshots = async (
+export interface SnapshotPageParams {
+  offset?: number;
+  limit?: number;
+  signal?: AbortSignal;
+}
+
+export const getSnapshotPage = async (
   id: GameID,
-  gameType: HistoryGameType
-): Promise<Snapshot[]> => {
-  return APIClient.get({
+  gameType: HistoryGameType,
+  params: SnapshotPageParams = {}
+): Promise<SnapshotPageData> => {
+  const { offset = 0, limit = 20, signal } = params;
+  const result = await APIClient.get<SnapshotPageData>({
     url: `/api/${gameType}/history/game/${id}/snapshots`,
+    params: { offset, limit },
+    signal,
   });
+  const numericFields: Array<keyof SnapshotPageData> = [
+    'totalEvents', 'totalSnapshots', 'offset', 'limit', 'nextOffset',
+  ];
+  if (
+    !result ||
+    !Array.isArray(result.snapshots) ||
+    typeof result.hasMore !== 'boolean' ||
+    numericFields.some(field => !Number.isInteger(result[field]))
+  ) {
+    throw new Error('回放分页响应格式无效');
+  }
+  return result;
 };
 
 export const getMyStats = async (

@@ -1,0 +1,107 @@
+@media (max-width: 767px) {
+  .mobile { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
+  .heading { gap: 8px; margin-bottom: 13px;
+    .headingIdentity { gap: 8px; }
+    .headingIdentity small { gap: 4px; font-size: 5px; letter-spacing: .1em; white-space: nowrap; &::before { width: 10px; } }
+    h1 { max-width: 221px; margin-top: 4px; gap: 7px; overflow: hidden; font-size: 17px; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  .backButton { width: 29px; height: 32px; svg { width: 17px; } }
+  .headingTools { gap: 7px; flex-shrink: 0;
+    > .deadline { min-width: 48px; min-height: 29px; padding: 0 7px; font-size: 10px; }
+    > button { display: none; }
+  }
+  .cash { padding-left: 10px; gap: 6px; border-left: 1px solid #354a54;
+    > svg { display: none; }
+    small { color: #7e9baa; font-size: 7px; }
+    b { font-size: 17px; }
+  }
+  .phase { min-height: 54px; margin-bottom: 10px; padding: 8px 10px; gap: 10px; border-radius: 7px;
+    &:has(.phaseCommand) { flex-wrap: wrap; }
+    &:has(.phaseCommand) .phaseCommand { display: flex; justify-content: flex-end; width: 100%; margin: 0; padding-top: 7px; border-top: 1px solid #4c5e563d; }
+  }
+  .phase:not(.myTurn), .neutralPhase { border-color: #45657370; background: #18303b80; }
+  .phaseSummary { display: none !important; }
+  .mobilePhase { display: flex; align-items: center; gap: 8px; min-width: 0; min-height: 36px; flex: 1; color: #d8c393; }
+  .mobilePhaseAvatar { display: grid; place-items: center; width: 30px; height: 30px; flex: 0 0 auto; color: #e4be7c;
+    > span { width: 28px !important; height: 28px !important; border-color: #d2b678; outline-color: #7e653a; box-shadow: 0 0 0 2px #c69e4f17; }
+    > svg { width: 28px; height: 28px; padding: 5px; border: 1px solid #b38d5633; border-radius: 50%; background: #c3a0640b; }
+  }
+  .mobilePhaseCopy { display: flex; flex: 1; min-width: 0; flex-direction: column;
+    strong { overflow: hidden; color: inherit; font-size: 11px; font-weight: 600; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+    small { overflow: hidden; margin-top: 2px; color: #9ca99f; font-size: 8px; line-height: 1.4; text-overflow: ellipsis; white-space: nowrap; }
+  }
+  .mobilePhaseStep { display: flex; align-items: center; gap: 5px; flex: 0 0 auto; padding-left: 8px; border-left: 1px solid #8e80523d; color: #dec190; font-size: 9px; white-space: nowrap;
+    i { display: grid; place-items: center; width: 18px; height: 18px; border: 1px solid #d9b475; border-radius: 50%; background: #d9b475; color: #1d2c2a; font-size: 8px; font-style: normal; }
+  }
+  .neutralPhase .mobilePhase, .phase:not(.myTurn) .mobilePhase { color: #b2cbd4; }
+  .neutralPhase .mobilePhaseAvatar, .phase:not(.myTurn) .mobilePhaseAvatar { color: #8bb8c9; }
+  .neutralPhase .mobilePhaseStep, .phase:not(.myTurn) .mobilePhaseStep { border-color: #5974835c; color: #9dbbc5;
+    i { border-color: #6f9bab; background: #6f9bab; color: #10272f; }
+  }
+  .phaseSteps { display: none; }
+  .phaseCommand { margin-left: auto; flex: 0 0 auto; }
+  .phaseCommand .endVoteControl { min-width: 116px; min-height: 34px; gap: 5px; padding-left: 9px; border-left-color: #4c5e566e;
+    > span { min-width: 42px; b { font-size: 8px; } small { font-size: 7px; } }
+  }
+  .endVoteSwitch { width: 32px; height: 18px; padding: 3px;
+    i { width: 10px; height: 10px; }
+  }
+  .endVoteSwitchOn i { translate: 14px 0; }
+  .endVoteHelp { width: 23px; height: 23px; svg { width: 14px; height: 14px; } }
+  .mobileResultsAction { width: 100%; margin-bottom: 10px;
+    > button { width: 100%; min-height: 44px; font-size: 12px; }
+  }
+  .mobileMarket { display: block; margin-bottom: 10px; overflow: hidden; border: 1px solid #354c568f; border-radius: 8px; background: linear-gradient(120deg,#172c35,#122630); }
+  .mobileMarketHeader { display: flex; align-items: center; justify-content: space-between; height: 34px; padding: 0 5px 0 10px; border-bottom: 1px solid #354d5670;
+    h2 { display: flex; align-items: center; gap: 7px; margin: 0; color: #c8d2ce; font-size: 12px; font-weight: 500;
+      > svg { color: #b5ae8b; }
+      small { margin-left: 2px; color: #76949f; font-size: 9px; font-weight: 400; letter-spacing: .07em; }
+    }
+    > div { display: flex; align-items: center; gap: 1px; height: 100%; }
+    button { display: grid; place-items: center; height: 32px; min-width: 30px; padding: 0 7px; border: 0; background: transparent; color: #95b0bc; font-size: 10px;
+      &:first-child { display: flex; align-items: center; }
+    }
+  }
+  .mobileMarketTable { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums;
+    th, td { height: 24px; padding: 0 8px 0 2px; text-align: right; white-space: nowrap; }
+    th:first-child { padding-left: 9px; text-align: left; }
+    thead th { height: 22px; background: #0d222c8c; color: #839fab; font-size: 9px; font-weight: 400; }
+    tbody tr { border-top: 1px solid #38505a32; }
+    tbody th { font-weight: 400; }
+    td { color: #c9d4d2; }
+  }
+  .marketNameColumn { width: 40%; }
+  .marketSizeColumn { width: 12%; }
+  .marketPriceColumn { width: 18%; }
+  .compactCompany { display: flex; align-items: center; gap: 6px; min-width: 0; color: var(--co); font-size: 11px; line-height: 1.3;
+    > span { overflow: hidden; text-overflow: ellipsis; }
+    > svg:last-child:not(:first-child) { margin-left: -2px; color: #9eb6a4; }
+  }
+  .inactiveMarketCompany {
+    td, .compactCompany { color: #708a97; }
+    .compactCompany > svg:first-child { color: var(--co); opacity: .6; }
+  }
+  .compactHolding { background: #a8b59c06; b { font-size: 11px; font-weight: 500; } }
+  .hasMarketHoldings .compactHolding { color: #e6d4a7; }
+  .city { margin-top: 0; }
+  .boardHeading { max-width: 100%; height: 22px; margin-bottom: 9px;
+    > span { font-size: 7px; gap: 5px; &::before { width: 10px; margin-right: 5px; } b { margin-left: 5px; font-size: 11px; } }
+  }
+  .boardTools { gap: 6px; }
+  .zoomButton { gap: 4px; padding: 5px 1px; font-size: 9px; svg { width: 12px; height: 12px; } }
+  .legend { max-width: 100%; margin: 10px 1px 12px; gap: 13px; font-size: 7px;
+    i { width: 6px; height: 6px; }
+    > small { font-size: 7px; }
+  }
+  .mobileBoardAction { width: 100%; max-width: var(--acq-board-max-width); margin-bottom: 14px;
+    > button { width: 100%; min-height: 42px; padding: 0 14px; font-size: 12px; }
+  }
+  .toast { bottom: calc(22px + env(safe-area-inset-bottom)); left: 50%; max-width: calc(100% - 30px); padding: 11px 15px; gap: 8px; border-radius: 7px; font-size: 10px; line-height: 1.8;
+    > span { width: 4px; height: 4px; }
+  }
+}
+@media (max-width: 359px) {
+  .mobilePhaseCopy small { display: none; }
+  .mobilePhaseStep { padding-left: 6px; font-size: 8px; }
+  .headingIdentity > div { min-width: 0; }
+}

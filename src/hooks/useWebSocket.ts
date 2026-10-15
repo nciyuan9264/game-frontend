@@ -3,55 +3,61 @@ import { useNavigate } from 'react-router-dom';
 
 export const useWebSocket = (url: string, onMessage: (msg: MessageEvent) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
+  const onMessageRef = useRef(onMessage);
   const navigate = useNavigate();
-  const close = () => {
-    if (wsRef.current && (wsRef.current.readyState === WebSocket.OPEN || wsRef.current.readyState === WebSocket.CONNECTING)) {
-      wsRef.current.close(1000, 'Component unmounted');
-      wsRef.current = null;
-    }
-  };
+
+  onMessageRef.current = onMessage;
+
   useEffect(() => {
-    if (!url || wsRef.current !== null) return;
-    let ws = new WebSocket(url);
+    if (!url) return;
+
+    let disposed = false;
+    const ws = new WebSocket(url);
     wsRef.current = ws;
 
-    // let reconnectTimeout: NodeJS.Timeout;
-
-    ws.onopen = () => {
-      console.log('WebSocket connected');
-      // sendWhenReady({ type: 'ready' });
+    const close = () => {
+      disposed = true;
+      if (ws.readyState === WebSocket.OPEN || ws.readyState === WebSocket.CONNECTING) {
+        ws.close(1000, 'Component unmounted');
+      }
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
     };
 
-    ws.onmessage = onMessage;
+    ws.onopen = () => {
+      if (disposed || wsRef.current !== ws) return;
+      console.log('WebSocket connected');
+    };
 
-    ws.onerror = err => {
-      console.error('WebSocket error:', err);
+    ws.onmessage = event => {
+      if (disposed || wsRef.current !== ws) return;
+      onMessageRef.current(event);
+    };
+
+    ws.onerror = event => {
+      if (disposed || wsRef.current !== ws) return;
+      console.error('WebSocket error:', { url, readyState: ws.readyState, event });
       navigate('/game/acquire');
     };
 
     ws.onclose = event => {
+      if (wsRef.current === ws) {
+        wsRef.current = null;
+      }
+      if (disposed) return;
       console.log('WebSocket closed:', event.code, event.reason);
       console.log('reason:', event.reason);
       console.log('wasClean:', event.wasClean);
-      // // 自动重连（可选）
-      // if (event.code !== 1000) {
-      //   reconnectTimeout = setTimeout(() => {
-      //     ws = new WebSocket(url);
-      //     wsRef.current = ws;
-      //   }, 1000);
-      // }
     };
-    //deepscan-disable-next-line
+
     window.addEventListener('popstate', close);
 
     return () => {
-      // clearTimeout(reconnectTimeout);
-      if (ws && ws.readyState === WebSocket.OPEN) {
-        ws.close(1000, 'Component unmounted');
-        wsRef.current = null;
-      }
+      window.removeEventListener('popstate', close);
+      close();
     };
-  }, [url]);
+  }, [navigate, url]);
 
   const sendMessage = (msg: string) => {
     if (wsRef.current && wsRef.current.readyState === WebSocket.OPEN) {

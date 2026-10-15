@@ -1,11 +1,15 @@
 import DaVinci from "@/view/DaVinci";
+import Acquire from "@/view/Acquire";
+import AcquireLobby from "@/features/acquire/pages/Lobby";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/view/Home"));
 const GameBoard = lazy(() => import("@/view/GameBoard"));
-const Acquire = lazy(() => import("@/view/Acquire"));
-const AcquireReplayPage = lazy(() => import("@/view/Acquire/Replay/page"));
+const AcquireReplayPage = lazy(() => import("@/features/acquire/pages/Replay"));
 const Splendor = lazy(() => import("@/view/Splendor"));
+const AcquireRankings = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.Rankings })));
+const AcquireGuide = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.Guide })));
+const AcquireMy = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.My })));
 
 export interface AppRoute {
   path: string;
@@ -17,8 +21,11 @@ export interface AppRoute {
 export const routes: AppRoute[] = [
   {
     path: "/game/acquire",
-    element: <GameBoard />
+    element: <AcquireLobby />
   },
+  { path: "/game/acquire/rankings", element: <AcquireRankings /> },
+  { path: "/game/acquire/guide", element: <AcquireGuide /> },
+  { path: "/game/acquire/me", element: <AcquireMy /> },
   {
     path: "/game/acquire/match",
     element: <Acquire />

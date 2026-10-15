@@ -7,6 +7,7 @@ export interface RoomPlayer {
   online: boolean;
   ai: boolean;
   ready: boolean;
+  seatIndex?: number;
 }
 
 /**

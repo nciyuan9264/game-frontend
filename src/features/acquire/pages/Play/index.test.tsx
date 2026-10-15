@@ -1,0 +1,140 @@
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
+import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
+import type { AcquireSession } from '../../hooks/useAcquireSession';
+import type { GameSnapshot } from '../../model/session';
+import { companyKeys } from '../../model/types';
+import { Play } from '.';
+
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
+beforeEach(() => {
+  HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
+    this.setAttribute('open', '');
+  });
+  HTMLDialogElement.prototype.close = vi.fn(function (this: HTMLDialogElement) {
+    this.removeAttribute('open');
+  });
+});
+
+function snapshot(status: 'setTile' | 'end'): GameSnapshot {
+  return {
+    type: 'ROOM_SYNC', roomID: 'room', phaseVersion: status === 'end' ? 2 : 1, turnNumber: 1,
+    playerId: 'me', ownerID: 'me', visibility: 'public',
+    playerData: { money: 6000, tiles: ['1A'], stocks: Object.fromEntries(companyKeys.map(company => [company, 0])) },
+    roomData: {
+      gameStatus: status, currentPlayer: 'me', currentStep: '', playerOrder: ['me'],
+      players: { me: { playerID: 'me', name: 'Player', online: true, ai: false, ready: true } },
+      companyInfo: Object.fromEntries(companyKeys.map(company => [company, {
+        name: company, tiles: company === 'Tower' ? 41 : 0, stockPrice: 200, stockTotal: 25, valuation: '',
+      }])),
+      tiles: { '1A': { id: '1A', belong: '' } },
+    },
+    tempData: { last_tile_key: '', merge_main_company_temp: '', merge_selection_temp: { mainCompany: [], otherCompany: [] }, mergeSettleData: {} },
+    result: status === 'end' ? { me: { money: 6000, stocks: 0, total: 6000 } } : undefined,
+  } as unknown as GameSnapshot;
+}
+
+describe('Acquire play end transition', () => {
+  it('opens the results page automatically when the server snapshot enters end', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    const ended = snapshot('end');
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = (data: GameSnapshot) => ({
+      data, draft: { key: `room:${data.phaseVersion}`, buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    }) as unknown as AcquireInteraction;
+
+    const { rerender } = render(<Play data={active} session={session} interaction={interaction(active)} onLeave={vi.fn()} />);
+    expect(screen.getByRole('group', { name: '12 列 9 行，共 108 块地' })).toBeTruthy();
+
+    rerender(<Play data={ended} session={session} interaction={interaction(ended)} onLeave={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: '一城落定，好局未完。' })).toBeTruthy();
+    expect(screen.queryByRole('group', { name: '12 列 9 行，共 108 块地' })).toBeNull();
+  });
+
+  it('keeps a visible mobile results action after returning to the final board', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const ended = snapshot('end');
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: ended, draft: { key: 'room:2', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    render(<Play data={ended} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: '查看终局棋盘' }));
+
+    const resultsButton = screen.getByRole('button', { name: '查看本局结算' });
+    expect(resultsButton).toBeTruthy();
+    fireEvent.click(resultsButton);
+    expect(screen.getByRole('heading', { name: '一城落定，好局未完。' })).toBeTruthy();
+  });
+
+  it('opens the end prompt once and submits the authoritative switch value', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    active.roomData.endGame = {
+      eligible: true, condition: 'company_size', company: 'Tower', tileCount: 41, votes: { me: false },
+    };
+    const submit = vi.fn(() => true);
+    const session = { pending: undefined, activity: [], submit } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '关闭面板' }));
+    expect(screen.queryByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeNull();
+
+    fireEvent.click(screen.getByRole('switch', { name: '允许结束游戏' }));
+    expect(submit).toHaveBeenCalledWith('game_end_vote', { allow: true });
+    fireEvent.click(screen.getByRole('button', { name: '查看终局规则' }));
+    expect(screen.getByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeTruthy();
+  });
+
+  it('waits for the required business panel before auto-opening the end prompt', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    active.roomData.endGame = {
+      eligible: true, condition: 'all_companies_safe', company: '', tileCount: 0, votes: { me: false },
+    };
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const makeInteraction = (panel?: 'buy') => ({
+      data: active, draft: { key: 'room:1', buy: {}, merge: {}, panel },
+      enabled: true, eligiblePanel: panel, panel,
+      selectTile: vi.fn(), place: vi.fn(), close: vi.fn(), submitBuy: vi.fn(), changeBuy: vi.fn(),
+    }) as unknown as AcquireInteraction;
+
+    const { rerender } = render(<Play data={active} session={session}
+      interaction={makeInteraction('buy')} onLeave={vi.fn()} />);
+    expect(screen.queryByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeNull();
+
+    rerender(<Play data={active} session={session} interaction={makeInteraction()} onLeave={vi.fn()} />);
+    expect(screen.getByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeTruthy();
+  });
+});

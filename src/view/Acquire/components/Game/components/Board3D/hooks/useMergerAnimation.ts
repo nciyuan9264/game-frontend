@@ -1,87 +1,39 @@
-import { useCallback } from 'react';
-import { getPrevData } from '../../../utils/game';
+import { useCallback, useEffect, useRef, type MutableRefObject } from 'react';
+import { Mesh, Scene, StandardMaterial } from '@babylonjs/core';
+import type { WsRoomSyncData } from '@/types/AcquireRoom';
 import { CompanyColor } from '@/const/color';
 import { hexToColor3 } from '../utils/colorUtils';
 import { createFlashAnimation, sortTilesByDistance } from '../utils/animationUtils';
-import { StandardMaterial } from '@babylonjs/core';
 
-export const useMergerAnimation = (roomID: string, tilesRef?: React.MutableRefObject<Record<string, any>>, sceneRef?: React.MutableRefObject<any>) => {
-  const detectAndAnimateMerger = useCallback((currentData: any) => {
-    const prevData = getPrevData(roomID);
-    if (!prevData || !currentData) return;
-
-    // 比较公司数量，检测是否有合并发生
-    const prevCompanies = Object.keys(prevData.roomData?.companyInfo || {}).filter(
-      key => prevData.roomData.companyInfo[key].isActive
-    );
-    const currentCompanies = Object.keys(currentData.roomData?.companyInfo || {}).filter(
-      key => currentData.roomData.companyInfo[key].isActive
-    );
-
-    if (prevCompanies.length > currentCompanies.length) {
-      // 发生了合并，找出被合并的公司和存活的公司
-      const mergedCompanies = prevCompanies.filter(company => !currentCompanies.includes(company));
-      const survivingCompany = currentCompanies.find(company => {
-        const prevTileCount = Object.values(prevData.roomData?.tiles || {}).filter(
-          (tile: any) => tile.belong === company
-        ).length;
-        const currentTileCount = Object.values(currentData.roomData?.tiles || {}).filter(
-          (tile: any) => tile.belong === company
-        ).length;
-        return currentTileCount > prevTileCount;
-      });
-
-      if (mergedCompanies.length > 0 && survivingCompany) {
-        console.log(`检测到合并: ${mergedCompanies.join(', ')} 被 ${survivingCompany} 合并`);
-        startMergeAnimation(mergedCompanies, survivingCompany, prevData.roomData?.tiles, currentData.roomData?.tiles);
-      }
-    }
+type BoardState = Pick<WsRoomSyncData['roomData'], 'tiles' | 'companyInfo'>;
+export function useMergerAnimation(roomID: string, tilesRef: MutableRefObject<Record<string, Mesh>>, sceneRef: MutableRefObject<Scene | null>) {
+  const previous = useRef<BoardState>();
+  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
+  useEffect(() => {
+    previous.current = undefined;
+    return () => { timers.current.forEach(clearTimeout); timers.current = []; };
   }, [roomID]);
-
-  const startMergeAnimation = useCallback((_: string[], survivingCompany: string, prevTiles: any, currentTiles: any) => {
-    if (!tilesRef?.current || !sceneRef?.current) return;
-
-    // 找出所有需要变色的tiles
-    const tilesToAnimate: string[] = [];
-    let lastPlacedTile = '';
-
-    Object.entries(currentTiles || {}).forEach(([tileId, tileData]: [string, any]) => {
-      if (tileData.belong === survivingCompany) {
-        const prevTileData = prevTiles?.[tileId];
-        if (!prevTileData || prevTileData.belong !== survivingCompany) {
-          // 这个tile是新加入存活公司的
-          tilesToAnimate.push(tileId);
-          lastPlacedTile = tileId; // 假设最后一个是触发合并的tile
-        }
-      }
+  const detectAndAnimateMerger = useCallback(({ roomData }: { roomData: BoardState }) => {
+    const before = previous.current;
+    previous.current = roomData;
+    if (!before || window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    const merged = Object.keys(before.companyInfo).filter(key => {
+      const company = key as keyof BoardState['companyInfo'];
+      return before.companyInfo[company].tiles > 0 && !roomData.companyInfo[company]?.tiles;
     });
-
-    if (tilesToAnimate.length > 0) {
-      // 按距离排序，创建波浪效果
-      const sortedTiles = sortTilesByDistance(tilesToAnimate, lastPlacedTile);
-      animateTileColorChange(sortedTiles, survivingCompany as keyof typeof CompanyColor);
-    }
-  }, [tilesRef, sceneRef]);
-
-  const animateTileColorChange = useCallback((tileIds: string[], targetCompany: keyof typeof CompanyColor) => {
-    if (!tilesRef?.current || !sceneRef?.current) return;
-
-    const targetColor = hexToColor3(CompanyColor[targetCompany] || '#ffffff');
-    
-    tileIds.forEach((tileId, index) => {
-      setTimeout(() => {
-        const tile = tilesRef.current[tileId];
-        if (tile && tile.material) {
-          const material = tile.material as StandardMaterial;
-          createFlashAnimation(material, targetColor);
+    if (!merged.length) return;
+    const changed = Object.keys(roomData.tiles).filter(id => merged.includes(before.tiles[id]?.belong) && roomData.tiles[id]?.belong !== before.tiles[id]?.belong);
+    timers.current.forEach(clearTimeout);
+    timers.current = [];
+    sortTilesByDistance(changed, changed[0] || '1A').forEach((id, index) => {
+      const company = roomData.tiles[id].belong;
+      timers.current.push(setTimeout(() => {
+        const tile = tilesRef.current[id];
+        if (!sceneRef.current?.isDisposed && tile && !tile.isDisposed() && tile.material instanceof StandardMaterial && previous.current?.tiles[id]?.belong === company) {
+          createFlashAnimation(tile.material, hexToColor3(CompanyColor[company] || '#ffffff'));
         }
-      }, index * 100); // 每个tile间隔100ms
+      }, index * 60));
     });
   }, [tilesRef, sceneRef]);
-
-  return {
-    detectAndAnimateMerger,
-    startMergeAnimation,
-    animateTileColorChange
-  };
-};
+  return { detectAndAnimateMerger };
+}

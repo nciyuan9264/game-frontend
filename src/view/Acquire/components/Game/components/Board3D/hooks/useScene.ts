@@ -84,9 +84,12 @@ export const useScene = () => {
       engine.resize();
     };
     window.addEventListener('resize', handleResize);
+    const observer = new ResizeObserver(handleResize);
+    observer.observe(canvasRef.current);
 
     return () => {
       window.removeEventListener('resize', handleResize);
+      observer.disconnect();
       scene.dispose();
       engine.dispose();
     };

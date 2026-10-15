@@ -1,0 +1,48 @@
+.market { overflow: hidden; border: 1px solid var(--acq-line); border-radius: 10px; background: var(--acq-panel);
+  > header { display: flex; align-items: center; justify-content: space-between; gap: 7px; padding: 17px 17px 14px; border-bottom: 1px solid #314a536e;
+    small { display: flex; align-items: center; gap: 6px; color: #82978b; font-size: 9px; font-weight: 500; letter-spacing: .16em;
+      &::before { content: ''; width: 12px; height: 1px; background: currentColor; opacity: .75; }
+    }
+    h2 { margin-top: 5px; font-size: 18px; }
+    > span { color: #7c989f; font-size: 11px; white-space: nowrap; }
+  }
+  > footer { display: flex; align-items: center; gap: 6px; padding: 14px; background: #10212a; color: #809d92; font-size: 12px; }
+}
+.company {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 68px;
+  padding: 13px 14px;
+  border: 0;
+  border-bottom: 1px solid #314a532a;
+  background: transparent;
+  text-align: left;
+  opacity: .48;
+
+  > span:nth-child(2) { flex: 1; min-width: 0; }
+  > span:last-child { text-align: right; }
+  strong { display: flex; align-items: center; gap: 5px; color: var(--co); font-size: 13px; font-weight: 500; }
+  small { display: block; margin-top: 5px; color: #8ba5b1; font-size: 12px; white-space: nowrap; }
+  b { color: #d8dfdb; font-size: 15px; font-weight: 500; white-space: nowrap; }
+  > span:last-child small { color: #76919e; }
+}
+.active { opacity: 1; background: linear-gradient(90deg,color-mix(in srgb,var(--co) 8%,transparent),transparent);
+  &::before { content: ''; position: absolute; left: 0; width: 2px; height: 26px; border-radius: 2px; background: var(--co); }
+}
+.companyIcon { display: grid; place-items: center; width: 29px; flex-shrink: 0; color: var(--co); }
+@media (hover: hover) and (pointer: fine) { .company:hover { background: #ffffff05; } }
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .company { padding: 12px 11px; gap: 6px; strong { font-size: 12px; } small { font-size: 11px; } b { font-size: 14px; } }
+  .companyIcon { width: 26px; }
+}
+@media (min-width: 768px) and (max-width: 1180px) {
+  .market > header { padding: 13px 12px; h2 { font-size: 16px; } }
+  .company { padding: 12px 11px; gap: 5px;
+    strong { font-size: 11px; } small { font-size: 10px; } b { font-size: 12px; }
+    > span:last-child small { display: none; }
+  }
+  .companyIcon { width: 23px; svg { width: 20px; } }
+}

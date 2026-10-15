@@ -1,0 +1,11 @@
+@media (min-width: 768px) {
+  .layout { grid-template-columns: 254px minmax(0,1fr) 268px; }
+  .portfolioColumn { position: sticky; top: 16px; }
+}
+@media (min-width: 1200px) and (max-width: 1400px) {
+  .layout { grid-template-columns: 220px minmax(0,1fr) 229px; gap: 17px; }
+}
+@media (min-width: 768px) and (max-width: 1199px) {
+  .layout { grid-template-columns: minmax(0,1fr) 220px; gap: 14px; }
+  .marketColumn { display: none; }
+}

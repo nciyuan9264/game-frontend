@@ -3,18 +3,34 @@
 
 <head>
   <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#07151f">
+  <style>
+    html,
+    body,
+    #root {
+      min-height: 100%;
+      background: #07151f;
+    }
+
+    html,
+    body {
+      margin: 0;
+    }
+  </style>
   <link rel="icon" type="image/png" href="/site.png" />
   <link href="/fonts/orbitron.css" rel="stylesheet">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>game</title>
   <script>
     var _hmt = _hmt || [];
-    (function () {
-      var hm = document.createElement("script");
-      hm.src = "https://hm.baidu.com/hm.js?30751122d9d7441845ce38f8ac5f5924";
-      var s = document.getElementsByTagName("script")[0];
-      s.parentNode.insertBefore(hm, s);
-    })();
+    if (window.location.hostname.endsWith("gamebus.online")) {
+      (function () {
+        var hm = document.createElement("script");
+        hm.src = "https://hm.baidu.com/hm.js?30751122d9d7441845ce38f8ac5f5924";
+        var s = document.getElementsByTagName("script")[0];
+        s.parentNode.insertBefore(hm, s);
+      })();
+    }
   </script>
 
   <style>

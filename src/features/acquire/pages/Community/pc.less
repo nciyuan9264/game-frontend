@@ -1,0 +1,23 @@
+@media (min-width: 768px) {
+  .grid { grid-template-columns: minmax(270px, .85fr) minmax(0, 1.7fr); }
+  .guideGrid { grid-template-columns: minmax(0, 1.7fr) minmax(270px, .85fr); }
+  .aside { position: sticky; top: 20px; }
+  .page { padding: 0 0 30px; }
+  .guidePage, .rankPage, .profilePage { max-width: none; }
+  .guideLayout { display: grid; grid-template-columns: minmax(230px, .7fr) minmax(0, 1fr); gap: 20px;
+    > aside { align-self: start; overflow: hidden; border: 1px solid #52665d80; border-radius: 12px; background: #172d35;
+      > img { width: 100%; aspect-ratio: 1.28; object-fit: cover; filter: saturate(.8); }
+    }
+  }
+  .guidePanel { padding: 25px; h2 { font-size: 22px; } }
+  .profileDisplay, .profileHistory { min-height: 485px; }
+}
+@media (min-width: 1200px) {
+  .guideLayout { grid-template-columns: minmax(280px, .75fr) minmax(0, 1fr); gap: 28px; }
+  .guidePanel { padding: 30px; h2 { font-size: 25px; } }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  .rankRow { grid-template-columns: 48px minmax(0,1fr) 90px 90px; gap: 12px; }
+  .profileLayout { grid-template-columns: 280px minmax(0,1fr); gap: 20px; }
+}

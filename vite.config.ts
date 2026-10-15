@@ -4,6 +4,7 @@ import path from 'path';
 
 export default defineConfig(({ mode }) => {
   const env = loadEnv(mode, process.cwd(), '');
+  const devRefreshToken = env.DEV_REFRESH_TOKEN?.trim();
 
   return {
     plugins: [react()],
@@ -16,24 +17,41 @@ export default defineConfig(({ mode }) => {
           target: 'http://localhost:8000',
           changeOrigin: true,
           secure: true,
-          rewrite: (path) => path.replace(/^\/api\/acquire/, ''),
+          ws: true,
+          rewrite: path => path.replace(/^\/api\/acquire/, ''),
         },
         '/api/davinci': {
           target: 'http://localhost:8001',
           changeOrigin: true,
           secure: true,
-          rewrite: (path) => path.replace(/^\/api\/davinci/, ''),
+          ws: true,
+          rewrite: path => path.replace(/^\/api\/davinci/, ''),
         },
         '/api/splendor': {
           target: 'http://localhost:8002',
           changeOrigin: true,
           secure: true,
-          rewrite: (path) => path.replace(/^\/api\/splendor/, ''),
+          ws: true,
+          rewrite: path => path.replace(/^\/api\/splendor/, ''),
         },
         '/pam-api': {
           target: env.VITE_PAM_GATEWAY_TARGET || 'http://localhost:19003',
           changeOrigin: true,
           secure: true,
+          cookieDomainRewrite: '',
+          configure: proxy => {
+            proxy.on('proxyReq', (proxyRequest, request) => {
+              if (!devRefreshToken || !request.url?.endsWith('/platform/auth/refresh')) {
+                return;
+              }
+              const cookies = (request.headers.cookie ?? '')
+                .split(';')
+                .map(cookie => cookie.trim())
+                .filter(cookie => cookie && !cookie.startsWith('refresh_token='));
+              cookies.push(`refresh_token=${devRefreshToken}`);
+              proxyRequest.setHeader('Cookie', cookies.join('; '));
+            });
+          },
         },
       },
     },

@@ -1,0 +1,25 @@
+.dialog {
+  padding: 0; border: 1px solid #506369; color: var(--acq-text);
+  background: radial-gradient(ellipse at 80% 0,#66624913,transparent 60%),#142731;
+  max-height: calc(100dvh - 104px); overflow: hidden; position: relative;
+  font-family: 'DM Sans', 'Noto Sans SC', 'PingFang SC', sans-serif; font-size: 13px; line-height: 1.5;
+  box-shadow: 0 25px 100px #0008, 0 0 0 1px #07121a;
+  &[open] { display: flex; flex-direction: column; animation: dialogIn .18s ease both; }
+  &::backdrop { background: #030a11b8; backdrop-filter: blur(7px); }
+}
+.header { position: relative; padding: 25px 28px 21px; border-bottom: 1px solid #3b515c80; flex-shrink: 0;
+  > div { width: 100%; min-width: 0; }
+  small { display: flex; align-items: center; gap: 8px; margin-bottom: 9px; color: #aa9c7a; font-size: 8px; font-weight: 500; letter-spacing: .16em; line-height: 1.5;
+    &::before { content: ''; width: 21px; height: 1px; background: currentColor; }
+  }
+  h2 { padding-right: 36px; font-size: 22px; line-height: 1.45; letter-spacing: .005em; }
+  button { position: absolute; top: 26px; right: 21px; display: grid; place-items: center; width: 31px; height: 31px; padding: 0; border: 1px solid #4d5f647d; border-radius: 6px; background: #263b43; color: #9eb3be; }
+}
+.body { padding: 24px 28px; min-height: 0; overflow: auto; overscroll-behavior: contain; }
+.footer { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 12px; padding: 18px 28px 21px; border-top: 1px solid #3b515c80; background: #10222c; flex-shrink: 0;
+  > button { min-height: 41px; padding: 0 17px; gap: 9px; font-size: 12px; font-weight: 600; line-height: 1.4; }
+}
+@keyframes dialogIn {
+  from { opacity: 0; translate: 0 7px; }
+  to { opacity: 1; translate: 0 0; }
+}

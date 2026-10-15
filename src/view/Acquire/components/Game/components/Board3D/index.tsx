@@ -1,7 +1,6 @@
 import  { useEffect } from 'react';
-import { ReloadOutlined } from '@ant-design/icons';
-import styles from './index.module.less';
-import { Button } from '@/components/Button';
+import styles from '@/features/acquire/components/Board3D/index.module.less';
+import { ActionButton } from '@/features/acquire/components/ActionButton';
 import { useScene } from './hooks/useScene';
 import { useTiles } from './hooks/useTiles';
 import { useCompanyModels } from './hooks/useCompanyModels';
@@ -21,7 +20,7 @@ export default function Board3D({ roomID, hoveredTile, data }: Props) {
   const { canvasRef, sceneRef, resetCamera } = useScene();
   const { tilesRef, createTiles, updateTileColor } = useTiles(sceneRef);
   const { checkAndLoadCompanyModels } = useCompanyModels(sceneRef, tilesRef);
-  const { detectAndAnimateMerger } = useMergerAnimation(roomID);
+  const { detectAndAnimateMerger } = useMergerAnimation(roomID, tilesRef, sceneRef);
 
   // 初始化棋盘
   useEffect(() => {
@@ -62,19 +61,16 @@ export default function Board3D({ roomID, hoveredTile, data }: Props) {
       <canvas
         ref={canvasRef}
         className={styles.canvas}
-        style={{ width: '100vw', height: '100vh' }}
       />
       
       {/* 相机重置按钮 */}
-      <Button
+      <ActionButton
         className={styles.resetCameraBtn}
-        customType="primary"
-        icon={<ReloadOutlined />}
         onClick={resetCamera}
         title="重置视角"
       >
         重置视角
-      </Button>
+      </ActionButton>
     </div>
   );
 }

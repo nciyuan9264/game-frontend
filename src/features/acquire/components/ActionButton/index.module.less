@@ -1,0 +1,19 @@
+.button {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  min-height: 40px; padding: 0 17px; border-radius: 6px;
+  border: 1px solid #3b505d; background-color: #1b303c; color: #dce5e5;
+  font-size: 12px; font-weight: 600; line-height: 1.4;
+  white-space: nowrap; transition: background-color .16s, border-color .16s, color .16s, filter .16s;
+  &:active:not(:disabled) { transform: translateY(1px); }
+}
+.primary { color: #33291d !important; background-color: #dfb16f; background-image: linear-gradient(120deg,#edc991,#dfb16f); border-color: #ecc489; box-shadow: 0 3px 0 #493b2833,0 5px 20px #ebbf7b08; }
+.secondary { color: #dce5e5 !important; }
+.quiet { background-color: transparent; border-color: transparent; color: var(--acq-muted) !important; }
+.danger { color: #f0b1a5 !important; border-color: #8b574b; background-color: #57352f; }
+.spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
+@media (hover: hover) and (pointer: fine) {
+  .button:hover:not(:disabled) { border-color: #647986; background-color: #2a414d; filter: brightness(1.08); }
+  .primary:hover:not(:disabled) { border-color: #f6d9ab; background-color: #dfb16f; filter: brightness(1.08); }
+  .danger:hover:not(:disabled) { border-color: #a76b5e; background-color: #694138; }
+}

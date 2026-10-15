@@ -8,6 +8,7 @@ export default {
             replace: true,
             mediaQuery: false,
             minPixelValue: 0,
+            exclude: /[\\/]src[\\/]features[\\/]acquire[\\/]/,
         },
     },
 };

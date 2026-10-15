@@ -1,0 +1,26 @@
+.value {
+  display: inline-block;
+  min-width: 1ch;
+  color: inherit;
+  font: inherit;
+  font-variant-numeric: tabular-nums;
+}
+
+.up { animation: valueUp .42s cubic-bezier(.2,.8,.2,1); }
+.down { animation: valueDown .42s cubic-bezier(.2,.8,.2,1); }
+
+@keyframes valueUp {
+  0% { color: inherit; text-shadow: none; }
+  38% { color: #d9ca98; text-shadow: 0 0 10px #cdb77473; }
+  100% { color: inherit; text-shadow: none; }
+}
+
+@keyframes valueDown {
+  0% { color: inherit; text-shadow: none; }
+  38% { color: #d6a08e; text-shadow: 0 0 10px #c97f6870; }
+  100% { color: inherit; text-shadow: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .up, .down { animation-duration: .01ms; }
+}

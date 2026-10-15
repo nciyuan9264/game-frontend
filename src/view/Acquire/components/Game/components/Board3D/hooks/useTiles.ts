@@ -1,5 +1,5 @@
 import { useRef, useCallback } from 'react';
-import { Mesh, StandardMaterial, DynamicTexture, Color3, ActionManager, ExecuteCodeAction, GlowLayer, Texture, MeshBuilder } from '@babylonjs/core';
+import { Mesh, StandardMaterial, DynamicTexture, Color3, GlowLayer, Texture, MeshBuilder } from '@babylonjs/core';
 import { CompanyColor } from '@/const/color';
 import { createTileGeometry } from '../utils/tileUtils';
 import { hexToColor3 } from '../utils/colorUtils';
@@ -28,13 +28,7 @@ export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: Glow
         tile.position.z = (rowIndex - (rows.length - 1) / 2) * tileSize + boardOffsetZ;
         tile.position.y = 0.15;
 
-        // 添加交互
-        tile.actionManager = new ActionManager(sceneRef.current);
-        tile.actionManager.registerAction(
-          new ExecuteCodeAction(ActionManager.OnPickTrigger, () => {
-            console.log(`Clicked tile: ${id}`);
-          })
-        );
+        tile.metadata = { baseTexture: (tile.material as StandardMaterial).diffuseTexture, belong: '' };
 
         tilesRef.current[id] = tile;
 
@@ -78,7 +72,8 @@ export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: Glow
       const isHovered = hoveredTile === id;
 
       if (tileData?.belong && CompanyColor[tileData.belong]) {
-        // 更新公司颜色
+        // Repaint only on ownership changes; snapshots and hover must not allocate GPU textures.
+        if (tile.metadata.belong !== tileData.belong) {
         const tileTexture = new DynamicTexture(`tileTexture_${id}_updated`, { width: 512, height: 512 }, sceneRef.current);
         const ctx = tileTexture.getContext();
 
@@ -102,7 +97,10 @@ export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: Glow
         ctx.restore();
 
         tileTexture.update();
+        if (material.diffuseTexture !== tile.metadata.baseTexture) material.diffuseTexture?.dispose();
         material.diffuseTexture = tileTexture;
+        tile.metadata.belong = tileData.belong;
+        }
 
         // 设置发光效果
         const companyColor = hexToColor3(CompanyColor[tileData.belong]);
@@ -110,7 +108,10 @@ export const useTiles = (sceneRef: React.MutableRefObject<any>, glowLayer?: Glow
         const scale = isHovered ? 0.2 / maxComponent : 0.6 / maxComponent;
         material.emissiveColor = new Color3(companyColor.r * scale, companyColor.g * scale, companyColor.b * scale);
       } else {
-        // 默认状态
+        // Restore the original tile texture when a new game clears the board.
+        if (material.diffuseTexture !== tile.metadata.baseTexture) material.diffuseTexture?.dispose();
+        material.diffuseTexture = tile.metadata.baseTexture;
+        tile.metadata.belong = '';
         material.emissiveColor = isHovered ? new Color3(0.2, 0.8, 1.0) : new Color3(0.05, 0.05, 0.1);
       }
     },

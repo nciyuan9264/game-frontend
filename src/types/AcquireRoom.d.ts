@@ -27,6 +27,15 @@ interface PlayerInfo {
   online: boolean;
   ai: boolean;
   ready: boolean;
+  seatIndex?: number;
+}
+
+interface EndGameState {
+  eligible: boolean;
+  condition: '' | 'company_size' | 'all_companies_safe';
+  company: string;
+  tileCount: number;
+  votes: Record<string, boolean>;
 }
 
 interface RoomData {
@@ -37,9 +46,11 @@ interface RoomData {
   tiles: Record<string, TileData>;
   players: Record<string, PlayerInfo>;
   /** 当前阶段结束时间（ISO 字符串） */
-  turnDeadline?: string;
+  turnDeadline?: string | null;
   /** 当前阶段计划时长，单位毫秒 */
   turnTimeoutMs?: number;
+  /** 终局资格及各玩家的权威选择；旧服务端可能暂未下发 */
+  endGame?: EndGameState;
 }
 
 interface TempData {
@@ -49,6 +60,14 @@ interface TempData {
     {
       dividends: Record<string, number>;
       hoders: string[];
+      settled?: Record<
+        string,
+        {
+          holdingBefore: number;
+          sellAmount: number;
+          exchangeAmount: number;
+        }
+      >;
     }
   >;
   /** 合并别的公司的公司 */
