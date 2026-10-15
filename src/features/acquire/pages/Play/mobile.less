@@ -96,6 +96,47 @@
   .mobileBoardAction { width: 100%; max-width: var(--acq-board-max-width); margin-bottom: 14px;
     > button { width: 100%; min-height: 42px; padding: 0 14px; font-size: 12px; }
   }
+  .fitHideBoardHeading .boardHeading { display: none; }
+  .fitCompactMarket {
+    .mobileMarket { margin-bottom: 6px; border-radius: 6px; }
+    .mobileMarketHeader { height: 26px; padding-left: 8px;
+      h2 { gap: 4px; font-size: 10px;
+        > svg { width: 12px; height: 12px; }
+        small { font-size: 7px; }
+      }
+      button { height: 26px; min-width: 26px; padding: 0 5px; font-size: 8px;
+        svg { width: 12px; height: 12px; }
+      }
+    }
+    .mobileMarketTable { font-size: 9px;
+      th, td { height: 18px; padding-right: 5px; }
+      th:first-child { padding-left: 7px; }
+      thead th { height: 16px; font-size: 7px; }
+    }
+    .compactCompany { gap: 4px; font-size: 9px;
+      > svg:first-child { width: 11px; height: 11px; }
+    }
+    .compactHolding b { font-size: 9px; }
+  }
+  .fitCompactPhase {
+    .heading { margin-bottom: 8px; }
+    .phase { min-height: 42px; margin-bottom: 6px; padding: 5px 8px; gap: 6px; }
+    .mobilePhase { min-height: 30px; gap: 6px; }
+    .mobilePhaseAvatar { width: 24px; height: 24px;
+      > span { width: 22px !important; height: 22px !important; }
+      > svg { width: 22px; height: 22px; padding: 4px; }
+    }
+    .mobilePhaseCopy {
+      strong { font-size: 10px; line-height: 1.25; }
+      small { display: none; }
+    }
+    .mobilePhaseStep { gap: 4px; padding-left: 5px; font-size: 8px;
+      i { width: 15px; height: 15px; font-size: 7px; }
+    }
+    .phaseCommand .endVoteControl { min-height: 28px; }
+    .mobileBoardAction > button { min-height: 38px; font-size: 11px; }
+    .legend { margin: 7px 1px 8px; gap: 9px; }
+  }
   .toast { bottom: calc(22px + env(safe-area-inset-bottom)); left: 50%; max-width: calc(100% - 30px); padding: 11px 15px; gap: 8px; border-radius: 7px; font-size: 10px; line-height: 1.8;
     > span { width: 4px; height: 4px; }
   }

@@ -5,12 +5,27 @@ import type { AcquireSession } from '../../hooks/useAcquireSession';
 import type { GameSnapshot } from '../../model/session';
 import { companyKeys } from '../../model/types';
 import { Play } from '.';
+import styles from './index.module.less';
+
+const fitMock = vi.hoisted(() => ({
+  fitLevel: 0,
+  enabled: false,
+}));
+
+vi.mock('./useMobilePlayFit', () => ({
+  useMobilePlayFit: (enabled: boolean) => {
+    fitMock.enabled = enabled;
+    return { containerRef: { current: null }, fitLevel: enabled ? fitMock.fitLevel : 0 };
+  },
+}));
 
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
 });
 beforeEach(() => {
+  fitMock.fitLevel = 0;
+  fitMock.enabled = false;
   HTMLDialogElement.prototype.showModal = vi.fn(function (this: HTMLDialogElement) {
     this.setAttribute('open', '');
   });
@@ -136,5 +151,55 @@ describe('Acquire play end transition', () => {
 
     rerender(<Play data={active} session={session} interaction={makeInteraction()} onLeave={vi.fn()} />);
     expect(screen.getByRole('heading', { name: '这座城，准备好落定了吗？' })).toBeTruthy();
+  });
+
+  it('applies short-screen fit classes only in mobile mode', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    fitMock.fitLevel = 2;
+    const active = snapshot('setTile');
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    const { container } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    const root = container.firstElementChild as HTMLElement;
+
+    expect(root.className).toContain(styles.playFitRoot);
+    expect(root.className).toContain(styles.fitHideBoardHeading);
+    expect(root.className).toContain(styles.fitCompactMarket);
+    expect(root.className).not.toContain(styles.fitCompactPhase);
+    expect(fitMock.enabled).toBe(true);
+  });
+
+  it('does not apply mobile fit classes on desktop', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    fitMock.fitLevel = 3;
+    const active = snapshot('setTile');
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    const { container } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    const root = container.firstElementChild as HTMLElement;
+
+    expect(root.className).toContain(styles.playFitRoot);
+    expect(root.className).not.toContain(styles.fitHideBoardHeading);
+    expect(root.className).not.toContain(styles.fitCompactMarket);
+    expect(root.className).not.toContain(styles.fitCompactPhase);
+    expect(fitMock.enabled).toBe(false);
   });
 });

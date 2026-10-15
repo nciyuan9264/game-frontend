@@ -17,6 +17,7 @@ import { Results } from '../Results';
 import { PlayDesktop } from './PlayDesktop';
 import { PlayMobile } from './PlayMobile';
 import { Activity, Deadline, EndVoteControl, PhaseAction, PhaseBanner } from './parts';
+import { useMobilePlayFit } from './useMobilePlayFit';
 import styles from './index.module.less';
 
 export function Play({ data, session, interaction, onLeave }: { data: GameSnapshot; session: AcquireSession; interaction: AcquireInteraction; onLeave: () => void }) {
@@ -54,6 +55,13 @@ export function Play({ data, session, interaction, onLeave }: { data: GameSnapsh
   const submitEndVote = (allow: boolean) => session.submit('game_end_vote', { allow });
   const endVoteControl = showEndVote ? <EndVoteControl data={data} enabled={interaction.enabled}
     pending={endVotePending} onToggle={submitEndVote} onHelp={openFinish} /> : undefined;
+  const mobileFit = useMobilePlayFit(isMobile && !(end && (panel === 'results' || panel === 'restart')));
+  const playFitClassName = [
+    styles.playFitRoot,
+    isMobile && mobileFit.fitLevel >= 1 ? styles.fitHideBoardHeading : '',
+    isMobile && mobileFit.fitLevel >= 2 ? styles.fitCompactMarket : '',
+    isMobile && mobileFit.fitLevel >= 3 ? styles.fitCompactPhase : '',
+  ].filter(Boolean).join(' ');
   const boardProps = { data, mode: 'live' as const, selected: interaction.draft.tile, canSelect: interaction.enabled && canPlace(data),
     onSelect: interaction.selectTile, onInspect: notify };
   const board = <Board {...boardProps} />;
@@ -69,15 +77,17 @@ export function Play({ data, session, interaction, onLeave }: { data: GameSnapsh
       <p>本局已结束。确认后回到准备房间，由房主开始下一局。</p>
     </ResponsiveDialog>}</>;
   return <>
-    <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
+    <div ref={mobileFit.containerRef} className={playFitClassName}>
+      <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
       <div className={styles.headingTools}><Deadline deadline={data.roomData.turnDeadline} /><ActionButton onClick={() => setPriceTier(0)}>股价速查</ActionButton>
       {end && !isMobile && <ActionButton onClick={() => setPanel('results')}>查看结算</ActionButton>}
       {!isMobile && endVoteControl}
       <div className={styles.cash}><Wallet size={18} /><span><small>可用现金</small><b><AnimatedValue value={data.playerData.money} formatter={money} /></b></span></div></div></div>
-    <PhaseBanner data={data} interaction={interaction}
-      action={!end ? isMobile ? endVoteControl
-        : <PhaseAction data={data} interaction={interaction} pending={!!session.pending} buttonOnly /> : undefined} />
-    {isMobile ? <PlayMobile {...props} /> : <PlayDesktop {...props} />}
+      <PhaseBanner data={data} interaction={interaction}
+        action={!end ? isMobile ? endVoteControl
+          : <PhaseAction data={data} interaction={interaction} pending={!!session.pending} buttonOnly /> : undefined} />
+      {isMobile ? <PlayMobile {...props} /> : <PlayDesktop {...props} />}
+    </div>
     <TradeDialog interaction={interaction} session={session} />
     {panel === 'zoom' && <ResponsiveDialog title="城市棋盘 · 放大查看" wide onClose={() => setPanel(undefined)} footer={<ActionButton onClick={() => setPanel(undefined)}>返回操作区确认</ActionButton>}>
       <Board {...boardProps} zoom />
