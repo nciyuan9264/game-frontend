@@ -35,9 +35,12 @@
   font: inherit;
   line-height: 1;
   -webkit-text-size-adjust: 100%;
-  transition: background .15s,border-color .15s;
+  -webkit-tap-highlight-color: transparent;
+  transition: transform .08s ease,filter .08s ease,background .15s,border-color .15s,box-shadow .15s;
 
   &:disabled, &[aria-disabled='true'] { cursor: default; opacity: 1; filter: none; -webkit-text-fill-color: currentColor; }
+  &:not(:disabled):not([aria-disabled='true']) { cursor: pointer; }
+  &:not(:disabled):not([aria-disabled='true']):active { transform: translateY(1px) scale(.96); filter: brightness(1.08) saturate(1.08); }
   > span { position: relative; z-index: 1; font-size: 9px; font-weight: 500; letter-spacing: .01em; }
   > svg { position: absolute; inset: 0; width: 55%; height: 55%; margin: auto; color: #102e3090; }
   &:has(> svg) > span { position: absolute; top: 3px; left: 4px; font-size: 7px; opacity: .8; }
@@ -72,8 +75,15 @@
   .axis { min-height: 17px; font-size: 9px; }
   .engraving { padding: 8px 5px 2px 20px; font-size: 6px; > svg { width: 13px; height: 14px; } }
 }
-@media (hover: hover) and (pointer: fine) { .cell:hover:not(:disabled):not([aria-disabled='true']) { border-color: #b0b897; } }
-@media (prefers-reduced-motion: reduce) { .playable::after { animation: none; opacity: .72; } }
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover:not(:disabled):not([aria-disabled='true']) { transform: translateY(-1px); border-color: #b0b897; filter: brightness(1.05); }
+  .cell:hover:not(:disabled):not([aria-disabled='true']):active { transform: translateY(1px) scale(.96); filter: brightness(1.08) saturate(1.08); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .cell { transition: background .15s,border-color .15s,box-shadow .15s; }
+  .cell:not(:disabled):not([aria-disabled='true']):active { transform: none; filter: brightness(1.08); }
+  .playable::after { animation: none; opacity: .72; }
+}
 @media (max-width: 767px) {
   .board { max-width: 100%; padding: 8px 7px 6px; border-radius: 7px; box-shadow: 0 3px 0 #112731,0 4px 0 #53685c65,0 8px 20px #030e183b,inset 0 0 0 2px #152e3660; }
   .grid { grid-template-columns: repeat(12,minmax(0,1fr)); gap: 2px; }

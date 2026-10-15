@@ -19,7 +19,9 @@
   small { color: #658b9c; font-size: 8px; }
 }
 .counter { display: flex; align-items: center; height: 33px; flex-shrink: 0; overflow: hidden; border: 1px solid #4a647269; border-radius: 5px; background: #0d222e;
-  button { display: grid; place-items: center; width: 29px; height: 31px; flex-shrink: 0; padding: 0; border: 0; background: #28404b; color: #bccfd8; font-size: 18px; }
+  button { display: grid; place-items: center; width: 29px; height: 31px; flex-shrink: 0; padding: 0; border: 0; background: #28404b; color: #bccfd8; font-size: 18px; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease,background .15s ease,color .15s ease;
+    &:active:not(:disabled) { transform: scale(.9); filter: brightness(1.12); }
+  }
   output { min-width: 36px; flex: 1; color: #e1e6e0; font-size: 15px; font-weight: 500; text-align: center; }
 }
 .total { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 15px; width: 100%; margin-bottom: 17px;
@@ -108,7 +110,8 @@
   p { margin-top: 6px; color: #809fa9; font-size: 11px; line-height: 1.9; }
 }
 .foundCompanies { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 11px;
-  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 8px; min-height: 148px; padding: 20px 10px 14px; border: 1px solid color-mix(in srgb,var(--co) 30%,transparent); border-radius: 8px; background: linear-gradient(140deg,color-mix(in srgb,var(--co) 9%,transparent),#132a3433); color: var(--co);
+  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 8px; min-height: 148px; padding: 20px 10px 14px; border: 1px solid color-mix(in srgb,var(--co) 30%,transparent); border-radius: 8px; background: linear-gradient(140deg,color-mix(in srgb,var(--co) 9%,transparent),#132a3433); color: var(--co); -webkit-tap-highlight-color: transparent; transition: transform .09s ease,filter .09s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
+    &:active:not(:disabled) { transform: translateY(1px) scale(.98); filter: brightness(1.08); }
     > strong { font-size: 13px; font-weight: 500; }
     > span { margin-top: -4px; font-size: 9px; opacity: .7; }
     > small { margin-top: 3px; padding: 4px 8px; border-radius: 3px; background: #0d25328a; color: #88a8ab; font-size: 9px; }
@@ -121,7 +124,8 @@
 .foundUnavailable { opacity: .27; }
 .survivorDescription { margin-bottom: 22px !important; color: #98adb7; font-size: 12px; line-height: 1.9; }
 .survivorChoices { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 16px;
-  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 9px; min-height: 166px; padding: 27px 13px; border: 1px solid #47647288; border-radius: 8px; background: #1b3540;
+  > button { position: relative; display: flex; align-items: center; flex-direction: column; gap: 9px; min-height: 166px; padding: 27px 13px; border: 1px solid #47647288; border-radius: 8px; background: #1b3540; -webkit-tap-highlight-color: transparent; transition: transform .09s ease,filter .09s ease,border-color .15s ease,background .15s ease,box-shadow .15s ease;
+    &:active:not(:disabled) { transform: translateY(1px) scale(.98); filter: brightness(1.08); }
     > span { display: flex; align-items: center; gap: 10px; color: var(--co);
       b { font-size: 14px; font-weight: 500; }
     }
@@ -132,7 +136,10 @@
 }
 .survivorSelected { border-color: #c5a774 !important; background: #7e673628 !important; }
 @media (hover: hover) and (pointer: fine) {
-  .foundCompanies > button:not(:disabled):hover { border-color: var(--co); background: linear-gradient(140deg,color-mix(in srgb,var(--co) 14%,transparent),#132a3433); }
-  .survivorChoices > button:not(:disabled):hover { border-color: #81959c; background: #203b46; }
+  .foundCompanies > button:not(:disabled):hover { transform: translateY(-1px); border-color: var(--co); background: linear-gradient(140deg,color-mix(in srgb,var(--co) 14%,transparent),#132a3433); filter: brightness(1.04); }
+  .foundCompanies > button:not(:disabled):hover:active { transform: translateY(1px) scale(.98); filter: brightness(1.08); }
+  .survivorChoices > button:not(:disabled):hover { transform: translateY(-1px); border-color: #81959c; background: #203b46; filter: brightness(1.04); }
+  .survivorChoices > button:not(:disabled):hover:active { transform: translateY(1px) scale(.98); filter: brightness(1.08); }
   .counter button:hover:not(:disabled) { background: #405865; color: #f3d099; }
+  .counter button:hover:not(:disabled):active { transform: scale(.9); filter: brightness(1.12); }
 }

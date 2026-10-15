@@ -8,11 +8,16 @@
 .companies { display: flex; gap: 26px; align-items: center; border-bottom: 1px solid #30424c;
   > span { color: #b8c2be; font-size: 11px; flex-shrink: 0; white-space: nowrap; small { display: block; margin-top: 3px; font-size: 6px; letter-spacing: .16em; color: #657e8a; } }
   > div { flex: 1; min-width: 0; display: flex; justify-content: space-between; align-items: center; gap: 12px;
-    button { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 0; border-radius: 5px; background: transparent; opacity: .8; white-space: nowrap; }
+    button { display: flex; align-items: center; gap: 8px; padding: 7px 8px; border: 0; border-radius: 5px; background: transparent; opacity: .8; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: transform .09s ease,filter .09s ease,background .15s ease,opacity .15s ease;
+      &:active { transform: translateY(1px) scale(.95); filter: brightness(1.08); opacity: 1; }
+    }
     b { font-size: 8px; font-weight: 500; letter-spacing: .12em; }
   }
 }
-@media (hover: hover) and (pointer: fine) { .companies button:hover { background: #ffffff06; opacity: 1; } }
+@media (hover: hover) and (pointer: fine) {
+  .companies button:hover { transform: translateY(-1px); background: #ffffff06; opacity: 1; }
+  .companies button:hover:active { transform: translateY(1px) scale(.95); filter: brightness(1.08); }
+}
 .browser { min-width: 0; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 16px;
   h2 { margin-top: 6px; font-size: 20px; }

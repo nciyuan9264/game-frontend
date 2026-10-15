@@ -66,8 +66,18 @@
 .collapseToggle { display: none; }
 .range { display: block; width: 100%; flex: 0 0 auto; accent-color: var(--acq-gold); margin: 12px 0; }
 .timelineViewport { min-height: 0; flex: 1; overflow: auto; overscroll-behavior: contain; }
-.events { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px; button { flex-shrink: 0; border: 1px solid var(--acq-line); border-radius: 7px; background: var(--acq-bg); color: var(--acq-muted); min-width: 65px; padding: 8px; font-size: 12px; &[aria-pressed='true'] { background: #766343; color: var(--acq-text); border-color: var(--acq-gold); } small { display: block; font-size: 10px; margin-top: 5px; } } }
+.events { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 8px;
+  button { flex-shrink: 0; min-width: 65px; padding: 8px; border: 1px solid var(--acq-line); border-radius: 7px; background: var(--acq-bg); color: var(--acq-muted); font-size: 12px; -webkit-tap-highlight-color: transparent; transition: transform .09s ease,filter .09s ease,background .15s ease,border-color .15s ease,color .15s ease;
+    &:active { transform: translateY(1px) scale(.97); filter: brightness(1.08); }
+    &[aria-pressed='true'] { background: #766343; color: var(--acq-text); border-color: var(--acq-gold); }
+    small { display: block; font-size: 10px; margin-top: 5px; }
+  }
+}
 .events .unloadedEvent { border-style: dashed; background: #10212a; color: #6f8086; }
 .events .loadingEvent { border-style: dashed; border-color: #9b8255; color: #d1b276; }
 .events .failedEvent { border-color: #a96158; background: #38242a; color: #efb0a6; }
+@media (hover: hover) and (pointer: fine) {
+  .events button:hover { transform: translateY(-1px); filter: brightness(1.05); }
+  .events button:hover:active { transform: translateY(1px) scale(.97); filter: brightness(1.08); }
+}
 @keyframes replay-spin { to { transform: rotate(360deg); } }
