@@ -281,6 +281,14 @@ export function Guide() {
   const [prices, setPrices] = useState(false);
   const [guideTab, setGuideTab] = useState(0);
   const step = guideSteps[guideTab];
+  const lastStep = guideTab === guideSteps.length - 1;
+  const handlePrimaryAction = () => {
+    if (lastStep) {
+      navigate('/game/acquire');
+      return;
+    }
+    setGuideTab(index => Math.min(index + 1, guideSteps.length - 1));
+  };
   return <AppShell title="玩法指南" profile={profile.data}><div className={`${styles.page} ${styles.guidePage}`}>
     <div className={styles.guide}>
       <header className={styles.guideHeading}><small>LEARN THE FIRST MOVE</small><h1>先懂一招，再赢一局。</h1></header>
@@ -294,7 +302,7 @@ export function Guide() {
         <small className={styles.guideEyebrow}>THE ESSENTIALS</small><h2>{step.title}</h2><p>{step.text}</p>
         <ol>{step.points.map(point => <li key={point}>{point}</li>)}</ol>
         <div className={styles.guideHint}><ShieldCheck size={16} /><span>本页遵循当前在线版本。股价、并列分红与超时处理以实际游戏服务为准。</span></div>
-        <div className={styles.guideActions}><ActionButton variant="primary" onClick={() => navigate('/game/acquire')}>创建房间<ArrowRight size={16} /></ActionButton>
+        <div className={styles.guideActions}><ActionButton variant="primary" onClick={handlePrimaryAction}>{lastStep ? '创建房间' : '下一步'}<ArrowRight size={16} /></ActionButton>
           <ActionButton onClick={() => setPrices(true)}>股价速查</ActionButton></div>
       </section></div>
     </div>

@@ -1,7 +1,7 @@
-import { cleanup, render, screen, waitFor } from '@testing-library/react';
-import { MemoryRouter } from 'react-router-dom';
+import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Rankings } from '.';
+import { Guide, Rankings } from '.';
 import type { LeaderboardEntry } from '@/types/leaderboard';
 
 const api = vi.hoisted(() => ({
@@ -79,5 +79,31 @@ describe('Acquire community rankings', () => {
     expect(api.getLeaderboard).toHaveBeenNthCalledWith(1, { gameType: 'acquire', limit: 8, offset: 0 });
     expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, { gameType: 'acquire', limit: 8, offset: 8 });
     expect(await screen.findByText('玩家 9')).toBeTruthy();
+  });
+});
+
+describe('Acquire guide', () => {
+  it('uses the primary action to advance guide tabs before creating a room', async () => {
+    render(<MemoryRouter initialEntries={['/game/acquire/guide']} future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Routes>
+        <Route path="/game/acquire/guide" element={<Guide />} />
+        <Route path="/game/acquire" element={<p>游戏大厅</p>} />
+      </Routes>
+    </MemoryRouter>);
+
+    await screen.findByRole('tab', { name: '01 开始' });
+    expect(screen.getByRole('tab', { name: '01 开始' }).getAttribute('aria-selected')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: /下一步/ }));
+    expect(screen.getByRole('tab', { name: '02 建造' }).getAttribute('aria-selected')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: /下一步/ }));
+    expect(screen.getByRole('tab', { name: '03 并购' }).getAttribute('aria-selected')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: /下一步/ }));
+    expect(screen.getByRole('tab', { name: '04 结束' }).getAttribute('aria-selected')).toBe('true');
+
+    fireEvent.click(screen.getByRole('button', { name: /创建房间/ }));
+    expect(screen.getByText('游戏大厅')).toBeTruthy();
   });
 });

@@ -24,7 +24,7 @@
   span { display: flex; align-items: center; gap: 8px; color: #acbbad; font-size: 10px; white-space: nowrap; }
   svg { color: #b8a67e; }
 }
-.guidePanel { min-width: 0; padding: 30px; border: 1px solid var(--acq-line); border-radius: 10px; background: linear-gradient(130deg, #172a34, #12242f);
+.guidePanel { display: flex; min-width: 0; min-height: 600px; padding: 30px; flex-direction: column; border: 1px solid var(--acq-line); border-radius: 10px; background: linear-gradient(130deg, #172a34, #12242f);
   h2 { margin: 14px 0 17px; font-size: 25px; line-height: 1.5; }
   > p { color: #9db4be; font-size: 13px; line-height: 1.9; }
   ol { display: flex; flex-direction: column; gap: 16px; margin: 25px 0 27px; padding-left: 24px; color: #a3bbc6; font-size: 12px; line-height: 1.9; }
@@ -42,7 +42,7 @@
 .guideHint { display: flex; align-items: flex-start; gap: 9px; margin-top: 16px; padding: 12px 13px; border: 1px solid #29414e7a; border-radius: 6px; background: #0e1f2a; color: #8ea6b4; font-size: 11px; line-height: 1.8;
   svg { margin-top: 2px; }
 }
-.guideActions { display: flex; gap: 13px; margin-top: 26px; }
+.guideActions { display: flex; gap: 13px; margin-top: auto; padding-top: 26px; }
 
 .communityHeading { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-bottom: 20px;
   small { display: flex; align-items: center; gap: 8px; color: #a8a488; font-size: 9px; font-weight: 500; line-height: 1.5; letter-spacing: 2px;
