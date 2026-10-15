@@ -55,4 +55,17 @@ describe('lobby synchronization', () => {
     await act(async () => {});
     expect(hook.result.current.filteredRooms.map(value => value.roomID)).toEqual([privateRoom.roomID]);
   });
+  it('keeps room order stable across refreshes with shuffled server responses', async () => {
+    const older = { ...room, roomID: '1013_140000' };
+    const newer = { ...room, roomID: '1013_150000' };
+    vi.mocked(listRooms)
+      .mockResolvedValueOnce({ rooms: [older, newer], onlinePlayer: 2 })
+      .mockResolvedValueOnce({ rooms: [newer, older], onlinePlayer: 2 });
+    const hook = renderHook(useAcquireLobby);
+    await act(async () => {});
+    expect(hook.result.current.rooms.map(value => value.roomID)).toEqual(['1013_150000', '1013_140000']);
+
+    await act(async () => { await vi.advanceTimersByTimeAsync(3000); });
+    expect(hook.result.current.rooms.map(value => value.roomID)).toEqual(['1013_150000', '1013_140000']);
+  });
 });

@@ -3,6 +3,9 @@ import { AcquireRequestError, listRooms } from '../api/room';
 import { roomOwnerName } from '../model/adapters';
 import type { AcquireRoom, LobbyFilter } from '../model/types';
 
+const sortRooms = (rooms: AcquireRoom[]) =>
+  [...rooms].sort((left, right) => right.roomID.localeCompare(left.roomID));
+
 export function useAcquireLobby() {
   const [rooms, setRooms] = useState<AcquireRoom[]>([]);
   const [hasLoaded, setHasLoaded] = useState(false);
@@ -28,7 +31,7 @@ export function useAcquireLobby() {
       try {
         const result = await listRooms(controller.signal);
         if (stopped || requestID !== sequence.current) return;
-        setRooms(result.rooms ?? []);
+        setRooms(sortRooms(result.rooms ?? []));
         setHasLoaded(true);
         setError('');
         setErrorCode('');
