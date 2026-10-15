@@ -26,11 +26,15 @@ export function Board(props: Props) {
       const landmark = tile?.belong && tile.belong !== 'Blank' && firstCompanyTile[tile.belong] === key;
       const description = color ? tile?.belong : owned ? '独立地块' : '空地';
       const interactive = selectable || !!props.onInspect;
+      const inert = !interactive;
       return <button type="button" key={key} className={`${styles.cell} ${owned ? styles.occupied : ''} ${tile?.belong === 'Blank' ? styles.neutral : ''} ${inHand && !owned ? styles.hand : ''} ${selectable ? styles.playable : ''} ${selected === key ? styles.selected : ''}`}
         style={color ? { '--co': color } as CSSProperties : undefined}
         aria-label={`地块 ${key}${inHand ? '，我的手牌' : `，${description}`}`}
-        aria-pressed={selectable ? selected === key : undefined} disabled={!interactive}
+        aria-pressed={selectable ? selected === key : undefined}
+        aria-disabled={inert ? true : undefined}
+        tabIndex={inert ? -1 : undefined}
         onClick={() => {
+          if (inert) return;
           if (props.mode === 'live' && selectable) props.onSelect(key);
           else props.onInspect?.(`${key} · ${description}`);
         }}>
