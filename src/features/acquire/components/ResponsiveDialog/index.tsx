@@ -1,5 +1,6 @@
 import { useEffect, useId, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { ClickParticles } from '../ClickParticles';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -37,5 +38,6 @@ export function ResponsiveDialog({ title, eyebrow, children, footer, onClose, wi
     </header>
     <div className={styles.body}>{children}</div>
     {footer && <footer className={styles.footer}>{footer}</footer>}
+    <ClickParticles scope="parent" />
   </dialog>;
 }

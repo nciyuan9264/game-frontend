@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { NavLink, Link } from 'react-router-dom';
 import { BookOpen, ChevronRight, LayoutGrid, Trophy, UserRound } from 'lucide-react';
 import type { UserProfile } from '@/hooks/request/useProfile';
+import { ClickParticles } from '../ClickParticles';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -69,5 +70,6 @@ export function AppShell({ children, title, profile, inMatch = false, hideRail =
       {navigation.map(({ path, title: label, Icon }) => <NavLink end key={path} to={path}
         className={({ isActive }) => isActive ? styles.active : ''}><Icon size={20} /><span>{label}</span></NavLink>)}
     </nav>}
+    <ClickParticles />
   </div>;
 }
