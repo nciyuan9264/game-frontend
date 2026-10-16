@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Spin } from 'antd';
 import { CloseOutlined, TrophyOutlined } from '@ant-design/icons';
 import Modal from '@/components/Modal';
@@ -37,38 +37,6 @@ const formatWins = (entry: LeaderboardEntry) => {
 const formatWinRate = (entry: LeaderboardEntry) => {
   const winRate = (entry as DavinciLeaderboardEntry).winRate;
   return typeof winRate === 'number' ? `${(winRate * 100).toFixed(1)}%` : '-';
-};
-
-const sortEntries = (
-  entries: LeaderboardEntry[],
-  gameType: HistoryGameType,
-  dim: LeaderboardSortDim
-): LeaderboardEntry[] => {
-  const list = [...entries];
-  if (dim === 'totalGames') {
-    list.sort((a, b) => b.totalGames - a.totalGames);
-    return list;
-  }
-  const sortByMetricMap: Record<HistoryGameType, (a: LeaderboardEntry, b: LeaderboardEntry) => number> = {
-    acquire: (a, b) =>
-      ((a as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
-      ((b as AcquireLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY),
-    davinci: (a, b) => {
-      const aw = (a as DavinciLeaderboardEntry).winRate;
-      const bw = (b as DavinciLeaderboardEntry).winRate;
-      if (typeof aw === 'number' && typeof bw === 'number') {
-        return bw - aw;
-      }
-      if (typeof bw === 'number') return 1;
-      if (typeof aw === 'number') return -1;
-      return b.totalGames - a.totalGames;
-    },
-    splendor: (a, b) =>
-      ((a as SplendorLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY) -
-      ((b as SplendorLeaderboardEntry).avgRank ?? Number.POSITIVE_INFINITY),
-  };
-  list.sort(sortByMetricMap[gameType]);
-  return list;
 };
 
 const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
@@ -128,14 +96,17 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
   useEffect(() => {
     if (visible) {
       setSortDim('metric');
-      run({ gameType, limit: 50, offset: 0 });
+      run({ gameType, limit: 50, offset: 0, sort: 'metric' });
     }
   }, [visible, gameType]);
 
-  const sortedEntries = useMemo(
-    () => sortEntries(data?.entries ?? [], gameType, sortDim),
-    [data, gameType, sortDim]
-  );
+  const requestSort = (nextSortDim: LeaderboardSortDim) => {
+    if (nextSortDim === sortDim) return;
+    setSortDim(nextSortDim);
+    run({ gameType, limit: 50, offset: 0, sort: nextSortDim });
+  };
+
+  const sortedEntries = data?.entries ?? [];
 
   const renderHeaderCells = () => (
     <div className={`${styles.row} ${styles.headRow}`}>
@@ -206,14 +177,14 @@ const LeaderboardModal: React.FC<LeaderboardModalProps> = ({
             <button
               type="button"
               className={`${styles.sortTab} ${sortDim === 'metric' ? styles.sortTabActive : ''}`}
-              onClick={() => setSortDim('metric')}
+              onClick={() => requestSort('metric')}
             >
               {meta.metricLabel}
             </button>
             <button
               type="button"
               className={`${styles.sortTab} ${sortDim === 'totalGames' ? styles.sortTabActive : ''}`}
-              onClick={() => setSortDim('totalGames')}
+              onClick={() => requestSort('totalGames')}
             >
               场次
             </button>

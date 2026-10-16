@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
+import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Clock, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
 import { getProfile, logout } from '@/api/room';
@@ -14,7 +14,7 @@ import { money } from '../../model/session';
 import tableArt from '../../assets/table-art.webp';
 import styles from './index.module.less';
 import type { Game } from '@/types/history';
-import type { LeaderboardEntry } from '@/types/leaderboard';
+import type { LeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
 
 const RANKING_PAGE_SIZE = 8;
 const HISTORY_PAGE_SIZE = 20;
@@ -147,6 +147,7 @@ export function Rankings() {
   const requestSeq = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const loadingNextRef = useRef(false);
+  const rankingSort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
   const retry = useCallback(() => {
     loadingNextRef.current = false;
     setEntries([]);
@@ -158,7 +159,7 @@ export function Rankings() {
     const requestID = ++requestSeq.current;
     setLoading(true);
     setError('');
-    getLeaderboard({ gameType: 'acquire', limit: RANKING_PAGE_SIZE, offset: page * RANKING_PAGE_SIZE })
+    getLeaderboard({ gameType: 'acquire', limit: RANKING_PAGE_SIZE, offset: page * RANKING_PAGE_SIZE, sort: rankingSort })
       .then(result => {
         if (requestID !== requestSeq.current) return;
         const next = result.entries ?? [];
@@ -178,7 +179,17 @@ export function Rankings() {
         }
       });
     return () => { requestSeq.current = requestID + 1; };
-  }, [page, revision]);
+  }, [page, rankingSort, revision]);
+  const changeMode = useCallback((nextMode: 'score' | 'games') => {
+    if (nextMode === mode) return;
+    loadingNextRef.current = false;
+    setMode(nextMode);
+    setEntries([]);
+    setHasMore(true);
+    setLoading(true);
+    setPage(0);
+    setRevision(value => value + 1);
+  }, [mode]);
   const loadNextPage = useCallback(() => {
     if (!hasMore || loading || error || loadingNextRef.current) return;
     loadingNextRef.current = true;
@@ -186,15 +197,14 @@ export function Rankings() {
     setPage(value => value + 1);
   }, [error, hasMore, loading]);
   useInfiniteLoad(sentinelRef, entries.length > 0 && hasMore && !loading && !error, loadNextPage);
-  const sorted = useMemo(() => [...entries].sort((a, b) => mode === 'games' ? b.totalGames - a.totalGames
-    : ('avgRank' in a && 'avgRank' in b ? a.avgRank - b.avgRank : 0)), [entries, mode]);
+  const sorted = entries;
   const myIndex = sorted.findIndex(entry => String(entry.userID) === String(profile.data?.id));
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page + ' ' + styles.rankPage}>
     <header className={styles.communityHeading}><div><small>THE CITY'S FINEST</small><h1>每一局，都算数。</h1></div><span className={styles.outlineTag}>真实对局记录</span></header>
     <section className={styles.rankHero}><Trophy size={39} /><div><small>ACQUIRE LEADERBOARD</small><h2>城市合伙人榜</h2><p>用平均名次衡量稳定发挥，也记录每一张完成的桌。</p></div>
       <div className={styles.myRank}><span>我的排名</span><b>{myIndex >= 0 ? '#' + (myIndex + 1) : '—'}</b><small>{myIndex >= 0 && 'avgRank' in sorted[myIndex] ? '平均名次 ' + sorted[myIndex].avgRank.toFixed(2) : '完成对局后进入排行'}</small></div>
     </section>
-    <section className={styles.rankPanel}><div className={styles.rankTabs}><button className={mode === 'score' ? styles.activeTab : ''} onClick={() => setMode('score')}>战绩榜</button><button className={mode === 'games' ? styles.activeTab : ''} onClick={() => setMode('games')}>场次榜</button></div>
+    <section className={styles.rankPanel}><div className={styles.rankTabs}><button className={mode === 'score' ? styles.activeTab : ''} onClick={() => changeMode('score')}>战绩榜</button><button className={mode === 'games' ? styles.activeTab : ''} onClick={() => changeMode('games')}>场次榜</button></div>
       <div className={styles.rankRow + ' ' + styles.rankHead}><span>名次</span><span>玩家</span><span>完成对局</span><span>平均名次</span></div>
       <Status resource={{ loading: loading && !entries.length, error: error && !entries.length ? error : '', retry }} />{sorted.map((entry, index) => { const mine = String(entry.userID) === String(profile.data?.id); return <div className={styles.rankRow + (mine ? ' ' + styles.rankSelf : '')} key={entry.userID}>
         <span className={styles.rankNumber}>{index === 0 ? <Trophy size={22} /> : String(index + 1).padStart(2, '0')}</span>

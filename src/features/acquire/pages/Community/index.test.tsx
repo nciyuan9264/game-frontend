@@ -2,7 +2,7 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Guide, My, Rankings } from '.';
-import type { LeaderboardEntry } from '@/types/leaderboard';
+import type { LeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
 
 const api = vi.hoisted(() => ({
   getProfile: vi.fn(),
@@ -56,7 +56,7 @@ beforeEach(() => {
   api.logout.mockReturnValue(new Promise(() => {}));
   api.getMyStats.mockResolvedValue({ totalGames: 3, wins: 1, avgScore: 7200 });
   api.listMyGames.mockResolvedValue({ games: [] });
-  api.getLeaderboard.mockImplementation(({ offset }: { offset: number }) => Promise.resolve({
+  api.getLeaderboard.mockImplementation(({ offset }: { offset: number; sort?: LeaderboardSortDim }) => Promise.resolve({
     gameType: 'acquire',
     entries: offset === 0
       ? Array.from({ length: 8 }, (_, index) => leaderboardEntry(index + 1))
@@ -110,9 +110,25 @@ describe('Acquire community rankings', () => {
     expect(screen.queryByText(/按平均名次/)).toBeNull();
 
     await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledTimes(2));
-    expect(api.getLeaderboard).toHaveBeenNthCalledWith(1, { gameType: 'acquire', limit: 8, offset: 0 });
-    expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, { gameType: 'acquire', limit: 8, offset: 8 });
+    expect(api.getLeaderboard).toHaveBeenNthCalledWith(1, { gameType: 'acquire', limit: 8, offset: 0, sort: 'metric' });
+    expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, { gameType: 'acquire', limit: 8, offset: 8, sort: 'metric' });
     expect(await screen.findByText('玩家 9')).toBeTruthy();
+  });
+
+  it('reloads from the first page with total games sort when switching ranking mode', async () => {
+    render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <Rankings />
+    </MemoryRouter>);
+
+    await screen.findByText('玩家 1');
+    fireEvent.click(screen.getByRole('button', { name: '场次榜' }));
+
+    await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledWith({
+      gameType: 'acquire',
+      limit: 8,
+      offset: 0,
+      sort: 'totalGames',
+    }));
   });
 });
 
