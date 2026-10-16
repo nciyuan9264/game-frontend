@@ -13,7 +13,9 @@
     &::before { content: ''; width: 21px; height: 1px; background: currentColor; }
   }
   h2 { padding-right: 36px; font-size: 22px; line-height: 1.45; letter-spacing: .005em; }
-  button { position: absolute; top: 26px; right: 21px; display: grid; place-items: center; width: 31px; height: 31px; padding: 0; border: 1px solid #4d5f647d; border-radius: 6px; background: #263b43; color: #9eb3be; }
+  button { position: absolute; top: 26px; right: 21px; display: grid; place-items: center; width: 31px; height: 31px; padding: 0; border: 1px solid #4d5f647d; border-radius: 6px; background: #263b43; color: #9eb3be; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease,border-color .15s ease,background .15s ease,color .15s ease;
+    &:active { transform: translateY(1px) scale(.9); filter: brightness(1.12); }
+  }
 }
 .body { padding: 24px 28px; min-height: 0; overflow: auto; overscroll-behavior: contain; }
 .footer { display: flex; align-items: center; flex-wrap: wrap; justify-content: flex-end; gap: 12px; padding: 18px 28px 21px; border-top: 1px solid #3b515c80; background: #10222c; flex-shrink: 0;
@@ -22,4 +24,8 @@
 @keyframes dialogIn {
   from { opacity: 0; translate: 0 7px; }
   to { opacity: 1; translate: 0 0; }
+}
+@media (hover: hover) and (pointer: fine) {
+  .header button:hover { transform: translateY(-1px); border-color: #d0ad6e75; background: #314b54; color: #e0c28a; }
+  .header button:hover:active { transform: translateY(1px) scale(.9); }
 }

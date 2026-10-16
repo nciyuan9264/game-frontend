@@ -31,8 +31,9 @@
   li { padding-left: 5px; &::marker { color: #c1b287; } }
 }
 .guideTabs { display: flex; align-items: center; gap: 26px; margin-bottom: 30px; padding-bottom: 7px; border-bottom: 1px solid #3b58626b;
-  button { position: relative; padding: 9px 0; border: 0; background: transparent; color: #829cab; font-size: 11px; white-space: nowrap;
-    &::after { content: ''; position: absolute; right: 0; bottom: -8px; left: 0; height: 2px; background: transparent; }
+  button { position: relative; padding: 9px 0; border: 0; background: transparent; color: #829cab; font-size: 11px; white-space: nowrap; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease,color .15s ease;
+    &:active { transform: translateY(1px) scale(.96); filter: brightness(1.12); }
+    &::after { content: ''; position: absolute; right: 0; bottom: -8px; left: 0; height: 2px; background: transparent; transition: background .15s ease,transform .15s ease; transform-origin: center; }
   }
   .activeTab { color: var(--acq-gold); &::after { background: var(--acq-gold); } }
 }
@@ -62,10 +63,17 @@
 }
 .rankPanel, .profileHistory { min-width: 0; padding: 17px 24px 15px; border: 1px solid var(--acq-line); border-radius: 10px; background: linear-gradient(130deg,#172a34,#12242f); }
 .rankTabs { display: flex; gap: 23px;
-  button { position: relative; padding: 9px 0; border: 0; background: transparent; color: #829cab; font-size: 11px;
-    &::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 2px; background: transparent; }
+  button { position: relative; padding: 9px 0; border: 0; background: transparent; color: #829cab; font-size: 11px; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease,color .15s ease;
+    &:active { transform: translateY(1px) scale(.96); filter: brightness(1.12); }
+    &::after { content: ''; position: absolute; right: 0; bottom: 0; left: 0; height: 2px; background: transparent; transition: background .15s ease,transform .15s ease; transform-origin: center; }
   }
   .activeTab { color: var(--acq-gold); &::after { background: var(--acq-gold); } }
+}
+@media (hover: hover) and (pointer: fine) {
+  .guideTabs button:hover, .rankTabs button:hover { transform: translateY(-1px); color: #d0bf94; }
+  .guideTabs button:hover::after, .rankTabs button:hover::after { transform: scaleX(.86); background: #6f6951; }
+  .guideTabs button:hover:active, .rankTabs button:hover:active { transform: translateY(1px) scale(.96); }
+  .guideTabs .activeTab:hover::after, .rankTabs .activeTab:hover::after { transform: scaleX(1); background: var(--acq-gold); }
 }
 .rankRow { display: grid; grid-template-columns: 65px minmax(0,1fr) 145px 145px; align-items: center; gap: 20px; min-height: 65px; padding: 0 14px; border-top: 1px solid #37505d70; color: #b0c7d0; font-size: 14px; text-align: right;
   > span:first-child, > span:nth-child(2) { text-align: left; } small { margin-left: 5px; color: #63899a; font-size: 9px; }

@@ -47,6 +47,7 @@
   .ready, .muted { font-size: 8px; gap: 3px; }
   .remove { top: 3px; right: 4px; width: 25px; height: 25px; svg { width: 15px; height: 15px; } }
   .empty { gap: 10px; background: #102a3430;
+    &:active:not(:disabled) { transform: translateY(1px) scale(.985); }
     > strong { font-size: 10px; font-weight: 400; } > small { font-size: 8px; }
   }
   .emptyAvatar { width: 36px; height: 36px; margin-top: 1px; svg { width: 18px; } }

@@ -58,7 +58,8 @@
       small { margin-left: 2px; color: #76949f; font-size: 9px; font-weight: 400; letter-spacing: .07em; }
     }
     > div { display: flex; align-items: center; gap: 1px; height: 100%; }
-    button { display: grid; place-items: center; height: 32px; min-width: 30px; padding: 0 7px; border: 0; background: transparent; color: #95b0bc; font-size: 10px;
+    button { display: grid; place-items: center; height: 32px; min-width: 30px; padding: 0 7px; border: 0; background: transparent; color: #95b0bc; font-size: 10px; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease,color .15s ease,background .15s ease;
+      &:active:not(:disabled) { transform: translateY(1px) scale(.94); filter: brightness(1.12); color: #d8bd83; }
       &:first-child { display: flex; align-items: center; }
     }
   }
