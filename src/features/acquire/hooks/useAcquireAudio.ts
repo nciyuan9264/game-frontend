@@ -1,4 +1,4 @@
-export type AcquireSound = 'ui-click' | 'button-click' | 'tab-click' | 'tile-select' | 'tile-place' | 'create-company';
+export type AcquireSound = 'ui-click' | 'button-click' | 'tab-click' | 'tile-select' | 'tile-place' | 'create-company' | 'stock-buy';
 
 const soundUrls: Record<AcquireSound, string> = {
   'ui-click': '/acquire-sounds/ui-click.mp3',
@@ -7,6 +7,7 @@ const soundUrls: Record<AcquireSound, string> = {
   'tile-select': '/acquire-sounds/tile-select.mp3',
   'tile-place': '/acquire-sounds/tile-place.mp3',
   'create-company': '/acquire-sounds/create-company.mp3',
+  'stock-buy': '/acquire-sounds/stock-buy.mp3',
 };
 
 const soundVolumes: Record<AcquireSound, number> = {
@@ -16,6 +17,7 @@ const soundVolumes: Record<AcquireSound, number> = {
   'tile-select': 0.5,
   'tile-place': 0.5,
   'create-company': 0.5,
+  'stock-buy': 0.5,
 };
 
 const audioCache: Partial<Record<AcquireSound, HTMLAudioElement>> = {};

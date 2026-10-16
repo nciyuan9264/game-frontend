@@ -46,6 +46,9 @@ function explicitSound(target: Element): AcquireSound | undefined {
   if (value === 'button') return 'button-click';
   if (value === 'tab') return 'tab-click';
   if (value === 'ui') return 'ui-click';
+  if (value === 'tile-place') return 'tile-place';
+  if (value === 'stock-buy') return 'stock-buy';
+  if (value === 'create-company') return 'create-company';
   return undefined;
 }
 

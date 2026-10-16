@@ -10,8 +10,9 @@ Acquire currently wires a small set of short MP3 sound effects.
 | `button-click.mp3` | `/acquire-sounds/button-click.mp3` | Generic button/link activation      |
 | `tab-click.mp3`    | `/acquire-sounds/tab-click.mp3`    | Tab or segmented-control switching  |
 | `tile-select.mp3`  | `/acquire-sounds/tile-select.mp3`  | Select or preview a board tile      |
-| `tile-place.mp3`   | `/acquire-sounds/tile-place.mp3`   | Confirmed successful tile placement |
-| `create-company.mp3` | `/acquire-sounds/create-company.mp3` | Confirmed successful company creation |
+| `tile-place.mp3`   | `/acquire-sounds/tile-place.mp3`   | Confirm tile placement action       |
+| `create-company.mp3` | `/acquire-sounds/create-company.mp3` | Confirm company creation action     |
+| `stock-buy.mp3`    | `/acquire-sounds/stock-buy.mp3`    | Confirm stock purchase action       |
 
 ## Playback Notes
 

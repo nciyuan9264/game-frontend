@@ -114,7 +114,7 @@ export function PhaseAction({ data, interaction, pending, buttonOnly = false }: 
   const labels = { buy: '继续购买股票', merge: '继续处理合并', 'merge-wait': '查看处理进度', found: '选择新公司', survivor: '选择存续公司' };
   const panel = interaction.eligiblePanel;
   const button = <ActionButton variant="primary" pending={pending} disabled={autoSkipping || !interaction.enabled || (placing ? !tile || !preview?.valid : !panel)}
-    data-click-sound={placing ? 'false' : undefined} onClick={placing ? interaction.place : interaction.open}>
+    data-click-sound={placing ? 'tile-place' : undefined} onClick={placing ? interaction.place : interaction.open}>
     {autoSkipping ? '正在跳过购买' : placing ? tile ? `确认落地 ${tile}` : '先选择一块地' : panel ? labels[panel] : '等待回合'}<ArrowRight size={16} />
   </ActionButton>;
   if (buttonOnly) return button;

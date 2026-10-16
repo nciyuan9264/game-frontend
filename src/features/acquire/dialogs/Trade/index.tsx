@@ -73,7 +73,7 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
     return <ResponsiveDialog title="把眼光，投进下一座城。" eyebrow="BUY SHARES / UP TO 3 PER TURN" onClose={interaction.close}
     footer={<><div className={styles.total}><span>本次买入<strong><AnimatedValue value={buying.cost} formatter={money} /></strong></span><span>购买后余额<strong><AnimatedValue value={buying.balance} formatter={money} /></strong></span><span>已选<strong><AnimatedValue value={buying.count} /><small> / 3 股</small></strong></span></div><div className={styles.footerActions}>
       <ActionButton disabled={!enabled} onClick={() => interaction.submitBuy(true)}>本轮不买</ActionButton>
-      <ActionButton variant="primary" disabled={!enabled || !buying.valid || !buying.count} pending={!!session.pending} onClick={() => interaction.submitBuy()}>确认购买<ArrowRight size={16} /></ActionButton></div></>}>
+      <ActionButton variant="primary" data-click-sound="stock-buy" disabled={!enabled || !buying.valid || !buying.count} pending={!!session.pending} onClick={() => interaction.submitBuy()}>确认购买<ArrowRight size={16} /></ActionButton></div></>}>
     <div className={styles.wallet}><span><Wallet size={17} />可用现金</span><b><AnimatedValue value={data.playerData.money} formatter={money} /></b></div>
     <div className={styles.stockShop}>{active.map(key => {
       const company = data.roomData.companyInfo[key], value = draft.buy[key] ?? 0;
@@ -152,7 +152,7 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
       className={styles.foundDialog} onClose={interaction.close}
       footer={<><span className={styles.foundSummary}>{selected ? `${selected} · 创始奖励 ${canAward ? 1 : 0} 股` : '选择一家尚未成立的公司'}</span>
         <ActionButton onClick={interaction.close}>稍后选择</ActionButton>
-        <ActionButton variant="primary" disabled={!enabled || !selected} pending={!!session.pending} onClick={interaction.submitCompany}>
+        <ActionButton variant="primary" data-click-sound="create-company" disabled={!enabled || !selected} pending={!!session.pending} onClick={interaction.submitCompany}>
           确认创建公司<ArrowRight size={16} />
         </ActionButton></>}>
       <div className={styles.foundIntro}><span>{placedTile}</span><div><h3>独立地块已经相连。</h3><p>选择公司的名字与标识，开启这一段城市版图。</p></div></div>
