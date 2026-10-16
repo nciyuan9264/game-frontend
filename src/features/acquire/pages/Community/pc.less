@@ -10,7 +10,7 @@
     }
   }
   .guidePanel { min-height: 520px; padding: 25px; h2 { font-size: 22px; } }
-  .profileDisplay, .profileHistory { min-height: 485px; }
+  .profileHistory { min-height: 485px; }
 }
 @media (min-width: 1200px) {
   .guideLayout { grid-template-columns: minmax(340px, 430px) minmax(0, 650px); max-width: 1120px; gap: 26px;
@@ -21,5 +21,11 @@
 
 @media (min-width: 768px) and (max-width: 1199px) {
   .rankRow { grid-template-columns: 48px minmax(0,1fr) 90px 90px; gap: 12px; }
-  .profileLayout { grid-template-columns: 280px minmax(0,1fr); gap: 20px; }
+  .profileLayout { grid-template-columns: 330px minmax(0,1fr); gap: 20px; }
+  .profileDisplay { padding: 28px 22px 23px; }
+  .profileIdentity { gap: 14px;
+    > span:first-child { width: 64px !important; height: 64px !important; }
+    h2 { font-size: 25px; }
+  }
+  .profileStats b { font-size: 22px; }
 }

@@ -26,9 +26,18 @@
   .rankSelf { padding-left: 3px; }
   .profileLayout { grid-template-columns: 1fr; gap: 19px; margin-top: 25px; }
   .profilePage .profileLayout { margin-top: 0; }
-  .profileDisplay { padding: 27px 20px 21px; border-radius: 9px; > span:first-of-type { width: 86px !important; height: 86px !important; } h2 { font-size: 25px; } }
-  .profileEyebrow { margin-top: 19px; font-size: 7px; }
-  .profileStats { margin-top: 24px; padding-top: 9px; b { font-size: 21px; } }
+  .profileDisplay { padding: 24px 19px 20px; border-radius: 10px; }
+  .profileIdentity { gap: 14px; margin-bottom: 28px;
+    > span:first-child { width: 60px !important; height: 60px !important; }
+    h2 { margin: 7px 0 7px; font-size: 26px; }
+    > div > span { font-size: 9px; }
+  }
+  .profileEmail { min-height: 39px; padding: 0 12px; font-size: 11px; }
+  .profileManage { margin-top: 14px; padding-top: 11px; }
+  .profileEdit { min-height: 24px; }
+  .profileLogout { min-height: 24px !important; }
+  .profileEyebrow { font-size: 7px; }
+  .profileStats { margin-top: 19px; padding-top: 20px; b { font-size: 22px; } small { margin-top: 8px; font-size: 9px; } }
   .profileHistory { padding: 23px 19px; border-radius: 9px; }
   .guideHeading { display: none; margin-bottom: 20px;
     small { gap: 7px; font-size: 8px; letter-spacing: .13em; &::before { width: 17px; } }

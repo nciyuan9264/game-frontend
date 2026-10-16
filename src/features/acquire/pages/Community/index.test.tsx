@@ -1,17 +1,18 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Guide, Rankings } from '.';
+import { Guide, My, Rankings } from '.';
 import type { LeaderboardEntry } from '@/types/leaderboard';
 
 const api = vi.hoisted(() => ({
   getProfile: vi.fn(),
+  logout: vi.fn(),
   getLeaderboard: vi.fn(),
   getMyStats: vi.fn(),
   listMyGames: vi.fn(),
 }));
 
-vi.mock('@/api/room', () => ({ getProfile: api.getProfile }));
+vi.mock('@/api/room', () => ({ getProfile: api.getProfile, logout: api.logout }));
 vi.mock('@/api/leaderboard', () => ({ getLeaderboard: api.getLeaderboard }));
 vi.mock('@/api/history', () => ({
   getMyStats: api.getMyStats,
@@ -52,6 +53,9 @@ beforeEach(() => {
     disconnect() {}
   });
   api.getProfile.mockResolvedValue({ id: 2, name: '玩家 2', email: '', avatar: '' });
+  api.logout.mockReturnValue(new Promise(() => {}));
+  api.getMyStats.mockResolvedValue({ totalGames: 3, wins: 1, avgScore: 7200 });
+  api.listMyGames.mockResolvedValue({ games: [] });
   api.getLeaderboard.mockImplementation(({ offset }: { offset: number }) => Promise.resolve({
     gameType: 'acquire',
     entries: offset === 0
@@ -64,6 +68,36 @@ afterEach(() => {
   cleanup();
   vi.clearAllMocks();
   vi.unstubAllGlobals();
+});
+
+describe('Acquire profile', () => {
+  it('calls logout from the profile page after confirmation', async () => {
+    const confirm = vi.fn(() => true);
+    vi.stubGlobal('confirm', confirm);
+
+    render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <My />
+    </MemoryRouter>);
+
+    const logoutButton = await screen.findByRole('button', { name: /退出登录/ });
+    fireEvent.click(logoutButton);
+
+    expect(confirm).toHaveBeenCalledWith('确定要退出登录吗？');
+    expect(api.logout).toHaveBeenCalledTimes(1);
+    await waitFor(() => expect(logoutButton.getAttribute('aria-busy')).toBe('true'));
+  });
+
+  it('keeps the session when profile logout is cancelled', async () => {
+    vi.stubGlobal('confirm', vi.fn(() => false));
+
+    render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <My />
+    </MemoryRouter>);
+
+    fireEvent.click(await screen.findByRole('button', { name: /退出登录/ }));
+
+    expect(api.logout).not.toHaveBeenCalled();
+  });
 });
 
 describe('Acquire community rankings', () => {

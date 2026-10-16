@@ -82,16 +82,31 @@
 .rankSelf { padding-left: 12px; border-left: 2px solid #c8ac70; background: linear-gradient(90deg,#ad975524,#ad975505); }
 .rankNumber { color: #6f90a0; font: 20px Georgia, serif; &:has(svg) { color: #d5bb7a; } }
 .rankPlayer { display: flex; align-items: center; gap: 13px; b { color: #d4dfe0; font-size: 13px; font-weight: 500; } em { padding: 1px 4px; border: 1px solid #9c855b60; border-radius: 3px; color: #d6bd7f; font-size: 8px; font-style: normal; } }
-.profileLayout { display: grid; grid-template-columns: 340px minmax(0,680px); align-items: start; justify-content: center; gap: 26px; margin-top: 34px; }
-.profileDisplay { display: flex; align-items: center; flex-direction: column; min-width: 0; padding: 38px 25px 30px; border: 1px solid #63776066; border-radius: 12px; background: radial-gradient(ellipse at 50% 0,#92987822,transparent 70%),linear-gradient(125deg,#2a4039,#162f35); text-align: center;
-  h2 { margin: 11px 0 16px; color: #e7dec2; font-size: 27px; } > p { margin-top: 21px; color: #90aca1; font-size: 10px; overflow-wrap: anywhere; }
+.profileLayout { display: grid; grid-template-columns: 390px minmax(0,680px); align-items: start; justify-content: center; gap: 28px; margin-top: 34px; }
+.profileDisplay { display: flex; align-items: stretch; flex-direction: column; min-width: 0; padding: 31px 26px 25px; border: 1px solid #63776066; border-radius: 14px; background: radial-gradient(ellipse at 50% 0,#92987822,transparent 68%),linear-gradient(125deg,#244139,#142c32); text-align: left; box-shadow: inset 0 1px 0 #d9d3a612, 0 12px 36px #020b101f;
 }
-.profileEyebrow { display: flex; align-items: center; gap: 8px; margin-top: 25px; color: #c7b77f; font-size: 8px; line-height: 1.5; letter-spacing: 1.6px;
-  &::before { content: ''; width: 21px; height: 1px; background: currentColor; }
+.profileIdentity { display: flex; align-items: center; gap: 17px; min-width: 0; margin-bottom: 32px;
+  > span:first-child { flex: 0 0 auto; box-shadow: 0 0 0 2px #9aaf8757, 0 10px 22px #06101838; }
+  > div { min-width: 0; }
+  h2 { margin: 8px 0 8px; color: #f0e8cf; font-size: 29px; line-height: 1.15; letter-spacing: .01em; overflow-wrap: anywhere; }
+  > div > span { color: #a6bbb7; font-size: 10px; letter-spacing: .12em; }
 }
-.profileEdit { display: flex; align-items: center; gap: 8px; margin-top: 19px; color: var(--acq-gold); font-size: 11px; }
-.profileStats { display: flex; width: 100%; margin-top: auto; padding-top: 32px; text-align: center;
-  span { flex: 1; min-width: 0; } span + span { border-left: 1px solid #5865524d; } b { display: block; color: #d9c7a9; font: 24px/1.1 Georgia, serif; overflow-wrap: anywhere; } small { display: block; margin-top: 6px; color: #8ea29e; font-size: 9px; }
+.profileEyebrow { display: block; color: #c7b77f; font-size: 8px; line-height: 1.5; letter-spacing: 1.6px;
+}
+.profileEmail { display: flex; align-items: center; gap: 10px; min-height: 42px; padding: 0 13px; border: 1px solid #37564c70; border-radius: 7px; background: #10292c8c; color: #a8bdb8; font-size: 12px; overflow-wrap: anywhere;
+  svg { flex: 0 0 auto; color: #91aaa4; }
+}
+.profileManage { display: flex; align-items: center; justify-content: flex-end; gap: 18px; margin-top: 20px; padding-top: 15px; border-top: 1px solid #5c726240; }
+.profileEdit, .profileLogout { display: inline-flex; align-items: center; gap: 7px; min-height: 28px; padding: 0 !important; border: 0 !important; background: transparent !important; color: #aebfb9 !important; font-size: 11px !important; font-weight: 500 !important;
+  svg { color: currentColor; }
+}
+.profileEdit { color: #d0b77c !important; }
+.profileLogout { color: #d4a89e !important;
+  &:hover:not(:disabled) { border-color: transparent !important; background: transparent !important; color: #f0c0b7 !important; }
+}
+.profileLogoutError { margin-top: 11px; color: #e7a69a !important; font-size: 10px !important; line-height: 1.7; }
+.profileStats { display: flex; width: 100%; margin-top: 23px; padding: 22px 0 2px; border-top: 1px solid #5c726240; text-align: center;
+  span { flex: 1; min-width: 0; padding: 0 7px; } span + span { border-left: 1px solid #5865524d; } b { display: block; color: #f0e7cf; font: 25px/1.1 Georgia, serif; overflow-wrap: anywhere; } small { display: block; margin-top: 9px; color: #9eb2ad; font-size: 10px; }
 }
 .profileHistory { padding: 30px; h2 { margin-bottom: 20px; font-size: 20px; } }
 .profileHistory .history a { display: inline-flex; align-items: center; gap: 5px; }

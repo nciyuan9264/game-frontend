@@ -1,7 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Clock, ShieldCheck, Trophy, Users } from 'lucide-react';
-import { getProfile } from '@/api/room';
+import { ArrowRight, Building2, Clock, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
+import { getProfile, logout } from '@/api/room';
 import { getMyStats, listMyGames } from '@/api/history';
 import { getLeaderboard } from '@/api/leaderboard';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
@@ -210,6 +210,8 @@ export function My() {
   const profile = useAcquireResource(getProfile);
   const stats = useAcquireResource(loadStats);
   const [games, setGames] = useState<Game[]>([]);
+  const [logoutPending, setLogoutPending] = useState(false);
+  const [logoutError, setLogoutError] = useState('');
   const [page, setPage] = useState(0);
   const [hasMore, setHasMore] = useState(true);
   const [historyLoading, setHistoryLoading] = useState(true);
@@ -256,16 +258,32 @@ export function My() {
     setHistoryLoading(true);
     setPage(value => value + 1);
   }, [hasMore, historyError, historyLoading]);
+  const handleLogout = useCallback(async () => {
+    if (!window.confirm('确定要退出登录吗？')) return;
+    setLogoutPending(true);
+    setLogoutError('');
+    try {
+      await logout();
+      localStorage.removeItem('profile');
+      window.location.href = 'https://auth.gamebus.online/login?redirect=' + encodeURIComponent(window.location.href);
+    } catch (reason) {
+      setLogoutError(reason instanceof Error ? reason.message : '退出登录失败，请稍后重试');
+      setLogoutPending(false);
+    }
+  }, []);
   useInfiniteLoad(sentinelRef, games.length > 0 && hasMore && !historyLoading && !historyError, loadNextHistoryPage);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
   return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page + ' ' + styles.profilePage}>
     <header className={styles.communityHeading}><div><small>YOUR PLAYER IDENTITY</small><h1>让这张筹码，代表你。</h1></div></header>
     {loading ? <AcquireLoading title="正在整理你的城市档案。" description="正在同步身份、战绩与对局记录" status="正在读取玩家资料" />
       : <div className={styles.profileLayout}><section className={styles.profileDisplay}>
-      <Status resource={profile} showLoading={false} />{profile.data && <><PlayerAvatar name={profile.data.name} avatar={profile.data.avatar} size={108} /><small className={styles.profileEyebrow}>THE CITY PARTNER</small>
-        <h2>{profile.data.name}</h2><span className={styles.outlineTag}>PLAYER ID · {profile.data.id}</span><p>{profile.data.email || '你的下一座城，还没有写下名字。'}</p>
-        <a className={styles.profileEdit} href="https://auth.gamebus.online/profile">编辑头像与个人资料 <ArrowRight size={14} /></a></>}
+      <Status resource={profile} showLoading={false} />{profile.data && <><div className={styles.profileIdentity}><PlayerAvatar name={profile.data.name} avatar={profile.data.avatar} size={72} />
+        <div><small className={styles.profileEyebrow}>THE CITY PARTNER</small><h2>{profile.data.name}</h2><span>PLAYER ID · {profile.data.id}</span></div></div>
+        <div className={styles.profileEmail}><Mail size={14} />{profile.data.email || '邮箱未绑定'}</div></>}
       <Status resource={stats} showLoading={false} />{stats.data && <div className={styles.profileStats}><span><b>{stats.data.totalGames}</b><small>对局</small></span><span><b>{stats.data.wins}</b><small>胜场</small></span><span><b>{money(Math.round(stats.data.avgScore))}</b><small>平均资产</small></span></div>}
+      {profile.data && <><div className={styles.profileManage}><a className={styles.profileEdit} href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
+          <ActionButton variant="quiet" className={styles.profileLogout} pending={logoutPending} onClick={handleLogout}><LogOut size={14} />退出登录</ActionButton></div>
+        {logoutError && <p role="alert" className={styles.profileLogoutError}>{logoutError}</p>}</>}
     </section><section className={styles.profileHistory}><h2>对局记录</h2><Status resource={{ loading: historyLoading && !games.length, error: historyError && !games.length ? historyError : '', retry: retryHistory }} showLoading={false} />
       <ol className={styles.history}>{games.map(game => { const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id)); return <li key={game.id}><div><strong>{game.roomID}</strong><small>{new Date(game.startedAt).toLocaleString('zh-CN')} · {game.endedAt ? '已结束' : '进行中'}</small>
         <small>{me?.isWinner ? '本局获胜 · ' : ''}{me?.finalScore != null ? money(me.finalScore) + ' · ' : ''}时长 {Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</small></div>
