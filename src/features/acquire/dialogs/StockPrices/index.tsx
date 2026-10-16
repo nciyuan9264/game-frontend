@@ -42,7 +42,7 @@ export function StockPrices({ data, onClose, initialTier = 0 }: {
   return <ResponsiveDialog wide title="每一块地，都能改变价格。" eyebrow="STOCK PRICE & SHAREHOLDER BONUS" onClose={onClose}
     footer={<><span className={styles.footerNote}>奖金在合并 / 终局时结算</span><ActionButton onClick={onClose}>知道了</ActionButton></>}>
     <div className={styles.tabs} role="group" aria-label="公司档位">{tiers.map((item, index) =>
-      <button type="button" key={item.label} className={tier === index ? styles.active : ''} aria-pressed={tier === index} onClick={() => setTier(index)}><b>{item.label}</b><small>{item.companies}</small></button>)}</div>
+      <button type="button" key={item.label} data-click-sound="tab" className={tier === index ? styles.active : ''} aria-pressed={tier === index} onClick={() => setTier(index)}><b>{item.label}</b><small>{item.companies}</small></button>)}</div>
     <table className={styles.table}><thead><tr><th>公司规模</th><th>每股价格</th><th>多数股东奖励</th><th>少数股东奖励</th></tr></thead>
       <tbody>{rows.map(([range, price, bonus], index) => <tr key={range} className={currentBands.has(index) ? styles.isCurrent : undefined}><th>{range}</th><td>{money(price + current.offset)}</td><td>{money(bonus + current.offset * 10)}</td><td>{money((bonus + current.offset * 10) / 2)}</td></tr>)}</tbody></table>
     <p className={styles.current}>{data ? `当前规模：${established.length ? established.map(company => `${company} ${data.roomData.companyInfo[company].tiles} 块`).join(' / ') : '本档公司尚未成立'}` : `当前档位：${current.companies}`}</p>

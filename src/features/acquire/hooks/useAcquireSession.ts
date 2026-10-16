@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { acquireWsUrl } from '@/const/env';
 import { confirmsCommand } from '../model/selectors';
 import { phaseKey, playerName, type CommandPayload, type CommandType, type PendingCommand, type ServerMessage, type Snapshot } from '../model/session';
+import { playAcquireSound } from './useAcquireAudio';
 import { useAcquireConnection } from './useAcquireConnection';
 
 export function useAcquireSession(roomID: string) {
@@ -30,7 +31,11 @@ export function useAcquireSession(roomID: string) {
     const previous = latest.current;
     if (previous && message.phaseVersion < previous.phaseVersion) return;
     const command = pendingRef.current;
-    if (command && confirmsCommand(command, message)) { clearPending(); setFeedback(''); }
+    if (command && confirmsCommand(command, message)) {
+      if (command.type === 'game_place_tile') playAcquireSound('tile-place');
+      if (command.type === 'game_create_company') playAcquireSound('create-company');
+      clearPending(); setFeedback('');
+    }
     else if (command && epoch !== command.epoch) {
       clearPending(); setFeedback('已恢复最新状态，请核对后继续操作');
     }

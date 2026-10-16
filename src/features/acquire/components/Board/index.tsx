@@ -32,6 +32,7 @@ export function Board(props: Props) {
         aria-label={`地块 ${key}${inHand ? '，我的手牌' : `，${description}`}`}
         aria-pressed={selectable ? selected === key : undefined}
         aria-disabled={inert ? true : undefined}
+        data-click-sound={selectable ? 'false' : undefined}
         tabIndex={inert ? -1 : undefined}
         onClick={() => {
           if (inert) return;

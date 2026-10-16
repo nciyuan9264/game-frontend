@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 import { actionPanel, buyPreview, canPlace, mergeCompanies, mergePreview, tilePreview } from '../model/selectors';
 import { phaseKey, type BusinessPanel, type BuyDraft, type GameSnapshot, type MergeDraft } from '../model/session';
 import { companyKeys, type Company } from '../model/types';
+import { playAcquireSound } from './useAcquireAudio';
 import type { AcquireSession } from './useAcquireSession';
 
 interface Draft {
@@ -30,8 +31,10 @@ export function useAcquireInteraction(session: AcquireSession) {
   const enabled = connected && !session.pending;
   const update = useCallback((patch: Partial<Draft>) => setDraft(value => ({ ...value, ...patch })), []);
   const selectTile = (tile: string) => {
-    if (data && enabled && canPlace(data) && tilePreview(data, tile).valid)
+    if (data && enabled && canPlace(data) && tilePreview(data, tile).valid) {
+      playAcquireSound('tile-select');
       update({ tile: active.tile === tile ? undefined : tile });
+    }
   };
   const changeBuy = (company: Company, amount: number) => {
     if (!data || !enabled) return;

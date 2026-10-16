@@ -94,6 +94,10 @@ export function confirmsCommand(command: PendingCommand, next: Snapshot): boolea
     if (command.type === 'game_end_vote') return endGameState(next).votes[next.playerId] === payload.allow;
     if (command.type === 'game_merging_settle') return mergeCompanies(next).length === 0;
     if (command.type === 'game_place_tile') return !!next.roomData.tiles[String(payload.tileKey)]?.belong;
+    if (command.type === 'game_create_company') {
+      const company = String(payload.company) as keyof typeof next.roomData.companyInfo;
+      return (next.roomData.companyInfo[company]?.tiles ?? 0) > (before.roomData.companyInfo[company]?.tiles ?? 0);
+    }
     if (command.type === 'game_buy_stock') return next.playerData.money !== before.playerData.money
       || companyKeys.some(key => next.playerData.stocks[key] !== before.playerData.stocks[key]);
   }

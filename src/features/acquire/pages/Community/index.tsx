@@ -204,7 +204,7 @@ export function Rankings() {
     <section className={styles.rankHero}><Trophy size={39} /><div><small>ACQUIRE LEADERBOARD</small><h2>城市合伙人榜</h2><p>用平均名次衡量稳定发挥，也记录每一张完成的桌。</p></div>
       <div className={styles.myRank}><span>我的排名</span><b>{myIndex >= 0 ? '#' + (myIndex + 1) : '—'}</b><small>{myIndex >= 0 && 'avgRank' in sorted[myIndex] ? '平均名次 ' + sorted[myIndex].avgRank.toFixed(2) : '完成对局后进入排行'}</small></div>
     </section>
-    <section className={styles.rankPanel}><div className={styles.rankTabs}><button className={mode === 'score' ? styles.activeTab : ''} onClick={() => changeMode('score')}>战绩榜</button><button className={mode === 'games' ? styles.activeTab : ''} onClick={() => changeMode('games')}>场次榜</button></div>
+    <section className={styles.rankPanel}><div className={styles.rankTabs}><button data-click-sound="tab" className={mode === 'score' ? styles.activeTab : ''} onClick={() => changeMode('score')}>战绩榜</button><button data-click-sound="tab" className={mode === 'games' ? styles.activeTab : ''} onClick={() => changeMode('games')}>场次榜</button></div>
       <div className={styles.rankRow + ' ' + styles.rankHead}><span>名次</span><span>玩家</span><span>完成对局</span><span>平均名次</span></div>
       <Status resource={{ loading: loading && !entries.length, error: error && !entries.length ? error : '', retry }} />{sorted.map((entry, index) => { const mine = String(entry.userID) === String(profile.data?.id); return <div className={styles.rankRow + (mine ? ' ' + styles.rankSelf : '')} key={entry.userID}>
         <span className={styles.rankNumber}>{index === 0 ? <Trophy size={22} /> : String(index + 1).padStart(2, '0')}</span>

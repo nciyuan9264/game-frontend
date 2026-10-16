@@ -1,0 +1,35 @@
+.layer { position: fixed; inset: 0; z-index: 1000; overflow: hidden; pointer-events: none; }
+.burst { position: absolute; left: 0; top: 0; width: 1px; height: 1px; transform: translate3d(var(--x),var(--y),0); }
+.ring, .flash, .particle { position: absolute; pointer-events: none; }
+.ring {
+  left: -17px; top: -17px; width: 34px; height: 34px; border: 1px solid #e8c48245; border-radius: 50%;
+  box-shadow: 0 0 22px #e8c4823b; animation: clickFeedbackRing .52s ease-out forwards;
+}
+.flash {
+  left: -13px; top: -13px; width: 26px; height: 26px; border-radius: 50%;
+  background: radial-gradient(circle,#f0d59674,transparent 66%); box-shadow: 0 0 30px #e8c48254;
+  animation: clickFeedbackFlash .44s ease-out forwards;
+}
+.particle {
+  left: var(--offset); top: var(--offset); width: var(--size); height: var(--size); border-radius: 50%;
+  background: var(--color); box-shadow: 0 0 8px color-mix(in srgb,var(--color) 72%,transparent);
+  animation: clickFeedbackMist .56s cubic-bezier(.18,.82,.24,1) var(--delay) forwards;
+}
+
+@keyframes clickFeedbackRing {
+  from { opacity: .72; transform: scale(.45); }
+  to { opacity: 0; transform: scale(1.9); }
+}
+@keyframes clickFeedbackFlash {
+  from { opacity: .95; transform: scale(.55); }
+  to { opacity: 0; transform: scale(1.5); }
+}
+@keyframes clickFeedbackMist {
+  0% { opacity: 0; transform: translate3d(0,0,0) scale(.8); filter: blur(0); }
+  20% { opacity: .48; }
+  100% { opacity: 0; transform: translate3d(var(--dx),var(--dy),0) scale(2.4); filter: blur(4px); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .burst { display: none; }
+}

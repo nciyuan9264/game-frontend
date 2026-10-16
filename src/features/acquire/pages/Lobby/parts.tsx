@@ -45,7 +45,7 @@ export function RoomBrowser({ lobby, playerID, onEnter }: Pick<LobbyViewProps, '
     <div className={styles.heading}><div><Eyebrow>FIND YOUR TABLE</Eyebrow><h2>找到房间，一起开场。</h2></div><span>可见房间</span></div>
     <div className={styles.filters}>
       <div className={styles.tabs} aria-label="房间状态">{filters.map(([key, label]) =>
-        <button type="button" key={key} aria-pressed={lobby.filter === key} className={lobby.filter === key ? styles.selected : ''}
+        <button type="button" key={key} data-click-sound="tab" aria-pressed={lobby.filter === key} className={lobby.filter === key ? styles.selected : ''}
           onClick={() => lobby.setFilter(key)}>{label}</button>)}</div>
       <label className={styles.search}><Search size={16} /><input aria-label="搜索房间号或房主" placeholder="搜索房间号 / 房主" value={lobby.query} onChange={event => lobby.setQuery(event.target.value)} /></label>
     </div>

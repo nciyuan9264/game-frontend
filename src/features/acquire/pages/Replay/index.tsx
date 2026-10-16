@@ -207,7 +207,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
           draggable={false} onDragStart={event => event.preventDefault()}
           onPointerDown={beginDrag} onTouchStart={beginTouchDrag}
           onKeyDown={moveWithKeyboard}><GripHorizontal size={18} /></button>
-        <div className={styles.timelineContent}><header><div role="group" aria-label="回放内容"><ActionButton variant={tab === 'timeline' ? 'primary' : 'quiet'} onClick={() => setTab('timeline')}>时间轴</ActionButton><ActionButton variant={tab === 'economy' ? 'primary' : 'quiet'} onClick={() => setTab('economy')}>经济曲线</ActionButton></div>
+        <div className={styles.timelineContent}><header><div role="group" aria-label="回放内容"><ActionButton data-click-sound="tab" variant={tab === 'timeline' ? 'primary' : 'quiet'} onClick={() => setTab('timeline')}>时间轴</ActionButton><ActionButton data-click-sound="tab" variant={tab === 'economy' ? 'primary' : 'quiet'} onClick={() => setTab('economy')}>经济曲线</ActionButton></div>
           <div className={styles.loadMeta}><span className={styles.loadCount}><b>已加载 {replay.loadedCount} / {total}</b><i>{replay.loadedCount}/{total}</i></span>{replay.backgroundLoading && <span className={styles.loadSpinner} aria-label="正在载入回放" />}</div>
           {replay.detail?.game.endedAt && <ActionButton pending={scorePending} onClick={openResults}>最终结算</ActionButton>}</header>
           <div className={styles.loadTrack} role="progressbar" aria-label="回放载入进度" aria-valuemin={0} aria-valuemax={total} aria-valuenow={replay.loadedCount}><i style={{ width: `${total ? replay.loadedCount / total * 100 : 0}%` }} /></div>
