@@ -1,4 +1,4 @@
-import { useEffect, useId, useRef, type ReactNode } from 'react';
+import { useLayoutEffect, useId, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
@@ -19,16 +19,17 @@ export function ResponsiveDialog({ title, eyebrow, children, footer, onClose, wi
   const closeRef = useRef(onClose);
   closeRef.current = onClose;
   const titleId = useId();
-  useEffect(() => {
+  useLayoutEffect(() => {
     const dialog = dialogRef.current;
     const previous = document.activeElement;
     dialog?.showModal();
+    dialog?.focus({ preventScroll: true });
     return () => {
-      dialog?.close();
-      if (previous instanceof HTMLElement && previous.isConnected) previous.focus();
+      if (dialog?.open) dialog.close();
+      if (previous instanceof HTMLElement && previous.isConnected) previous.focus({ preventScroll: true });
     };
   }, []);
-  return <dialog ref={dialogRef} aria-labelledby={titleId}
+  return <dialog ref={dialogRef} aria-labelledby={titleId} tabIndex={-1}
     className={`${rootStyles.root} ${styles.dialog} ${wide ? styles.wide : ''} ${className}`}
     onCancel={event => { event.preventDefault(); closeRef.current(); }}>
     <header className={styles.header}>
