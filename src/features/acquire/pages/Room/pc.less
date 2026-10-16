@@ -34,7 +34,8 @@
     &:nth-child(5) { left: 35%; top: 83%; } &:nth-child(6) { left: 65%; top: 83%; }
   }
   .seatNumber { position: absolute; top: 7px; left: 10px; align-self: auto; font-size: 6px; letter-spacing: .15em; }
-  .empty { min-height: 116px; background: #122c3229; box-shadow: none; }
+  .empty { min-height: 123px; background: #122c3229; box-shadow: none; }
+  .seats > button.empty:not(:disabled):active { transform: translate(-50%,calc(-50% + 1px)) scale(.985); filter: brightness(1.08); border-color: #d1b17278; }
   .emptyAvatar { width: 43px; height: 43px; margin-top: 5px; }
   @media (hover: hover) and (pointer: fine) {
     .empty:not(:disabled) { transition: border-color .16s, background .16s, color .16s;
