@@ -2,8 +2,10 @@
   > img { position: absolute; right: 0; top: 0; width: 82%; height: 100%; object-fit: cover; object-position: 70% 51%; z-index: -2; }
   &::after { content: ''; position: absolute; inset: 0; z-index: -1; background: linear-gradient(90deg,#10222c 3%,#10222ced 26%,#10222c00 69%); }
 }
-.heroCopy { h1 { line-height: 1.43; letter-spacing: .035em; margin: 11px 0 8px; color: #f2e8d6; } p { color: #9db0b8; font-size: 11px; } > button { margin-top: 18px; } }
+.heroCopy { h1 { line-height: 1.43; letter-spacing: .035em; margin: 11px 0 8px; color: #f2e8d6; } p { color: #9db0b8; font-size: 11px; } }
+.heroActions { display: flex; align-items: center; gap: 10px; margin-top: 18px; }
 .heroCreateButton { font-weight: 600; }
+.heroShareButton { border-color: #61716c7a; background-color: #142a3299; color: #c1ceca !important; backdrop-filter: blur(5px); }
 .caption { position: absolute; right: 23px; bottom: 18px; font-size: 8px; letter-spacing: .17em; color: #dcccad; text-shadow: 0 1px 7px #000; }
 .companies { display: flex; gap: 26px; align-items: center; border-bottom: 1px solid #30424c;
   > span { color: #b8c2be; font-size: 11px; flex-shrink: 0; white-space: nowrap; small { display: block; margin-top: 3px; font-size: 6px; letter-spacing: .16em; color: #657e8a; } }
@@ -83,6 +85,16 @@
 .visibilityCheck { position: absolute; top: 14px; right: 13px; color: #e0c084 !important; }
 .createHint { display: flex; align-items: flex-start; gap: 9px; padding: 12px 13px; border: 1px solid #29414e7a; border-radius: 6px; background: #0e1f2a; color: #8ea6b4; font-size: 11px; line-height: 1.8;
   > svg { margin-top: 2px; }
+}
+.shareDialog { width: min(460px,calc(100vw - 32px)); }
+.shareContent { display: flex; align-items: stretch; flex-direction: column; gap: 18px; }
+.shareQRCode { align-self: center; padding: 12px; border-radius: 8px; background: #f0e7cf; line-height: 0; }
+.shareAddress { min-width: 0; padding: 12px 14px; border: 1px solid #3b566366; border-radius: 6px; background: #0e232e;
+  span { display: block; margin-bottom: 5px; color: #7896a2; font-size: 9px; }
+  strong { display: block; color: #d8e1dd; font-size: 11px; font-weight: 500; overflow-wrap: anywhere; }
+}
+.shareHint { display: flex; align-items: flex-start; gap: 8px; color: #809ca7; font-size: 10px; line-height: 1.8;
+  svg { flex: 0 0 auto; margin-top: 1px; color: #bba779; }
 }
 
 .joinForm { display: flex; flex-direction: column; gap: 18px;

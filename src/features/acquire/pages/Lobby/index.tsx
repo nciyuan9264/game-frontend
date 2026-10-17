@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowRight, Check, Globe, KeyRound, Lock, ShieldCheck } from 'lucide-react';
+import { QRCode } from 'antd';
+import { ArrowRight, Check, Copy, Globe, KeyRound, Lock, QrCode, ShieldCheck } from 'lucide-react';
 import { getProfile } from '@/api/room';
 import { getMyStats } from '@/api/history';
 import { profile2BackendName } from '@/util/user';
@@ -22,6 +23,7 @@ import { LobbyMobile } from './LobbyMobile';
 import styles from './index.module.less';
 
 const loadStats = () => getMyStats('acquire');
+const SHARE_URL = 'https://board.gamebus.online/game/acquire';
 
 export default function Lobby() {
   const navigate = useNavigate();
@@ -29,7 +31,8 @@ export default function Lobby() {
   const profile = useAcquireResource(getProfile);
   const stats = useAcquireResource(loadStats);
   const { isMobile } = useAcquireViewport();
-  const [panel, setPanel] = useState<'create' | 'join'>();
+  const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
+  const [shareCopied, setShareCopied] = useState(false);
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<AcquireRoom>();
@@ -71,10 +74,23 @@ export default function Lobby() {
       if (id === requestID.current) { busy.current = false; setPending(false); }
     }
   };
-  const close = () => { if (!busy.current) setPanel(undefined); };
+  const copyShareURL = async () => {
+    try {
+      await navigator.clipboard.writeText(SHARE_URL);
+      setShareCopied(true);
+    } catch {
+      setShareCopied(false);
+    }
+  };
+  const close = () => {
+    if (busy.current) return;
+    setPanel(undefined);
+    setShareCopied(false);
+  };
   const props = {
     lobby, profile: profile.data, stats: stats.data, statsError: stats.error, playerID, code, setCode,
-    onCreate: () => { setError(''); setPanel('create'); }, onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
+    onCreate: () => { setError(''); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
+    onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
   return <AppShell title="游戏大厅" profile={profile.data}>
@@ -109,6 +125,17 @@ export default function Lobby() {
       {error && <Feedback error>{error}</Feedback>}
       <div className={styles.joinHint}><ShieldCheck size={16} /><span>输入朋友分享的完整房间号。</span></div>
       {foundRoom && <RoomCard room={foundRoom} playerID={playerID} onEnter={onEnter} />}
+    </ResponsiveDialog>}
+    {panel === 'share' && <ResponsiveDialog title="分享 Acquire" eyebrow="INVITE SOMEONE TO THE TABLE" className={styles.shareDialog} onClose={close}
+      footer={<><ActionButton onClick={close}>关闭</ActionButton><ActionButton variant="primary" onClick={() => void copyShareURL()}>
+        {shareCopied ? <Check size={16} /> : <Copy size={16} />}{shareCopied ? '链接已复制' : '复制游戏链接'}
+      </ActionButton></>}>
+      <div className={styles.shareContent}>
+        <div className={styles.shareQRCode}><QRCode type="svg" value={SHARE_URL} size={184} bordered={false}
+          color="#172c35" bgColor="#f0e7cf" errorLevel="M" /></div>
+        <div className={styles.shareAddress}><span>游戏地址</span><strong>{SHARE_URL}</strong></div>
+        <p className={styles.shareHint}><QrCode size={16} />朋友可以扫码进入大厅，也可以使用复制的链接直接打开。</p>
+      </div>
     </ResponsiveDialog>}
     {priceTier != null && <StockPrices initialTier={priceTier} onClose={() => setPriceTier(undefined)} />}
   </AppShell>;
