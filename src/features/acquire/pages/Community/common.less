@@ -110,3 +110,35 @@
 }
 .profileHistory { padding: 30px; h2 { margin-bottom: 20px; font-size: 20px; } }
 .profileHistory .history a { display: inline-flex; align-items: center; gap: 5px; }
+.aboutEntry { display: flex; align-items: center; gap: 12px; width: min(1098px,100%); min-height: 58px; margin: 22px auto 0; padding: 11px 5px; border: 0; border-top: 1px solid #38505778; background: transparent; color: #a8bdbe; text-align: left;
+  > span:nth-child(2) { min-width: 0; }
+  > svg:last-child { margin-left: auto; color: #6f8c95; }
+  b, small { display: block; }
+  b { color: #cbd7d2; font-size: 12px; font-weight: 500; }
+  small { margin-top: 3px; color: #718e98; font-size: 9px; }
+}
+.aboutEntryIcon { display: grid; place-items: center; width: 31px; height: 31px; flex: 0 0 auto; border: 1px solid #536b6273; border-radius: 50%; color: #c2ad7b; background: #8f7b4910; }
+.aboutDialog { width: min(520px,calc(100vw - 32px)); }
+.aboutIntro { display: flex; align-items: center; gap: 16px; padding-bottom: 23px; border-bottom: 1px solid #3a525b70;
+  > div { min-width: 0; }
+  > span:first-child { box-shadow: 0 0 0 2px #9aaf8740; }
+  small { color: #b6a675; font-size: 7px; letter-spacing: .16em; }
+  h3 { margin: 6px 0 5px; color: #eee5cd; font-size: 20px; font-weight: 600; overflow-wrap: anywhere; }
+  p { color: #91a9b1; font-size: 11px; line-height: 1.8; }
+}
+.aboutLinks { margin-top: 8px;
+  a, button { display: flex; align-items: center; gap: 13px; width: 100%; min-height: 64px; padding: 10px 2px; border: 0; border-bottom: 1px solid #354d5670; background: transparent; color: #9eb5bc; text-align: left;
+    > svg:first-child { color: #c4ad76; }
+    > svg:last-child { margin-left: auto; color: #6f8e98; }
+    > span { min-width: 0; }
+  }
+  b, small { display: block; }
+  b { color: #d4ded8; font-size: 12px; font-weight: 500; }
+  small { margin-top: 4px; color: #76939e; font-size: 10px; overflow-wrap: anywhere; }
+}
+.aboutLegal { margin-top: 19px !important; color: #718c96; font-size: 9px; line-height: 1.9; }
+@media (hover: hover) and (pointer: fine) {
+  .aboutEntry:hover { color: #d2bd88; filter: brightness(1.08); }
+  .aboutEntry:hover > svg:last-child { color: #c8ae72; }
+  .aboutLinks a:hover, .aboutLinks button:hover { color: #d8bd7f; background: #ffffff04; }
+}

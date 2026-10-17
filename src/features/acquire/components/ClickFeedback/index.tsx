@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState, type CSSProperties } from 'react';
+import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 'react';
 import { playAcquireSound, type AcquireSound } from '../../hooks/useAcquireAudio';
 import styles from './index.module.less';
 
@@ -78,7 +78,13 @@ function createParticles(seed: number): Particle[] {
   });
 }
 
-export function ClickFeedback() {
+interface Props {
+  scopeRef?: RefObject<HTMLElement>;
+  playSound?: boolean;
+  className?: string;
+}
+
+export function ClickFeedback({ scopeRef, playSound = true, className = '' }: Props = {}) {
   const [bursts, setBursts] = useState<Burst[]>([]);
   const rootRef = useRef<HTMLDivElement>(null);
   const sequenceRef = useRef(0);
@@ -88,9 +94,11 @@ export function ClickFeedback() {
     const handleClick = (event: Event) => {
       if (!(event instanceof MouseEvent)) return;
       if (event.detail === 0 || event.button !== 0) return;
+      if (scopeRef && (!(event.target instanceof Node) || !scopeRef.current?.contains(event.target))) return;
       const sound = resolveClickSound(event.target);
-      if (sound) playAcquireSound(sound);
+      if (playSound && sound) playAcquireSound(sound);
       if (sound !== 'ui-click') return;
+      if (!scopeRef && event.target instanceof Element && event.target.closest('dialog')) return;
       const id = ++sequenceRef.current;
       const rect = rootRef.current?.getBoundingClientRect();
       const x = rect ? event.clientX - rect.left : event.clientX;
@@ -111,9 +119,9 @@ export function ClickFeedback() {
       timersRef.current.forEach(timer => window.clearTimeout(timer));
       timersRef.current = [];
     };
-  }, []);
+  }, [playSound, scopeRef]);
 
-  return <div ref={rootRef} className={styles.layer} aria-hidden="true">
+  return <div ref={rootRef} className={`${styles.layer} ${className}`} aria-hidden="true">
     {bursts.map(burst => <span key={burst.id} className={styles.burst} style={{
       '--x': `${burst.x}px`,
       '--y': `${burst.y}px`,

@@ -29,6 +29,18 @@ function leaderboardEntry(index: number): LeaderboardEntry {
 }
 
 beforeEach(() => {
+  Object.defineProperty(navigator, 'clipboard', {
+    configurable: true,
+    value: { writeText: vi.fn().mockResolvedValue(undefined) },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+    configurable: true,
+    value() { this.setAttribute('open', ''); },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+    configurable: true,
+    value() { this.removeAttribute('open'); },
+  });
   vi.stubGlobal('matchMedia', vi.fn(() => ({
     matches: false,
     addEventListener: vi.fn(),
@@ -71,6 +83,26 @@ afterEach(() => {
 });
 
 describe('Acquire profile', () => {
+  it('opens the project contact panel from the bottom entry', async () => {
+    render(<MemoryRouter future={{ v7_startTransition: true, v7_relativeSplatPath: true }}>
+      <My />
+    </MemoryRouter>);
+
+    fireEvent.click(await screen.findByRole('button', { name: /关于与联系/ }));
+
+    const dialog = screen.getByRole('dialog', { name: '关于 Acquire Online' });
+    fireEvent.click(screen.getByRole('button', { name: /QQ 联系作者/ }));
+    await waitFor(() => expect(navigator.clipboard.writeText).toHaveBeenCalledWith('1522457543'));
+    expect(screen.getByRole('button', { name: /QQ 已复制/ })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /查看项目源码/ }).getAttribute('href')).toBe('https://github.com/nciyuan9264/game-frontend');
+
+    fireEvent.click(screen.getByText(/本项目是非官方在线实现/), { button: 0, clientX: 100, clientY: 100, detail: 1 });
+    await waitFor(() => expect(dialog.querySelectorAll('i')).toHaveLength(7));
+
+    fireEvent.click(screen.getByRole('button', { name: '知道了' }));
+    expect(screen.queryByRole('dialog', { name: '关于 Acquire Online' })).toBeNull();
+  });
+
   it('calls logout from the profile page after confirmation', async () => {
     const confirm = vi.fn(() => true);
     vi.stubGlobal('confirm', confirm);

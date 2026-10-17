@@ -4,13 +4,16 @@
   .aside { position: sticky; top: 20px; }
   .page { padding: 0 0 30px; }
   .guidePage, .rankPage, .profilePage { max-width: none; }
+  .profilePage { display: flex; height: calc(100dvh - 116px); min-height: 560px; flex-direction: column; }
+  .profilePage .profileLayout { grid-template-rows: minmax(0,1fr); flex: 1; min-height: 0; align-items: stretch; }
+  .profileDisplay { align-self: start; }
   .guideLayout { display: grid; grid-template-columns: minmax(250px, 360px) minmax(0, 1fr); align-items: stretch; justify-content: center; max-width: 1040px; gap: 22px;
     > aside { display: flex; min-height: 520px; overflow: hidden; flex-direction: column; border: 1px solid #52665d80; border-radius: 12px; background: #172d35;
       > img { width: 100%; flex: 1; min-height: 0; object-fit: cover; filter: saturate(.8); }
     }
   }
   .guidePanel { min-height: 520px; padding: 25px; h2 { font-size: 22px; } }
-  .profileHistory { min-height: 485px; }
+  .profileHistory { min-height: 0; overflow-y: auto; }
 }
 @media (min-width: 1200px) {
   .guideLayout { grid-template-columns: minmax(340px, 430px) minmax(0, 650px); max-width: 1120px; gap: 26px;

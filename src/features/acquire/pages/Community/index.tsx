@@ -1,6 +1,6 @@
 import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Clock, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
+import { ArrowRight, Building2, Check, ChevronRight, Clock, Code2, Copy, ExternalLink, Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
 import { getProfile, logout } from '@/api/room';
 import { getMyStats, listMyGames } from '@/api/history';
 import { getLeaderboard } from '@/api/leaderboard';
@@ -8,6 +8,7 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { ActionButton } from '../../components/ActionButton';
 import { Feedback } from '../../components/Panel';
 import { AcquireLoading } from '../../components/LoadingState';
+import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { StockPrices } from '../../dialogs/StockPrices';
 import { useAcquireResource } from '../../hooks/useAcquireResource';
 import { money } from '../../model/session';
@@ -219,6 +220,8 @@ export function Rankings() {
 export function My() {
   const profile = useAcquireResource(getProfile);
   const stats = useAcquireResource(loadStats);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [qqCopied, setQQCopied] = useState(false);
   const [games, setGames] = useState<Game[]>([]);
   const [logoutPending, setLogoutPending] = useState(false);
   const [logoutError, setLogoutError] = useState('');
@@ -281,6 +284,14 @@ export function My() {
       setLogoutPending(false);
     }
   }, []);
+  const copyQQ = useCallback(async () => {
+    try {
+      await navigator.clipboard.writeText('1522457543');
+      setQQCopied(true);
+    } catch {
+      setQQCopied(false);
+    }
+  }, []);
   useInfiniteLoad(sentinelRef, games.length > 0 && hasMore && !historyLoading && !historyError, loadNextHistoryPage);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
   return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page + ' ' + styles.profilePage}>
@@ -301,6 +312,27 @@ export function My() {
       {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link className={styles.link} to="/game/acquire">去大厅开一桌</Link></Feedback>}
       {!!games.length && <InfiniteFooter loading={historyLoading} error={historyError} hasMore={hasMore} retry={retryHistory} anchorRef={sentinelRef} />}
     </section></div>}
+    <button type="button" className={styles.aboutEntry} onClick={() => { setQQCopied(false); setAboutOpen(true); }}>
+      <span className={styles.aboutEntryIcon}><Info size={17} /></span>
+      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
+      <ChevronRight size={17} />
+    </button>
+    {aboutOpen && <ResponsiveDialog title="关于 Acquire Online" eyebrow="ABOUT & CONTACT" className={styles.aboutDialog}
+      onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
+      <div className={styles.aboutIntro}>
+        <PlayerAvatar name="nciyuan9264" size={58} />
+        <div><small>DESIGNED & BUILT BY</small><h3>nciyuan9264</h3><p>独立设计、开发并维护这个在线 Acquire 游戏。</p></div>
+      </div>
+      <div className={styles.aboutLinks}>
+        <button type="button" onClick={() => void copyQQ()}>
+          <MessageCircle size={19} /><span><b>{qqCopied ? 'QQ 已复制' : 'QQ 联系作者'}</b><small>1522457543</small></span>{qqCopied ? <Check size={15} /> : <Copy size={15} />}
+        </button>
+        <a href="https://github.com/nciyuan9264/game-frontend" target="_blank" rel="noreferrer">
+          <Code2 size={19} /><span><b>查看项目源码</b><small>nciyuan9264/game-frontend</small></span><ExternalLink size={15} />
+        </a>
+      </div>
+      <p className={styles.aboutLegal}>本项目是非官方在线实现。游戏名称、规则及相关商标归其各自权利人所有。</p>
+    </ResponsiveDialog>}
   </div></AppShell>;
 }
 export function Guide() {

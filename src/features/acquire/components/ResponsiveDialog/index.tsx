@@ -1,5 +1,6 @@
 import { useLayoutEffect, useId, useRef, type ReactNode } from 'react';
 import { X } from 'lucide-react';
+import { ClickFeedback } from '../ClickFeedback';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -38,5 +39,6 @@ export function ResponsiveDialog({ title, eyebrow, children, footer, onClose, wi
     </header>
     <div className={styles.body}>{children}</div>
     {footer && <footer className={styles.footer}>{footer}</footer>}
+    <ClickFeedback scopeRef={dialogRef} playSound={false} className={styles.feedbackLayer} />
   </dialog>;
 }
