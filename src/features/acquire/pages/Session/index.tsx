@@ -1,5 +1,6 @@
 import { useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
+import { getProfile } from '@/api/room';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '../../components/ActionButton';
 import { Feedback } from '../../components/Panel';
@@ -7,6 +8,7 @@ import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { useAcquireSession } from '../../hooks/useAcquireSession';
 import { useAcquireInteraction } from '../../hooks/useAcquireInteraction';
 import { useAcquireLeave } from '../../hooks/useAcquireLeave';
+import { useAcquireResource } from '../../hooks/useAcquireResource';
 import { playerName, selfID } from '../../model/session';
 import { Room } from '../Room';
 import { Play } from '../Play';
@@ -47,5 +49,14 @@ function Session({ roomID }: { roomID: string }) {
 export default function AcquireSessionPage() {
   const [params] = useSearchParams();
   const roomID = params.get('roomID') ?? '';
+  const auth = useAcquireResource(getProfile);
+  if (auth.loading && !auth.data) return <AcquireSessionLoading />;
+  if (!auth.data) return <AppShell inMatch hideRail title="经典对局">
+    <Feedback error>
+      登录状态确认失败
+      <span>{auth.error || '暂时无法验证登录状态，请重试。'}</span>
+      <ActionButton onClick={auth.retry}><RefreshCw size={14} />重新验证</ActionButton>
+    </Feedback>
+  </AppShell>;
   return <Session key={roomID} roomID={roomID} />;
 }
