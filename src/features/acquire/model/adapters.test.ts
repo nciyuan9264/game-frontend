@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { playerName, roomEntry } from './adapters';
+import { ACQUIRE_PUBLIC_URL, acquireRoomInviteURL, playerName, roomEntry } from './adapters';
 import type { AcquireRoom } from './types';
 
 const room: AcquireRoom = {
@@ -19,5 +19,8 @@ describe('room entry', () => {
   it('removes only the legacy numeric user ID suffix', () => {
     expect(playerName('name-with-hyphens-12')).toBe('name-with-hyphens');
     expect(playerName('ai_001')).toBe('ai_001');
+  });
+  it('builds a production invite link with an encoded room ID', () => {
+    expect(acquireRoomInviteURL('room 1/2')).toBe(`${ACQUIRE_PUBLIC_URL}/match?roomID=room%201%2F2`);
   });
 });

@@ -16,14 +16,13 @@ import { RoomCard } from '../../components/RoomCard';
 import { useAcquireLobby } from '../../hooks/useAcquireLobby';
 import { useAcquireResource } from '../../hooks/useAcquireResource';
 import { useAcquireViewport } from '../../hooks/useAcquireViewport';
-import { roomEntry } from '../../model/adapters';
+import { ACQUIRE_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import { companyPriceTiers, type AcquireRoom, type Visibility } from '../../model/types';
 import { LobbyDesktop } from './LobbyDesktop';
 import { LobbyMobile } from './LobbyMobile';
 import styles from './index.module.less';
 
 const loadStats = () => getMyStats('acquire');
-const SHARE_URL = 'https://board.gamebus.online/game/acquire';
 
 export default function Lobby() {
   const navigate = useNavigate();
@@ -76,7 +75,7 @@ export default function Lobby() {
   };
   const copyShareURL = async () => {
     try {
-      await navigator.clipboard.writeText(SHARE_URL);
+      await navigator.clipboard.writeText(ACQUIRE_PUBLIC_URL);
       setShareCopied(true);
     } catch {
       setShareCopied(false);
@@ -131,9 +130,9 @@ export default function Lobby() {
         {shareCopied ? <Check size={16} /> : <Copy size={16} />}{shareCopied ? '链接已复制' : '复制游戏链接'}
       </ActionButton></>}>
       <div className={styles.shareContent}>
-        <div className={styles.shareQRCode}><QRCode type="svg" value={SHARE_URL} size={184} bordered={false}
+        <div className={styles.shareQRCode}><QRCode type="svg" value={ACQUIRE_PUBLIC_URL} size={184} bordered={false}
           color="#172c35" bgColor="#f0e7cf" errorLevel="M" /></div>
-        <div className={styles.shareAddress}><span>游戏地址</span><strong>{SHARE_URL}</strong></div>
+        <div className={styles.shareAddress}><span>游戏地址</span><strong>{ACQUIRE_PUBLIC_URL}</strong></div>
         <p className={styles.shareHint}><QrCode size={16} />朋友可以扫码进入大厅，也可以使用复制的链接直接打开。</p>
       </div>
     </ResponsiveDialog>}

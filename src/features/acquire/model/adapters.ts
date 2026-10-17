@@ -1,5 +1,11 @@
 import type { AcquireRoom } from './types';
 
+export const ACQUIRE_PUBLIC_URL = 'https://board.gamebus.online/game/acquire';
+
+export function acquireRoomInviteURL(roomID: string) {
+  return `${ACQUIRE_PUBLIC_URL}/match?roomID=${encodeURIComponent(roomID)}`;
+}
+
 export function playerName(id: string) {
   // Historical IDs use name-userID; preserve hyphens inside the display name.
   return id.replace(/-\d+$/, '');

@@ -6,6 +6,7 @@ import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { useAcquireViewport } from '../../hooks/useAcquireViewport';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
 import { playerName, type MatchSnapshot } from '../../model/session';
+import { acquireRoomInviteURL } from '../../model/adapters';
 import type { Visibility } from '../../model/types';
 import { RoomDesktop } from './RoomDesktop';
 import { RoomMobile } from './RoomMobile';
@@ -19,6 +20,7 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
   const [copyMessage, setCopyMessage] = useState('');
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
+  const inviteURL = acquireRoomInviteURL(data.roomID);
   const props = {
     data, enabled, pending: !!session.pending,
     onAddAI: (seatIndex?: number) => {
@@ -30,9 +32,9 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
     onInvite: () => { setCopyMessage(''); setPanel('invite'); },
     onSettings: () => { setVisibility(data.visibility); setPanel('settings'); },
   };
-  const copy = async (value: string) => {
-    try { await navigator.clipboard.writeText(value); setCopyMessage('已复制'); }
-    catch { setCopyMessage('复制未成功，请长按或选中文本手动复制'); }
+  const copy = async (value: string, successMessage: string) => {
+    try { await navigator.clipboard.writeText(value); setCopyMessage(successMessage); }
+    catch { setCopyMessage('复制未成功，请稍后重试'); }
   };
   const close = () => setPanel(undefined);
   const players = Object.entries(data.players);
@@ -44,13 +46,14 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
         <ActionButton variant="primary" onClick={props.onInvite}><UserPlus size={16} />邀请好友</ActionButton></div></div>
     {isMobile ? <RoomMobile {...props} /> : <RoomDesktop {...props} />}
     {panel === 'invite' && <ResponsiveDialog title="给朋友，留一个好位置。" eyebrow="BETTER AROUND ONE TABLE" onClose={close}
-      footer={<><ActionButton onClick={close}>完成</ActionButton><ActionButton variant="primary" onClick={() => void copy(data.roomID)}><Copy size={16} />复制房间号</ActionButton></>}>
+      footer={<><ActionButton onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={16} />复制房间号</ActionButton>
+        <ActionButton variant="primary" onClick={() => void copy(inviteURL, '邀请链接已复制')}><Copy size={16} />复制邀请链接</ActionButton></>}>
       <div className={styles.invitePlayers}>{players.map(([id, player]) => <PlayerAvatar key={id} name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} size={44} />)}
         {players.length < data.maxPlayers && <span className={styles.inviteEmpty}><Plus size={22} /></span>}</div>
-      <p className={`${styles.dialogDescription} ${styles.center}`}>房间 {data.roomID} 还有 {data.maxPlayers - players.length} 个席位。<br />分享房间号，朋友就能找到这张桌。</p>
+      <p className={`${styles.dialogDescription} ${styles.center}`}>房间 {data.roomID} 还有 {data.maxPlayers - players.length} 个席位。<br />可以分享房间号，也可以直接发送邀请链接。</p>
       <div className={styles.inviteCode}><span>ROOM NUMBER</span><input aria-label="分享房间号" value={data.roomID} readOnly onClick={event => event.currentTarget.select()} /><small>经典对局 · {players.length} / {data.maxPlayers} 人 · {data.visibility === 'private' ? '私密' : '公开'}</small></div>
-      {hint(copyMessage || (data.visibility === 'private' ? '私密房间仅房主可在大厅看到，请将完整房间号分享给朋友。'
-        : '朋友可以在大厅查找房间号并加入。系统不会自动发送外部邀请。'))}
+      {hint(copyMessage || (data.visibility === 'private' ? '私密房间仅房主可在大厅看到，请将房间号或邀请链接分享给朋友。'
+        : '朋友可以打开邀请链接，也可以在大厅通过房间号加入。'))}
     </ResponsiveDialog>}
     {panel === 'settings' && <ResponsiveDialog title={owner ? '房间设置' : '房间信息'} eyebrow="ROOM VISIBILITY" onClose={close}
       footer={owner ? <><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="primary" type="submit" form="acquire-room-settings" disabled={!enabled}>保存设置<ArrowRight size={16} /></ActionButton></>
@@ -64,7 +67,7 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
             {value === 'public' ? <Globe size={23} /> : <Lock size={23} />}<strong>{value === 'public' ? '公开房间' : '私密房间'}</strong>
             <small>{value === 'public' ? '显示在大厅，其他玩家可加入' : '仅房主可在大厅看到，其他玩家通过房间号加入'}</small>{value === visibility && <Check size={14} />}
           </button>)}</div>
-        {hint(visibility === 'private' ? '仅你会在大厅看到这张桌；将完整房间号分享给朋友即可邀请入座。' : '公开房间可从大厅列表或通过房间号加入。')}
+        {hint(visibility === 'private' ? '仅你会在大厅看到这张桌；可在邀请面板复制完整链接分享给朋友。' : '公开房间可从大厅列表、房间号或邀请链接加入。')}
       </form>
     </ResponsiveDialog>}
     {panel === 'start' && <ResponsiveDialog title="合伙人齐了，开场吧。" eyebrow="READY FOR THE FIRST MOVE" onClose={close}
