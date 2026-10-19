@@ -1,0 +1,211 @@
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Link, useNavigate } from 'react-router-dom';
+import {
+  ArrowRight, BookOpen, Check, Clock, Code2, Copy, ExternalLink, Fingerprint,
+  Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users,
+} from 'lucide-react';
+import { getProfile, logout } from '@/api/room';
+import { getMyStats, listMyGames } from '@/api/history';
+import { getLeaderboard } from '@/api/leaderboard';
+import { useAsyncResource } from '@/hooks/useAsyncResource';
+import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Feedback } from '@/components/GameUI/Panel';
+import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
+import type { Game } from '@/types/history';
+import type { DavinciLeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
+import { AppShell, PlayerAvatar } from '../../components/AppShell';
+import { DavinciLoading } from '../../components/LoadingState';
+import rootStyles from '../../styles/root.module.less';
+import styles from './index.module.less';
+
+const loadStats = () => getMyStats('davinci');
+const PAGE_SIZE = 20;
+const guideSteps = [
+  {
+    tab: '牌序',
+    title: '先读懂序列，才有可能破解它。',
+    text: '每人持有 5 张密码牌。数字从小到大排列；数字相同时，黑牌在白牌之前。',
+    points: ['黑白两色各有 0–11。', 'JOKER 不受数字顺序限制，可以放在任意位置。', '对手的暗牌只显示颜色与位置。'],
+  },
+  {
+    tab: '抽牌',
+    title: '每一次抽牌，都会增加新的线索。',
+    text: '轮到你时，先从中央公共牌池抽取一张牌。你知道它的数字，对手只知道颜色。',
+    points: ['抽牌后进入猜牌阶段。', '观察牌池剩余颜色，可以排除部分可能。', '新抽的牌会暂存在你的序列旁。'],
+  },
+  {
+    tab: '猜牌',
+    title: '猜对可以继续，猜错就会暴露自己。',
+    text: '选择对手一张未公开的牌，猜测 0–11 或 JOKER。',
+    points: ['猜对：目标牌公开，你可以继续猜。', '猜错：本回合新牌公开，并轮到对手。', '已经公开的牌不能再次猜测。'],
+  },
+  {
+    tab: '收手',
+    title: '知道什么时候停，比猜中一次更重要。',
+    text: '猜对后可以继续，也可以把新牌放回自己的密码序列并结束回合。',
+    points: ['普通数字牌必须按顺序放回。', 'JOKER 可以选择任意合法槽位。', '率先公开对手全部密码牌的一方获胜。'],
+  },
+] as const;
+
+export function Rankings() {
+  const profile = useAsyncResource(getProfile);
+  const [mode, setMode] = useState<'wins' | 'games'>('wins');
+  const [entries, setEntries] = useState<DavinciLeaderboardEntry[]>([]);
+  const [page, setPage] = useState(0);
+  const [hasMore, setHasMore] = useState(true);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
+  const requestSequence = useRef(0);
+  const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
+
+  useEffect(() => {
+    const requestID = ++requestSequence.current;
+    setLoading(true);
+    setError('');
+    getLeaderboard({ gameType: 'davinci', limit: PAGE_SIZE, offset: page * PAGE_SIZE, sort })
+      .then(result => {
+        if (requestID !== requestSequence.current) return;
+        const next = result.entries.filter((entry): entry is DavinciLeaderboardEntry => 'winRate' in entry);
+        setEntries(current => page === 0 ? next : [...current, ...next.filter(entry => !current.some(item => item.userID === entry.userID))]);
+        setHasMore(next.length === PAGE_SIZE);
+      })
+      .catch(reason => {
+        if (requestID === requestSequence.current) setError(reason instanceof Error ? reason.message : '排行榜加载失败');
+      })
+      .finally(() => { if (requestID === requestSequence.current) setLoading(false); });
+    return () => { requestSequence.current = requestID + 1; };
+  }, [page, sort]);
+
+  const changeMode = (next: 'wins' | 'games') => {
+    if (next === mode) return;
+    setMode(next);
+    setEntries([]);
+    setHasMore(true);
+    setPage(0);
+  };
+  const myIndex = entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
+
+  return <AppShell title="排行榜" profile={profile.data}><div className={styles.page}>
+    <header className={styles.heading}><div><small>THE SHARPEST MINDS</small><h1>每一次破解，都留下记录。</h1></div><Trophy size={30} /></header>
+    <section className={styles.rankSummary}><div><small>DAVINCI LEADERBOARD</small><h2>密码破译榜</h2><p>胜率记录判断的准确度，场次记录持续对局的经验。</p></div>
+      <span><small>我的排名</small><b>{myIndex >= 0 ? `#${myIndex + 1}` : '—'}</b></span></section>
+    <div className={styles.rankTabs}><button className={mode === 'wins' ? styles.active : ''} onClick={() => changeMode('wins')}>胜率榜</button>
+      <button className={mode === 'games' ? styles.active : ''} onClick={() => changeMode('games')}>场次榜</button></div>
+    <section className={styles.rankList}>
+      <header><span>名次</span><span>玩家</span><span>胜场</span><span>胜率</span><span>对局</span></header>
+      {entries.map((entry, index) => <div key={entry.userID} className={String(entry.userID) === String(profile.data?.id) ? styles.mine : ''}>
+        <span>{index === 0 ? <Trophy size={18} /> : String(index + 1).padStart(2, '0')}</span>
+        <span><PlayerAvatar name={entry.playerID.replace(/-\d+$/, '')} size={34} /><b>{entry.playerID.replace(/-\d+$/, '')}</b></span>
+        <span>{entry.wins}</span><span>{(entry.winRate * 100).toFixed(1)}%</span><span>{entry.totalGames}</span>
+      </div>)}
+      {loading && !entries.length && <DavinciLoading title="正在整理破译记录。" description="读取排行榜" />}
+      {error && <Feedback error>{error}</Feedback>}
+      {!loading && !error && !entries.length && <Feedback>暂时还没有排行记录。</Feedback>}
+    </section>
+    {hasMore && !!entries.length && <ActionButton className={styles.loadMore} pending={loading} onClick={() => setPage(value => value + 1)}>加载更多</ActionButton>}
+  </div></AppShell>;
+}
+
+export function Guide() {
+  const navigate = useNavigate();
+  const profile = useAsyncResource(getProfile);
+  const [stepIndex, setStepIndex] = useState(0);
+  const step = guideSteps[stepIndex];
+  const last = stepIndex === guideSteps.length - 1;
+  return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
+    <header className={styles.heading}><div><small>LEARN THE CIPHER</small><h1>四步，读懂一场密码对决。</h1></div><BookOpen size={30} /></header>
+    <div className={styles.guideLayout}><aside className={styles.tileDemo}>
+      <div><span className={styles.blackTile}>3</span><span className={styles.whiteTile}>3</span><span className={styles.blackTile}>7</span><span className={styles.whiteTile}>—</span></div>
+      <p>黑 3 排在白 3 之前；JOKER 可以隐藏在任意位置。</p>
+      <footer><span><Users size={16} />2 人</span><span><Clock size={16} />约 20 分钟</span><span><Fingerprint size={16} />26 张牌</span></footer>
+    </aside><section className={styles.guidePanel}>
+      <div className={styles.guideTabs} role="tablist" aria-label="玩法章节">{guideSteps.map((item, index) =>
+        <button key={item.tab} role="tab" aria-selected={stepIndex === index} className={stepIndex === index ? styles.active : ''} onClick={() => setStepIndex(index)}>
+          {String(index + 1).padStart(2, '0')} {item.tab}
+        </button>)}</div>
+      <small>THE ESSENTIALS</small><h2>{step.title}</h2><p>{step.text}</p>
+      <ol>{step.points.map(point => <li key={point}>{point}</li>)}</ol>
+      <div className={styles.guideHint}><ShieldCheck size={16} />在线对局的合法操作与牌序由服务端校验。</div>
+      <ActionButton variant="primary" onClick={() => last ? navigate('/game/davinci') : setStepIndex(index => index + 1)}>
+        {last ? '进入大厅' : '下一步'}<ArrowRight size={16} />
+      </ActionButton>
+    </section></div>
+  </div></AppShell>;
+}
+
+export function My() {
+  const profile = useAsyncResource(getProfile);
+  const stats = useAsyncResource(loadStats);
+  const [games, setGames] = useState<Game[]>([]);
+  const [historyError, setHistoryError] = useState('');
+  const [historyLoading, setHistoryLoading] = useState(true);
+  const [aboutOpen, setAboutOpen] = useState(false);
+  const [copied, setCopied] = useState(false);
+  const [logoutPending, setLogoutPending] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    listMyGames({ gameType: 'davinci', limit: 20, offset: 0 })
+      .then(result => { if (active) setGames(result.games ?? []); })
+      .catch(reason => { if (active) setHistoryError(reason instanceof Error ? reason.message : '历史记录加载失败'); })
+      .finally(() => { if (active) setHistoryLoading(false); });
+    return () => { active = false; };
+  }, []);
+  const handleLogout = useCallback(async () => {
+    if (!window.confirm('确定要退出登录吗？')) return;
+    setLogoutPending(true);
+    try {
+      await logout();
+      localStorage.removeItem('profile');
+      window.location.href = 'https://auth.gamebus.online/login?redirect=' + encodeURIComponent(window.location.href);
+    } catch {
+      setLogoutPending(false);
+    }
+  }, []);
+  const copyQQ = async () => {
+    try {
+      await navigator.clipboard.writeText('1522457543');
+      setCopied(true);
+    } catch {
+      setCopied(false);
+    }
+  };
+  const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
+
+  return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page}>
+    <header className={styles.heading}><div><small>YOUR CIPHER RECORD</small><h1>身份、判断与每一场对决。</h1></div><UserRoundIcon /></header>
+    {loading ? <DavinciLoading title="正在整理你的破译档案。" description="同步身份、战绩与历史对局" /> : <div className={styles.profileLayout}>
+      <section className={styles.profileSummary}>
+        {profile.data && <><PlayerAvatar name={profile.data.name} avatar={profile.data.avatar} size={70} />
+          <div><small>PLAYER ID · {profile.data.id}</small><h2>{profile.data.name}</h2><span><Mail size={13} />{profile.data.email || '邮箱未绑定'}</span></div></>}
+        <div className={styles.profileStats}><span><b>{stats.data?.totalGames ?? '—'}</b><small>对局</small></span>
+          <span><b>{stats.data?.wins ?? '—'}</b><small>胜场</small></span>
+          <span><b>{stats.data ? `${(stats.data.winRate * 100).toFixed(0)}%` : '—'}</b><small>胜率</small></span></div>
+        <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
+          <ActionButton variant="quiet" pending={logoutPending} onClick={() => void handleLogout()}><LogOut size={14} />退出登录</ActionButton></div>
+      </section>
+      <section className={styles.history}><h2>最近对局</h2>
+        {games.map(game => {
+          const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id));
+          const opponent = game.players?.find(player => player.id !== me?.id);
+          return <article key={game.id}><span className={me?.isWinner ? styles.win : styles.loss}>{me?.isWinner ? '胜' : '负'}</span>
+            <div><strong>{opponent?.isAI ? 'AI 对手' : opponent?.playerID?.replace(/-\d+$/, '') || '未知对手'}</strong>
+              <small>{new Date(game.startedAt).toLocaleString('zh-CN')}</small></div>
+            <span><b>{Math.max(0, Math.round(game.durationSeconds / 60))}</b><small>分钟</small></span></article>;
+        })}
+        {historyError && <Feedback error>{historyError}</Feedback>}
+        {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link to="/game/davinci">去大厅开始第一局</Link></Feedback>}
+      </section>
+    </div>}
+    <button className={styles.about} type="button" onClick={() => { setCopied(false); setAboutOpen(true); }}><Info size={17} /><span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
+    {aboutOpen && <ResponsiveDialog title="关于 DaVinci Code Online" eyebrow="ABOUT & CONTACT" themeClassName={rootStyles.root}
+      onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
+      <div className={styles.aboutLinks}><button type="button" onClick={() => void copyQQ()}><MessageCircle size={19} /><span><b>{copied ? 'QQ 已复制' : 'QQ 联系作者'}</b><small>1522457543</small></span>{copied ? <Check size={15} /> : <Copy size={15} />}</button>
+        <a href="https://github.com/nciyuan9264/game-frontend" target="_blank" rel="noreferrer"><Code2 size={19} /><span><b>查看项目源码</b><small>nciyuan9264/game-frontend</small></span><ExternalLink size={15} /></a></div>
+    </ResponsiveDialog>}
+  </div></AppShell>;
+}
+
+function UserRoundIcon() {
+  return <span className={styles.headingIcon}><Fingerprint size={28} /></span>;
+}

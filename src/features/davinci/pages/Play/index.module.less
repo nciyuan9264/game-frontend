@@ -1,0 +1,75 @@
+.play { height: 100dvh; min-width: 0; display: grid; grid-template-rows: 66px 42px minmax(0,1fr) 34px; overflow: hidden; background: #101210; }
+.topbar { min-width: 0; display: grid; grid-template-columns: 220px minmax(0,1fr) 220px; align-items: center; gap: 15px; padding: 0 18px; border-bottom: 1px solid #3b423d; background: #151815; }
+.roomTools { display: flex; align-items: center; gap: 11px; min-width: 0;
+  > button, .ruleButton { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 1px solid #444b46; border-radius: 6px; color: #acb4ae; background: #222623; }
+  span { min-width: 0; } small { display: block; color: #7f8881; font-size: 7px; letter-spacing: .13em; } b { display: block; overflow: hidden; text-overflow: ellipsis; color: #d8d2c5; font: 11px/1.4 monospace; }
+}
+.phase { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 10px;
+  > i { width: 7px; height: 7px; border-radius: 50%; background: #b79b67; box-shadow: 0 0 9px #b79b6766; }
+  > span { min-width: 0; text-align: center; } strong, small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  strong { font: 600 14px/1.2 Georgia,serif; } small { margin-top: 3px; color: #8d968f; font-size: 9px; }
+}
+.myTurn > i { background: var(--game-success); box-shadow: 0 0 10px #78c69a88; animation: pulse 1.4s ease-in-out infinite; }
+.topActions { display: flex; align-items: center; justify-content: flex-end; gap: 8px; }
+.ruleButton { width: 34px; height: 34px; display: grid; place-items: center; flex-shrink: 0; padding: 0; border: 1px solid #444b46; border-radius: 6px; color: #acb4ae; background: #222623; }
+.timer { min-width: 61px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; gap: 6px; height: 34px; border: 1px solid #3e4540; border-radius: 6px; background: #1b1e1b;
+  small { color: #7f8881; font-size: 7px; } b { font: 700 12px/1 monospace; }
+  > div { padding: 0; border: 0; background: transparent; box-shadow: none; font-size: 12px; }
+}
+.activity { min-width: 0; display: flex; align-items: center; justify-content: center; gap: 8px; padding: 0 12px; border-bottom: 1px solid #303632; color: #9ca59e; background: #121512; font-size: 10px;
+  b { padding: 3px 7px; border-radius: 4px; color: #d8ddd8; background: #2a302b; }
+  span { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+}
+.correct { color: #a6d7b6; b { color: #bce8c9; background: #31543c; } }
+.wrong { color: #dba39c; b { color: #efb9b2; background: #573732; } }
+.board { min-height: 0; position: relative; overflow: hidden; border-block: 1px solid #222723; background: #121412; }
+.boardLabel { position: absolute; z-index: 4; left: 14px; display: flex; align-items: baseline; gap: 8px; pointer-events: none; text-shadow: 0 2px 6px #000;
+  span { color: #d4cec0; font-size: 9px; letter-spacing: .13em; } small { color: #777f79; font-size: 8px; }
+}
+.opponentLabel { top: 10px; }
+.selfLabel { bottom: 10px; }
+.legend { display: flex; align-items: center; gap: 16px; padding: 0 16px; border-top: 1px solid #343a36; color: #89928b; background: #151815; font-size: 8px;
+  span { display: flex; align-items: center; gap: 5px; } i { width: 8px; height: 8px; border: 1px solid #686f69; border-radius: 2px; }
+  em { margin-left: auto; color: #c4a973; font-style: normal; }
+}
+.ivory { background: #eee9dc; }
+.graphite { background: #282b29; }
+.green { background: #5da678; }
+.guessDialog { p { color: #9ca59e; text-align: center; }
+  > div { display: grid; grid-template-columns: repeat(6,1fr); gap: 8px; margin-top: 18px; }
+  button { aspect-ratio: 1; border: 1px solid #4b534d; border-radius: 5px; color: #ece7dc; background: #242824; font: 600 15px/1 Georgia,serif; }
+  .joker { grid-column: 1/-1; aspect-ratio: auto; min-height: 42px; color: #231f16; border-color: #ddc084; background: #d1aa67; font-size: 11px; letter-spacing: .13em; }
+}
+.rules { > header { display: flex; align-items: center; gap: 12px; padding-bottom: 18px; border-bottom: 1px solid #3b423d; color: #d2b372;
+    strong { color: #e6e3db; } p { margin-top: 3px; color: #8f9891; font-size: 10px; }
+  }
+  > div { display: grid; grid-template-columns: repeat(2,1fr); gap: 12px; margin-top: 17px; }
+  section { position: relative; padding: 17px; border: 1px solid #3f4641; border-radius: 7px; background: #1b1f1c;
+    > span { position: absolute; top: 13px; right: 13px; color: #7d725c; font: 9px/1 monospace; }
+    h3 { font-size: 13px; } ul { margin: 11px 0 0; padding-left: 16px; color: #9ba49d; font-size: 10px; line-height: 1.7; }
+  }
+}
+@keyframes pulse { 50% { opacity: .4; } }
+
+@media (max-width: 767px) {
+  .play { grid-template-rows: 56px 38px minmax(0,1fr) 31px; }
+  .topbar { grid-template-columns: 115px minmax(0,1fr) 85px; gap: 7px; padding: 0 8px; }
+  .roomTools { gap: 6px; > button { width: 31px; height: 31px; } }
+  .phase { gap: 6px; strong { font-size: 11px; } small { font-size: 7px; } }
+  .topActions { gap: 5px; > button:first-child { display: none; } }
+  .ruleButton { width: 31px; height: 31px; }
+  .timer { min-width: 48px; height: 31px; small { display: none; } }
+  .activity { font-size: 9px; }
+  .legend { gap: 10px; padding: 0 9px; em { font-size: 8px; } }
+  .boardLabel { left: 8px; span { font-size: 8px; } small { display: none; } }
+  .rules > div { grid-template-columns: 1fr; }
+}
+@media (orientation: landscape) and (max-height: 500px) {
+  .play { grid-template-rows: 45px 30px minmax(0,1fr) 26px; }
+  .topbar { grid-template-columns: 140px minmax(0,1fr) 90px; }
+  .roomTools > button, .ruleButton, .timer { height: 28px; }
+  .phase small { display: none; }
+  .activity { font-size: 8px; }
+  .boardLabel { display: none; }
+  .legend { span:nth-child(-n+2) { display: none; } }
+}

@@ -1,4 +1,3 @@
-import DaVinci from "@/view/DaVinci";
 import Acquire from "@/view/Acquire";
 import AcquireLobby from "@/features/acquire/pages/Lobby";
 import React, { lazy } from "react";
@@ -10,6 +9,11 @@ const Splendor = lazy(() => import("@/view/Splendor"));
 const AcquireRankings = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.Rankings })));
 const AcquireGuide = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.Guide })));
 const AcquireMy = lazy(() => import("@/features/acquire/pages/Community").then(module => ({ default: module.My })));
+const DavinciLobby = lazy(() => import("@/features/davinci/pages/Lobby"));
+const DavinciSession = lazy(() => import("@/features/davinci/pages/Session"));
+const DavinciRankings = lazy(() => import("@/features/davinci/pages/Community").then(module => ({ default: module.Rankings })));
+const DavinciGuide = lazy(() => import("@/features/davinci/pages/Community").then(module => ({ default: module.Guide })));
+const DavinciMy = lazy(() => import("@/features/davinci/pages/Community").then(module => ({ default: module.My })));
 
 export interface AppRoute {
   path: string;
@@ -36,11 +40,14 @@ export const routes: AppRoute[] = [
   },
   {
     path: "/game/davinci",
-    element: <GameBoard />
+    element: <DavinciLobby />
   },
+  { path: "/game/davinci/rankings", element: <DavinciRankings /> },
+  { path: "/game/davinci/guide", element: <DavinciGuide /> },
+  { path: "/game/davinci/me", element: <DavinciMy /> },
   {
     path: "/game/davinci/match",
-    element: <DaVinci />
+    element: <DavinciSession />
   },
   {
     path: "/game/splendor",

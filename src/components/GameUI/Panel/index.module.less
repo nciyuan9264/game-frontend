@@ -1,0 +1,15 @@
+.panel {
+  min-width: 0; padding: 22px;
+  border: 1px solid var(--game-line, #30434e); border-radius: 10px;
+  background: var(--game-panel-gradient, linear-gradient(130deg,#172a34,#12242f));
+}
+.eyebrow {
+  display: flex; align-items: center; gap: 8px;
+  color: var(--game-eyebrow, #a8a488); font-size: 9px; font-weight: 500; letter-spacing: .16em; line-height: 1.5;
+  &::before { content: ''; width: 21px; height: 1px; flex: 0 0 auto; background: currentColor; opacity: .75; }
+}
+.feedback {
+  padding: 12px 14px; border: 1px solid var(--game-feedback-border, #354e5a); border-radius: 6px;
+  color: var(--game-muted, #91a7b3); background: var(--game-feedback-bg, #0e1f2a); font-size: 13px;
+}
+.error { color: var(--game-danger, #edafa3); border-color: var(--game-danger-border, #76534c); }

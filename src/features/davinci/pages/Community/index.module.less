@@ -1,0 +1,96 @@
+.page { width: 100%; margin: auto; }
+.heading { display: flex; align-items: end; justify-content: space-between; margin-bottom: 24px; border-bottom: 1px solid #353b37; padding-bottom: 18px;
+  small { color: #b19a6f; font-size: 8px; letter-spacing: .18em; }
+  h1 { margin-top: 6px; font: 600 27px/1.3 Georgia,serif; }
+  > svg, .headingIcon { color: var(--game-accent); }
+}
+.rankSummary { display: flex; justify-content: space-between; align-items: center; padding: 22px 0; border-bottom: 1px solid #353b37;
+  > div { max-width: 560px; } small { color: #9a8f77; font-size: 8px; letter-spacing: .15em; } h2 { margin-top: 5px; font: 600 24px/1.3 Georgia,serif; } p { margin-top: 7px; color: #929b94; font-size: 12px; }
+  > span { min-width: 130px; text-align: right; b { display: block; margin-top: 5px; color: #e4c78e; font: 600 29px/1 Georgia,serif; } }
+}
+.rankTabs { display: flex; gap: 4px; margin: 20px 0 10px;
+  button { min-width: 90px; height: 38px; border: 0; border-bottom: 2px solid transparent; color: #939c95; background: transparent; font-size: 11px; }
+  .active { color: #dec28e; border-color: var(--game-accent); }
+}
+.rankList { border-top: 1px solid #3a413c;
+  > header, > div { display: grid; grid-template-columns: 70px minmax(180px,1fr) 90px 90px 90px; align-items: center; min-height: 57px; border-bottom: 1px solid #303632; }
+  > header { min-height: 38px; color: #7f8982; font-size: 9px; text-transform: uppercase; }
+  > div > span { color: #bfc5bf; font-size: 12px; }
+  > div > span:first-child { color: #d4b677; font: 600 14px/1 monospace; }
+  > div > span:nth-child(2) { display: flex; align-items: center; gap: 10px; min-width: 0; b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; } }
+  .mine { background: #d1aa6708; box-shadow: inset 2px 0 var(--game-accent); }
+}
+.loadMore { display: flex; margin: 18px auto 0; }
+.guideLayout { display: grid; grid-template-columns: minmax(280px,.8fr) minmax(0,1.2fr); gap: 28px; align-items: stretch; }
+.tileDemo { min-height: 430px; display: flex; flex-direction: column; justify-content: center; padding: 34px; border-right: 1px solid #3b423d; background: #151815;
+  > div { display: flex; justify-content: center; gap: 9px; }
+  > p { max-width: 420px; margin: 26px auto 0; color: #9ca59e; font-size: 12px; line-height: 1.8; text-align: center; }
+  footer { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; margin-top: 30px; color: #b7beb8; font-size: 10px; span { display: flex; align-items: center; gap: 6px; } }
+}
+.blackTile, .whiteTile { width: clamp(48px,6vw,68px); aspect-ratio: .68; display: grid; place-items: center; border-radius: 5px; box-shadow: 0 8px 16px #0006; font: 700 34px/1 Georgia,serif; }
+.blackTile { color: #eee9dc; border: 1px solid #5f665f; background: #242725; }
+.whiteTile { color: #252825; border: 1px solid #d1cbbd; background: #eee9dc; }
+.guidePanel { padding: 28px 10px 28px 0;
+  > small { color: #b29a6c; font-size: 8px; letter-spacing: .18em; }
+  > h2 { max-width: 580px; margin-top: 10px; font: 600 25px/1.35 Georgia,serif; }
+  > p { max-width: 640px; margin-top: 13px; color: #9da69f; line-height: 1.8; }
+  ol { margin: 21px 0; padding: 0; list-style: none; counter-reset: guide;
+    li { counter-increment: guide; position: relative; padding: 11px 0 11px 38px; border-bottom: 1px solid #303632; color: #c7ccc7; font-size: 12px; }
+    li::before { content: counter(guide,decimal-leading-zero); position: absolute; left: 0; color: #c0a56f; font: 10px/1.6 monospace; }
+  }
+}
+.guideTabs { display: flex; margin-bottom: 28px; border-bottom: 1px solid #353b37;
+  button { flex: 1; min-height: 39px; border: 0; border-bottom: 2px solid transparent; color: #89928b; background: transparent; font-size: 10px; }
+  .active { color: #dfc28a; border-color: var(--game-accent); }
+}
+.guideHint { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; color: #8f9991; font-size: 11px; }
+.profileLayout { display: grid; grid-template-columns: 340px minmax(0,1fr); gap: 34px; }
+.profileSummary { padding-right: 30px; border-right: 1px solid #383e3a;
+  > div:nth-of-type(1) { margin-top: 15px; small { color: #858e87; font-size: 9px; } h2 { margin-top: 5px; font: 600 25px/1.3 Georgia,serif; } span { display: flex; align-items: center; gap: 6px; margin-top: 8px; color: #969f98; font-size: 11px; } }
+}
+.profileStats { display: grid; grid-template-columns: repeat(3,1fr); margin-top: 24px; padding: 18px 0; border-block: 1px solid #353b37;
+  span { text-align: center; } b { display: block; color: #e9e5da; font: 600 23px/1 Georgia,serif; } small { color: #848d86; font-size: 9px; }
+}
+.profileActions { display: flex; align-items: center; justify-content: space-between; margin-top: 16px;
+  a { display: flex; align-items: center; gap: 6px; color: #d5bb88; font-size: 11px; }
+}
+.history { h2 { margin-bottom: 12px; font: 600 19px/1.3 Georgia,serif; }
+  > article { display: grid; grid-template-columns: 34px minmax(0,1fr) 60px; align-items: center; gap: 12px; min-height: 62px; border-bottom: 1px solid #313733;
+    > span:first-child { width: 29px; height: 29px; display: grid; place-items: center; border-radius: 50%; font-size: 11px; font-weight: 700; }
+    > div { min-width: 0; strong, small { display: block; } strong { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; } small { margin-top: 3px; color: #7f8982; font-size: 9px; } }
+    > span:last-child { text-align: right; b,small { display: block; } b { font: 600 17px/1 Georgia,serif; } small { color: #7f8982; font-size: 8px; } }
+  }
+  a { color: #d4b77d; }
+}
+.win { color: #bde1ca; background: #47735a66; }
+.loss { color: #edb0a8; background: #77494066; }
+.about { width: 100%; min-height: 58px; margin-top: 28px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border: 1px solid #383f3a; border-radius: 6px; color: #b8bfb9; background: #171a18; text-align: left;
+  > span { flex: 1; b,small { display: block; } b { font-size: 11px; } small { color: #7f8982; font-size: 9px; } }
+}
+.aboutLinks { display: grid; gap: 10px;
+  button, a { min-height: 59px; display: flex; align-items: center; gap: 12px; padding: 0 14px; border: 1px solid #414843; border-radius: 6px; color: #d8dcd7; background: #1b1f1c; text-align: left; }
+  span { flex: 1; b,small { display: block; } small { color: #858e87; font-size: 10px; } }
+}
+
+@media (min-width: 768px) {
+  .guideLayout { max-width: 1040px; }
+  .tileDemo { min-height: 520px; }
+  .guidePanel { min-height: 520px; }
+}
+@media (min-width: 1200px) {
+  .guideLayout { max-width: 1120px; }
+  .tileDemo { min-height: 560px; }
+  .guidePanel { min-height: 560px; }
+}
+
+@media (max-width: 767px) {
+  .heading { align-items: center; margin-bottom: 18px; h1 { font-size: 22px; } }
+  .rankSummary { align-items: flex-start; > span { min-width: 70px; } p { display: none; } h2 { font-size: 20px; } }
+  .rankList { overflow-x: auto; > header, > div { min-width: 600px; } }
+  .guideLayout, .profileLayout { grid-template-columns: 1fr; gap: 20px; }
+  .tileDemo { min-height: 260px; padding: 24px 15px; border-right: 0; border-bottom: 1px solid #3b423d; }
+  .blackTile, .whiteTile { font-size: 27px; }
+  .guidePanel { padding: 0; }
+  .guideTabs { margin-bottom: 21px; button { font-size: 9px; } }
+  .profileSummary { padding-right: 0; padding-bottom: 22px; border-right: 0; border-bottom: 1px solid #383e3a; }
+}
