@@ -1,6 +1,6 @@
 import { useState } from 'react';
 import { ShieldCheck } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { money, type DisplaySnapshot } from '../../model/session';
 import { companyKeys, companyPriceTiers } from '../../model/types';

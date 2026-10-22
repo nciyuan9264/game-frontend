@@ -1,11 +1,12 @@
 import { ArrowRight, BookOpen, Building2, KeyRound, Plus, RefreshCw, Search, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
+import { GameTabs } from '@/components/GameUI/GameTabs';
 import type { UserProfile } from '@/hooks/request/useProfile';
-import type { Stats } from '@/types/history';
-import { ActionButton } from '../../components/ActionButton';
+import type { Stats } from '@/features/game-core/model/history';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import { PlayerAvatar } from '../../components/AppShell';
-import { Eyebrow, Feedback, Panel } from '../../components/Panel';
+import { Eyebrow, Feedback, Panel } from '@/components/GameUI/Panel';
 import { RoomCard } from '../../components/RoomCard';
 import { useAcquireLobby } from '../../hooks/useAcquireLobby';
 import type { AcquireRoom, Company, LobbyFilter } from '../../model/types';
@@ -44,13 +45,17 @@ export function LobbyHero({ onCreate, onShare, onCompany }: Pick<LobbyViewProps,
   </div></>;
 }
 export function RoomBrowser({ lobby, playerID, onEnter }: Pick<LobbyViewProps, 'lobby' | 'playerID' | 'onEnter'>) {
-  const filters: [LobbyFilter, string][] = [['all', '全部房间'], ['joinable', '可加入'], ['playing', '对局中']];
+  const filters: Array<{ value: LobbyFilter; label: string }> = [
+    { value: 'all', label: '全部房间' },
+    { value: 'joinable', label: '可加入' },
+    { value: 'playing', label: '对局中' },
+  ];
   return <section className={styles.browser} aria-label="可见房间">
     <div className={styles.heading}><div><Eyebrow>FIND YOUR TABLE</Eyebrow><h2>找到房间，一起开场。</h2></div><span>可见房间</span></div>
     <div className={styles.filters}>
-      <div className={styles.tabs} aria-label="房间状态">{filters.map(([key, label]) =>
-        <button type="button" key={key} data-click-sound="tab" aria-pressed={lobby.filter === key} className={lobby.filter === key ? styles.selected : ''}
-          onClick={() => lobby.setFilter(key)}>{label}</button>)}</div>
+      <GameTabs items={filters} value={lobby.filter} onChange={lobby.setFilter}
+        ariaLabel="房间状态" className={styles.tabs} activeClassName={styles.selected}
+        getItemProps={() => ({ 'data-click-sound': 'tab' })} />
       <label className={styles.search}><Search size={16} /><input aria-label="搜索房间号或房主" placeholder="搜索房间号 / 房主" value={lobby.query} onChange={event => lobby.setQuery(event.target.value)} /></label>
     </div>
     {lobby.error && !lobby.hasLoaded ? <div className={styles.empty}><RefreshCw size={36} />

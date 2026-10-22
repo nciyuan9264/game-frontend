@@ -4,6 +4,7 @@ import { Suspense } from 'react';
 import { LoadingBlock } from '@/components/LoadingBlock/index.tsx';
 import { AcquireLoading } from '@/features/acquire/components/LoadingState';
 import { DavinciLoading } from '@/features/davinci/components/LoadingState';
+import { SplendorLoading } from '@/features/splendor/components/LoadingState';
 
 /**
  * 渲染路由
@@ -16,7 +17,9 @@ export const RenderRoutes = () => {
                 ? <AcquireLoading fullScreen title="正在进入午夜董事会。" description="正在准备城市与牌桌资源" />
                 : route.path.startsWith('/game/davinci')
                     ? <DavinciLoading fullScreen />
-                    : <LoadingBlock />;
+                    : route.path.startsWith('/game/splendor')
+                        ? <SplendorLoading fullScreen />
+                        : <LoadingBlock />;
             return (
                 <Route
                     key={route.path}

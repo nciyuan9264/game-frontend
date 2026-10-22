@@ -1,7 +1,7 @@
 import { ArrowRight, Building2, Lock, Users } from 'lucide-react';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import type { AcquireRoom } from '../../model/types';
 import { roomEntry, roomOwnerName } from '../../model/adapters';
-import { ActionButton } from '../ActionButton';
 import { PlayerAvatar } from '../AppShell';
 import styles from './index.module.less';
 

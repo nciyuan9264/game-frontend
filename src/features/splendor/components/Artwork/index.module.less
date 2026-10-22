@@ -1,0 +1,52 @@
+.artwork {
+  display: block;
+  flex-shrink: 0;
+  overflow: hidden;
+
+  svg {
+    display: block;
+    overflow: hidden;
+  }
+}
+
+.gem {
+  display: inline-block;
+  flex-shrink: 0;
+  filter: drop-shadow(0 1px 1px #34252217);
+}
+
+.brandMark {
+  position: relative;
+  display: inline-flex;
+  width: 32px;
+  align-items: center;
+  justify-content: center;
+  color: var(--wine);
+
+  i {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    background: var(--gold);
+    transform: translate(-50%, -50%) rotate(45deg);
+  }
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--gold);
+  font-size: 10px;
+  font-weight: 600;
+  line-height: 1.5;
+  letter-spacing: 2px;
+
+  i {
+    width: 16px;
+    height: 1px;
+    background: currentColor;
+  }
+}

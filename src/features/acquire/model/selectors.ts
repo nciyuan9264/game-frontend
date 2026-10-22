@@ -73,7 +73,9 @@ export function mergePreview(data: GameSnapshot, draft: MergeDraft) {
     groups += action.groups; revenue += action.sell * data.roomData.companyInfo[key].stockPrice;
     retained += held - action.sell - action.groups * 2;
   }
-  const stock = data.roomData.companyInfo[data.tempData.merge_main_company_temp]?.stockTotal ?? 0;
+  const stock = data.roomData.companyInfo[
+    data.tempData.merge_main_company_temp as Company
+  ]?.stockTotal ?? 0;
   return { groups, revenue, retained, stock, valid: valid && groups <= stock && companies.length > 0 };
 }
 

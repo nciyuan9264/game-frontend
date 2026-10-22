@@ -1,9 +1,11 @@
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
-import { getProfile } from '@/api/room';
+import { getProfile } from '@/features/game-core/api/auth';
+import { lookupGameRoom } from '@/features/game-core/api/room';
 import { AppShell } from '../../components/AppShell';
-import { ActionButton } from '../../components/ActionButton';
-import { Feedback } from '../../components/Panel';
+import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Feedback } from '@/components/GameUI/Panel';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { useAcquireSession } from '../../hooks/useAcquireSession';
 import { useAcquireInteraction } from '../../hooks/useAcquireInteraction';
@@ -15,8 +17,8 @@ import { Play } from '../Play';
 import { SessionExitState } from './ExitState';
 import { AcquireSessionLoading } from './Loading';
 
-function Session({ roomID }: { roomID: string }) {
-  const session = useAcquireSession(roomID);
+function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
+  const session = useAcquireSession(roomID, matchID);
   const interaction = useAcquireInteraction(session);
   const leave = useAcquireLeave(session.connection.close);
   const { connection, snapshot } = session;
@@ -49,14 +51,25 @@ function Session({ roomID }: { roomID: string }) {
 export default function AcquireSessionPage() {
   const [params] = useSearchParams();
   const roomID = params.get('roomID') ?? '';
-  const auth = useAcquireResource(getProfile);
-  if (auth.loading && !auth.data) return <AcquireSessionLoading />;
-  if (!auth.data) return <AppShell inMatch hideRail title="经典对局">
+  const loadTarget = useCallback(async () => {
+    const profile = await getProfile();
+    if (!roomID) return { profile, matchID: '' };
+    const room = await lookupGameRoom('acquire', roomID);
+    if (!room.currentMatchID) throw new Error('当前房间没有可连接的对局');
+    return { profile, matchID: room.currentMatchID };
+  }, [roomID]);
+  const target = useAcquireResource(loadTarget);
+  if (target.loading && !target.data) return <AcquireSessionLoading />;
+  if (!target.data) return <AppShell inMatch hideRail title="经典对局">
     <Feedback error>
-      登录状态确认失败
-      <span>{auth.error || '暂时无法验证登录状态，请重试。'}</span>
-      <ActionButton onClick={auth.retry}><RefreshCw size={14} />重新验证</ActionButton>
+      对局信息确认失败
+      <span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
+      <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton>
     </Feedback>
   </AppShell>;
-  return <Session key={roomID} roomID={roomID} />;
+  return <Session
+    key={`${roomID}:${target.data.matchID}`}
+    roomID={roomID}
+    matchID={target.data.matchID}
+  />;
 }

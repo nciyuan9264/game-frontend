@@ -1,7 +1,7 @@
-import { getProfile } from '@/api/room';
 import { useRequest } from 'ahooks';
 import { message } from 'antd';
 import { useState } from 'react';
+import { getProfile } from '@/features/game-core/api/auth';
 
 export interface UserProfile {
   name: string;

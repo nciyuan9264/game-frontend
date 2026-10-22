@@ -1,5 +1,5 @@
 import { Building2, Check, Flag, ShieldCheck, UsersRound } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { endGameState, type GameSnapshot } from '../../model/session';

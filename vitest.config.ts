@@ -7,7 +7,8 @@ export default defineConfig({
     environment: 'jsdom',
     include: [
       'src/components/GameUI/**/*.test.{ts,tsx}',
-      'src/features/{acquire,davinci}/**/*.test.{ts,tsx}',
+      'src/features/game-core/**/*.test.{ts,tsx}',
+      'src/features/{acquire,davinci,splendor}/**/*.test.{ts,tsx}',
     ],
     restoreMocks: true,
     clearMocks: true,

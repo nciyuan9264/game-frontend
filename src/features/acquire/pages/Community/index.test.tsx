@@ -2,7 +2,10 @@ import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/re
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { Guide, My, Rankings } from '.';
-import type { LeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
+import type {
+  LeaderboardEntry,
+  LeaderboardSortDim,
+} from '@/features/game-core/model/history';
 
 const api = vi.hoisted(() => ({
   getProfile: vi.fn(),
@@ -12,9 +15,12 @@ const api = vi.hoisted(() => ({
   listMyGames: vi.fn(),
 }));
 
-vi.mock('@/api/room', () => ({ getProfile: api.getProfile, logout: api.logout }));
-vi.mock('@/api/leaderboard', () => ({ getLeaderboard: api.getLeaderboard }));
-vi.mock('@/api/history', () => ({
+vi.mock('@/features/game-core/api/auth', () => ({
+  getProfile: api.getProfile,
+  logout: api.logout,
+}));
+vi.mock('@/features/game-core/api/history', () => ({
+  getLeaderboard: api.getLeaderboard,
   getMyStats: api.getMyStats,
   listMyGames: api.listMyGames,
 }));
@@ -142,8 +148,12 @@ describe('Acquire community rankings', () => {
     expect(screen.queryByText(/按平均名次/)).toBeNull();
 
     await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledTimes(2));
-    expect(api.getLeaderboard).toHaveBeenNthCalledWith(1, { gameType: 'acquire', limit: 8, offset: 0, sort: 'metric' });
-    expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, { gameType: 'acquire', limit: 8, offset: 8, sort: 'metric' });
+    expect(api.getLeaderboard).toHaveBeenNthCalledWith(1, {
+      gameType: 'acquire', limit: 8, offset: 0, sort: 'metric', signal: expect.any(AbortSignal),
+    });
+    expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, {
+      gameType: 'acquire', limit: 8, offset: 8, sort: 'metric', signal: expect.any(AbortSignal),
+    });
     expect(await screen.findByText('玩家 9')).toBeTruthy();
   });
 
@@ -153,13 +163,14 @@ describe('Acquire community rankings', () => {
     </MemoryRouter>);
 
     await screen.findByText('玩家 1');
-    fireEvent.click(screen.getByRole('button', { name: '场次榜' }));
+    fireEvent.click(screen.getByRole('tab', { name: '场次榜' }));
 
     await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledWith({
       gameType: 'acquire',
       limit: 8,
       offset: 0,
       sort: 'totalGames',
+      signal: expect.any(AbortSignal),
     }));
   });
 });

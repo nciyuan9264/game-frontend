@@ -1,0 +1,96 @@
+.root {
+  --paper: #f6f3ed;
+  --surface: #fffdf8;
+  --ink: #342f2d;
+  --muted: #837970;
+  --line: #e5ded3;
+  --wine: #713a47;
+  --wine-dark: #532733;
+  --gold: #af8b51;
+  --serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+
+  --game-bg: var(--paper);
+  --game-panel: var(--surface);
+  --game-raised: #f0e8dc;
+  --game-line: var(--line);
+  --game-accent: var(--wine);
+  --game-primary: var(--wine);
+  --game-primary-gradient: none;
+  --game-primary-border: var(--wine);
+  --game-primary-hover-border: var(--wine-dark);
+  --game-primary-text: #fff7ee;
+  --game-text: var(--ink);
+  --game-muted: var(--muted);
+  --game-placeholder: #a4998e;
+  --game-success: #547461;
+  --game-danger: #a34f51;
+  --game-danger-text: #9e4548;
+  --game-danger-bg: #f8e8e5;
+  --game-danger-border: #d9a7a3;
+  --game-danger-hover-bg: #f2d9d5;
+  --game-danger-hover-border: #c7857f;
+  --game-button-bg: var(--surface);
+  --game-button-border: #dcd1c5;
+  --game-button-text: #6e514c;
+  --game-button-hover-bg: #eee6dc;
+  --game-button-hover-border: #c3ad9a;
+  --game-panel-gradient: linear-gradient(145deg, #fffdf8, #f6f0e7);
+  --game-feedback-bg: #fffaf1;
+  --game-feedback-border: #e3d7c4;
+  --game-eyebrow: var(--gold);
+  --game-dialog-bg: #faf6ee;
+  --game-dialog-footer-bg: #f9f4eb;
+  --game-dialog-border: #ede4d8;
+  --game-dialog-line: #e7dccd;
+  --game-dialog-close-bg: transparent;
+  --game-dialog-close-border: transparent;
+  --game-dialog-close-text: #a8947e;
+  --game-dialog-backdrop: #2e24245c;
+  --game-dialog-handle: #d4c5b2;
+  --game-dialog-shadow: 0 24px 90px #2b171e40;
+  --game-scroll-track: #f6f0e7;
+  --game-scroll-thumb: #cbbba9;
+  --game-scroll-thumb-hover: #ab9278;
+  --game-feedback-particle-1: #713a47;
+  --game-feedback-particle-2: #547461;
+  --game-feedback-particle-3: #af8b51;
+
+  min-height: 100%;
+  color-scheme: light;
+  color: var(--ink);
+  background: var(--paper);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  letter-spacing: 0;
+
+  button, input, select, textarea { letter-spacing: 0; }
+  button:not([data-game-action-button]) {
+    border: 0;
+    background: none;
+    color: inherit;
+  }
+  h1, h2 { font-family: var(--serif); font-weight: 500; }
+}
+
+.highContrast {
+  --muted: #645449;
+  --game-muted: #645449;
+  --game-placeholder: #74614e;
+}
+
+.reduceMotion {
+  &, * { scroll-behavior: auto !important; }
+  *, *::before, *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: .001ms !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root *, .root *::before, .root *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .001ms !important;
+  }
+}

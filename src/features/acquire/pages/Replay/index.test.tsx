@@ -1,7 +1,10 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GameDetailData, Snapshot } from '@/types/history';
+import type {
+  GameDetailData,
+  Snapshot,
+} from '@/features/game-core/model/history';
 import { companyKeys } from '../../model/types';
 import Replay from '.';
 
@@ -11,8 +14,8 @@ const api = vi.hoisted(() => ({
   getSnapshotPage: vi.fn(),
 }));
 
-vi.mock('@/api/room', () => ({ getProfile: api.getProfile }));
-vi.mock('@/api/history', () => ({
+vi.mock('@/features/game-core/api/auth', () => ({ getProfile: api.getProfile }));
+vi.mock('@/features/game-core/api/history', () => ({
   getGameDetail: api.getGameDetail,
   getSnapshotPage: api.getSnapshotPage,
 }));

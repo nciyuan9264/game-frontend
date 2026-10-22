@@ -6,10 +6,12 @@ import { SessionExitState } from './ExitState';
 
 const mocks = vi.hoisted(() => ({
   getProfile: vi.fn(),
+  lookupGameRoom: vi.fn(),
   useAcquireSession: vi.fn(),
 }));
 
-vi.mock('@/api/room', () => ({ getProfile: mocks.getProfile }));
+vi.mock('@/features/game-core/api/auth', () => ({ getProfile: mocks.getProfile }));
+vi.mock('@/features/game-core/api/room', () => ({ lookupGameRoom: mocks.lookupGameRoom }));
 vi.mock('../../hooks/useAcquireSession', () => ({ useAcquireSession: mocks.useAcquireSession }));
 vi.mock('../../hooks/useAcquireInteraction', () => ({ useAcquireInteraction: vi.fn(() => ({})) }));
 vi.mock('../../hooks/useAcquireLeave', () => ({
@@ -23,7 +25,9 @@ vi.mock('../../hooks/useAcquireLeave', () => ({
 
 beforeEach(() => {
   mocks.getProfile.mockReset();
+  mocks.lookupGameRoom.mockReset();
   mocks.useAcquireSession.mockReset();
+  mocks.lookupGameRoom.mockResolvedValue({ currentMatchID: 'match-1' });
   mocks.useAcquireSession.mockReturnValue({
     snapshot: undefined,
     pending: undefined,
@@ -70,7 +74,7 @@ describe('Acquire session authentication preflight', () => {
       resolveProfile({ id: '42', name: 'Alice', email: 'alice@example.com' });
     });
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1', 'match-1'));
   });
 
   it('keeps the session closed after verification failure and supports retrying', async () => {
@@ -80,12 +84,12 @@ describe('Acquire session authentication preflight', () => {
       <AcquireSessionPage />
     </MemoryRouter>);
 
-    expect(await screen.findByText('登录状态确认失败')).toBeTruthy();
+    expect(await screen.findByText('对局信息确认失败')).toBeTruthy();
     expect(mocks.useAcquireSession).not.toHaveBeenCalled();
 
     mocks.getProfile.mockResolvedValue({ id: '42', name: 'Alice', email: 'alice@example.com' });
     fireEvent.click(screen.getByRole('button', { name: '重新验证' }));
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2', 'match-1'));
   });
 });

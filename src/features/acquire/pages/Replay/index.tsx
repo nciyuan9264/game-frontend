@@ -5,11 +5,11 @@ import { ArrowLeft, ChevronDown, ChevronUp, GripHorizontal, Maximize2 } from 'lu
 import { snapshotToWsRoomSyncData } from './snapshotAdapter';
 import EconomyChart from './EconomyChart';
 import { AppShell } from '../../components/AppShell';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Board } from '../../components/Board';
 import { MarketTable } from '../../components/MarketTable';
 import { AcquireLoading } from '../../components/LoadingState';
-import { Feedback } from '../../components/Panel';
+import { Feedback } from '@/components/GameUI/Panel';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { StockPrices } from '../../dialogs/StockPrices';
 import { companyPriceTiers, type Company } from '../../model/types';

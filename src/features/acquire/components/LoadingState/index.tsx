@@ -1,5 +1,5 @@
 import { AcquireMark } from '../AppShell';
-import { Eyebrow } from '../Panel';
+import { Eyebrow } from '@/components/GameUI/Panel';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 

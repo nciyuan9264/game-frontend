@@ -1,11 +1,11 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { ArrowRight, Check, Coins, Layers, LoaderCircle, Lock, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
-import { Feedback } from '../../components/Panel';
+import { Feedback } from '@/components/GameUI/Panel';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
 import { buyPreview, mergeCompanies, mergePreview, pendingMergePlayers, settledMergeCompanies } from '../../model/selectors';

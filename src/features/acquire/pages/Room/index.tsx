@@ -1,6 +1,6 @@
 import { useState, type ReactNode } from 'react';
 import { ArrowLeft, ArrowRight, Check, Clock, Copy, Globe, Layers, Lock, Plus, Settings2, ShieldCheck, UserPlus, Wallet } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { useAcquireViewport } from '../../hooks/useAcquireViewport';

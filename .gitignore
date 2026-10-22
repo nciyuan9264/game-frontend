@@ -2,3 +2,4 @@ dist
 node_modules
 showcase/
 .env*.local
+.DS_Store

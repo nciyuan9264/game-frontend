@@ -12,6 +12,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          path: game/game-frontend
+
+      - name: Checkout pinned IDL
+        uses: actions/checkout@v4
+        with:
+          repository: nciyuan9264/pam-idl
+          ref: bfa32fb7b35dc37d382bf879a947fa5ad6d99419
+          path: pam-idl
+
+      - name: Checkout pinned generator
+        uses: actions/checkout@v4
+        with:
+          repository: nciyuan9264/pam-generate
+          ref: 609f369d9dee06920c9d40abebc2d2b38ee4631f
+          path: pam-generate
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v2
@@ -24,10 +40,20 @@ jobs:
           node-version: 20
 
       - name: Install dependencies
+        working-directory: game/game-frontend
         run: pnpm install
 
-      - name: Build project
-        run: pnpm run build
+      - name: Build generator
+        working-directory: pam-generate
+        run: npm ci && npm run build
+
+      - name: Verify generated API and quality gates
+        working-directory: game/game-frontend
+        run: |
+          pnpm check:generated
+          pnpm lint
+          pnpm test
+          pnpm build
 
       - name: Setup ossutil
         run: |
@@ -44,7 +70,7 @@ jobs:
 
       - name: Upload to OSS (mirror deploy)
         run: |
-          ossutil sync dist/ oss://${{ secrets.OSS_BUCKET }}/ \
+          ossutil sync game/game-frontend/dist/ oss://${{ secrets.OSS_BUCKET }}/ \
             --delete \
             --force
 

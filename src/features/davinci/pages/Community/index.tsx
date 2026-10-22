@@ -1,25 +1,33 @@
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, BookOpen, Check, Clock, Code2, Copy, ExternalLink, Fingerprint,
   Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
-import { getProfile, logout } from '@/api/room';
-import { getMyStats, listMyGames } from '@/api/history';
-import { getLeaderboard } from '@/api/leaderboard';
+import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
-import type { Game } from '@/types/history';
-import type { DavinciLeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
+import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
+import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
+import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
+import { useGameStats } from '@/features/game-core/hooks/useGameStats';
+import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import type {
+  DavinciLeaderboardEntry,
+  LeaderboardEntry,
+  LeaderboardSortDim,
+} from '@/features/game-core/model/history';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { DavinciLoading } from '../../components/LoadingState';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
-const loadStats = () => getMyStats('davinci');
 const PAGE_SIZE = 20;
+const isDavinciEntry = (entry: LeaderboardEntry):
+  entry is DavinciLeaderboardEntry => 'winRate' in entry;
 const guideSteps = [
   {
     tab: '牌序',
@@ -50,47 +58,22 @@ const guideSteps = [
 export function Rankings() {
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'wins' | 'games'>('wins');
-  const [entries, setEntries] = useState<DavinciLeaderboardEntry[]>([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const requestSequence = useRef(0);
   const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
-
-  useEffect(() => {
-    const requestID = ++requestSequence.current;
-    setLoading(true);
-    setError('');
-    getLeaderboard({ gameType: 'davinci', limit: PAGE_SIZE, offset: page * PAGE_SIZE, sort })
-      .then(result => {
-        if (requestID !== requestSequence.current) return;
-        const next = result.entries.filter((entry): entry is DavinciLeaderboardEntry => 'winRate' in entry);
-        setEntries(current => page === 0 ? next : [...current, ...next.filter(entry => !current.some(item => item.userID === entry.userID))]);
-        setHasMore(next.length === PAGE_SIZE);
-      })
-      .catch(reason => {
-        if (requestID === requestSequence.current) setError(reason instanceof Error ? reason.message : '排行榜加载失败');
-      })
-      .finally(() => { if (requestID === requestSequence.current) setLoading(false); });
-    return () => { requestSequence.current = requestID + 1; };
-  }, [page, sort]);
-
-  const changeMode = (next: 'wins' | 'games') => {
-    if (next === mode) return;
-    setMode(next);
-    setEntries([]);
-    setHasMore(true);
-    setPage(0);
-  };
+  const { entries, loading, error, hasMore, loadMore } = useGameLeaderboard<DavinciLeaderboardEntry>({
+    gameType: 'davinci',
+    pageSize: PAGE_SIZE,
+    sort,
+    isEntry: isDavinciEntry,
+  });
   const myIndex = entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
 
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page}>
     <header className={styles.heading}><div><small>THE SHARPEST MINDS</small><h1>每一次破解，都留下记录。</h1></div><Trophy size={30} /></header>
     <section className={styles.rankSummary}><div><small>DAVINCI LEADERBOARD</small><h2>密码破译榜</h2><p>胜率记录判断的准确度，场次记录持续对局的经验。</p></div>
       <span><small>我的排名</small><b>{myIndex >= 0 ? `#${myIndex + 1}` : '—'}</b></span></section>
-    <div className={styles.rankTabs}><button className={mode === 'wins' ? styles.active : ''} onClick={() => changeMode('wins')}>胜率榜</button>
-      <button className={mode === 'games' ? styles.active : ''} onClick={() => changeMode('games')}>场次榜</button></div>
+    <GameTabs className={styles.rankTabs} activeClassName={styles.active}
+      ariaLabel="排行榜模式" value={mode} onChange={setMode}
+      items={[{ value: 'wins', label: '胜率榜' }, { value: 'games', label: '场次榜' }]} />
     <section className={styles.rankList}>
       <header><span>名次</span><span>玩家</span><span>胜场</span><span>胜率</span><span>对局</span></header>
       {entries.map((entry, index) => <div key={entry.userID} className={String(entry.userID) === String(profile.data?.id) ? styles.mine : ''}>
@@ -102,16 +85,15 @@ export function Rankings() {
       {error && <Feedback error>{error}</Feedback>}
       {!loading && !error && !entries.length && <Feedback>暂时还没有排行记录。</Feedback>}
     </section>
-    {hasMore && !!entries.length && <ActionButton className={styles.loadMore} pending={loading} onClick={() => setPage(value => value + 1)}>加载更多</ActionButton>}
+    {hasMore && !!entries.length && <ActionButton className={styles.loadMore} pending={loading} onClick={loadMore}>加载更多</ActionButton>}
   </div></AppShell>;
 }
 
 export function Guide() {
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
-  const [stepIndex, setStepIndex] = useState(0);
-  const step = guideSteps[stepIndex];
-  const last = stepIndex === guideSteps.length - 1;
+  const guide = useGuideSteps(guideSteps);
+  const step = guide.current;
   return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
     <header className={styles.heading}><div><small>LEARN THE CIPHER</small><h1>四步，读懂一场密码对决。</h1></div><BookOpen size={30} /></header>
     <div className={styles.guideLayout}><aside className={styles.tileDemo}>
@@ -119,15 +101,17 @@ export function Guide() {
       <p>黑 3 排在白 3 之前；JOKER 可以隐藏在任意位置。</p>
       <footer><span><Users size={16} />2 人</span><span><Clock size={16} />约 20 分钟</span><span><Fingerprint size={16} />26 张牌</span></footer>
     </aside><section className={styles.guidePanel}>
-      <div className={styles.guideTabs} role="tablist" aria-label="玩法章节">{guideSteps.map((item, index) =>
-        <button key={item.tab} role="tab" aria-selected={stepIndex === index} className={stepIndex === index ? styles.active : ''} onClick={() => setStepIndex(index)}>
-          {String(index + 1).padStart(2, '0')} {item.tab}
-        </button>)}</div>
+      <GameTabs className={styles.guideTabs} activeClassName={styles.active}
+        ariaLabel="玩法章节" value={guide.index} onChange={guide.select}
+        items={guideSteps.map((item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+        }))} />
       <small>THE ESSENTIALS</small><h2>{step.title}</h2><p>{step.text}</p>
       <ol>{step.points.map(point => <li key={point}>{point}</li>)}</ol>
       <div className={styles.guideHint}><ShieldCheck size={16} />在线对局的合法操作与牌序由服务端校验。</div>
-      <ActionButton variant="primary" onClick={() => last ? navigate('/game/davinci') : setStepIndex(index => index + 1)}>
-        {last ? '进入大厅' : '下一步'}<ArrowRight size={16} />
+      <ActionButton variant="primary" onClick={() => guide.isLast ? navigate('/game/davinci') : guide.next()}>
+        {guide.isLast ? '进入大厅' : '下一步'}<ArrowRight size={16} />
       </ActionButton>
     </section></div>
   </div></AppShell>;
@@ -135,33 +119,19 @@ export function Guide() {
 
 export function My() {
   const profile = useAsyncResource(getProfile);
-  const stats = useAsyncResource(loadStats);
-  const [games, setGames] = useState<Game[]>([]);
-  const [historyError, setHistoryError] = useState('');
-  const [historyLoading, setHistoryLoading] = useState(true);
+  const stats = useGameStats('davinci');
+  const {
+    games,
+    error: historyError,
+    loading: historyLoading,
+  } = useGameHistory({ gameType: 'davinci', pageSize: 20 });
+  const logoutAction = useGameLogout();
   const [aboutOpen, setAboutOpen] = useState(false);
   const [copied, setCopied] = useState(false);
-  const [logoutPending, setLogoutPending] = useState(false);
-
-  useEffect(() => {
-    let active = true;
-    listMyGames({ gameType: 'davinci', limit: 20, offset: 0 })
-      .then(result => { if (active) setGames(result.games ?? []); })
-      .catch(reason => { if (active) setHistoryError(reason instanceof Error ? reason.message : '历史记录加载失败'); })
-      .finally(() => { if (active) setHistoryLoading(false); });
-    return () => { active = false; };
-  }, []);
-  const handleLogout = useCallback(async () => {
+  const handleLogout = async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
-    setLogoutPending(true);
-    try {
-      await logout();
-      localStorage.removeItem('profile');
-      window.location.href = 'https://auth.gamebus.online/login?redirect=' + encodeURIComponent(window.location.href);
-    } catch {
-      setLogoutPending(false);
-    }
-  }, []);
+    await logoutAction.run();
+  };
   const copyQQ = async () => {
     try {
       await navigator.clipboard.writeText('1522457543');
@@ -182,7 +152,8 @@ export function My() {
           <span><b>{stats.data?.wins ?? '—'}</b><small>胜场</small></span>
           <span><b>{stats.data ? `${(stats.data.winRate * 100).toFixed(0)}%` : '—'}</b><small>胜率</small></span></div>
         <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
-          <ActionButton variant="quiet" pending={logoutPending} onClick={() => void handleLogout()}><LogOut size={14} />退出登录</ActionButton></div>
+          <ActionButton variant="quiet" pending={logoutAction.pending} onClick={() => void handleLogout()}><LogOut size={14} />退出登录</ActionButton></div>
+        {logoutAction.error && <Feedback error>{logoutAction.error}</Feedback>}
       </section>
       <section className={styles.history}><h2>最近对局</h2>
         {games.map(game => {

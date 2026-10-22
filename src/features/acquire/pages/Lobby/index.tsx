@@ -1,14 +1,15 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCode } from 'antd';
 import { ArrowRight, Check, Copy, Globe, KeyRound, Lock, QrCode, ShieldCheck } from 'lucide-react';
-import { getProfile } from '@/api/room';
-import { getMyStats } from '@/api/history';
+import { getProfile } from '@/features/game-core/api/auth';
+import { getMyStats } from '@/features/game-core/api/history';
+import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { profile2BackendName } from '@/util/user';
 import { createAcquireRoom, lookupRoom } from '../../api/room';
 import { AppShell } from '../../components/AppShell';
-import { ActionButton } from '../../components/ActionButton';
-import { Feedback } from '../../components/Panel';
+import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Feedback } from '@/components/GameUI/Panel';
 import { AcquireLoading } from '../../components/LoadingState';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { StockPrices } from '../../dialogs/StockPrices';
@@ -35,43 +36,26 @@ export default function Lobby() {
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<AcquireRoom>();
-  const [error, setError] = useState('');
   const [priceTier, setPriceTier] = useState<number>();
-  const [pending, setPending] = useState(false);
-  const requestID = useRef(0);
-  const busy = useRef(false);
-  useEffect(() => () => { ++requestID.current; }, []);
+  const action = useLatestAsyncAction();
+  const { error, pending } = action;
   const playerID = profile2BackendName(profile.data);
   const onEnter = (room: AcquireRoom) => {
     if (roomEntry(room, playerID).allowed) navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
   };
   const create = async () => {
-    if (busy.current) return;
-    busy.current = true;
-    const id = ++requestID.current;
-    setPending(true); setError('');
     try {
-      const room = await createAcquireRoom(visibility);
-      if (id === requestID.current) navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
-    } catch (reason) {
-      if (id === requestID.current) setError(reason instanceof Error ? reason.message : '创建失败，请重试');
-    } finally {
-      if (id === requestID.current) { busy.current = false; setPending(false); }
-    }
+      const room = await action.run(signal => createAcquireRoom(visibility, signal));
+      navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
+    } catch { /* Error state is owned by the shared action hook. */ }
   };
   const find = async () => {
-    if (busy.current || !code.trim()) return;
-    busy.current = true;
-    const id = ++requestID.current;
-    setPending(true); setError(''); setFoundRoom(undefined); setPanel('join');
+    if (!code.trim()) return;
+    setFoundRoom(undefined);
+    setPanel('join');
     try {
-      const room = await lookupRoom(code.trim());
-      if (id === requestID.current) setFoundRoom(room);
-    } catch (reason) {
-      if (id === requestID.current) setError(reason instanceof Error ? reason.message : '查找失败，请重试');
-    } finally {
-      if (id === requestID.current) { busy.current = false; setPending(false); }
-    }
+      setFoundRoom(await action.run(signal => lookupRoom(code.trim(), signal)));
+    } catch { /* Error state is owned by the shared action hook. */ }
   };
   const copyShareURL = async () => {
     try {
@@ -82,13 +66,14 @@ export default function Lobby() {
     }
   };
   const close = () => {
-    if (busy.current) return;
+    if (pending) return;
     setPanel(undefined);
     setShareCopied(false);
+    action.reset();
   };
   const props = {
     lobby, profile: profile.data, stats: stats.data, statsError: stats.error, playerID, code, setCode,
-    onCreate: () => { setError(''); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
+    onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
     onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;

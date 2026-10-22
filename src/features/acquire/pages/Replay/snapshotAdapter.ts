@@ -1,12 +1,15 @@
-import type { Snapshot } from '@/types/history';
+import type { Snapshot } from '@/features/game-core/model/history';
 import type {
-  CompanyKey,
-  CompanyInfoItem,
-  TileData,
-  PlayerInfo,
-} from '@/types/AcquireRoom';
-import type { DisplaySnapshot } from '../../model/session';
+  DisplaySnapshot,
+  GameSnapshot,
+} from '../../model/session';
+import type {
+  AcquirePlayer,
+  Company,
+} from '../../model/types';
 import { GameStatus } from '@/enum/game';
+
+type CompanyKey = Company | 'Blank';
 
 /**
  * 把后端 Snapshot 适配为前端组件可消费的 WsRoomSyncData。
@@ -20,16 +23,15 @@ export function snapshotToWsRoomSyncData(
 
   const companyInfo = Object.entries(snap.roomData.companyInfo || {}).reduce(
     (acc, [name, c]) => {
-      acc[name as CompanyKey] = {
+      acc[name as Company] = {
         name: c.name,
         stockPrice: c.stockPrice,
         stockTotal: c.stockTotal,
         tiles: c.tiles,
-        valuation: '',
       };
       return acc;
     },
-    {} as Record<CompanyKey, CompanyInfoItem>
+    {} as GameSnapshot['roomData']['companyInfo']
   );
 
   const tiles = Object.entries(snap.roomData.tiles || {}).reduce(
@@ -40,7 +42,7 @@ export function snapshotToWsRoomSyncData(
       };
       return acc;
     },
-    {} as Record<string, TileData>
+    {} as GameSnapshot['roomData']['tiles']
   );
 
   const players = Object.entries(snap.roomData.players || {}).reduce(
@@ -53,10 +55,30 @@ export function snapshotToWsRoomSyncData(
       };
       return acc;
     },
-    {} as Record<string, PlayerInfo>
+    {} as Record<string, AcquirePlayer>
   );
 
   const stocks = (viewerData?.stocks ?? {}) as Record<CompanyKey, number>;
+  const replayEndGame = snap.roomData.endGame;
+  let endCondition: '' | 'company_size' | 'all_companies_safe' = '';
+  if (
+    replayEndGame?.condition === 'company_size'
+    || replayEndGame?.condition === 'all_companies_safe'
+  ) {
+    endCondition = replayEndGame.condition;
+  }
+  const endGame = replayEndGame
+    ? {
+        ...replayEndGame,
+        condition: endCondition,
+      }
+    : {
+        eligible: false,
+        condition: '' as const,
+        company: '',
+        tileCount: 0,
+        votes: {},
+      };
 
   return {
     playerId: viewerID,
@@ -68,13 +90,10 @@ export function snapshotToWsRoomSyncData(
     roomData: {
       companyInfo,
       currentPlayer: snap.roomData.currentPlayer,
-      currentStep: '',
       gameStatus: (snap.roomData.gameStatus as unknown) as GameStatus,
       tiles,
       players,
-      endGame: snap.roomData.endGame ?? {
-        eligible: false, condition: '', company: '', tileCount: 0, votes: {},
-      },
+      endGame,
     },
     result: snap.result,
   };

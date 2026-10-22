@@ -1,14 +1,16 @@
-import { useEffect, useRef, useState } from 'react';
+import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { QRCode } from 'antd';
 import {
   ArrowRight, Check, Copy, Eye, Hash, KeyRound, ListOrdered, Plus, RefreshCw, Search, Share2, ShieldCheck, UserRound,
 } from 'lucide-react';
-import { getProfile } from '@/api/room';
-import { getMyStats } from '@/api/history';
+import { getProfile } from '@/features/game-core/api/auth';
+import { getMyStats } from '@/features/game-core/api/history';
 import { profile2BackendName } from '@/util/user';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
+import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { createDavinciRoom } from '../../api/room';
@@ -28,6 +30,11 @@ const cipherFacts = [
   ['JOKER', '万能未知牌', KeyRound],
   ['观察', '颜色与空位', Eye],
 ] as const;
+const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
+  { value: 'all', label: '全部' },
+  { value: 'joinable', label: '可加入' },
+  { value: 'playing', label: '对局中' },
+];
 
 function RoomCard({ room, playerID, onEnter }: {
   room: DavinciRoom;
@@ -67,11 +74,9 @@ export default function Lobby() {
   const [copied, setCopied] = useState(false);
   const [code, setCode] = useState('');
   const [heroReady, setHeroReady] = useState(false);
-  const [pending, setPending] = useState(false);
-  const [createError, setCreateError] = useState('');
-  const requestID = useRef(0);
+  const createAction = useLatestAsyncAction();
+  const { pending, error: createError } = createAction;
   const playerID = profile2BackendName(profile.data);
-  useEffect(() => () => { ++requestID.current; }, []);
 
   const enter = (room: DavinciRoom) => {
     if (roomEntry(room, playerID).allowed) {
@@ -79,18 +84,10 @@ export default function Lobby() {
     }
   };
   const create = async () => {
-    if (pending) return;
-    const id = ++requestID.current;
-    setPending(true);
-    setCreateError('');
     try {
-      const room = await createDavinciRoom();
-      if (id === requestID.current) navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
-    } catch (reason) {
-      if (id === requestID.current) setCreateError(reason instanceof Error ? reason.message : '创建失败，请重试');
-    } finally {
-      if (id === requestID.current) setPending(false);
-    }
+      const room = await createAction.run(createDavinciRoom);
+      navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
+    } catch { /* Error state is owned by the shared action hook. */ }
   };
   const copyShare = async () => {
     try {
@@ -139,11 +136,8 @@ export default function Lobby() {
         <header className={styles.sectionHeading}><div><small>OPEN TABLES</small><h2>选择一张密码桌</h2></div>
           <ActionButton variant="quiet" onClick={lobby.refresh} disabled={lobby.refreshing}><RefreshCw size={15} />刷新</ActionButton></header>
         <div className={styles.controls}>
-          <div className={styles.tabs} role="tablist" aria-label="房间筛选">{([
-            ['all', '全部'], ['joinable', '可加入'], ['playing', '对局中'],
-          ] as Array<[LobbyFilter, string]>).map(([value, label]) =>
-            <button role="tab" aria-selected={lobby.filter === value} key={value}
-              className={lobby.filter === value ? styles.active : ''} onClick={() => lobby.setFilter(value)}>{label}</button>)}</div>
+          <GameTabs items={roomFilters} value={lobby.filter} onChange={lobby.setFilter}
+            ariaLabel="房间筛选" className={styles.tabs} activeClassName={styles.active} />
           <label><Search size={15} /><input aria-label="搜索房间" placeholder="搜索房间号或房主" value={lobby.query}
             onChange={event => lobby.setQuery(event.target.value)} /></label>
         </div>

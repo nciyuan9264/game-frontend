@@ -1,6 +1,9 @@
 import React, { useMemo, useRef, useState } from 'react';
 import { backendName2FrontendName } from '@/util/user';
-import type { Snapshot, GamePlayer } from '@/types/history';
+import type {
+  GamePlayer,
+  Snapshot,
+} from '@/features/game-core/model/history';
 import styles from './index.module.less';
 
 interface EconomyChartProps {

@@ -8,7 +8,8 @@ import { companyKeys } from '../model/types';
 function createSession(phase: string = 'buyStock'): AcquireSession {
   return {
     snapshot: {
-      type: 'ROOM_SYNC', roomID: 'room', phaseVersion: 2, playerId: 'me',
+      schemaVersion: 2, type: 'ROOM_SYNC', roomID: 'room', matchID: 'match',
+      seq: 2, phaseVersion: 2, turnNumber: 2, playerId: 'me',
       playerData: { money: 6000, tiles: ['1A', '2A'], stocks: {} },
       roomData: {
         currentPlayer: 'me', gameStatus: phase, tiles: { '1A': { belong: '' }, '2A': { belong: '' } },
@@ -36,7 +37,7 @@ describe('Acquire drafts', () => {
     act(() => result.current.open());
     expect(result.current.draft.buy.Tower).toBe(2);
     expect(session.submit).not.toHaveBeenCalled();
-    rerender({ value: { ...session, snapshot: { ...session.snapshot!, phaseVersion: 3 } } });
+    rerender({ value: { ...session, snapshot: { ...session.snapshot!, seq: 3, phaseVersion: 3 } } });
     expect(result.current.draft.buy).toEqual({});
   });
   it('preselects, switches and deselects without sending; prevents actions on another turn', () => {

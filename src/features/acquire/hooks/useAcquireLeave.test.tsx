@@ -2,11 +2,11 @@ import { StrictMode } from 'react';
 import { act, cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { installGameNavigationGuard } from '@/features/game-core/model/navigationGuard';
 import { useAcquireLeave } from './useAcquireLeave';
-import { installAcquireNavigationGuard } from '../model/navigationGuard';
 
 let removeNavigationGuard: () => void;
-beforeEach(() => { removeNavigationGuard = installAcquireNavigationGuard(); });
+beforeEach(() => { removeNavigationGuard = installGameNavigationGuard(); });
 afterEach(() => { cleanup(); removeNavigationGuard(); });
 it('keeps the live route on Back/cancel and exits to the lobby once confirmed, including StrictMode', async () => {
   const close = vi.fn();

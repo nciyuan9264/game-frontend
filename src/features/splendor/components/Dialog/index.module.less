@@ -1,0 +1,27 @@
+.dialog {
+  width: min(504px, calc(100% - 48px));
+  border-radius: 9px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+
+  > header { padding: 25px 28px 20px; }
+  > header h2 { font-size: 24px; }
+  > header > button { width: 36px; height: 36px; }
+  > div { padding: 22px 28px; }
+  > footer { padding: 18px 28px 23px; }
+  > footer > button { min-height: 43px; font-size: 12px; }
+}
+
+@media (max-width: 767px) {
+  .dialog {
+    width: 100%;
+    max-height: calc(100dvh - 66px);
+    border-radius: 15px 15px 0 0;
+
+    > header { padding: 14px 22px 17px; }
+    > header h2 { font-size: 22px; }
+    > header > button { width: 44px; height: 44px; }
+    > div { padding: 20px 22px; }
+    > footer { padding: 16px 22px max(20px, env(safe-area-inset-bottom)); }
+    > footer > button { min-height: 44px; font-size: 12px; }
+  }
+}

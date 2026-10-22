@@ -1,25 +1,23 @@
+import {
+  gameInviteURL,
+  legacyPlayerName as sharedLegacyPlayerName,
+  roomEntry as sharedRoomEntry,
+  roomOwnerName as sharedRoomOwnerName,
+} from '@/features/game-core/model/room';
 import type { DavinciRoom } from './types';
 
 export const DAVINCI_PUBLIC_URL = 'https://board.gamebus.online/game/davinci';
 
 export function davinciRoomInviteURL(roomID: string) {
-  return `${DAVINCI_PUBLIC_URL}/match?roomID=${encodeURIComponent(roomID)}`;
+  return gameInviteURL('davinci', roomID);
 }
 
-export function legacyPlayerName(playerID: string) {
-  return playerID.replace(/-\d+$/, '');
-}
+export const legacyPlayerName = sharedLegacyPlayerName;
 
 export function roomOwnerName(room: DavinciRoom) {
-  return room.ownerName
-    || room.roomPlayer.find(player => player.playerID === room.ownerID)?.name
-    || legacyPlayerName(room.ownerID);
+  return sharedRoomOwnerName(room);
 }
 
 export function roomEntry(room: DavinciRoom, playerID: string) {
-  const member = room.isMember || room.roomPlayer.some(player => player.playerID === playerID);
-  if (member) return { allowed: true, label: room.status === 'match' ? '返回房间' : '进入对局' };
-  if (room.status !== 'match') return { allowed: false, label: '已开局' };
-  if (room.roomPlayer.length >= room.maxPlayers) return { allowed: false, label: '房间已满' };
-  return { allowed: true, label: '加入房间' };
+  return sharedRoomEntry(room, playerID);
 }

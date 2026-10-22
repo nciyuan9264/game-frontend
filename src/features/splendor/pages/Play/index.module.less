@@ -1,0 +1,191 @@
+.play { min-height:100dvh; background:#f4f0e8; color:var(--ink); }
+.topbar { position:sticky; top:0; z-index:30; display:flex; height:66px; align-items:center; gap:18px; padding:0 32px; border-bottom:1px solid var(--line); background:#fbf8f1f5; backdrop-filter:blur(12px);
+  > button { display:grid; width:40px; height:40px; place-items:center; border:0; border-radius:50%; background:transparent; color:#8d735c; }
+  > button:hover { background:#eae2d8; }
+}
+.brand { display:flex; align-items:center; gap:8px; color:var(--wine);
+  b { display:block; font:600 21px/1 var(--serif); letter-spacing:2.5px; }
+  small { display:block; margin-top:5px; color:#917e67; font-size:6px; letter-spacing:1.5px; }
+}
+.divider { width:1px; height:22px; background:var(--line); }
+.roomName { min-width:0;
+  strong { display:block; overflow:hidden; max-width:380px; color:#6d4c47; font-size:13px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  small { display:block; overflow:hidden; margin-top:5px; max-width:460px; color:var(--muted); font-size:9px; letter-spacing:1px; text-overflow:ellipsis; white-space:nowrap; }
+}
+.spacer { flex:1; }
+.timer { display:flex; min-width:50px; height:31px; align-items:center; justify-content:center; padding:0 9px; border:1px solid #c8af7a; border-radius:4px; background:#f3ead9; color:#8e6f46;
+  b,>span { font:600 12px sans-serif; }
+}
+.live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
+.content { max-width:1440px; margin:auto; padding:16px 32px 24px; }
+.players { display:grid; grid-auto-columns:minmax(0,1fr); grid-auto-flow:column; gap:12px; margin-bottom:16px;
+  > button { position:relative; display:grid; min-width:0; min-height:0; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:0 10px; overflow:hidden; padding:9px 13px 10px; border:1px solid #e2d8c9; border-radius:6px; background:#faf7f0; text-align:left; }
+  > button:hover { background:#f1eade; }
+}
+.currentPlayer { border-color:#a97b80!important; background:#f5e9e6!important; }
+.playerInfo { min-width:0;
+  > strong { display:flex; align-items:center; gap:7px; overflow:hidden; font-size:13px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  em { padding:2px 4px; border-radius:3px; background:#e9dadc; color:var(--wine); font-size:9px; font-style:normal; font-weight:400; }
+  > span { display:flex; align-items:center; gap:5px; margin-top:4px; color:#826d59; font-size:10px; }
+  > span i { width:3px; height:3px; border-radius:50%; background:#baa78e; }
+}
+.playerScore { text-align:center;
+  > b { color:#79504d; font:600 28px/.9 var(--serif); }
+  small { display:block; margin-top:3px; color:#806b56; font-size:9px; }
+}
+.publicResources { display:block; grid-column:1/-1; min-width:0; margin-top:7px; padding-top:7px; border-top:1px solid #dfd3c5;
+  &,&>span { display:grid; grid-template-columns:29px repeat(6,minmax(0,1fr)); gap:3px; }
+  > span { display:flex; align-items:center; flex-direction:column; gap:3px; min-width:0; }
+  > span:first-child { align-items:flex-start; color:#7b6554; font-size:10px; }
+  > span:first-child i { display:flex; height:18px; align-items:center; font-style:normal; }
+  > span:not(:first-child)>b { display:flex; width:min(24px,100%); height:18px; align-items:center; justify-content:center; border:1px solid #d9cbb9; border-radius:3px; background:#ede3d4; color:#755b46; font-size:12px; font-weight:500; }
+  > span:not(:first-child)>i { height:18px; color:#674d40; font-size:12px; font-style:normal; font-weight:500; }
+}
+.currentLine { position:absolute; right:13px; bottom:0; left:13px; height:2px; background:#9b6a71; }
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:20px; align-items:start; }
+.market { min-width:0; padding:16px 16px 0; border:1px solid #ded1bd; border-radius:7px; background:#ebe4d8; box-shadow:inset 0 0 0 5px #f5eee460; }
+.nobleArea {
+  > header { display:flex; height:22px; align-items:center; gap:7px; color:#876e52; font-size:11px; font-weight:500; }
+  > header small { margin-left:auto; color:#9a896f; font-size:10px; font-weight:400; }
+  > div { display:grid; grid-template-columns:repeat(auto-fit,minmax(120px,1fr)); gap:8px; margin-top:8px; }
+}
+.marketArea {
+  > header { display:flex; align-items:center; justify-content:space-between; gap:12px; margin:16px 0 12px; }
+  > header > span { display:flex; align-items:center; gap:7px; color:#876e52; font-size:11px; font-weight:500; }
+  > header > small { display:flex; align-items:center; gap:5px; color:#64745b; font-size:10px; }
+  > header > small svg { padding:2px; border-radius:50%; background:#3e6953; color:#fff9e9; }
+  > footer { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:12px 0; color:#ae9a79; font-size:9px; }
+  > footer span:first-child,>footer span:last-child { font:500 10px var(--serif); letter-spacing:1.5px; }
+}
+.cardRows { display:flex; flex-direction:column; gap:10px; }
+.cardRow { display:grid; grid-template-columns:51px repeat(4,minmax(0,1fr)); gap:11px; align-items:stretch;
+  > button,>span:not(:first-child) { min-height:0; }
+}
+.sidebar { display:flex; min-width:0; flex-direction:column; gap:13px; }
+.bankPanel,.collectionPanel,.activity { padding:17px 16px; border:1px solid #dfd4c3; border-radius:6px; background:#fcf8ef;
+  > header { display:flex; align-items:center; justify-content:space-between; gap:10px; margin-bottom:13px; }
+  > header h3 { display:flex; align-items:center; gap:6px; color:#725247; font-size:13px; font-weight:500; }
+  > header span { color:#a08b70; font-size:9px; }
+  > header button { color:var(--wine); font-size:10px; }
+}
+.bankTokens { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:2px; margin:14px 0 0; }
+.bankHint { display:flex; min-height:30px; align-items:flex-start; gap:5px; margin-top:9px; color:#978167; font-size:9px; line-height:1.75; }
+.selection { display:flex; align-items:center; justify-content:space-between; margin-top:6px; padding:6px 0 9px; border-top:1px solid #e7dece; color:#94765e; font-size:10px;
+  button { min-height:30px; color:var(--wine); font-size:10px; }
+}
+.bankPanel > button { width:100%; min-height:40px; justify-content:space-between; padding:0 13px; font-size:12px; }
+.reserveSummary { display:flex; justify-content:space-between; padding:4px 0 9px; color:#a08a6d; font-size:10px;
+  > span { display:flex; align-items:center; gap:5px; } b { color:#886449; font-weight:500; }
+}
+.reservedMini { display:flex; flex-direction:column; gap:5px;
+  > button { width:100%; padding:0; border:0; background:transparent; }
+  > p { padding:12px 0 7px; color:#ae987a; font-size:10px; text-align:center; }
+}
+.activity { padding:15px 16px;
+  > header { margin-bottom:9px; }
+  > p { color:#a38c70; font-size:10px; line-height:1.85; }
+}
+.mobileDock { display:none; }
+.rules { display:flex; flex-direction:column; gap:21px;
+  article { display:flex; align-items:flex-start; gap:17px; }
+  article>span { color:#bea073; font:500 29px var(--serif); }
+  h3 { margin-bottom:7px; color:#7c5743; font-size:14px; font-weight:500; }
+  p { color:#9c815d; font-size:12px; line-height:1.9; }
+}
+.ruleNotice { display:flex; align-items:flex-start; gap:8px; margin-top:18px; padding:13px 14px; border:1px solid #e7ddcb; border-radius:5px; background:#f8f2e6; color:#8e744b; font-size:11px; line-height:1.8; }
+
+@media (min-width:768px) and (max-width:1150px) {
+  .topbar { padding-inline:20px; gap:12px; }
+  .content { padding-inline:20px; }
+  .layout { grid-template-columns:minmax(0,1fr) 274px; gap:14px; }
+  .market { padding-inline:12px; }
+  .cardRow { grid-template-columns:38px repeat(4,minmax(0,1fr)); gap:7px; }
+  .nobleArea>div { gap:6px; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); }
+  .bankPanel,.collectionPanel,.activity { padding-inline:12px; }
+  .players>button { padding-inline:10px; gap:0 8px; }
+  .publicResources { >span:first-child { font-size:9px; } }
+}
+@media (min-width:768px) and (max-width:900px) {
+  .players[data-player-count='4'] { grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); }
+}
+@media (max-width:767px) {
+  .play { --dock-height:240px; }
+  .topbar { height:44px; gap:4px; padding:0 10px; background:#f4f0e8;
+    >button { width:44px; height:44px; }
+    >button:nth-last-child(3) { display:grid; }
+    >button:nth-last-child(2) { display:grid; }
+    >.brand,.divider { display:none; }
+  }
+  .roomName { min-width:0; flex:1; margin-left:4px;
+    strong { max-width:none; font-size:14px; line-height:1.4; }
+    small { max-width:none; margin-top:3px; font-size:10px; line-height:1.5; letter-spacing:0; }
+  }
+  .spacer { display:none; }
+  .timer { min-width:42px; height:29px; padding:0 6px; }
+  .content { max-width:none; padding:8px 12px calc(var(--dock-height) + 12px); }
+  .players { gap:6px; margin-bottom:10px;
+    >button { display:grid; min-height:48px; grid-template-columns:22px minmax(0,1fr); gap:2px 4px; padding:5px; border-radius:5px; }
+    >button>span:first-child { width:22px!important; height:22px!important; grid-row:1/3; align-self:center; font-size:14px; }
+  }
+  .playerInfo { align-self:end;
+    >strong { display:block; font-size:9.5px; line-height:13px; }
+    em,>span { display:none; }
+  }
+  .playerScore { display:flex; grid-column:2; align-items:baseline; gap:3px; align-self:start; text-align:left;
+    >b { font-size:21px; } small { margin:0; font-size:8px; }
+  }
+  .publicResources { display:none; }
+  .currentLine { right:7px; left:7px; }
+  .layout { display:block; }
+  .sidebar { display:none; }
+  .market { padding:6px; border-radius:6px; box-shadow:inset 0 0 0 4px #f6f0e34a; }
+  .nobleArea {
+    >header { height:20px; padding:0 1px; font-size:10px; }
+    >header svg { width:12px; }
+    >header small { font-size:8.5px; white-space:nowrap; }
+    >div { grid-template-columns:none; grid-auto-columns:minmax(0,1fr); grid-auto-flow:column; gap:5px; margin-top:4px; }
+    >div>button { min-height:64px; }
+  }
+  .marketArea {
+    >header { height:28px; margin:3px 0 0; }
+    >header>span { font-size:10px; } >header>small { font-size:8.5px; }
+    >footer { display:none; }
+  }
+  .cardRows { gap:6px; }
+  .cardRow { grid-template-columns:28px repeat(4,minmax(0,1fr)); gap:4px;
+    >span:first-child { min-width:0; gap:5px; padding:4px 1px; border-radius:3px; box-shadow:1px 1px 0 #d1bea0; }
+    >span:first-child::before { inset:2px; }
+    >span:first-child strong { font-size:17px; line-height:19px; }
+    >span:first-child svg { width:13px; height:13px; }
+    >span:first-child small { font-size:12px; line-height:14px; }
+  }
+  .mobileDock { position:fixed; inset:auto 0 0; z-index:50; display:block; padding:6px 14px calc(env(safe-area-inset-bottom)); border-top:1px solid #d7c7b0; background:#fcf8f0; box-shadow:0 -5px 20px #6b4d3110;
+    >section { padding-bottom:6px; border-bottom:1px solid #e4d7c4; }
+    >section>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:8px; }
+    h3 { flex-shrink:0; color:#775348; font-size:12px; font-weight:500; }
+    >section>div:first-child small { min-width:0; color:#8b7058; font-size:9px; line-height:12px; text-align:right; }
+    .bankTokens { gap:4px; margin:6px 0 0; }
+  }
+  .mobileWalletHead { display:flex; min-height:30px; align-items:center; gap:8px; color:#8b7058; font-size:10px;
+    button { display:flex; min-height:44px; align-items:center; gap:4px; padding:0; color:#775348; font-size:10px; white-space:nowrap; }
+    button:first-child { margin-right:auto; font-size:11px; }
+    button:last-child { margin-left:auto; }
+    span { white-space:nowrap; } b { color:#76543f; font-weight:500; }
+  }
+  .mobileWallet { display:grid; height:34px; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px;
+    >span { display:grid; grid-template-columns:20px 1fr; align-items:center; justify-items:center; gap:1px 4px; }
+    b { color:#674d3e; font-size:14px; font-weight:500; }
+    small { grid-column:1/-1; color:#937956; font-size:9px; line-height:1.3; white-space:nowrap; }
+    >span:last-child { padding-left:6px; border-left:1px solid #e3d8c6; }
+  }
+  .mobileActions { display:flex; gap:9px; margin-top:8px;
+    >button { min-height:44px; flex:1; padding:0 12px; font-size:13px; }
+    >button:first-child:not(:last-child) { flex:0 0 72px; font-size:12px; }
+  }
+  .rules h3 { font-size:15px; } .rules p { font-size:13px; }
+}
+@media (max-width:389px) {
+  .content { padding-inline:11px; }
+  .mobileWallet { gap:5px; }
+  .playerScore small { display:none; }
+}

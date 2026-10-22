@@ -3,7 +3,7 @@ module.exports = {
   env: { browser: true, es2022: true, node: true },
   parser: '@typescript-eslint/parser',
   parserOptions: { ecmaVersion: 'latest', sourceType: 'module', ecmaFeatures: { jsx: true } },
-  ignorePatterns: ['showcase/', 'dist/', 'node_modules/'],
+  ignorePatterns: ['showcase/', 'dist/', 'node_modules/', 'src/api/generated/'],
   plugins: ['@typescript-eslint', 'react-hooks'],
   overrides: [{
     files: ['src/features/acquire/**/*.{ts,tsx}'],

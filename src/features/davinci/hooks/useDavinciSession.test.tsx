@@ -1,17 +1,25 @@
 import { act, renderHook } from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { MatchSnapshot, ServerMessage } from '../model/session';
+import { beforeEach, describe, expect, it, vi } from 'vitest';
+import type {
+  MatchSnapshot,
+  ServerMessage,
+} from '../model/session';
 import { useDavinciSession } from './useDavinciSession';
 
-vi.mock('@/const/env', () => ({ davinciWsUrl: 'ws://localhost/api/davinci' }));
+vi.mock('@/const/env', () => ({ gameWsUrl: 'ws://localhost/ws' }));
 const transport = vi.hoisted(() => ({
   epoch: { current: 1 },
   send: vi.fn(() => true),
-  retry: vi.fn(),
-  receive: undefined as undefined | ((message: ServerMessage, epoch: number) => void),
+  receive: undefined as undefined | ((
+    message: ServerMessage,
+    epoch: number,
+  ) => void),
 }));
-vi.mock('./useDavinciConnection', () => ({
-  useDavinciConnection: (_url: string, receive: typeof transport.receive) => {
+vi.mock('@/features/game-core/hooks/useGameConnection', () => ({
+  useGameConnection: (
+    _url: string,
+    receive: typeof transport.receive,
+  ) => {
     transport.receive = receive;
     return {
       status: 'connected',
@@ -19,75 +27,61 @@ vi.mock('./useDavinciConnection', () => ({
       fatal: '',
       epoch: transport.epoch,
       send: transport.send,
-      retry: transport.retry,
+      retry: vi.fn(),
       close: vi.fn(),
     };
   },
 }));
 
 const snapshot = (): MatchSnapshot => ({
+  schemaVersion: 2,
   type: 'MATCH_SYNC',
   roomID: 'room',
+  matchID: 'match',
+  seq: 1,
   ownerID: 'me',
   playerID: 'me',
   phaseVersion: 1,
-  turnNumber: 0,
+  turnNumber: 1,
   status: 'match',
   maxPlayers: 2,
   playerOrder: ['me'],
-  players: { me: { playerID: 'me', name: 'Me', online: true, ai: false, ready: true } },
+  players: {
+    me: {
+      playerID: 'me',
+      name: 'Me',
+      online: true,
+      ai: false,
+      ready: true,
+    },
+  },
 });
-const receive = (message: ServerMessage, epoch = transport.epoch.current) =>
-  act(() => transport.receive?.(message, epoch));
+const receive = (message: ServerMessage) =>
+  act(() => transport.receive?.(message, transport.epoch.current));
 
-describe('DaVinci command acknowledgement', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-    transport.epoch.current = 1;
-    vi.clearAllMocks();
-  });
-  afterEach(() => vi.useRealTimers());
+beforeEach(() => {
+  transport.receive = undefined;
+  vi.clearAllMocks();
+});
 
-  it('allows only one pending command and clears it for the matching acknowledgement', () => {
-    const { result } = renderHook(() => useDavinciSession('room'));
+describe('DaVinci v2 session', () => {
+  it('serializes a generated game command payload', () => {
+    const { result } = renderHook(() => useDavinciSession('room', 'match'));
     receive(snapshot());
-    act(() => { result.current.submit('match_add_ai', { seatIndex: 1 }); });
-    const pending = result.current.pending;
-    expect(result.current.submit('match_begin')).toBe(false);
-    receive({ ...snapshot(), phaseVersion: 2 });
-    expect(result.current.pending).toEqual(pending);
-    receive({ type: 'command_result', requestId: 'another-request' });
-    expect(result.current.pending).toEqual(pending);
-    receive({ type: 'command_result', requestId: pending?.id, phaseVersion: 2 });
-    expect(result.current.pending).toBeUndefined();
-    expect(transport.send).toHaveBeenCalledTimes(1);
-  });
+    act(() => {
+      result.current.submit('game_guess_card', { id: 'card-1', num: 7 });
+    });
 
-  it('keeps the last snapshot on rejection and resynchronizes without replay', () => {
-    const { result } = renderHook(() => useDavinciSession('room'));
-    const before = snapshot();
-    receive(before);
-    act(() => { result.current.submit('match_add_ai'); });
-    receive({ type: 'error', requestId: result.current.pending?.id, message: '房间已满' });
-    expect(result.current.snapshot).toEqual(before);
-    expect(result.current.feedback).toBe('房间已满');
-
-    act(() => { result.current.submit('match_add_ai'); });
-    act(() => vi.advanceTimersByTime(12000));
-    expect(transport.retry).toHaveBeenCalledTimes(1);
-    transport.epoch.current = 2;
-    receive({ ...snapshot(), phaseVersion: 2 });
-    expect(result.current.pending).toBeUndefined();
-    expect(result.current.feedback).toContain('已恢复最新状态');
-    expect(transport.send).toHaveBeenCalledTimes(2);
-  });
-
-  it('ignores snapshots from another room or an older phase', () => {
-    const { result } = renderHook(() => useDavinciSession('room'));
-    const current = { ...snapshot(), phaseVersion: 3 };
-    receive(current);
-    receive(snapshot());
-    receive({ ...snapshot(), roomID: 'other', phaseVersion: 4 });
-    expect(result.current.snapshot).toEqual(current);
+    expect(transport.send).toHaveBeenCalledWith({
+      schemaVersion: 2,
+      commandID: expect.any(String),
+      matchID: 'match',
+      type: 'game_guess_card',
+      payload: {
+        davinci: {
+          guessCard: { id: 'card-1', num: 7 },
+        },
+      },
+    });
   });
 });

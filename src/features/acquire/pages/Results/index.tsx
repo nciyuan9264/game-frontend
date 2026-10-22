@@ -1,5 +1,5 @@
 import { ArrowRight, ShieldCheck, TrendingUp, Trophy, Wallet } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import { money, playerName, type DisplaySnapshot } from '../../model/session';

@@ -1,6 +1,10 @@
 import { act, cleanup, renderHook, waitFor } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import type { GameDetailData, Snapshot, SnapshotPageData } from '@/types/history';
+import type {
+  GameDetailData,
+  Snapshot,
+  SnapshotPageData,
+} from '@/features/game-core/model/history';
 import { useProgressiveReplay } from './useProgressiveReplay';
 
 const api = vi.hoisted(() => ({
@@ -9,8 +13,8 @@ const api = vi.hoisted(() => ({
   getSnapshotPage: vi.fn(),
 }));
 
-vi.mock('@/api/room', () => ({ getProfile: api.getProfile }));
-vi.mock('@/api/history', () => ({
+vi.mock('@/features/game-core/api/auth', () => ({ getProfile: api.getProfile }));
+vi.mock('@/features/game-core/api/history', () => ({
   getGameDetail: api.getGameDetail,
   getSnapshotPage: api.getSnapshotPage,
 }));

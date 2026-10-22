@@ -1,5 +1,5 @@
 import { Bot, Check, Clock, Crown, Globe, Lock, MoreHorizontal, Plus, ShieldCheck, Users, Wallet } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
 import { playerName, type MatchSnapshot } from '../../model/session';

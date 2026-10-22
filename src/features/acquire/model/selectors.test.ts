@@ -40,9 +40,9 @@ describe('authoritative transaction previews', () => {
   });
   it('does not treat unrelated repeated snapshots as transaction confirmation', () => {
     const game = gameFixture();
-    const command: PendingCommand = { id: '1', type: 'game_buy_stock', payload: { stocks: { Tower: 1 } }, before: game, epoch: 1 };
+    const command: PendingCommand = { commandID: '1', type: 'game_buy_stock', payload: { stocks: { Tower: 1 } }, before: game, epoch: 1 };
     expect(confirmsCommand(command, structuredClone(game))).toBe(false);
-    expect(confirmsCommand(command, { ...game, phaseVersion: 4 })).toBe(true);
+    expect(confirmsCommand(command, { ...game, seq: 4, phaseVersion: 4 })).toBe(true);
   });
   it('confirms both approval and revocation from the authoritative vote map', () => {
     const game = gameFixture();
@@ -50,14 +50,14 @@ describe('authoritative transaction previews', () => {
       eligible: true, condition: 'company_size', company: 'Tower', tileCount: 41, votes: { 'me-1': false },
     };
     const approval: PendingCommand = {
-      id: 'vote-1', type: 'game_end_vote', payload: { allow: true }, before: structuredClone(game), epoch: 1,
+      commandID: 'vote-1', type: 'game_end_vote', payload: { allow: true }, before: structuredClone(game), epoch: 1,
     };
     const approved = structuredClone(game);
     approved.roomData.endGame!.votes['me-1'] = true;
     expect(confirmsCommand(approval, approved)).toBe(true);
 
     const revocation: PendingCommand = {
-      id: 'vote-2', type: 'game_end_vote', payload: { allow: false }, before: approved, epoch: 1,
+      commandID: 'vote-2', type: 'game_end_vote', payload: { allow: false }, before: approved, epoch: 1,
     };
     const revoked = structuredClone(approved);
     revoked.roomData.endGame!.votes['me-1'] = false;

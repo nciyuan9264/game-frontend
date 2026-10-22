@@ -1,6 +1,8 @@
+import { useCallback } from 'react';
 import { ArrowLeft, CircleAlert, RefreshCw } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
-import { getProfile } from '@/api/room';
+import { getProfile } from '@/features/game-core/api/auth';
+import { lookupGameRoom } from '@/features/game-core/api/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -22,8 +24,8 @@ function ExitState({ title, message, onLeave }: { title: string; message: string
   </section></div>;
 }
 
-function Session({ roomID }: { roomID: string }) {
-  const session = useDavinciSession(roomID);
+function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
+  const session = useDavinciSession(roomID, matchID);
   const leave = useDavinciLeave(session.connection.close);
   const { connection, snapshot } = session;
   const players = snapshot?.type === 'MATCH_SYNC' ? snapshot.players : snapshot?.roomData.players;
@@ -58,11 +60,22 @@ function Session({ roomID }: { roomID: string }) {
 export default function DavinciSessionPage() {
   const [params] = useSearchParams();
   const roomID = params.get('roomID') ?? '';
-  const auth = useAsyncResource(getProfile);
-  if (auth.loading && !auth.data) return <AppShell inMatch title="验证身份"><DavinciLoading description="正在验证登录身份" /></AppShell>;
-  if (!auth.data) return <AppShell inMatch title="身份验证失败"><div className={styles.authError}><Feedback error>
-    登录状态确认失败<span>{auth.error || '暂时无法验证登录状态，请重试。'}</span>
-    <ActionButton onClick={auth.retry}><RefreshCw size={14} />重新验证</ActionButton>
+  const loadTarget = useCallback(async () => {
+    const profile = await getProfile();
+    if (!roomID) return { profile, matchID: '' };
+    const room = await lookupGameRoom('davinci', roomID);
+    if (!room.currentMatchID) throw new Error('当前房间没有可连接的对局');
+    return { profile, matchID: room.currentMatchID };
+  }, [roomID]);
+  const target = useAsyncResource(loadTarget);
+  if (target.loading && !target.data) return <AppShell inMatch title="验证对局"><DavinciLoading description="正在确认身份与当前对局" /></AppShell>;
+  if (!target.data) return <AppShell inMatch title="对局验证失败"><div className={styles.authError}><Feedback error>
+    对局信息确认失败<span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
+    <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton>
   </Feedback></div></AppShell>;
-  return <Session key={roomID} roomID={roomID} />;
+  return <Session
+    key={`${roomID}:${target.data.matchID}`}
+    roomID={roomID}
+    matchID={target.data.matchID}
+  />;
 }

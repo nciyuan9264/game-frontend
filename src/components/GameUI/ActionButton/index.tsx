@@ -14,7 +14,7 @@ export function ActionButton({
   children,
   ...props
 }: ActionButtonProps) {
-  return <button {...props} type={props.type ?? 'button'} disabled={disabled || pending}
+  return <button {...props} data-game-action-button type={props.type ?? 'button'} disabled={disabled || pending}
     aria-busy={pending || undefined} className={`${styles.button} ${styles[variant]} ${className}`}>
     {pending && <span className={styles.spinner} aria-hidden="true" />}{children}
   </button>;

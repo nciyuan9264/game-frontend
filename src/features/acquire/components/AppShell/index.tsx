@@ -1,16 +1,17 @@
 import type { ReactNode } from 'react';
-import { NavLink, Link } from 'react-router-dom';
 import { BookOpen, ChevronRight, LayoutGrid, Trophy, UserRound } from 'lucide-react';
+import { GameAppShell } from '@/components/GameUI/GameAppShell';
+import { GameAvatar } from '@/components/GameUI/GameAvatar';
 import type { UserProfile } from '@/hooks/request/useProfile';
 import { ClickFeedback } from '../ClickFeedback';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const navigation = [
-  { path: '/game/acquire', title: '大厅', Icon: LayoutGrid },
-  { path: '/game/acquire/rankings', title: '排行', Icon: Trophy },
-  { path: '/game/acquire/guide', title: '玩法', Icon: BookOpen },
-  { path: '/game/acquire/me', title: '我的', Icon: UserRound },
+  { path: '/game/acquire', title: '大厅', icon: <LayoutGrid size={21} />, mobileIcon: <LayoutGrid size={20} /> },
+  { path: '/game/acquire/rankings', title: '排行', icon: <Trophy size={21} />, mobileIcon: <Trophy size={20} /> },
+  { path: '/game/acquire/guide', title: '玩法', icon: <BookOpen size={21} />, mobileIcon: <BookOpen size={20} /> },
+  { path: '/game/acquire/me', title: '我的', icon: <UserRound size={21} />, mobileIcon: <UserRound size={20} /> },
 ];
 export function AcquireMark() {
   return <svg viewBox="0 0 48 48" fill="none" aria-hidden="true">
@@ -34,42 +35,58 @@ function Brand() {
 }
 export function PlayerAvatar({ name, avatar, ai, size = 36 }: { name: string; avatar?: string; ai?: boolean; size?: number }) {
   const variant = ai ? 2 : Array.from(name).reduce((value, char) => value + (char.codePointAt(0) ?? 0), 0) % 6;
-  return <span className={styles.avatar} style={{ width: size, height: size }} aria-hidden="true">
-    {avatar ? <img src={avatar} alt="" referrerPolicy="no-referrer" /> : <AvatarArt variant={variant} bot={ai} />}
-  </span>;
+  return <GameAvatar className={styles.avatar} name={name} avatar={avatar} ai={ai} size={size}
+    renderFallback={() => <AvatarArt variant={variant} bot={ai} />} />;
 }
 export function AppShell({ children, title, profile, inMatch = false, hideRail = false, hideHeader = false, tools }: {
   children: ReactNode; title: string; profile?: Pick<UserProfile, 'name' | 'avatar'>;
   inMatch?: boolean; hideRail?: boolean; hideHeader?: boolean; tools?: ReactNode;
 }) {
-  const shellClassName = `${rootStyles.root} ${styles.shell} ${inMatch ? styles.inMatch : ''} ${hideRail ? styles.hideRail : ''} ${hideHeader ? styles.hideHeader : ''}`;
-  return <div className={shellClassName}>
-    <aside className={styles.rail}>
-      {inMatch ? <span className={styles.monogram}><AcquireMark /></span> : <Link className={styles.monogram} to="/game/acquire" aria-label="Acquire 大厅"><AcquireMark /></Link>}
-      {!inMatch && <nav aria-label="Acquire 导航">{navigation.slice(0, 3).map(({ path, title: label, Icon }) =>
-        <NavLink key={path} to={path} end className={({ isActive }) => isActive ? styles.active : ''}><Icon size={21} /><span>{label}</span></NavLink>
-      )}</nav>}
-      <div className={styles.railBottom}><span className={styles.onlineDot} />{inMatch
-        ? <span aria-label="当前玩家"><PlayerAvatar name={profile?.name ?? '玩家'} avatar={profile?.avatar} size={40} /></span>
-        : <Link to="/game/acquire/me" aria-label="个人资料"><PlayerAvatar name={profile?.name ?? '玩家'} avatar={profile?.avatar} size={40} /></Link>}
-      </div>
-    </aside>
-    <div className={styles.main}>
-      {!hideHeader && <header className={styles.header}>
-        {inMatch ? <span className={styles.brand}><Brand /></span>
-          : <Link to="/game/acquire" className={styles.brand} aria-label="Acquire 游戏大厅"><Brand /></Link>}
-        <span className={styles.topDivider} />
-        <span className={styles.breadcrumb}><span>ACQUIRE</span><ChevronRight size={12} /><b>{title}</b></span>
-        <div className={styles.tools}><span className={styles.environment}><i />在线版本</span>{tools}{profile && (inMatch
-          ? <span className={styles.profile} aria-label="当前玩家"><PlayerAvatar name={profile.name} avatar={profile.avatar} /></span>
-          : <Link to="/game/acquire/me" className={styles.profile}><PlayerAvatar name={profile.name} avatar={profile.avatar} /><span className={styles.profileName}>{profile.name}</span></Link>)}</div>
-      </header>}
-      <main className={styles.content}>{children}</main>
-    </div>
-    {!inMatch && <nav className={styles.mobileNav} aria-label="Acquire 手机导航">
-      {navigation.map(({ path, title: label, Icon }) => <NavLink end key={path} to={path}
-        className={({ isActive }) => isActive ? styles.active : ''}><Icon size={20} /><span>{label}</span></NavLink>)}
-    </nav>}
-    <ClickFeedback />
-  </div>;
+  return <GameAppShell
+    rootClassName={rootStyles.root}
+    classes={{
+      shell: styles.shell,
+      inMatch: styles.inMatch,
+      hideRail: styles.hideRail,
+      hideHeader: styles.hideHeader,
+      rail: styles.rail,
+      monogram: styles.monogram,
+      active: styles.active,
+      railBottom: styles.railBottom,
+      onlineDot: styles.onlineDot,
+      main: styles.main,
+      header: styles.header,
+      brand: styles.brand,
+      divider: styles.topDivider,
+      breadcrumb: styles.breadcrumb,
+      tools: styles.tools,
+      environment: styles.environment,
+      profile: styles.profile,
+      matchProfile: styles.profile,
+      profileName: styles.profileName,
+      content: styles.content,
+      mobileNav: styles.mobileNav,
+    }}
+    basePath="/game/acquire"
+    navigation={navigation}
+    title={title}
+    profile={profile}
+    inMatch={inMatch}
+    hideRail={hideRail}
+    hideHeader={hideHeader}
+    tools={tools}
+    renderMark={() => <AcquireMark />}
+    renderBrand={() => <Brand />}
+    renderAvatar={avatarProps => <PlayerAvatar {...avatarProps} />}
+    renderBreadcrumb={currentTitle => <><span>ACQUIRE</span><ChevronRight size={12} /><b>{currentTitle}</b></>}
+    renderFeedback={() => <ClickFeedback />}
+    environmentLabel="在线版本"
+    labels={{
+      home: 'Acquire 游戏大厅',
+      navigation: 'Acquire 导航',
+      mobileNavigation: 'Acquire 手机导航',
+      profile: '个人资料',
+      currentPlayer: '当前玩家',
+    }}
+  >{children}</GameAppShell>;
 }

@@ -1,19 +1,16 @@
-import type { ListRoomInfo, RoomPlayer } from '@/types/room';
+import type {
+  LobbyPlayerLike,
+  LobbyRoomLike,
+} from '@/features/game-core/model/room';
+export type { LobbyFilter } from '@/features/game-core/model/room';
 
 export type Visibility = 'public' | 'private';
-export interface AcquirePlayer extends RoomPlayer {
-  name?: string;
-  avatar?: string;
-}
-export interface AcquireRoom extends Omit<ListRoomInfo, 'roomPlayer'> {
+export interface AcquirePlayer extends LobbyPlayerLike {}
+export interface AcquireRoom extends LobbyRoomLike {
   visibility: Visibility;
   roomPlayer: AcquirePlayer[];
   playerOrder?: string[];
-  ownerName?: string;
-  ownerAvatar?: string;
-  isMember?: boolean;
 }
-export type LobbyFilter = 'all' | 'joinable' | 'playing';
 export const companyKeys = ['American', 'Continental', 'Festival', 'Imperial', 'Sackson', 'Tower', 'Worldwide'] as const;
 export type Company = typeof companyKeys[number];
 export const companyColors: Record<Company, string> = {

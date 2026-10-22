@@ -1,4 +1,8 @@
-import type { ListRoomInfo, RoomPlayer } from '@/types/room';
+import type {
+  LobbyPlayerLike,
+  LobbyRoomLike,
+} from '@/features/game-core/model/room';
+export type { LobbyFilter } from '@/features/game-core/model/room';
 
 export type GameStatus = 'match' | 'waiting' | 'getCard' | 'guessCard' | 'setCard' | 'end';
 
@@ -10,17 +14,9 @@ export interface Card {
   index?: number;
 }
 
-export interface DavinciPlayer extends RoomPlayer {
-  name?: string;
-  avatar?: string;
-}
+export interface DavinciPlayer extends LobbyPlayerLike {}
 
-export interface DavinciRoom extends Omit<ListRoomInfo, 'roomPlayer'> {
+export interface DavinciRoom extends LobbyRoomLike {
   roomPlayer: DavinciPlayer[];
   playerOrder?: string[];
-  ownerName?: string;
-  ownerAvatar?: string;
-  isMember?: boolean;
 }
-
-export type LobbyFilter = 'all' | 'joinable' | 'playing';

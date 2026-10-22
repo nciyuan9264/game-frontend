@@ -1,6 +1,9 @@
 import { cleanup, render, screen } from '@testing-library/react';
 import { afterEach, expect, it } from 'vitest';
-import type { GamePlayer, Snapshot } from '@/types/history';
+import type {
+  GamePlayer,
+  Snapshot,
+} from '@/features/game-core/model/history';
 import EconomyChart from '.';
 
 const players: GamePlayer[] = [{

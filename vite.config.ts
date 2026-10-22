@@ -29,7 +29,7 @@ export default defineConfig(({ mode }) => {
       },
       workbox: {
         cleanupOutdatedCaches: true,
-        navigateFallbackDenylist: [/^\/api\//, /^\/pam-api\//],
+        navigateFallbackDenylist: [/^\/pam-api\//, /^\/ws/],
         globPatterns: [
           'index.html',
           'registerSW.js',
@@ -59,26 +59,11 @@ export default defineConfig(({ mode }) => {
       host: true,
       port: 5173,
       proxy: {
-        '/api/acquire': {
-          target: 'http://localhost:8000',
+        '/ws': {
+          target: env.VITE_GAME_GATEWAY_TARGET || 'http://localhost:18000',
           changeOrigin: true,
           secure: true,
           ws: true,
-          rewrite: path => path.replace(/^\/api\/acquire/, ''),
-        },
-        '/api/davinci': {
-          target: 'http://localhost:8001',
-          changeOrigin: true,
-          secure: true,
-          ws: true,
-          rewrite: path => path.replace(/^\/api\/davinci/, ''),
-        },
-        '/api/splendor': {
-          target: 'http://localhost:8002',
-          changeOrigin: true,
-          secure: true,
-          ws: true,
-          rewrite: path => path.replace(/^\/api\/splendor/, ''),
         },
         '/pam-api': {
           target: env.VITE_PAM_GATEWAY_TARGET || 'http://localhost:19003',
@@ -115,7 +100,6 @@ export default defineConfig(({ mode }) => {
         output: {
           manualChunks(id) {
             if (id.includes('node_modules')) {
-              if (id.includes('@babylonjs') || id.includes('babylonjs')) return 'vendor-babylon';
               if (id.includes('react')) return 'vendor-react';
               if (id.includes('antd')) return 'vendor-antd';
               return 'vendor';

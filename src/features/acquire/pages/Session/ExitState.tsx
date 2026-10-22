@@ -1,5 +1,5 @@
 import { ArrowLeft, CircleAlert } from 'lucide-react';
-import { ActionButton } from '../../components/ActionButton';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import styles from './index.module.less';
 
 export function SessionExitState({ title, message, onLeave }: { title: string; message: string; onLeave: () => void }) {

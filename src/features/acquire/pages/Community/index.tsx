@@ -1,12 +1,17 @@
-import { useCallback, useEffect, useRef, useState, type RefObject } from 'react';
+import { useCallback, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, Check, ChevronRight, Clock, Code2, Copy, ExternalLink, Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
-import { getProfile, logout } from '@/api/room';
-import { getMyStats, listMyGames } from '@/api/history';
-import { getLeaderboard } from '@/api/leaderboard';
+import { GameTabs } from '@/components/GameUI/GameTabs';
+import { getProfile } from '@/features/game-core/api/auth';
+import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
+import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
+import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
+import { useGameStats } from '@/features/game-core/hooks/useGameStats';
+import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useInfiniteLoad } from '@/features/game-core/hooks/useInfiniteLoad';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { ActionButton } from '../../components/ActionButton';
-import { Feedback } from '../../components/Panel';
+import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Feedback } from '@/components/GameUI/Panel';
 import { AcquireLoading } from '../../components/LoadingState';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { StockPrices } from '../../dialogs/StockPrices';
@@ -14,13 +19,10 @@ import { useAcquireResource } from '../../hooks/useAcquireResource';
 import { money } from '../../model/session';
 import tableArt from '../../assets/table-art.webp';
 import styles from './index.module.less';
-import type { Game } from '@/types/history';
-import type { LeaderboardEntry, LeaderboardSortDim } from '@/types/leaderboard';
+import type { LeaderboardSortDim } from '@/features/game-core/model/history';
 
 const RANKING_PAGE_SIZE = 8;
 const HISTORY_PAGE_SIZE = 20;
-const LOAD_MORE_MARGIN = 180;
-const loadStats = () => getMyStats('acquire');
 const guideSteps = [
   {
     tab: '开始',
@@ -81,123 +83,24 @@ function InfiniteFooter({ loading, error, hasMore, retry, anchorRef }: {
   </div>;
 }
 
-function findScrollParent(element: HTMLElement): HTMLElement | Window {
-  let parent = element.parentElement;
-  while (parent) {
-    const style = window.getComputedStyle(parent);
-    if (/(auto|scroll|overlay)/.test(style.overflowY) && parent.scrollHeight > parent.clientHeight) {
-      return parent;
-    }
-    parent = parent.parentElement;
-  }
-  return window;
-}
-
-function useInfiniteLoad(
-  anchorRef: RefObject<HTMLDivElement>,
-  enabled: boolean,
-  loadMore: () => void
-) {
-  const loadMoreRef = useRef(loadMore);
-  useEffect(() => { loadMoreRef.current = loadMore; }, [loadMore]);
-
-  useEffect(() => {
-    const anchor = anchorRef.current;
-    if (!anchor || !enabled) return;
-
-    let frame = 0;
-    const checkNearEnd = () => {
-      if (frame) return;
-      frame = window.requestAnimationFrame(() => {
-        frame = 0;
-        const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
-        if (anchor.getBoundingClientRect().top <= viewportHeight + LOAD_MORE_MARGIN) {
-          loadMoreRef.current();
-        }
-      });
-    };
-
-    const observer = typeof IntersectionObserver === 'undefined' ? null : new IntersectionObserver(([entry]) => {
-      if (entry.isIntersecting) loadMoreRef.current();
-    }, { rootMargin: `${LOAD_MORE_MARGIN}px 0px` });
-    observer?.observe(anchor);
-
-    const scrollParent = findScrollParent(anchor);
-    scrollParent.addEventListener('scroll', checkNearEnd, { passive: true });
-    window.addEventListener('resize', checkNearEnd);
-    checkNearEnd();
-
-    return () => {
-      if (frame) window.cancelAnimationFrame(frame);
-      observer?.disconnect();
-      scrollParent.removeEventListener('scroll', checkNearEnd);
-      window.removeEventListener('resize', checkNearEnd);
-    };
-  }, [anchorRef, enabled]);
-}
-
 export function Rankings() {
   const profile = useAcquireResource(getProfile);
   const [mode, setMode] = useState<'score' | 'games'>('score');
-  const [entries, setEntries] = useState<LeaderboardEntry[]>([]);
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState('');
-  const [revision, setRevision] = useState(0);
-  const requestSeq = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const loadingNextRef = useRef(false);
   const rankingSort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
-  const retry = useCallback(() => {
-    loadingNextRef.current = false;
-    setEntries([]);
-    setHasMore(true);
-    setPage(0);
-    setRevision(value => value + 1);
-  }, []);
-  useEffect(() => {
-    const requestID = ++requestSeq.current;
-    setLoading(true);
-    setError('');
-    getLeaderboard({ gameType: 'acquire', limit: RANKING_PAGE_SIZE, offset: page * RANKING_PAGE_SIZE, sort: rankingSort })
-      .then(result => {
-        if (requestID !== requestSeq.current) return;
-        const next = result.entries ?? [];
-        setEntries(current => page === 0 ? next : [
-          ...current,
-          ...next.filter(entry => !current.some(item => item.userID === entry.userID)),
-        ]);
-        setHasMore(next.length === RANKING_PAGE_SIZE);
-      })
-      .catch(reason => {
-        if (requestID === requestSeq.current) setError(reason instanceof Error ? reason.message : '加载失败，请重试');
-      })
-      .finally(() => {
-        if (requestID === requestSeq.current) {
-          loadingNextRef.current = false;
-          setLoading(false);
-        }
-      });
-    return () => { requestSeq.current = requestID + 1; };
-  }, [page, rankingSort, revision]);
-  const changeMode = useCallback((nextMode: 'score' | 'games') => {
-    if (nextMode === mode) return;
-    loadingNextRef.current = false;
-    setMode(nextMode);
-    setEntries([]);
-    setHasMore(true);
-    setLoading(true);
-    setPage(0);
-    setRevision(value => value + 1);
-  }, [mode]);
-  const loadNextPage = useCallback(() => {
-    if (!hasMore || loading || error || loadingNextRef.current) return;
-    loadingNextRef.current = true;
-    setLoading(true);
-    setPage(value => value + 1);
-  }, [error, hasMore, loading]);
-  useInfiniteLoad(sentinelRef, entries.length > 0 && hasMore && !loading && !error, loadNextPage);
+  const {
+    entries,
+    loading,
+    error,
+    hasMore,
+    loadMore,
+    retry,
+  } = useGameLeaderboard({
+    gameType: 'acquire',
+    pageSize: RANKING_PAGE_SIZE,
+    sort: rankingSort,
+  });
+  useInfiniteLoad(sentinelRef, entries.length > 0 && hasMore && !loading && !error, loadMore);
   const sorted = entries;
   const myIndex = sorted.findIndex(entry => String(entry.userID) === String(profile.data?.id));
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page + ' ' + styles.rankPage}>
@@ -205,7 +108,10 @@ export function Rankings() {
     <section className={styles.rankHero}><Trophy size={39} /><div><small>ACQUIRE LEADERBOARD</small><h2>城市合伙人榜</h2><p>用平均名次衡量稳定发挥，也记录每一张完成的桌。</p></div>
       <div className={styles.myRank}><span>我的排名</span><b>{myIndex >= 0 ? '#' + (myIndex + 1) : '—'}</b><small>{myIndex >= 0 && 'avgRank' in sorted[myIndex] ? '平均名次 ' + sorted[myIndex].avgRank.toFixed(2) : '完成对局后进入排行'}</small></div>
     </section>
-    <section className={styles.rankPanel}><div className={styles.rankTabs}><button data-click-sound="tab" className={mode === 'score' ? styles.activeTab : ''} onClick={() => changeMode('score')}>战绩榜</button><button data-click-sound="tab" className={mode === 'games' ? styles.activeTab : ''} onClick={() => changeMode('games')}>场次榜</button></div>
+    <section className={styles.rankPanel}><GameTabs className={styles.rankTabs} activeClassName={styles.activeTab}
+      ariaLabel="排行榜模式" value={mode} onChange={setMode}
+      items={[{ value: 'score', label: '战绩榜' }, { value: 'games', label: '场次榜' }]}
+      getItemProps={() => ({ 'data-click-sound': 'tab' })} />
       <div className={styles.rankRow + ' ' + styles.rankHead}><span>名次</span><span>玩家</span><span>完成对局</span><span>平均名次</span></div>
       <Status resource={{ loading: loading && !entries.length, error: error && !entries.length ? error : '', retry }} />{sorted.map((entry, index) => { const mine = String(entry.userID) === String(profile.data?.id); return <div className={styles.rankRow + (mine ? ' ' + styles.rankSelf : '')} key={entry.userID}>
         <span className={styles.rankNumber}>{index === 0 ? <Trophy size={22} /> : String(index + 1).padStart(2, '0')}</span>
@@ -219,71 +125,23 @@ export function Rankings() {
 }
 export function My() {
   const profile = useAcquireResource(getProfile);
-  const stats = useAcquireResource(loadStats);
+  const stats = useGameStats('acquire');
+  const {
+    games,
+    loading: historyLoading,
+    error: historyError,
+    hasMore,
+    loadMore: loadNextHistoryPage,
+    retry: retryHistory,
+  } = useGameHistory({ gameType: 'acquire', pageSize: HISTORY_PAGE_SIZE });
+  const logoutAction = useGameLogout();
   const [aboutOpen, setAboutOpen] = useState(false);
   const [qqCopied, setQQCopied] = useState(false);
-  const [games, setGames] = useState<Game[]>([]);
-  const [logoutPending, setLogoutPending] = useState(false);
-  const [logoutError, setLogoutError] = useState('');
-  const [page, setPage] = useState(0);
-  const [hasMore, setHasMore] = useState(true);
-  const [historyLoading, setHistoryLoading] = useState(true);
-  const [historyError, setHistoryError] = useState('');
-  const [revision, setRevision] = useState(0);
-  const requestSeq = useRef(0);
   const sentinelRef = useRef<HTMLDivElement>(null);
-  const loadingNextRef = useRef(false);
-  const retryHistory = useCallback(() => {
-    loadingNextRef.current = false;
-    setGames([]);
-    setHasMore(true);
-    setPage(0);
-    setRevision(value => value + 1);
-  }, []);
-  useEffect(() => {
-    const requestID = ++requestSeq.current;
-    setHistoryLoading(true);
-    setHistoryError('');
-    listMyGames({ gameType: 'acquire', limit: HISTORY_PAGE_SIZE, offset: page * HISTORY_PAGE_SIZE })
-      .then(result => {
-        if (requestID !== requestSeq.current) return;
-        const next = result.games ?? [];
-        setGames(current => page === 0 ? next : [
-          ...current,
-          ...next.filter(game => !current.some(item => item.id === game.id)),
-        ]);
-        setHasMore(next.length === HISTORY_PAGE_SIZE);
-      })
-      .catch(reason => {
-        if (requestID === requestSeq.current) setHistoryError(reason instanceof Error ? reason.message : '加载失败，请重试');
-      })
-      .finally(() => {
-        if (requestID === requestSeq.current) {
-          loadingNextRef.current = false;
-          setHistoryLoading(false);
-        }
-      });
-    return () => { requestSeq.current = requestID + 1; };
-  }, [page, revision]);
-  const loadNextHistoryPage = useCallback(() => {
-    if (!hasMore || historyLoading || historyError || loadingNextRef.current) return;
-    loadingNextRef.current = true;
-    setHistoryLoading(true);
-    setPage(value => value + 1);
-  }, [hasMore, historyError, historyLoading]);
   const handleLogout = useCallback(async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
-    setLogoutPending(true);
-    setLogoutError('');
-    try {
-      await logout();
-      localStorage.removeItem('profile');
-      window.location.href = 'https://auth.gamebus.online/login?redirect=' + encodeURIComponent(window.location.href);
-    } catch (reason) {
-      setLogoutError(reason instanceof Error ? reason.message : '退出登录失败，请稍后重试');
-      setLogoutPending(false);
-    }
-  }, []);
+    await logoutAction.run();
+  }, [logoutAction]);
   const copyQQ = useCallback(async () => {
     try {
       await navigator.clipboard.writeText('1522457543');
@@ -303,8 +161,8 @@ export function My() {
         <div className={styles.profileEmail}><Mail size={14} />{profile.data.email || '邮箱未绑定'}</div></>}
       <Status resource={stats} showLoading={false} />{stats.data && <div className={styles.profileStats}><span><b>{stats.data.totalGames}</b><small>对局</small></span><span><b>{stats.data.wins}</b><small>胜场</small></span><span><b>{money(Math.round(stats.data.avgScore))}</b><small>平均资产</small></span></div>}
       {profile.data && <><div className={styles.profileManage}><a className={styles.profileEdit} href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
-          <ActionButton variant="quiet" className={styles.profileLogout} pending={logoutPending} onClick={handleLogout}><LogOut size={14} />退出登录</ActionButton></div>
-        {logoutError && <p role="alert" className={styles.profileLogoutError}>{logoutError}</p>}</>}
+          <ActionButton variant="quiet" className={styles.profileLogout} pending={logoutAction.pending} onClick={handleLogout}><LogOut size={14} />退出登录</ActionButton></div>
+        {logoutAction.error && <p role="alert" className={styles.profileLogoutError}>{logoutAction.error}</p>}</>}
     </section><section className={styles.profileHistory}><h2>对局记录</h2><Status resource={{ loading: historyLoading && !games.length, error: historyError && !games.length ? historyError : '', retry: retryHistory }} showLoading={false} />
       <ol className={styles.history}>{games.map(game => { const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id)); return <li key={game.id}><div><strong>{game.roomID}</strong><small>{new Date(game.startedAt).toLocaleString('zh-CN')} · {game.endedAt ? '已结束' : '进行中'}</small>
         <small>{me?.isWinner ? '本局获胜 · ' : ''}{me?.finalScore != null ? money(me.finalScore) + ' · ' : ''}时长 {Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</small></div>
@@ -339,15 +197,14 @@ export function Guide() {
   const navigate = useNavigate();
   const profile = useAcquireResource(getProfile);
   const [prices, setPrices] = useState(false);
-  const [guideTab, setGuideTab] = useState(0);
-  const step = guideSteps[guideTab];
-  const lastStep = guideTab === guideSteps.length - 1;
+  const guide = useGuideSteps(guideSteps);
+  const step = guide.current;
   const handlePrimaryAction = () => {
-    if (lastStep) {
+    if (guide.isLast) {
       navigate('/game/acquire');
       return;
     }
-    setGuideTab(index => Math.min(index + 1, guideSteps.length - 1));
+    guide.next();
   };
   return <AppShell title="玩法指南" profile={profile.data}><div className={`${styles.page} ${styles.guidePage}`}>
     <div className={styles.guide}>
@@ -355,14 +212,16 @@ export function Guide() {
       <div className={styles.guideLayout}><aside><img src={tableArt} alt="Acquire 桌面材质示意" />
         <div className={styles.guideFacts}><span><Users size={18} />2–6 人</span><span><Clock size={18} />45–90 分钟</span><span><Building2 size={18} />108 块地</span></div>
       </aside><section className={styles.guidePanel}>
-        <div className={styles.guideTabs} role="tablist" aria-label="玩法章节">{guideSteps.map((item, index) =>
-          <button key={item.tab} role="tab" aria-selected={guideTab === index} className={guideTab === index ? styles.activeTab : ''} onClick={() => setGuideTab(index)}>
-            {String(index + 1).padStart(2, '0')} {item.tab}
-          </button>)}</div>
+        <GameTabs className={styles.guideTabs} activeClassName={styles.activeTab}
+          ariaLabel="玩法章节" value={guide.index} onChange={guide.select}
+          items={guideSteps.map((item, index) => ({
+            value: index,
+            label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+          }))} />
         <small className={styles.guideEyebrow}>THE ESSENTIALS</small><h2>{step.title}</h2><p>{step.text}</p>
         <ol>{step.points.map(point => <li key={point}>{point}</li>)}</ol>
         <div className={styles.guideHint}><ShieldCheck size={16} /><span>本页遵循当前在线版本。股价、并列分红与超时处理以实际游戏服务为准。</span></div>
-        <div className={styles.guideActions}><ActionButton variant="primary" onClick={handlePrimaryAction}>{lastStep ? '创建房间' : '下一步'}<ArrowRight size={16} /></ActionButton>
+        <div className={styles.guideActions}><ActionButton variant="primary" onClick={handlePrimaryAction}>{guide.isLast ? '创建房间' : '下一步'}<ArrowRight size={16} /></ActionButton>
           <ActionButton onClick={() => setPrices(true)}>股价速查</ActionButton></div>
       </section></div>
     </div>

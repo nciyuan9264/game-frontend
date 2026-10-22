@@ -17,8 +17,11 @@ vi.mock('../../components/ResponsiveDialog', () => ({
 }));
 
 const data: MatchSnapshot = {
+  schemaVersion: 2,
   type: 'MATCH_SYNC',
   roomID: 'room 1/2',
+  matchID: 'match-1',
+  seq: 1,
   ownerID: 'Alice-42',
   playerID: 'Alice-42',
   visibility: 'private',
