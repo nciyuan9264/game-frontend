@@ -5,7 +5,7 @@ import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
-import { canPlace, tilePreview } from '../../model/selectors';
+import { canPlace, mergeSettlementPlayer, tilePreview } from '../../model/selectors';
 import { endGameState, money, playerName, type GameSnapshot, type DisplaySnapshot } from '../../model/session';
 import { companyColors, companyKeys, type Company } from '../../model/types';
 import styles from './index.module.less';
@@ -55,10 +55,8 @@ export function PhaseBanner({ data, interaction, action }: { data: GameSnapshot;
   const ended = data.roomData.gameStatus === 'end';
   const waitingForMerger = data.roomData.gameStatus === 'mergingSettle' && interaction.eligiblePanel !== 'merge';
   const players = data.roomData.players;
-  const playerIDs = data.roomData.playerOrder?.filter(id => players[id]) ?? Object.keys(players);
-  const mergingPlayers = new Set(Object.values(data.tempData.mergeSettleData ?? {}).flatMap(settlement => settlement.hoders ?? []));
   const activePlayerID = data.roomData.gameStatus === 'mergingSettle'
-    ? (mergingPlayers.has(data.playerId) ? data.playerId : playerIDs.find(id => mergingPlayers.has(id)))
+    ? mergeSettlementPlayer(data)
     : data.roomData.currentPlayer;
   const phasePlayerID = activePlayerID && players[activePlayerID] ? activePlayerID : data.playerId;
   const phasePlayer = players[phasePlayerID];

@@ -9,13 +9,25 @@ export function settledMergeCompanies(data: GameSnapshot): Company[] {
 }
 export function pendingMergePlayers(data: GameSnapshot): string[] {
   const pending = new Set(companyKeys.flatMap(company => data.tempData.mergeSettleData?.[company]?.hoders ?? []));
-  return (data.roomData.playerOrder ?? Object.keys(data.roomData.players)).filter(playerID => pending.has(playerID));
+  return (data.roomData.playerOrder ?? Object.keys(data.roomData.players ?? {})).filter(playerID => pending.has(playerID));
+}
+export function mergeSettlementPlayer(data: GameSnapshot): string | undefined {
+  if (data.tempData.merge_settle_current_player) return data.tempData.merge_settle_current_player;
+  const pending = new Set(pendingMergePlayers(data));
+  const order = data.roomData.playerOrder ?? Object.keys(data.roomData.players ?? {});
+  const start = Math.max(0, order.indexOf(data.roomData.currentPlayer));
+  for (let offset = 0; offset < order.length; offset++) {
+    const playerID = order[(start + offset) % order.length];
+    if (pending.has(playerID)) return playerID;
+  }
 }
 export function actionPanel(data?: GameSnapshot): BusinessPanel | undefined {
   if (!data) return;
   if (data.roomData.gameStatus === 'mergingSettle') {
-    if (mergeCompanies(data).length) return 'merge';
-    if (settledMergeCompanies(data).length && pendingMergePlayers(data).length) return 'merge-wait';
+    const pending = pendingMergePlayers(data);
+    const companies = mergeCompanies(data);
+    if (mergeSettlementPlayer(data) === data.playerId && companies.length) return 'merge';
+    if (pending.length) return 'merge-wait';
   }
   if (data.playerId !== data.roomData.currentPlayer) return;
   switch (data.roomData.gameStatus) {

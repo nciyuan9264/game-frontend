@@ -117,6 +117,7 @@ describe('Acquire drafts', () => {
     const data = session.snapshot as GameSnapshot;
     data.playerData.stocks.American = 3;
     data.tempData.mergeSettleData.American = { hoders: ['me'], dividends: { me: 3000 } };
+    data.tempData.merge_settle_current_player = 'me';
 
     const { result } = renderHook(() => useAcquireInteraction(session));
 
@@ -130,6 +131,7 @@ describe('Acquire drafts', () => {
     data.roomData.players = { me: { playerID: 'me' }, guest: { playerID: 'guest' } } as never;
     data.playerData.stocks.American = 4;
     data.tempData.mergeSettleData.American = { hoders: ['me', 'guest'], dividends: { me: 3000 } };
+    data.tempData.merge_settle_current_player = 'me';
     const { result, rerender } = renderHook(({ value }) => useAcquireInteraction(value), { initialProps: { value: session } });
     expect(result.current.panel).toBe('merge');
 
@@ -138,9 +140,32 @@ describe('Acquire drafts', () => {
       hoders: ['guest'], dividends: { me: 3000 },
       settled: { me: { holdingBefore: 4, sellAmount: 2, exchangeAmount: 2 } },
     };
+    next.tempData.merge_settle_current_player = 'guest';
     rerender({ value: { ...session, snapshot: next } });
 
     expect(result.current.eligiblePanel).toBe('merge-wait');
     expect(result.current.panel).toBe('merge-wait');
+  });
+  it('opens merger actions only when the serial settlement turn reaches this player', () => {
+    const session = createSession('mergingSettle');
+    const data = session.snapshot as GameSnapshot;
+    data.roomData.playerOrder = ['guest', 'me'];
+    data.roomData.players = { me: { playerID: 'me' }, guest: { playerID: 'guest' } } as never;
+    data.playerData.stocks.American = 2;
+    data.tempData.mergeSettleData.American = { hoders: ['me', 'guest'], dividends: {} };
+    data.tempData.merge_settle_current_player = 'guest';
+    const { result, rerender } = renderHook(({ value }) => useAcquireInteraction(value), { initialProps: { value: session } });
+
+    expect(result.current.eligiblePanel).toBe('merge-wait');
+    expect(result.current.panel).toBe('merge-wait');
+
+    const next = structuredClone(data);
+    next.seq++;
+    next.tempData.mergeSettleData.American.hoders = ['me'];
+    next.tempData.merge_settle_current_player = 'me';
+    rerender({ value: { ...session, snapshot: next } });
+
+    expect(result.current.eligiblePanel).toBe('merge');
+    expect(result.current.panel).toBe('merge');
   });
 });

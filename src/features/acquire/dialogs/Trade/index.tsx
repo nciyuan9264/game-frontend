@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { ArrowRight, Check, Coins, Layers, LoaderCircle, Lock, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowRight, Check, Clock, Coins, Layers, LoaderCircle, Lock, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
@@ -8,7 +8,7 @@ import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
-import { buyPreview, mergeCompanies, mergePreview, pendingMergePlayers, settledMergeCompanies } from '../../model/selectors';
+import { buyPreview, mergeCompanies, mergePreview, mergeSettlementPlayer, pendingMergePlayers, settledMergeCompanies } from '../../model/selectors';
 import { money, playerName, type GameSnapshot } from '../../model/session';
 import { companyColors, companyKeys, type Company } from '../../model/types';
 import styles from './index.module.less';
@@ -89,7 +89,13 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
     const settledSources = settledMergeCompanies(data);
     const pendingPlayers = pendingMergePlayers(data);
     const pendingSet = new Set(pendingPlayers);
+    const currentPlayerID = mergeSettlementPlayer(data);
     const completedSet = new Set(companyKeys.flatMap(key => Object.keys(data.tempData.mergeSettleData?.[key]?.settled ?? {})));
+    const waitingForTurn = pendingSet.has(data.playerId);
+    const completed = completedSet.has(data.playerId);
+    const currentPlayerName = currentPlayerID
+      ? playerName(currentPlayerID, data.roomData.players)
+      : '其他股东';
     const participantIDs = (data.roomData.playerOrder ?? Object.keys(data.roomData.players))
       .filter(playerID => pendingSet.has(playerID) || completedSet.has(playerID));
     const receipt = settledSources.reduce((total, key) => {
@@ -101,21 +107,25 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
       total.revenue += result.sellAmount * data.roomData.companyInfo[key].stockPrice;
       return total;
     }, { sold: 0, exchanged: 0, retained: 0, revenue: 0 });
-    return <ResponsiveDialog title="你的选择已确认，等待其他股东。" eyebrow="MERGER / PROCESSING" onClose={interaction.close}
-      footer={<><span className={styles.waitFooter}><LoaderCircle size={15} />正在等待其他股东</span><ActionButton onClick={interaction.close}>返回棋盘</ActionButton></>}>
-      <div className={styles.submitted}><span><Check size={27} /></span><h3>股票处理已提交</h3>
+    return <ResponsiveDialog title={waitingForTurn ? `等待 ${currentPlayerName} 完成处理。`
+      : completed ? '你的选择已确认，等待其他股东。' : `并购结算进行中，当前由 ${currentPlayerName} 处理。`} eyebrow="MERGER / PROCESSING" onClose={interaction.close}
+      footer={<><span className={styles.waitFooter}><LoaderCircle size={15} />等待 {currentPlayerName}</span><ActionButton onClick={interaction.close}>返回棋盘</ActionButton></>}>
+      <div className={styles.submitted}><span>{completed ? <Check size={27} /> : <Clock size={27} />}</span><h3>{waitingForTurn ? '尚未轮到你' : completed ? '股票处理已提交' : '并购结算清单'}</h3>
         <p>{sources.join(' + ')} → {data.tempData.merge_main_company_temp}</p></div>
       <MergerDividends data={data} sources={sources} />
-      <div className={styles.mergeReceipt}><span><small>卖出旧股</small><b>{receipt.sold} 股</b><em>+{money(receipt.revenue)}</em></span>
+      {completed && <div className={styles.mergeReceipt}><span><small>卖出旧股</small><b>{receipt.sold} 股</b><em>+{money(receipt.revenue)}</em></span>
         <span><small>兑换新股</small><b>{receipt.exchanged} 股</b><em>使用 {receipt.exchanged * 2} 股旧股</em></span>
-        <span><small>保留旧股</small><b>{receipt.retained} 股</b><em>等待未来机会</em></span></div>
+        <span><small>保留旧股</small><b>{receipt.retained} 股</b><em>等待未来机会</em></span></div>}
       <div className={styles.settlementPlayers}>{participantIDs.map(playerID => {
         const player = data.roomData.players[playerID], pending = pendingSet.has(playerID);
+        const active = pending && playerID === currentPlayerID;
         return <div key={playerID}><PlayerAvatar name={playerName(playerID, data.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={35} />
-          <span>{playerName(playerID, data.roomData.players)}</span><b className={pending ? styles.pendingSettlement : ''}>
-            {pending ? <><LoaderCircle size={13} />处理中</> : <><Check size={13} />已完成</>}</b></div>;
+          <span>{playerName(playerID, data.roomData.players)}</span><b className={active ? styles.pendingSettlement : ''}>
+            {active ? <><LoaderCircle size={13} />处理中</> : pending ? <><Clock size={13} />等待中</> : <><Check size={13} />已完成</>}</b></div>;
       })}</div>
-      {hint(`你已完成 ${settledSources.length} 家被并公司的股票处理。全部股东提交后，对局将自动进入下一阶段。`)}
+      {hint(waitingForTurn ? '股东按座位顺序依次处理股票；轮到你时系统会自动打开操作面板。'
+        : completed ? `你已完成 ${settledSources.length} 家被并公司的股票处理。全部股东提交后，对局将自动进入下一阶段。`
+          : '结算清单会实时更新；只有当前股东可以提交股票处理方案。')}
     </ResponsiveDialog>;
   }
   if (panel === 'merge') {

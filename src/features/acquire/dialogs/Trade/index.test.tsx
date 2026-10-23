@@ -40,6 +40,7 @@ function mergeSnapshot(): GameSnapshot {
     },
     tempData: {
       merge_main_company_temp: 'Tower',
+      merge_settle_current_player: 'me',
       merge_selection_temp: { mainCompany: [], otherCompany: [] },
       mergeSettleData: {
         American: { hoders: ['me'], dividends: { me: 4000, guest: 2000 } },
@@ -83,6 +84,7 @@ describe('TradeDialog merger state', () => {
       hoders: [], dividends: { me: 3000 },
       settled: { me: { holdingBefore: 4, sellAmount: 0, exchangeAmount: 2 } },
     };
+    data.tempData.merge_settle_current_player = 'guest';
     const interaction = {
       data,
       panel: 'merge-wait',
@@ -102,6 +104,48 @@ describe('TradeDialog merger state', () => {
     expect(screen.getByRole('region', { name: '股东奖励明细', hidden: true })).toBeTruthy();
     expect(screen.getByText('已完成')).toBeTruthy();
     expect(screen.getByText('处理中')).toBeTruthy();
+  });
+  it('renders a waiting state before this shareholder turn', () => {
+    const data = mergeSnapshot();
+    data.tempData.merge_settle_current_player = 'guest';
+    data.tempData.mergeSettleData.American.hoders = ['me', 'guest'];
+    const interaction = {
+      data,
+      panel: 'merge-wait',
+      draft: { key: 'room:4', buy: {}, merge: {}, panel: 'merge-wait' },
+      enabled: true,
+      close: vi.fn(),
+    } as unknown as AcquireInteraction;
+    const session = { pending: undefined, feedback: '' } as unknown as AcquireSession;
+
+    render(<TradeDialog interaction={interaction} session={session} />);
+
+    expect(screen.getByText('尚未轮到你')).toBeTruthy();
+    expect(screen.getByText('等待中')).toBeTruthy();
+    expect(screen.queryByText('卖出旧股')).toBeNull();
+  });
+  it('shows a read-only settlement checklist to a non-shareholder', () => {
+    const data = mergeSnapshot();
+    data.playerId = 'observer';
+    data.roomData.playerOrder = ['me', 'guest', 'observer'];
+    data.roomData.players.observer = { playerID: 'observer', name: 'Observer', online: true, ai: false, ready: true } as never;
+    data.tempData.merge_settle_current_player = 'guest';
+    data.tempData.mergeSettleData.American.hoders = ['guest'];
+    data.tempData.mergeSettleData.Festival.hoders = [];
+    const interaction = {
+      data,
+      panel: 'merge-wait',
+      draft: { key: 'room:4', buy: {}, merge: {}, panel: 'merge-wait' },
+      enabled: true,
+      close: vi.fn(),
+    } as unknown as AcquireInteraction;
+    const session = { pending: undefined, feedback: '' } as unknown as AcquireSession;
+
+    render(<TradeDialog interaction={interaction} session={session} />);
+
+    expect(screen.getByText('并购结算清单')).toBeTruthy();
+    expect(screen.getByText('处理中')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: '确认股票处理', hidden: true })).toBeNull();
   });
 });
 

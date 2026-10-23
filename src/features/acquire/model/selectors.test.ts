@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest';
-import { actionPanel, buyPreview, confirmsCommand, mergeCompanies, mergePreview, pendingMergePlayers, settledMergeCompanies, tilePreview } from './selectors';
+import { actionPanel, buyPreview, confirmsCommand, mergeCompanies, mergePreview, mergeSettlementPlayer, pendingMergePlayers, settledMergeCompanies, tilePreview } from './selectors';
 import type { GameSnapshot, PendingCommand } from './session';
 import { companyKeys } from './types';
 
@@ -91,9 +91,30 @@ describe('authoritative transaction previews', () => {
     game.roomData.gameStatus = 'mergingSettle';
     game.tempData.mergeSettleData.American = { hoders: ['me-1'], dividends: {} };
     game.tempData.mergeSettleData.Festival = { hoders: ['guest', 'me-1'], dividends: {} };
+    game.tempData.merge_settle_current_player = 'me-1';
 
     expect(actionPanel(game)).toBe('merge');
     expect(mergeCompanies(game)).toEqual(['American', 'Festival']);
+  });
+  it('keeps a pending shareholder waiting until the server selects them', () => {
+    const game = gameFixture();
+    game.roomData.gameStatus = 'mergingSettle';
+    game.roomData.playerOrder = ['me-1', 'guest'];
+    game.tempData.mergeSettleData.American = { hoders: ['me-1', 'guest'], dividends: {} };
+    game.tempData.merge_settle_current_player = 'guest';
+
+    expect(mergeSettlementPlayer(game)).toBe('guest');
+    expect(actionPanel(game)).toBe('merge-wait');
+  });
+  it('shows the read-only settlement list to players without acquired shares', () => {
+    const game = gameFixture();
+    game.roomData.gameStatus = 'mergingSettle';
+    game.roomData.playerOrder = ['me-1', 'guest'];
+    game.tempData.mergeSettleData.American = { hoders: ['guest'], dividends: {} };
+    game.tempData.merge_settle_current_player = 'guest';
+
+    expect(mergeCompanies(game)).toEqual([]);
+    expect(actionPanel(game)).toBe('merge-wait');
   });
   it('opens merger waiting after this player submits while another holder is pending', () => {
     const game = gameFixture();
@@ -104,6 +125,7 @@ describe('authoritative transaction previews', () => {
       hoders: ['guest'], dividends: { 'me-1': 3000 },
       settled: { 'me-1': { holdingBefore: 4, sellAmount: 2, exchangeAmount: 2 } },
     };
+    game.tempData.merge_settle_current_player = 'guest';
 
     expect(actionPanel(game)).toBe('merge-wait');
     expect(settledMergeCompanies(game)).toEqual(['American']);

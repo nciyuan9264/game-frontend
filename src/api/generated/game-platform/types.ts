@@ -204,6 +204,7 @@ export interface AcquireTempData {
   mergeSettleData: Record<string, AcquireSettleData>;
   merge_main_company_temp: string;
   merge_selection_temp: AcquireMergingSelection;
+  merge_settle_current_player?: string;
 }
 
 export interface AcquirePlayerResult {
