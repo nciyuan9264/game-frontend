@@ -20,7 +20,14 @@ import { Activity, Deadline, EndVoteControl, PhaseAction, PhaseBanner } from './
 import { useMobilePlayFit } from './useMobilePlayFit';
 import styles from './index.module.less';
 
-export function Play({ data, session, interaction, onLeave }: { data: GameSnapshot; session: AcquireSession; interaction: AcquireInteraction; onLeave: () => void }) {
+export function Play({ data, session, interaction, onLeave, onStartNextMatch, startNextMatchPending = false }: {
+  data: GameSnapshot;
+  session: AcquireSession;
+  interaction: AcquireInteraction;
+  onLeave: () => void;
+  onStartNextMatch?: () => Promise<boolean>;
+  startNextMatchPending?: boolean;
+}) {
   const { isMobile } = useAcquireViewport();
   const [panel, setPanel] = useState<'zoom' | 'activity' | 'finish' | 'results' | 'restart'>();
   const [priceTier, setPriceTier] = useState<number>();
@@ -71,9 +78,12 @@ export function Play({ data, session, interaction, onLeave }: { data: GameSnapsh
     resultsAction: end ? <ActionButton variant="primary" aria-label="查看本局结算" onClick={() => setPanel('results')}><Trophy size={16} />查看结算</ActionButton> : undefined,
     boardTools: <div className={styles.boardTools}><button className={styles.zoomButton} onClick={() => setPanel('zoom')}><Maximize2 size={13} />放大棋盘</button></div> };
   if (end && (panel === 'results' || panel === 'restart')) return <><Results data={data} enabled={interaction.enabled} onClose={() => setPanel(undefined)}
-    onLeave={onLeave} onRestart={data.ownerID === data.playerId ? () => setPanel('restart') : undefined} />
+    onLeave={onLeave} onRestart={data.ownerID === data.playerId && onStartNextMatch ? () => setPanel('restart') : undefined} />
     {panel === 'restart' && <ResponsiveDialog title="重新开局" onClose={() => setPanel('results')}
-      footer={<><ActionButton onClick={() => setPanel('results')}>取消</ActionButton><ActionButton variant="primary" disabled={!interaction.enabled} onClick={() => { if (session.submit('game_restart_game')) setPanel(undefined); }}>确认重开</ActionButton></>}>
+      footer={<><ActionButton onClick={() => setPanel('results')}>取消</ActionButton><ActionButton variant="primary"
+        disabled={!interaction.enabled || startNextMatchPending} onClick={() => {
+          void onStartNextMatch?.().then(started => { if (started) setPanel(undefined); });
+        }}>确认重开</ActionButton></>}>
       <p>本局已结束。确认后回到准备房间，由房主开始下一局。</p>
     </ResponsiveDialog>}</>;
   return <>

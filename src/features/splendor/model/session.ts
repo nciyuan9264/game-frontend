@@ -72,8 +72,7 @@ export type CommandType =
   | 'game_ready'
   | 'game_get_gem'
   | 'game_buy_card'
-  | 'game_preserve_card'
-  | 'game_restart_game';
+  | 'game_preserve_card';
 
 export type PendingCommand = SessionPendingCommand<
   Snapshot,

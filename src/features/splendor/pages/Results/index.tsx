@@ -8,11 +8,13 @@ import { playerName, type GameSnapshot } from '../../model/session';
 import { winnerIDs } from '../../model/selectors';
 import styles from './index.module.less';
 
-export function Results({ session, data, onViewBoard, onLeave, readOnly = false }: {
+export function Results({ session, data, onViewBoard, onLeave, onRestart, restarting = false, readOnly = false }: {
   session?: SplendorSession;
   data: GameSnapshot;
   onViewBoard: () => void;
   onLeave: () => void;
+  onRestart?: () => Promise<boolean>;
+  restarting?: boolean;
   readOnly?: boolean;
 }) {
   const winners = winnerIDs(data);
@@ -54,8 +56,9 @@ export function Results({ session, data, onViewBoard, onLeave, readOnly = false 
         <p className={styles.note}><ShieldCheck size={15} />已完成触发终局的当前轮，每位玩家行动次数相同。
           同分时发展卡更少者优先；仍相同则共享胜利。</p>
         <div className={styles.actions}><ActionButton onClick={onViewBoard}><Eye size={16} />查看终局牌面</ActionButton>
-          {!readOnly && owner && session && <ActionButton variant="primary" disabled={!!session.pending}
-            onClick={() => session.submit('game_restart_game')}><RotateCcw size={16} />再来一局<ArrowRight size={17} /></ActionButton>}</div>
+          {!readOnly && owner && session && onRestart && <ActionButton variant="primary"
+            disabled={!!session.pending || restarting} onClick={() => { void onRestart(); }}>
+            <RotateCcw size={16} />再来一局<ArrowRight size={17} /></ActionButton>}</div>
         <p className={styles.disclaimer}>结算结果来自本局服务端快照</p>
       </section></main>
   </div>;

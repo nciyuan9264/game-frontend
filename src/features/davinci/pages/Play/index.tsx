@@ -23,10 +23,14 @@ export function Play({
   session,
   data,
   onLeave,
+  onStartNextMatch,
+  startNextMatchPending = false,
 }: {
   session: DavinciSession;
   data: GameSnapshot;
   onLeave: () => void;
+  onStartNextMatch?: () => Promise<boolean>;
+  startNextMatchPending?: boolean;
 }) {
   const [selectedGuess, setSelectedGuess] = useState<Card>();
   const [rulesOpen, setRulesOpen] = useState(false);
@@ -67,7 +71,8 @@ export function Play({
   }, [data, interactive, session]);
 
   if (data.roomData.gameStatus === 'end' && showResults) {
-    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave} />;
+    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave}
+      onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
   return <div className={styles.play}>

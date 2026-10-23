@@ -70,7 +70,7 @@ const confirmsCommand = (
   next: TestSnapshot,
 ) => next.seq > command.before.seq;
 
-function useTestSession() {
+function useTestSession(url = 'ws://test') {
   return useAuthoritativeSession<
     TestSnapshot,
     TestMessage,
@@ -79,7 +79,7 @@ function useTestSession() {
     ReturnType<typeof useTestConnection>
   >({
     roomID: 'room',
-    url: 'ws://test',
+    url,
     useConnection: useTestConnection,
     confirmsCommand,
     createEmptyPayload: () => ({}),
@@ -187,5 +187,23 @@ describe('useAuthoritativeSession', () => {
     receive(result(commandID!));
     receive(snapshot(1, 'waiting'));
     expect(transport.send).toHaveBeenCalledTimes(1);
+  });
+
+  it('clears the old match boundary when the connection URL changes', () => {
+    const hook = renderHook(
+      ({ url }) => useTestSession(url),
+      { initialProps: { url: 'ws://test?matchID=match' } },
+    );
+    receive(snapshot(3));
+    act(() => {
+      hook.result.current.submit('act');
+    });
+
+    hook.rerender({ url: 'ws://test?matchID=match-2' });
+    expect(hook.result.current.snapshot).toBeUndefined();
+    expect(hook.result.current.pending).toBeUndefined();
+
+    receive({ ...snapshot(0), matchID: 'match-2' });
+    expect(hook.result.current.snapshot?.matchID).toBe('match-2');
   });
 });

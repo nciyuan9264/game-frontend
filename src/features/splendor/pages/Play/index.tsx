@@ -38,10 +38,18 @@ const rules = [
   ['终局判定', '达到十五点后完成当前轮。最高声望获胜；同分时发展卡更少者优先。'],
 ] as const;
 
-export function Play({ session, data, onLeave }: {
+export function Play({
+  session,
+  data,
+  onLeave,
+  onStartNextMatch,
+  startNextMatchPending = false,
+}: {
   session: SplendorSession;
   data: GameSnapshot;
   onLeave: () => void;
+  onStartNextMatch?: () => Promise<boolean>;
+  startNextMatchPending?: boolean;
 }) {
   const ui = useSplendorPlayUI(data);
   const [showResults, setShowResults] = useState(data.roomData.gameStatus === 'end');
@@ -85,7 +93,8 @@ export function Play({ session, data, onLeave }: {
 
   if (!me) return null;
   if (data.roomData.gameStatus === 'end' && showResults) {
-    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave} />;
+    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave}
+      onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
   const closeCard = () => {

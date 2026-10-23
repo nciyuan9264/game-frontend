@@ -2,6 +2,7 @@ import {
   CreateRoom,
   GetRoom,
   ListRooms,
+  StartNextMatch,
   type RoomInfo,
 } from '@/api/generated/game-platform';
 import type { GameType } from '@/hooks/useGameType';
@@ -91,6 +92,26 @@ export async function lookupGameRoom<TRoom = LobbyRoomLike>(
       room_id: roomID,
     }, requestOptions(options));
     return mapRoom<TRoom>(response.data);
+  } catch (reason) {
+    throw mapError(reason, options);
+  }
+}
+
+export async function startNextGameMatch(
+  gameType: GameType,
+  roomID: string,
+  options: GameRoomRequestOptions = {},
+): Promise<{ matchID: string; roundNo: number }> {
+  try {
+    const response = await StartNextMatch({
+      game_type: gameType,
+      room_id: roomID,
+      request_id: crypto.randomUUID(),
+    }, requestOptions(options));
+    return {
+      matchID: response.data.matchID,
+      roundNo: response.data.roundNo,
+    };
   } catch (reason) {
     throw mapError(reason, options);
   }

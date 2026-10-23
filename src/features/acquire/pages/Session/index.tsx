@@ -3,6 +3,7 @@ import { useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { lookupGameRoom } from '@/features/game-core/api/room';
+import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -26,7 +27,8 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAcquireResource(loadTarget);
-  const matchID = target.data?.matchID ?? '';
+  const nextMatch = useStartNextMatch('acquire', roomID);
+  const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useAcquireSession(roomID, matchID);
   const interaction = useAcquireInteraction(session);
   const leave = useAcquireLeave(session.connection.close);
@@ -55,8 +57,10 @@ function Session({ roomID }: { roomID: string }) {
         {connection.status === 'disconnected' && <ActionButton onClick={connection.retry}><RefreshCw size={14} />重新连接</ActionButton>}
       </Feedback>}
     {session.feedback && !connection.fatal && <Feedback error>{session.feedback}</Feedback>}
+    {nextMatch.error && !connection.fatal && <Feedback error>{nextMatch.error}</Feedback>}
     {snapshot?.type === 'MATCH_SYNC' && <Room session={session} data={snapshot} onLeave={leave.request} />}
-    {snapshot?.type === 'ROOM_SYNC' && <Play session={session} data={snapshot} interaction={interaction} onLeave={leave.request} />}
+    {snapshot?.type === 'ROOM_SYNC' && <Play session={session} data={snapshot} interaction={interaction}
+      onLeave={leave.request} onStartNextMatch={nextMatch.start} startNextMatchPending={nextMatch.pending} />}
     {leave.visible && <ResponsiveDialog title={snapshot?.type === 'ROOM_SYNC' ? '退出当前对局？' : '离开当前房间？'} eyebrow="LEAVE THE TABLE" onClose={leave.cancel}
       footer={<><ActionButton onClick={leave.cancel}>继续留在这里</ActionButton><ActionButton variant="danger" onClick={leave.confirm}>确认离开</ActionButton></>}>
       <p>{snapshot?.type === 'ROOM_SYNC' && snapshot.roomData.gameStatus !== 'end'

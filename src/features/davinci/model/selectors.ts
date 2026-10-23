@@ -4,7 +4,6 @@ import type { Card } from './types';
 export function confirmsCommand(command: PendingCommand, next: Snapshot): boolean {
   const before = command.before;
   if (command.type === 'match_begin') return before.type === 'MATCH_SYNC' && next.type === 'ROOM_SYNC';
-  if (command.type === 'game_restart_game') return before.type === 'ROOM_SYNC' && next.type === 'MATCH_SYNC';
   if (next.type === 'MATCH_SYNC' && before.type === 'MATCH_SYNC') {
     switch (command.type) {
       case 'match_ready':

@@ -3,6 +3,7 @@ import {
   CreateRoom,
   GetRoom,
   ListRooms,
+  StartNextMatch,
   type RoomInfo,
 } from '@/api/generated/game-platform';
 import {
@@ -10,12 +11,14 @@ import {
   GameRoomRequestError,
   listGameRooms,
   lookupGameRoom,
+  startNextGameMatch,
 } from './room';
 
 vi.mock('@/api/generated/game-platform', () => ({
   CreateRoom: vi.fn(),
   GetRoom: vi.fn(),
   ListRooms: vi.fn(),
+  StartNextMatch: vi.fn(),
 }));
 
 const room: RoomInfo = {
@@ -54,6 +57,7 @@ beforeEach(() => {
   vi.mocked(CreateRoom).mockReset();
   vi.mocked(GetRoom).mockReset();
   vi.mocked(ListRooms).mockReset();
+  vi.mocked(StartNextMatch).mockReset();
 });
 
 describe('game room API', () => {
@@ -118,5 +122,23 @@ describe('game room API', () => {
     await expect(listGameRooms('splendor')).rejects.toBeInstanceOf(
       GameRoomRequestError,
     );
+  });
+
+  it('starts the next match with an idempotency request ID', async () => {
+    vi.mocked(StartNextMatch).mockResolvedValue({
+      status_code: 200,
+      message: 'ok',
+      data: { room, matchID: 'match-2', roundNo: 2 },
+    });
+
+    await expect(startNextGameMatch('splendor', 'room-1')).resolves.toEqual({
+      matchID: 'match-2',
+      roundNo: 2,
+    });
+    expect(StartNextMatch).toHaveBeenCalledWith({
+      game_type: 'splendor',
+      room_id: 'room-1',
+      request_id: expect.any(String),
+    }, { signal: undefined });
   });
 });

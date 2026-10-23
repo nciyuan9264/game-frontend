@@ -178,6 +178,15 @@ export function useAuthoritativeSession<
     roomID,
   ]);
 
+  useEffect(() => {
+    latestRef.current = undefined;
+    latestEpochRef.current = undefined;
+    readyKeyRef.current = '';
+    clearPending();
+    setSnapshot(undefined);
+    setFeedback('');
+  }, [clearPending, url]);
+
   const connection = useConnection(url, receive);
   const { epoch, retry, send } = connection;
 

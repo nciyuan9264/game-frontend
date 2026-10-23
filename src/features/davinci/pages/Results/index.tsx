@@ -11,11 +11,15 @@ export function Results({
   data,
   onViewBoard,
   onLeave,
+  onRestart,
+  restarting = false,
 }: {
   session: DavinciSession;
   data: GameSnapshot;
   onViewBoard: () => void;
   onLeave: () => void;
+  onRestart?: () => Promise<boolean>;
+  restarting?: boolean;
 }) {
   const winnerID = winner(data);
   const won = winnerID === data.playerId;
@@ -37,7 +41,8 @@ export function Results({
     </article>)}</section>
     <div className={styles.facts}><span><b>{duration}</b><small>回合</small></span><span><b>{26 - Object.keys(data.roomData.boardCards).length}</b><small>已抽牌</small></span><span><b>{players.length}</b><small>玩家</small></span></div>
     <div className={styles.actions}><ActionButton onClick={onViewBoard}><Eye size={16} />查看终局牌面</ActionButton>
-      {owner && <ActionButton variant="primary" disabled={!!session.pending} onClick={() => session.submit('game_restart_game')}>
+      {owner && onRestart && <ActionButton variant="primary" disabled={!!session.pending || restarting}
+        onClick={() => { void onRestart(); }}>
         <RotateCcw size={16} />再来一局</ActionButton>}</div>
   </div>;
 }

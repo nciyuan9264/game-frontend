@@ -99,8 +99,7 @@ export type CommandType =
   | 'game_buy_stock'
   | 'game_merging_selection'
   | 'game_merging_settle'
-  | 'game_end_vote'
-  | 'game_restart_game';
+  | 'game_end_vote';
 export type CommandPayload = Record<string, unknown>;
 export type PendingCommand = SessionPendingCommand<
   Snapshot,
