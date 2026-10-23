@@ -172,6 +172,9 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     turnNumber: envelope.seq,
   };
   if (envelope.type === 'MATCH_SYNC') {
+    // #region debug-point C:match-sync
+    void fetch('http://127.0.0.1:7777/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-create-filter-error', runId: 'pre-fix', hypothesisId: 'C', location: 'features/acquire/model/session.ts:parseServerMessage', msg: '[DEBUG] Acquire MATCH_SYNC shape', data: { roomID: envelope.roomID, envelopeKeys: Object.keys(envelope), playerOrderIsArray: Array.isArray(envelope.playerOrder), playerOrderLength: Array.isArray(envelope.playerOrder) ? envelope.playerOrder.length : -1, playersIsRecord: !!envelope.players && typeof envelope.players === 'object', playerCount: envelope.players && typeof envelope.players === 'object' ? Object.keys(envelope.players).length : -1 }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
     return {
       ...common,
       type: 'MATCH_SYNC',

@@ -71,6 +71,9 @@ export async function createGameRoom(
       max_players: data.maxPlayers,
       request_id: crypto.randomUUID(),
     }, requestOptions(options));
+    // #region debug-point A:create-response
+    void fetch('http://127.0.0.1:7777/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-create-filter-error', runId: 'pre-fix', hypothesisId: 'A', location: 'features/game-core/api/room.ts:createGameRoom', msg: '[DEBUG] Create room response shape', data: { statusCode: response?.status_code, hasData: !!response?.data, dataKeys: Object.keys(response?.data ?? {}), playersIsArray: Array.isArray(response?.data?.players), playersLength: Array.isArray(response?.data?.players) ? response.data.players.length : -1 }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
     return {
       roomID: response.data.roomID,
       room: toLobbyRoom(response.data),
