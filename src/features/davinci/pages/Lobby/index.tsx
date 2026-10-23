@@ -36,12 +36,13 @@ const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'playing', label: '对局中' },
 ];
 
-function RoomCard({ room, playerID, onEnter }: {
+function RoomCard({ room, userID, playerID, onEnter }: {
   room: DavinciRoom;
+  userID: string;
   playerID: string;
   onEnter: (room: DavinciRoom) => void;
 }) {
-  const entry = roomEntry(room, playerID);
+  const entry = roomEntry(room, { userID, playerID });
   const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
   const progress = Math.max(0, Math.min(100, ((26 - (room.boardCardCount ?? 26)) / 26) * 100));
   return <article className={styles.roomCard}>
@@ -76,10 +77,12 @@ export default function Lobby() {
   const [heroReady, setHeroReady] = useState(false);
   const createAction = useLatestAsyncAction();
   const { pending, error: createError } = createAction;
+  const userID = profile.data?.id ?? '';
   const playerID = profile2BackendName(profile.data);
+  const identity = { userID, playerID };
 
   const enter = (room: DavinciRoom) => {
-    if (roomEntry(room, playerID).allowed) {
+    if (roomEntry(room, identity).allowed) {
       navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
     }
   };
@@ -143,7 +146,7 @@ export default function Lobby() {
         </div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
         <div className={styles.roomGrid}>{lobby.filteredRooms.map(room =>
-          <RoomCard key={room.roomID} room={room} playerID={playerID} onEnter={enter} />)}</div>
+          <RoomCard key={room.roomID} room={room} userID={userID} playerID={playerID} onEnter={enter} />)}</div>
         {!lobby.error && !lobby.filteredRooms.length && <div className={styles.empty}><KeyRound size={25} /><h3>当前没有匹配的密码桌</h3><p>创建一个房间，或清空筛选条件查看全部。</p></div>}
       </section>
       <aside className={styles.side}>

@@ -19,6 +19,7 @@ export interface LobbyViewProps {
   profile?: UserProfile;
   stats?: Stats;
   statsError: string;
+  userID: string;
   playerID: string;
   code: string;
   setCode: (value: string) => void;
@@ -44,7 +45,7 @@ export function LobbyHero({ onCreate, onShare, onCompany }: Pick<LobbyViewProps,
     <div>{companyKeys.map(company => <button type="button" key={company} style={{ color: companyColors[company] }} aria-label={`查看 ${company} 股价`} onClick={() => onCompany(company)}><CompanyGlyph company={company} size={25} /><b>{company.toUpperCase()}</b></button>)}</div>
   </div></>;
 }
-export function RoomBrowser({ lobby, playerID, onEnter }: Pick<LobbyViewProps, 'lobby' | 'playerID' | 'onEnter'>) {
+export function RoomBrowser({ lobby, userID, playerID, onEnter }: Pick<LobbyViewProps, 'lobby' | 'userID' | 'playerID' | 'onEnter'>) {
   const filters: Array<{ value: LobbyFilter; label: string }> = [
     { value: 'all', label: '全部房间' },
     { value: 'joinable', label: '可加入' },
@@ -64,7 +65,7 @@ export function RoomBrowser({ lobby, playerID, onEnter }: Pick<LobbyViewProps, '
       : <>{lobby.error && <div className={styles.error}><Feedback error>{lobby.error}</Feedback><ActionButton onClick={lobby.refresh} pending={lobby.refreshing}><RefreshCw size={15} />重试</ActionButton></div>}
     {!lobby.rooms.length ? <div className={styles.empty}><Building2 size={34} /><h3>这座城市，等你开第一桌。</h3><p>点击上方「创建房间」，邀请朋友或添加人机开始。</p></div>
         : !lobby.filteredRooms.length ? <div className={styles.empty}><Search size={32} /><h3>还没找到这张桌</h3><p>私密房间请通过完整房间号查找。</p><ActionButton onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清除筛选</ActionButton></div>
-          : <div className={styles.cards}>{lobby.filteredRooms.map(room => <RoomCard key={room.roomID} room={room} playerID={playerID} onEnter={onEnter} />)}</div>}</>}
+          : <div className={styles.cards}>{lobby.filteredRooms.map(room => <RoomCard key={room.roomID} room={room} userID={userID} playerID={playerID} onEnter={onEnter} />)}</div>}</>}
   </section>;
 }
 export function JoinCard({ code, setCode, onJoin }: Pick<LobbyViewProps, 'code' | 'setCode' | 'onJoin'>) {

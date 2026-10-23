@@ -3,6 +3,7 @@ import {
   legacyPlayerName,
   roomEntry as sharedRoomEntry,
   roomOwnerName as sharedRoomOwnerName,
+  type RoomEntryIdentity,
 } from '@/features/game-core/model/room';
 import type { AcquireRoom } from './types';
 
@@ -16,6 +17,6 @@ export const playerName = legacyPlayerName;
 export function roomOwnerName(room: AcquireRoom) {
   return sharedRoomOwnerName(room);
 }
-export function roomEntry(room: AcquireRoom, playerID: string) {
-  return sharedRoomEntry(room, playerID);
+export function roomEntry(room: AcquireRoom, identity: RoomEntryIdentity) {
+  return sharedRoomEntry(room, identity);
 }

@@ -10,7 +10,7 @@ const room: DavinciRoom = {
   maxPlayers: 2,
   status: 'match',
   roomPlayer: [{
-    playerID: 'Alice-42', name: 'Alice', online: true, ready: true, ai: false, seatIndex: 0,
+    userID: 'user-42', playerID: 'Alice-42', name: 'Alice', online: true, ready: true, ai: false, seatIndex: 0,
   }],
 };
 
@@ -36,7 +36,7 @@ describe('DaVinci protocol model', () => {
 
   it('derives room ownership and entry state without truncating hyphenated names', () => {
     expect(roomOwnerName(room)).toBe('Alice');
-    expect(roomEntry(room, 'Alice-42')).toEqual({ allowed: true, label: '返回房间' });
-    expect(roomEntry({ ...room, status: 'guessCard' }, 'Bob-7')).toEqual({ allowed: false, label: '已开局' });
+    expect(roomEntry(room, { userID: 'user-42', playerID: 'Renamed-42' })).toEqual({ allowed: true, label: '返回房间' });
+    expect(roomEntry({ ...room, status: 'guessCard' }, { userID: 'user-7', playerID: 'Bob-7' })).toEqual({ allowed: false, label: '已开局' });
   });
 });

@@ -15,6 +15,7 @@ const room: LobbyRoomLike = {
   maxPlayers: 2,
   status: 'match',
   roomPlayer: [{
+    userID: 'user-7',
     playerID: 'Alice-Cooper-7',
     name: 'Alice Cooper',
     online: true,
@@ -27,14 +28,14 @@ describe('shared lobby room model', () => {
   it('resolves owner names and entry states', () => {
     expect(legacyPlayerName('Alice-Cooper-7')).toBe('Alice-Cooper');
     expect(roomOwnerName(room)).toBe('Alice Cooper');
-    expect(roomEntry(room, 'Alice-Cooper-7')).toEqual({ allowed: true, label: '返回房间' });
-    expect(roomEntry({ ...room, status: 'playing' }, 'Bob-8')).toEqual({ allowed: false, label: '已开局' });
+    expect(roomEntry(room, { userID: 'user-7', playerID: 'Renamed-7' })).toEqual({ allowed: true, label: '返回房间' });
+    expect(roomEntry({ ...room, status: 'playing' }, { userID: 'user-8', playerID: 'Bob-8' })).toEqual({ allowed: false, label: '已开局' });
     expect(roomEntry({ ...room, roomPlayer: [...room.roomPlayer, {
       playerID: 'Bob-8',
       online: true,
       ai: false,
       ready: false,
-    }] }, 'Carol-9')).toEqual({ allowed: false, label: '房间已满' });
+    }] }, { userID: 'user-9', playerID: 'Carol-9' })).toEqual({ allowed: false, label: '房间已满' });
   });
 
   it('sorts, filters, and searches without mutating the source', () => {

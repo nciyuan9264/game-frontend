@@ -39,9 +39,11 @@ export default function Lobby() {
   const [priceTier, setPriceTier] = useState<number>();
   const action = useLatestAsyncAction();
   const { error, pending } = action;
+  const userID = profile.data?.id ?? '';
   const playerID = profile2BackendName(profile.data);
+  const identity = { userID, playerID };
   const onEnter = (room: AcquireRoom) => {
-    if (roomEntry(room, playerID).allowed) navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
+    if (roomEntry(room, identity).allowed) navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
   };
   const create = async () => {
     try {
@@ -72,7 +74,7 @@ export default function Lobby() {
     action.reset();
   };
   const props = {
-    lobby, profile: profile.data, stats: stats.data, statsError: stats.error, playerID, code, setCode,
+    lobby, profile: profile.data, stats: stats.data, statsError: stats.error, userID, playerID, code, setCode,
     onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
     onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
@@ -100,15 +102,15 @@ export default function Lobby() {
     </ResponsiveDialog>}
     {panel === 'join' && <ResponsiveDialog title="通过房间号加入" eyebrow="FIND YOUR FRIENDS' TABLE" onClose={close}
       footer={<><ActionButton onClick={close} disabled={pending}>取消</ActionButton><ActionButton variant="primary" type={foundRoom ? 'button' : 'submit'} form={foundRoom ? undefined : 'acquire-join-room'}
-        pending={pending} disabled={!code.trim() || !!foundRoom && !roomEntry(foundRoom, playerID).allowed}
-        onClick={() => { if (foundRoom) onEnter(foundRoom); }}>{foundRoom ? roomEntry(foundRoom, playerID).label : '加入房间'}<ArrowRight size={16} /></ActionButton></>}>
+        pending={pending} disabled={!code.trim() || !!foundRoom && !roomEntry(foundRoom, identity).allowed}
+        onClick={() => { if (foundRoom) onEnter(foundRoom); }}>{foundRoom ? roomEntry(foundRoom, identity).label : '加入房间'}<ArrowRight size={16} /></ActionButton></>}>
       <form id="acquire-join-room" className={styles.joinForm} onSubmit={event => { event.preventDefault(); void find(); }}>
         <div className={styles.modalEmblem}><KeyRound size={29} /></div>
         <label>房间号<input aria-label="房间号" placeholder="例如 0302_075034" value={code} disabled={pending} onChange={event => { setCode(event.target.value); setFoundRoom(undefined); }} autoCapitalize="off" spellCheck={false} /></label>
       </form>
       {error && <Feedback error>{error}</Feedback>}
       <div className={styles.joinHint}><ShieldCheck size={16} /><span>输入朋友分享的完整房间号。</span></div>
-      {foundRoom && <RoomCard room={foundRoom} playerID={playerID} onEnter={onEnter} />}
+      {foundRoom && <RoomCard room={foundRoom} userID={userID} playerID={playerID} onEnter={onEnter} />}
     </ResponsiveDialog>}
     {panel === 'share' && <ResponsiveDialog title="分享 Acquire" eyebrow="INVITE SOMEONE TO THE TABLE" className={styles.shareDialog} onClose={close}
       footer={<><ActionButton onClick={close}>关闭</ActionButton><ActionButton variant="primary" onClick={() => void copyShareURL()}>

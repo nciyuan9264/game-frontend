@@ -30,13 +30,14 @@ const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'playing', label: '对局中' },
 ];
 
-function RoomCard({ room, playerID, onEnter, artIndex }: {
+function RoomCard({ room, userID, playerID, onEnter, artIndex }: {
   room: SplendorRoom;
+  userID: string;
   playerID: string;
   onEnter: (room: SplendorRoom) => void;
   artIndex: number;
 }) {
-  const entry = roomEntry(room, playerID);
+  const entry = roomEntry(room, { userID, playerID });
   const owner = roomOwnerName(room);
   const players = room.roomPlayer;
   return <article className={styles.roomCard}>
@@ -68,10 +69,12 @@ export default function Lobby() {
   const [foundRoom, setFoundRoom] = useState<SplendorRoom>();
   const action = useLatestAsyncAction();
   const { error, pending } = action;
+  const userID = profile.data?.id ?? '';
   const playerID = profile2BackendName(profile.data);
+  const identity = { userID, playerID };
 
   const enter = (room: SplendorRoom) => {
-    if (roomEntry(room, playerID).allowed) {
+    if (roomEntry(room, identity).allowed) {
       navigate(`/game/splendor/match?roomID=${encodeURIComponent(room.roomID)}`);
     }
   };
@@ -127,7 +130,7 @@ export default function Lobby() {
             {lobby.query && <button type="button" aria-label="清空搜索" onClick={() => lobby.setQuery('')}><X size={14} /></button>}</label></div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
         <div className={styles.roomGrid}>{lobby.filteredRooms.map((room, index) =>
-          <RoomCard key={room.roomID} room={room} playerID={playerID} onEnter={enter} artIndex={[4, 5, 7][index % 3]} />)}</div>
+          <RoomCard key={room.roomID} room={room} userID={userID} playerID={playerID} onEnter={enter} artIndex={[4, 5, 7][index % 3]} />)}</div>
         {!lobby.error && !lobby.filteredRooms.length && <div className={styles.empty}><Search size={32} />
           <h3>还没有找到这间商会</h3><p>换个关键词，或开一间自己的房间。</p>
           <ActionButton onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清空筛选</ActionButton></div>}
@@ -164,13 +167,13 @@ export default function Lobby() {
     {panel === 'join' && <Dialog title="朋友已经留好了席位？" eyebrow="AN INVITATION TO THE SALON" onClose={close}
       footer={<ActionButton variant="primary" pending={pending} disabled={!code.trim()}
         onClick={() => foundRoom ? enter(foundRoom) : void find()}>
-        {foundRoom ? roomEntry(foundRoom, playerID).label : '查找房间'}<ArrowRight size={17} /></ActionButton>}>
+        {foundRoom ? roomEntry(foundRoom, identity).label : '查找房间'}<ArrowRight size={17} /></ActionButton>}>
       <form className={styles.join} onSubmit={event => { event.preventDefault(); foundRoom ? enter(foundRoom) : void find(); }}>
         <KeyRound size={28} /><p>输入完整房间号，找到朋友的商会。</p>
         <label>房间号<input aria-label="房间号" value={code} onChange={event => { setCode(event.target.value); setFoundRoom(undefined); action.reset(); }}
           placeholder="输入完整房间号" autoCapitalize="off" autoCorrect="off" spellCheck={false} /></label></form>
       {error && <Feedback error>{error}</Feedback>}
-      {foundRoom && <RoomCard room={foundRoom} playerID={playerID} onEnter={enter} artIndex={4} />}
+      {foundRoom && <RoomCard room={foundRoom} userID={userID} playerID={playerID} onEnter={enter} artIndex={4} />}
     </Dialog>}
   </AppShell>;
 }

@@ -16,8 +16,13 @@ function roomProgress(room: AcquireRoom) {
   return Math.round(ACQUIRE_TILE_COUNT / 2);
 }
 
-export function RoomCard({ room, playerID, onEnter }: { room: AcquireRoom; playerID: string; onEnter: (room: AcquireRoom) => void }) {
-  const entry = roomEntry(room, playerID);
+export function RoomCard({ room, userID, playerID, onEnter }: {
+  room: AcquireRoom;
+  userID: string;
+  playerID: string;
+  onEnter: (room: AcquireRoom) => void;
+}) {
+  const entry = roomEntry(room, { userID, playerID });
   const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
   const name = roomOwnerName(room);
   const bots = room.roomPlayer.filter(player => player.ai).length;

@@ -28,13 +28,17 @@ export interface LobbyRoomLike {
   roomPlayer: LobbyPlayerLike[];
   ownerName?: string;
   ownerAvatar?: string;
-  isMember?: boolean;
   emptyTileCount?: number;
   boardCardCount?: number;
   maxScore?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
+
+export interface RoomEntryIdentity {
+  userID: string;
+  playerID: string;
+}
 
 export function legacyPlayerName(playerID: string) {
   return playerID.replace(/-\d+$/, '');
@@ -46,8 +50,11 @@ export function roomOwnerName(room: LobbyRoomLike) {
     || legacyPlayerName(room.ownerID);
 }
 
-export function roomEntry(room: LobbyRoomLike, playerID: string) {
-  const member = room.isMember || room.roomPlayer.some(player => player.playerID === playerID);
+export function roomEntry(room: LobbyRoomLike, identity: RoomEntryIdentity) {
+  const member = room.roomPlayer.some(player =>
+    player.playerID === identity.playerID
+    || (!!identity.userID && player.userID === identity.userID)
+  );
   if (member) {
     return { allowed: true, label: room.status === 'match' ? '返回房间' : '进入对局' };
   }
@@ -93,7 +100,6 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     })),
     ownerName: room.players.find(player => player.playerID === room.ownerPlayerID)?.displayName,
     ownerAvatar: room.players.find(player => player.playerID === room.ownerPlayerID)?.avatar,
-    isMember: room.players.some(player => player.userID === room.ownerUserID),
     emptyTileCount: room.metrics.acquire?.emptyTileCount,
     boardCardCount: room.metrics.davinci?.boardCardCount,
     maxScore: room.metrics.splendor?.maxScore,

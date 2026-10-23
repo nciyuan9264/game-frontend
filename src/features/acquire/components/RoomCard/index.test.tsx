@@ -17,7 +17,7 @@ describe('Acquire room card', () => {
       roomPlayer: [{ playerID: 'Alice-42', online: true, ai: false, ready: false }],
     };
 
-    render(<RoomCard room={room} playerID="Alice-42" onEnter={() => {}} />);
+    render(<RoomCard room={room} userID="user-42" playerID="Alice-42" onEnter={() => {}} />);
 
     expect(screen.getByText('仅你可见')).toBeTruthy();
     expect(screen.getByRole('button', { name: '返回房间 private-room' })).toBeTruthy();
@@ -38,7 +38,7 @@ describe('Acquire room card', () => {
       roomPlayer: [{ playerID: 'Alice-42', online: true, ai: false, ready: true }],
     };
 
-    render(<RoomCard room={room} playerID="Alice-42" onEnter={() => {}} />);
+    render(<RoomCard room={room} userID="user-42" playerID="Alice-42" onEnter={() => {}} />);
 
     const progress = screen.getByRole('progressbar', { name: '对局进度' });
     expect(progress.getAttribute('aria-valuenow')).toBe('27');
