@@ -1,5 +1,5 @@
 .button {
-  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center;
   min-height: 40px; padding: 0 17px; border-radius: 6px;
   border: 1px solid var(--game-button-border, #3b505d);
   background-color: var(--game-button-bg, #1b303c);
@@ -8,6 +8,8 @@
   white-space: nowrap; transition: transform .08s ease, background-color .16s, border-color .16s, color .16s, filter .16s;
   &:active:not(:disabled) { transform: translateY(1px); }
 }
+.content { display: inline-flex; align-items: center; justify-content: center; gap: 9px; }
+.pendingContent { opacity: 0; }
 .primary {
   color: var(--game-primary-text, #33291d) !important;
   background-color: var(--game-primary, #dfb16f);
@@ -22,7 +24,7 @@
   border-color: var(--game-danger-border, #8b574b);
   background-color: var(--game-danger-bg, #57352f);
 }
-.spinner { width: 14px; height: 14px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
+.spinner { position: absolute; inset: 50% auto auto 50%; width: 14px; height: 14px; margin: -7px 0 0 -7px; border: 2px solid currentColor; border-right-color: transparent; border-radius: 50%; animation: spin 1s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
 @media (hover: hover) and (pointer: fine) {
   .button:hover:not(:disabled) { border-color: var(--game-button-hover-border, #647986); background-color: var(--game-button-hover-bg, #2a414d); filter: brightness(1.08); }

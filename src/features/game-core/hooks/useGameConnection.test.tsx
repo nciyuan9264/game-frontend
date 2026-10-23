@@ -58,6 +58,19 @@ afterEach(() => {
 });
 
 describe('useGameConnection', () => {
+  it('waits for a non-empty URL and then creates one connection', () => {
+    const receive = vi.fn();
+    const hook = renderHook(
+      ({ url }) => useGameConnection(url, receive, parseRealtimeEnvelope),
+      { initialProps: { url: '' } },
+    );
+    expect(Socket.instances).toHaveLength(0);
+
+    hook.rerender({ url: 'ws://localhost/ws?roomID=room&matchID=match' });
+
+    expect(Socket.instances).toHaveLength(1);
+  });
+
   it('reconnects with the last accepted snapshot sequence', () => {
     const receive = vi.fn();
     renderHook(() => useGameConnection(

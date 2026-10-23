@@ -9,11 +9,11 @@ export function AcquireSessionLoading() {
     const root = document.querySelector<HTMLElement>('[role="status"]');
     const rect = root?.getBoundingClientRect();
     // #region debug-point B-C:loader-lifecycle
-    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'B,C', location: 'features/acquire/pages/Session/Loading', msg: '[DEBUG] Acquire session loader mounted', data: { mountID: debugMountID, width: rect?.width ?? -1, height: rect?.height ?? -1 }, ts: Date.now() }) }).catch(() => {});
+    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'B,C', location: 'features/acquire/pages/Session/Loading', msg: '[DEBUG] Acquire session loader mounted', data: { mountID: debugMountID, width: rect?.width ?? -1, height: rect?.height ?? -1 }, ts: Date.now() }) }).catch(() => {});
     // #endregion
     return () => {
       // #region debug-point B:loader-unmount
-      void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'B', location: 'features/acquire/pages/Session/Loading', msg: '[DEBUG] Acquire session loader unmounted', data: { mountID: debugMountID }, ts: Date.now() }) }).catch(() => {});
+      void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'B', location: 'features/acquire/pages/Session/Loading', msg: '[DEBUG] Acquire session loader unmounted', data: { mountID: debugMountID }, ts: Date.now() }) }).catch(() => {});
       // #endregion
     };
   }, []);

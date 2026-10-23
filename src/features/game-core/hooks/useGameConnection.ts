@@ -53,7 +53,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
     const debugAcquire = window.location.pathname.includes('/game/acquire/');
     const debugURL = url ? new URL(url) : undefined;
     // #region debug-point D:connection-effect
-    if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:effect', msg: '[DEBUG] Acquire connection effect entered', data: { hasURL: !!url, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '' }, ts: Date.now() }) }).catch(() => {});
+    if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:effect', msg: '[DEBUG] Acquire connection effect entered', data: { hasURL: !!url, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '' }, ts: Date.now() }) }).catch(() => {});
     // #endregion
     if (!url) return;
     let disposed = false;
@@ -79,7 +79,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
       const connectionEpoch = epoch.current;
       constructions += 1;
       // #region debug-point D:websocket-construction
-      if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:connect', msg: '[DEBUG] Acquire WebSocket constructed', data: { constructions, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '', failures }, ts: Date.now() }) }).catch(() => {});
+      if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:connect', msg: '[DEBUG] Acquire WebSocket constructed', data: { constructions, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '', failures }, ts: Date.now() }) }).catch(() => {});
       // #endregion
       const ws = new WebSocket(reconnectURL(url, lastSeq.current));
       socket.current = ws;

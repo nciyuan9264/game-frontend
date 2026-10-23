@@ -23,7 +23,16 @@ function ExitState({ title, message, onLeave }: { title: string; message: string
   </section></div>;
 }
 
-function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
+function Session({ roomID }: { roomID: string }) {
+  const loadTarget = useCallback(async () => {
+    const profile = await getProfile();
+    if (!roomID) return { profile, matchID: '' };
+    const room = await lookupGameRoom('splendor', roomID);
+    if (!room.currentMatchID) throw new Error('当前房间没有可连接的对局');
+    return { profile, matchID: room.currentMatchID };
+  }, [roomID]);
+  const target = useAsyncResource(loadTarget);
+  const matchID = target.data?.matchID ?? '';
   const session = useSplendorSession(roomID, matchID);
   const leave = useSplendorLeave(session.connection.close);
   const { connection, snapshot } = session;
@@ -31,9 +40,16 @@ function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
   const playerID = snapshot ? selfID(snapshot) : '';
   const currentPlayer = players?.[playerID];
   const profile = currentPlayer ? { name: playerName(playerID, players), avatar: currentPlayer.avatar } : undefined;
-  const initialLoading = !!roomID && !snapshot && (connection.status === 'connecting' || connection.status === 'reconnecting');
+  const initialLoading = target.loading && !target.data
+    || !!roomID && !!matchID && !snapshot && (connection.status === 'connecting' || connection.status === 'reconnecting');
 
-  if (initialLoading) return <AppShell inMatch title="连接珠宝展厅"><SplendorLoading description="正在建立可靠会话" /></AppShell>;
+  if (initialLoading) return <AppShell inMatch title="连接珠宝展厅">
+    <SplendorLoading description={target.data ? '正在建立可靠会话' : '正在确认身份与当前对局'} />
+  </AppShell>;
+  if (!target.data) return <AppShell inMatch title="对局验证失败"><div className={styles.authError}><Feedback error>
+    对局信息确认失败<span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
+    <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton>
+  </Feedback></div></AppShell>;
   return <AppShell inMatch hideHeader={snapshot?.type === 'ROOM_SYNC'} profile={profile}
     title={snapshot?.type === 'MATCH_SYNC' ? '准备房间' : snapshot?.roomData.gameStatus === 'end' ? '本局结算' : '珠宝对局'}>
     {!roomID && <ExitState title="对局链接无效" message="链接缺少房间号，请返回大厅重新进入。" onLeave={leave.confirm} />}
@@ -58,22 +74,5 @@ function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
 export default function SplendorSessionPage() {
   const [params] = useSearchParams();
   const roomID = params.get('roomID') ?? '';
-  const loadTarget = useCallback(async () => {
-    const profile = await getProfile();
-    if (!roomID) return { profile, matchID: '' };
-    const room = await lookupGameRoom('splendor', roomID);
-    if (!room.currentMatchID) throw new Error('当前房间没有可连接的对局');
-    return { profile, matchID: room.currentMatchID };
-  }, [roomID]);
-  const target = useAsyncResource(loadTarget);
-  if (target.loading && !target.data) return <AppShell inMatch title="验证对局"><SplendorLoading description="正在确认身份与当前对局" /></AppShell>;
-  if (!target.data) return <AppShell inMatch title="对局验证失败"><div className={styles.authError}><Feedback error>
-    对局信息确认失败<span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
-    <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton>
-  </Feedback></div></AppShell>;
-  return <Session
-    key={`${roomID}:${target.data.matchID}`}
-    roomID={roomID}
-    matchID={target.data.matchID}
-  />;
+  return <Session key={roomID} roomID={roomID} />;
 }
