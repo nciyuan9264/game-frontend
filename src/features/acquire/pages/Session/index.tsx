@@ -1,4 +1,4 @@
-import { useCallback } from 'react';
+import { useCallback, useEffect } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
@@ -27,6 +27,11 @@ function Session({ roomID, matchID }: { roomID: string; matchID: string }) {
   const currentPlayer = players?.[playerID];
   const initialLoading = !!roomID && !snapshot && (connection.status === 'connecting' || connection.status === 'reconnecting');
   const profile = currentPlayer ? { name: playerName(playerID, players ?? {}), avatar: currentPlayer.avatar } : undefined;
+  useEffect(() => {
+    // #region debug-point B-D:session-stage
+    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'B,D', location: 'features/acquire/pages/Session:Session', msg: '[DEBUG] Acquire session stage rendered', data: { roomID, matchID, connectionStatus: connection.status, hasSnapshot: !!snapshot, initialLoading }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
+  }, [connection.status, initialLoading, matchID, roomID, snapshot]);
   if (initialLoading) return <AcquireSessionLoading />;
   return <AppShell inMatch hideRail hideHeader={snapshot?.type === 'ROOM_SYNC'} profile={profile} title={snapshot?.type === 'MATCH_SYNC' ? '准备房间'
     : snapshot?.roomData.gameStatus === 'end' ? '本局结算' : '经典对局'}>
@@ -59,6 +64,11 @@ export default function AcquireSessionPage() {
     return { profile, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAcquireResource(loadTarget);
+  useEffect(() => {
+    // #region debug-point B-D:target-stage
+    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'B,D', location: 'features/acquire/pages/Session:AcquireSessionPage', msg: '[DEBUG] Acquire target stage rendered', data: { roomID, loading: target.loading, hasData: !!target.data, matchID: target.data?.matchID ?? '', hasError: !!target.error }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
+  }, [roomID, target.data, target.error, target.loading]);
   if (target.loading && !target.data) return <AcquireSessionLoading />;
   if (!target.data) return <AppShell inMatch hideRail title="经典对局">
     <Feedback error>

@@ -50,10 +50,16 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
   parse.current = parseMessage;
 
   useEffect(() => {
+    const debugAcquire = window.location.pathname.includes('/game/acquire/');
+    const debugURL = url ? new URL(url) : undefined;
+    // #region debug-point D:connection-effect
+    if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:effect', msg: '[DEBUG] Acquire connection effect entered', data: { hasURL: !!url, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '' }, ts: Date.now() }) }).catch(() => {});
+    // #endregion
     if (!url) return;
     let disposed = false;
     let stopped = false;
     let failures = 0;
+    let constructions = 0;
     let timer: ReturnType<typeof setTimeout> | undefined;
     let handshake: ReturnType<typeof setTimeout> | undefined;
     lastSeq.current = 0;
@@ -71,6 +77,10 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
       clearTimeout(timer);
       closeSocket();
       const connectionEpoch = epoch.current;
+      constructions += 1;
+      // #region debug-point D:websocket-construction
+      if (debugAcquire) void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'pre-fix', hypothesisId: 'D', location: 'features/game-core/hooks/useGameConnection:connect', msg: '[DEBUG] Acquire WebSocket constructed', data: { constructions, roomID: debugURL?.searchParams.get('roomID') ?? '', matchID: debugURL?.searchParams.get('matchID') ?? '', failures }, ts: Date.now() }) }).catch(() => {});
+      // #endregion
       const ws = new WebSocket(reconnectURL(url, lastSeq.current));
       socket.current = ws;
       setStatus(failures ? 'reconnecting' : 'connecting');
