@@ -77,7 +77,7 @@ export function filterLobbyRooms<TRoom extends LobbyRoomLike>(
   return rooms.filter(room => {
     const joinable = room.status === 'match' && room.roomPlayer.length < room.maxPlayers;
     const matchesFilter = filter === 'all'
-      || (filter === 'joinable' ? joinable : room.status !== 'match');
+      || (filter === 'joinable' ? joinable : room.status === 'playing');
     return matchesFilter
       && `${room.roomID} ${getOwnerName(room)}`.toLowerCase().includes(search);
   });

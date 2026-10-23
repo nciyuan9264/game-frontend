@@ -40,14 +40,17 @@ describe('shared lobby room model', () => {
 
   it('sorts, filters, and searches without mutating the source', () => {
     const newer = { ...room, roomID: '1021_150000', status: 'playing' };
-    const source = [room, newer];
+    const ended = { ...room, roomID: '1021_160000', status: 'end' };
+    const source = [room, newer, ended];
     expect(sortLobbyRooms(source).map(item => item.roomID)).toEqual([
+      '1021_160000',
       '1021_150000',
       '1021_140000',
     ]);
     expect(source[0]).toBe(room);
     expect(filterLobbyRooms(source, 'joinable', 'alice')).toEqual([room]);
     expect(filterLobbyRooms(source, 'playing', '')).toEqual([newer]);
+    expect(filterLobbyRooms(source, 'all', '')).toEqual(source);
   });
 
   it('builds an encoded public invite URL', () => {
