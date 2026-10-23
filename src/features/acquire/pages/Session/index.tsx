@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from 'react';
+import { useCallback } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import { RefreshCw } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
@@ -37,16 +37,6 @@ function Session({ roomID }: { roomID: string }) {
   const initialLoading = target.loading && !target.data
     || !!roomID && !!matchID && !snapshot && (connection.status === 'connecting' || connection.status === 'reconnecting');
   const profile = currentPlayer ? { name: playerName(playerID, players ?? {}), avatar: currentPlayer.avatar } : undefined;
-  useEffect(() => {
-    // #region debug-point B-D:target-stage
-    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'B,D', location: 'features/acquire/pages/Session:AcquireSessionPage', msg: '[DEBUG] Acquire target stage rendered', data: { roomID, loading: target.loading, hasData: !!target.data, matchID, hasError: !!target.error }, ts: Date.now() }) }).catch(() => {});
-    // #endregion
-  }, [matchID, roomID, target.data, target.error, target.loading]);
-  useEffect(() => {
-    // #region debug-point B-D:session-stage
-    void fetch('https://api.gamebus.online/__trae-debug/room-loading-jitter/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-loading-jitter', runId: 'post-fix', hypothesisId: 'B,D', location: 'features/acquire/pages/Session:Session', msg: '[DEBUG] Acquire session stage rendered', data: { roomID, matchID, connectionStatus: connection.status, hasSnapshot: !!snapshot, initialLoading }, ts: Date.now() }) }).catch(() => {});
-    // #endregion
-  }, [connection.status, initialLoading, matchID, roomID, snapshot]);
   if (initialLoading) return <AcquireSessionLoading />;
   if (!target.data) return <AppShell inMatch hideRail title="经典对局">
     <Feedback error>
