@@ -172,9 +172,6 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     turnNumber: envelope.seq,
   };
   if (envelope.type === 'MATCH_SYNC') {
-    // #region debug-point C:match-sync
-    void fetch('https://api.gamebus.online/__trae-debug/room-create-filter-error/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-create-filter-error', runId: 'post-fix', hypothesisId: 'C', location: 'features/acquire/model/session.ts:parseServerMessage', msg: '[DEBUG] Acquire MATCH_SYNC shape', data: { roomID: envelope.roomID, envelopeKeys: Object.keys(envelope), playerOrderIsArray: Array.isArray(envelope.playerOrder), playerOrderLength: Array.isArray(envelope.playerOrder) ? envelope.playerOrder.length : -1, playersIsRecord: !!envelope.players && typeof envelope.players === 'object', playerCount: envelope.players && typeof envelope.players === 'object' ? Object.keys(envelope.players).length : -1 }, ts: Date.now() }) }).catch(() => {});
-    // #endregion
     return {
       ...common,
       type: 'MATCH_SYNC',

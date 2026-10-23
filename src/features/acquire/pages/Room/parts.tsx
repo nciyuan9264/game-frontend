@@ -18,9 +18,6 @@ export function roomReadiness(data: MatchSnapshot) {
     reason: players.length < 2 ? '再来一位，就能开场。' : ready < players.length ? '等每一位合伙人准备好。' : '一切就绪，好局即将开场。' };
 }
 export function roomSeatOrder(data: MatchSnapshot) {
-  // #region debug-point B:room-render
-  void fetch('https://api.gamebus.online/__trae-debug/room-create-filter-error/event', { method: 'POST', body: JSON.stringify({ sessionId: 'room-create-filter-error', runId: 'post-fix', hypothesisId: 'B', location: 'features/acquire/pages/Room/parts.tsx:roomSeatOrder', msg: '[DEBUG] Acquire room seat render input', data: { roomID: data.roomID, playerOrderIsArray: Array.isArray(data.playerOrder), playerOrderLength: Array.isArray(data.playerOrder) ? data.playerOrder.length : -1, playersIsRecord: !!data.players && typeof data.players === 'object', playerCount: data.players && typeof data.players === 'object' ? Object.keys(data.players).length : -1, path: window.location.pathname, serviceWorkerControlled: !!navigator.serviceWorker?.controller }, ts: Date.now() }) }).catch(() => {});
-  // #endregion
   const order = [...data.playerOrder.filter(id => data.players[id]), ...Object.keys(data.players).filter(id => !data.playerOrder.includes(id))];
   const seats = Array<string | undefined>(6);
   const unassigned: string[] = [];
