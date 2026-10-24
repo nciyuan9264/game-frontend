@@ -98,6 +98,21 @@ function normalizePlayers(
   ]));
 }
 
+function normalizePlayerStates(
+  players: Record<string, PlayerState>,
+): Record<string, PlayerState> {
+  return Object.fromEntries(Object.entries(players).map(([id, player]) => [
+    id,
+    {
+      ...player,
+      normalCard: player.normalCard ?? [],
+      nobleCard: player.nobleCard ?? [],
+      gem: player.gem ?? {},
+      reserveCard: player.reserveCard ?? [],
+    },
+  ]));
+}
+
 function parsePayloadJSON(value?: string): unknown {
   if (!value) return;
   try {
@@ -143,7 +158,9 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     ownerID: view.ownerID,
     visibility: view.visibility as Visibility,
     playerId: view.playerId,
-    playerData: view.playerData as Record<string, PlayerState>,
+    playerData: normalizePlayerStates(
+      view.playerData as Record<string, PlayerState>,
+    ),
     result: view.result as Record<string, SplendorResult> | undefined,
     roomData: {
       card: view.roomData.card as Record<string, DevelopmentCard[]>,

@@ -14,7 +14,15 @@ describe('splendor protocol parser', () => {
           ownerID: 'owner',
           visibility: 'public',
           playerId: 'me',
-          playerData: {},
+          playerData: {
+            me: {
+              normalCard: null,
+              nobleCard: null,
+              gem: null,
+              score: 0,
+              reserveCard: null,
+            },
+          },
           roomData: {
             card: {},
             deckCounts: {},
@@ -29,7 +37,16 @@ describe('splendor protocol parser', () => {
       },
     }));
     expect(message?.type).toBe('ROOM_SYNC');
-    if (message?.type === 'ROOM_SYNC') expect(message.phaseVersion).toBe(4);
+    if (message?.type === 'ROOM_SYNC') {
+      expect(message.phaseVersion).toBe(4);
+      expect(message.playerData.me).toEqual({
+        normalCard: [],
+        nobleCard: [],
+        gem: {},
+        score: 0,
+        reserveCard: [],
+      });
+    }
   });
 
   it('retains structured errors and ignores malformed snapshots', () => {
