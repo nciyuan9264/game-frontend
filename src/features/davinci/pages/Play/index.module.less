@@ -57,6 +57,12 @@
   .roomTools { gap: 6px; > button { width: 31px; height: 31px; } }
   .phase { gap: 6px; strong { font-size: 11px; } small { font-size: 7px; } }
   .topActions { gap: 5px; > button:first-child { display: none; } }
+  .endedTopbar {
+    .topActions > .resultsButton { width: 31px; min-height: 31px; display: inline-flex; padding: 0;
+      > span { gap: 0; } > span > span { display: none; }
+    }
+    .timer { display: none; }
+  }
   .ruleButton { width: 31px; height: 31px; }
   .timer { min-width: 48px; height: 31px; small { display: none; } }
   .activity { font-size: 9px; }

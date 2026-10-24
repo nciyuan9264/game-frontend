@@ -1,12 +1,15 @@
-.page { width: 100%; margin: auto; display: grid; gap: 22px; }
+.page { width: 100%; min-width: 0; margin: auto; display: grid; gap: 22px; }
 .heading { display: flex; align-items: center; justify-content: space-between; gap: 20px;
-  > div { display: flex; align-items: center; gap: 12px; }
+  > div { min-width: 0; display: flex; align-items: center; gap: 12px; }
+  > div:first-child { flex: 1; > span { min-width: 0; } }
   > div:first-child > button { width: 37px; height: 37px; display: grid; place-items: center; padding: 0; border: 1px solid #424944; border-radius: 6px; color: #afb6b0; background: #1c201d; }
   small { display: block; color: #95886d; font-size: 8px; letter-spacing: .16em; }
-  h1 { margin-top: 3px; font: 600 24px/1.2 Georgia,serif; letter-spacing: .04em; }
-  em { margin-left: 10px; padding: 3px 6px; border: 1px solid #54705d; border-radius: 4px; color: #9bd0ac; font: normal 8px/1 sans-serif; vertical-align: middle; }
+  h1 { min-width: 0; display: flex; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 3px; font: 600 24px/1.2 Georgia,serif; letter-spacing: .04em;
+    > span { min-width: 0; overflow-wrap: anywhere; }
+  }
+  em { padding: 3px 6px; border: 1px solid #54705d; border-radius: 4px; color: #9bd0ac; font: normal 8px/1 sans-serif; vertical-align: middle; }
 }
-.table { min-height: 430px; position: relative; display: grid; align-content: center; gap: 27px; padding: 40px; overflow: hidden; border: 1px solid #3d443f; border-radius: 8px; background: linear-gradient(145deg,#202420,#151815);
+.table { width: 100%; min-width: 0; min-height: 430px; position: relative; display: grid; align-content: center; gap: 27px; padding: 40px; overflow: hidden; border: 1px solid #3d443f; border-radius: 8px; background: linear-gradient(145deg,#202420,#151815);
   &::before { content: ''; position: absolute; inset: 50% 0 auto; height: 1px; background: linear-gradient(90deg,transparent,#d1aa6738,transparent); }
 }
 .tableLabel { display: flex; align-items: center; justify-content: center; gap: 16px; color: #777f79; font-size: 8px; letter-spacing: .2em;
@@ -57,9 +60,11 @@
 
 @media (max-width: 767px) {
   .page { gap: 15px; padding-bottom: calc(82px + env(safe-area-inset-bottom)); }
-  .heading { align-items: flex-start;
+  .heading { align-items: stretch; flex-direction: column; gap: 12px;
+    > div { width: 100%; }
+    > div:last-child { padding-left: 49px; }
     > div:last-child > button:first-child { display: none; }
-    > div:last-child > button { padding: 0 11px; }
+    > div:last-child > button { width: 100%; padding: 0 11px; }
     h1 { font-size: 19px; }
   }
   .table { min-height: 0; padding: 22px 13px; gap: 18px; }

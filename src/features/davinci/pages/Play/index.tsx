@@ -76,14 +76,16 @@ export function Play({
   }
 
   return <div className={styles.play}>
-    <header className={styles.topbar}>
+    <header className={`${styles.topbar} ${data.roomData.gameStatus === 'end' ? styles.endedTopbar : ''}`}>
       <div className={styles.roomTools}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={18} /></button>
         <span><small>ROOM</small><b>{data.roomID}</b></span></div>
       <div className={`${styles.phase} ${playerTurn ? styles.myTurn : ''}`} aria-live="polite">
         <i /><span><strong>{phaseTitle}</strong><small>{phaseDescription}</small></span>
       </div>
       <div className={styles.topActions}>
-        {data.roomData.gameStatus === 'end' && <ActionButton onClick={() => setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
+        {data.roomData.gameStatus === 'end' && <ActionButton className={styles.resultsButton}
+          aria-label="打开终局结算" title="查看结算" onClick={() => setShowResults(true)}>
+          <Eye size={15} /><span>查看结算</span></ActionButton>}
         <button type="button" className={styles.ruleButton} aria-label="查看游戏规则" onClick={() => setRulesOpen(true)}><CircleHelp size={18} /></button>
         <span className={styles.timer}><small>TIME</small>{data.roomData.turnDeadline && playerTurn && data.roomData.gameStatus !== 'end'
           ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />

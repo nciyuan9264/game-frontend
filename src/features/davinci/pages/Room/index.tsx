@@ -42,7 +42,7 @@ export function Room({
 
   return <div className={styles.page}>
     <header className={styles.heading}><div><button type="button" aria-label="离开房间" onClick={onLeave}><ArrowLeft size={18} /></button>
-      <span><small>CIPHER ROOM · 房间号</small><h1>{data.roomID}<em>准备中</em></h1></span></div>
+      <span><small>CIPHER ROOM · 房间号</small><h1><span>{data.roomID}</span><em>准备中</em></h1></span></div>
       <div><ActionButton onClick={() => setPanel('info')}><Info size={15} />房间信息</ActionButton>
         <ActionButton variant="primary" onClick={() => { setCopyMessage(''); setPanel('invite'); }}><UserPlus size={15} />邀请好友</ActionButton></div></header>
     <section className={styles.table}>
