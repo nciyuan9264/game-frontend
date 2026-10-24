@@ -10,7 +10,7 @@ import { StockPrices } from '../../dialogs/StockPrices';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import { useAcquireViewport } from '../../hooks/useAcquireViewport';
-import { canPlace } from '../../model/selectors';
+import { canPlace, mergeSettlementPlayer } from '../../model/selectors';
 import { endGameState, money, type GameSnapshot } from '../../model/session';
 import { companyPriceTiers, type Company } from '../../model/types';
 import { Results } from '../Results';
@@ -39,6 +39,12 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
   const endGame = endGameState(data);
   const showEndVote = endGame.eligible && !end;
   const endVotePending = session.pending?.type === 'game_end_vote';
+  const timedPlayerID = data.roomData.gameStatus === 'mergingSettle'
+    ? mergeSettlementPlayer(data)
+    : data.roomData.currentPlayer;
+  const turnDeadline = timedPlayerID === data.playerId
+    ? data.roomData.turnDeadline
+    : undefined;
   const endKey = end ? `${data.roomID}:${data.phaseVersion}` : '';
   if (endKey !== endedKey) {
     setEndedKey(endKey); setPanel(end ? 'results' : undefined);
@@ -89,7 +95,7 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
   return <>
     <div ref={mobileFit.containerRef} className={playFitClassName}>
       <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
-      <div className={styles.headingTools}><Deadline deadline={data.roomData.turnDeadline} /><ActionButton onClick={() => setPriceTier(0)}>股价速查</ActionButton>
+      <div className={styles.headingTools}><Deadline deadline={turnDeadline} /><ActionButton onClick={() => setPriceTier(0)}>股价速查</ActionButton>
       {end && !isMobile && <ActionButton onClick={() => setPanel('results')}>查看结算</ActionButton>}
       {!isMobile && endVoteControl}
       <div className={styles.cash}><Wallet size={18} /><span><small>可用现金</small><b><AnimatedValue value={data.playerData.money} formatter={money} /></b></span></div></div></div>

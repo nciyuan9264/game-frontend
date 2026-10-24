@@ -22,6 +22,7 @@ vi.mock('./useMobilePlayFit', () => ({
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();
+  vi.useRealTimers();
 });
 beforeEach(() => {
   fitMock.fitLevel = 0;
@@ -53,6 +54,45 @@ function snapshot(status: 'setTile' | 'end'): GameSnapshot {
 }
 
 describe('Acquire play end transition', () => {
+  it('shows the countdown only to the timed player, including merger settlement', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-25T10:00:00Z'));
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: false,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    active.roomData.turnDeadline = '2026-10-25T10:00:30Z';
+    active.roomData.playerOrder = ['me', 'guest'];
+    active.roomData.players.guest = {
+      playerID: 'guest', name: 'Guest', online: true, ai: false, ready: true,
+    };
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    const { rerender } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    expect(screen.getByRole('timer', { name: '本阶段剩余 30 秒' })).toBeTruthy();
+
+    active.roomData.currentPlayer = 'guest';
+    rerender(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    expect(screen.queryByRole('timer')).toBeNull();
+
+    active.roomData.gameStatus = 'mergingSettle';
+    active.roomData.currentPlayer = 'me';
+    active.tempData.merge_settle_current_player = 'guest';
+    rerender(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    expect(screen.queryByRole('timer')).toBeNull();
+
+    active.tempData.merge_settle_current_player = 'me';
+    rerender(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    expect(screen.getByRole('timer', { name: '本阶段剩余 30 秒' })).toBeTruthy();
+  });
+
   it('opens the results page automatically when the server snapshot enters end', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       matches: false,

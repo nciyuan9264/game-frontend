@@ -176,7 +176,7 @@ export function Play({
       {data.roomData.gameStatus === 'end' && <ActionButton onClick={() => setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
       <button type="button" aria-label="商会动态" onClick={() => ui.openPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="对局规则" onClick={() => ui.openPanel('rules')}><BookOpen size={19} /></button>
-      <span className={styles.timer}>{data.roomData.turnDeadline && playable
+      <span className={styles.timer}>{data.roomData.turnDeadline && playable && myTurn
         ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
         : <b>--</b>}</span>
     </header>

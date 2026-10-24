@@ -85,7 +85,7 @@ export function Play({
       <div className={styles.topActions}>
         {data.roomData.gameStatus === 'end' && <ActionButton onClick={() => setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
         <button type="button" className={styles.ruleButton} aria-label="查看游戏规则" onClick={() => setRulesOpen(true)}><CircleHelp size={18} /></button>
-        <span className={styles.timer}><small>TIME</small>{data.roomData.turnDeadline && data.roomData.gameStatus !== 'end'
+        <span className={styles.timer}><small>TIME</small>{data.roomData.turnDeadline && playerTurn && data.roomData.gameStatus !== 'end'
           ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
           : <b>--</b>}</span>
       </div>
