@@ -10,6 +10,8 @@
     "check:generated": "pnpm generate:api && git diff --exit-code -- src/api/generated",
     "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
     "test": "vitest run",
+    "test:e2e": "playwright test",
+    "test:e2e:production": "PLAYWRIGHT_PRODUCTION=1 playwright test",
     "preview": "vite preview"
   },
   "dependencies": {
@@ -27,6 +29,7 @@
     "react-router-dom": "^6.20.0"
   },
   "devDependencies": {
+    "@playwright/test": "^1.64.1",
     "@testing-library/react": "^16.3.3",
     "@types/react": "^18.2.37",
     "@types/react-dom": "^18.2.15",

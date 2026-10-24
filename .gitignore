@@ -6,3 +6,5 @@ showcase/
 .dbg/
 .trae/
 debug-*.md
+playwright-report/
+test-results/
