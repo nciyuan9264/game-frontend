@@ -197,7 +197,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
     {!replay.initialLoading && replay.detail && !total && <Feedback>此对局暂无可用快照。</Feedback>}
     {display && <><MobileMarket data={display} onCompany={(company: Company) => setPriceTier(companyPriceTiers[company])} onActivity={() => setTab('timeline')} />
       <div className={styles.layout}><aside className={styles.marketColumn}><MarketTable data={display} /></aside>
-      <section className={styles.boardColumn}><div className={styles.boardHeading}><span>{event ? `${event.playerID.replace(/-\d+$/, '')} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}
+      <section className={styles.boardColumn}><div className={styles.boardHeading}><span>{event ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}
         {replay.pendingIndex != null && <small className={styles.frameStatus}>正在加载第 {replay.pendingIndex} 步</small>}</span><div className={styles.boardTools}><button type="button" className={styles.zoomButton} onClick={() => setPanel('zoom')}><Maximize2 size={13} />放大棋盘</button></div></div>
         <Board data={display} mode="replay" /><p className={styles.note}>你的手牌：{display.playerData.tiles.join(' · ') || '无'}。回放不会发送对局操作。</p></section>
       <aside className={styles.portfolioColumn}><Portfolio data={display} /></aside></div>

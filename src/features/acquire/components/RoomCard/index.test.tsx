@@ -9,15 +9,15 @@ describe('Acquire room card', () => {
   it('marks an owner-visible private room', () => {
     const room: AcquireRoom = {
       roomID: 'private-room',
-      ownerID: 'Alice-42',
+      ownerID: '42',
       ownerName: 'Alice',
       maxPlayers: 6,
       visibility: 'private',
       status: 'match',
-      roomPlayer: [{ playerID: 'Alice-42', online: true, ai: false, ready: false }],
+      roomPlayer: [{ userID: '42', playerID: '42', displayName: 'Alice-42', online: true, ai: false, ready: false }],
     };
 
-    render(<RoomCard room={room} userID="user-42" playerID="Alice-42" onEnter={() => {}} />);
+    render(<RoomCard room={room} userID="42" onEnter={() => {}} />);
 
     expect(screen.getByText('仅你可见')).toBeTruthy();
     expect(screen.getByRole('button', { name: '返回房间 private-room' })).toBeTruthy();
@@ -29,16 +29,16 @@ describe('Acquire room card', () => {
   it('renders acquire game progress from remaining empty tiles', () => {
     const room: AcquireRoom = {
       roomID: 'playing-room',
-      ownerID: 'Alice-42',
+      ownerID: '42',
       ownerName: 'Alice',
       maxPlayers: 6,
       visibility: 'public',
       status: 'playing',
       emptyTileCount: 81,
-      roomPlayer: [{ playerID: 'Alice-42', online: true, ai: false, ready: true }],
+      roomPlayer: [{ userID: '42', playerID: '42', displayName: 'Alice-42', online: true, ai: false, ready: true }],
     };
 
-    render(<RoomCard room={room} userID="user-42" playerID="Alice-42" onEnter={() => {}} />);
+    render(<RoomCard room={room} userID="42" onEnter={() => {}} />);
 
     expect(screen.getByText('对局中')).toBeTruthy();
     expect(screen.queryByText('已结束')).toBeNull();

@@ -1,5 +1,4 @@
 import React, { useMemo, useRef, useState } from 'react';
-import { backendName2FrontendName } from '@/util/user';
 import type {
   GamePlayer,
   Snapshot,
@@ -25,6 +24,7 @@ interface SeriesPoint {
 }
 interface Series {
   playerID: string;
+  displayName: string;
   color: string;
   points: SeriesPoint[];
 }
@@ -71,13 +71,22 @@ const EconomyChart: React.FC<EconomyChartProps> = ({
     }
 
     let max = 0;
+    const displayNames = new Map(players?.map(player => [
+      player.playerID,
+      player.displayName,
+    ]));
     const s: Series[] = playerIDs.map((pid, i) => {
       const pts: SeriesPoint[] = points.map((snap, turn) => {
         const total = snap.result?.[pid]?.total ?? 0;
         if (total > max) max = total;
         return { turn, total };
       });
-      return { playerID: pid, color: PALETTE[i % PALETTE.length], points: pts };
+      return {
+        playerID: pid,
+        displayName: displayNames.get(pid) ?? `玩家 ${pid}`,
+        color: PALETTE[i % PALETTE.length],
+        points: pts,
+      };
     });
 
     return { series: s, turnCount: points.length, maxTotal: max };
@@ -125,7 +134,7 @@ const EconomyChart: React.FC<EconomyChartProps> = ({
         {series.map((s) => (
           <div key={s.playerID} className={styles.legendItem}>
             <span className={styles.legendDot} style={{ background: s.color }} />
-            {backendName2FrontendName(s.playerID)}
+            {s.displayName}
           </div>
         ))}
         {loadedCount < totalSnapshots && <span className={styles.chartStatus}>
@@ -224,7 +233,7 @@ const EconomyChart: React.FC<EconomyChartProps> = ({
               <div key={s.playerID} className={styles.tooltipRow}>
                 <span className={styles.legendDot} style={{ background: s.color }} />
                 <span className={styles.tooltipName}>
-                  {backendName2FrontendName(s.playerID)}
+                  {s.displayName}
                 </span>
                 <span className={styles.tooltipVal}>
                   ${s.points[hoverTurn]?.total ?? 0}

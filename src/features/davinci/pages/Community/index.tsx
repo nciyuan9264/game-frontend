@@ -78,7 +78,7 @@ export function Rankings() {
       <header><span>名次</span><span>玩家</span><span>胜场</span><span>胜率</span><span>对局</span></header>
       {entries.map((entry, index) => <div key={entry.userID} className={String(entry.userID) === String(profile.data?.id) ? styles.mine : ''}>
         <span>{index === 0 ? <Trophy size={18} /> : String(index + 1).padStart(2, '0')}</span>
-        <span><PlayerAvatar name={entry.playerID.replace(/-\d+$/, '')} size={34} /><b>{entry.playerID.replace(/-\d+$/, '')}</b></span>
+        <span><PlayerAvatar name={entry.displayName} size={34} /><b>{entry.displayName}</b></span>
         <span>{entry.wins}</span><span>{(entry.winRate * 100).toFixed(1)}%</span><span>{entry.totalGames}</span>
       </div>)}
       {loading && !entries.length && <DavinciLoading title="正在整理破译记录。" description="读取排行榜" />}
@@ -160,7 +160,7 @@ export function My() {
           const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id));
           const opponent = game.players?.find(player => player.id !== me?.id);
           return <article key={game.id}><span className={me?.isWinner ? styles.win : styles.loss}>{me?.isWinner ? '胜' : '负'}</span>
-            <div><strong>{opponent?.isAI ? 'AI 对手' : opponent?.playerID?.replace(/-\d+$/, '') || '未知对手'}</strong>
+            <div><strong>{opponent?.displayName || '未知对手'}</strong>
               <small>{new Date(game.startedAt).toLocaleString('zh-CN')}</small></div>
             <span><b>{Math.max(0, Math.round(game.durationSeconds / 60))}</b><small>分钟</small></span></article>;
         })}

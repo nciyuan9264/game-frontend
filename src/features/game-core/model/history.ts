@@ -22,6 +22,7 @@ export interface GamePlayer {
   gameID: GameID;
   userID?: GameID;
   playerID: string;
+  displayName: string;
   seatIndex: number;
   isAI: boolean;
   finalScore?: number;
@@ -51,6 +52,7 @@ export interface Game {
 export interface EventMeta {
   seq: number;
   playerID: string;
+  displayName: string;
   cmdType: CmdType;
 }
 
@@ -97,6 +99,7 @@ export interface SnapshotPageData<TSnapshot = Snapshot> {
 export interface LeaderboardEntryBase {
   userID: GameID;
   playerID: string;
+  displayName: string;
   totalGames: number;
 }
 
@@ -125,6 +128,7 @@ export function toLeaderboardEntry(
     return {
       userID: entry.userID,
       playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
       totalGames: entry.totalGames,
       wins: entry.metric.davinci.wins,
       winRate: entry.metric.davinci.winRate,
@@ -133,6 +137,7 @@ export function toLeaderboardEntry(
   return {
     userID: entry.userID,
     playerID: entry.playerID,
+    displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
     totalGames: entry.totalGames,
     avgRank: entry.metric.rank.avgRank,
   };
@@ -151,6 +156,7 @@ export function parseReplayPayload(event?: ReplayEvent): ReplayEventData | undef
   return {
     seq: event.seq,
     playerID: event.playerID,
+    displayName: event.displayName ?? `玩家 ${event.playerID}`,
     cmdType: event.cmdType,
     payload,
   };

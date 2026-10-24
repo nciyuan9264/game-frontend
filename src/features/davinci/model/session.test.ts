@@ -5,12 +5,12 @@ import type { DavinciRoom } from './types';
 
 const room: DavinciRoom = {
   roomID: 'room-1',
-  ownerID: 'Alice-42',
-  ownerName: 'Alice',
+  ownerID: '42',
+  ownerName: 'Alice-Cooper-42',
   maxPlayers: 2,
   status: 'match',
   roomPlayer: [{
-    userID: 'user-42', playerID: 'Alice-42', name: 'Alice', online: true, ready: true, ai: false, seatIndex: 0,
+    userID: '42', playerID: '42', displayName: 'Alice-Cooper-42', online: true, ready: true, ai: false, seatIndex: 0,
   }],
 };
 
@@ -22,8 +22,8 @@ describe('DaVinci protocol model', () => {
       roomID: 'room-1',
       matchID: 'match-1',
       seq: 1,
-      ownerID: 'Alice-42',
-      playerID: 'Alice-42',
+      ownerID: '42',
+      playerID: '42',
       players: {},
       maxPlayers: 2,
       playerOrder: [],
@@ -35,8 +35,8 @@ describe('DaVinci protocol model', () => {
   });
 
   it('derives room ownership and entry state without truncating hyphenated names', () => {
-    expect(roomOwnerName(room)).toBe('Alice');
-    expect(roomEntry(room, { userID: 'user-42', playerID: 'Renamed-42' })).toEqual({ allowed: true, label: '返回房间' });
-    expect(roomEntry({ ...room, status: 'guessCard' }, { userID: 'user-7', playerID: 'Bob-7' })).toEqual({ allowed: false, label: '已开局' });
+    expect(roomOwnerName(room)).toBe('Alice-Cooper-42');
+    expect(roomEntry(room, { userID: '42' })).toEqual({ allowed: true, label: '返回房间' });
+    expect(roomEntry({ ...room, status: 'guessCard' }, { userID: '7' })).toEqual({ allowed: false, label: '已开局' });
   });
 });

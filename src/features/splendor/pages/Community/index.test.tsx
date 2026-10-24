@@ -27,7 +27,7 @@ beforeEach(() => {
   api.getProfile.mockResolvedValue({ id: '1', name: 'Alice', email: '', avatar: '' });
   api.getLeaderboard.mockResolvedValue({
     gameType: 'splendor',
-    entries: [{ userID: 1, playerID: 'Alice-1', totalGames: 2, avgRank: 1.5 }],
+    entries: [{ userID: 1, playerID: '1', displayName: 'Alice-1', totalGames: 2, avgRank: 1.5 }],
   });
 });
 afterEach(() => {

@@ -49,7 +49,10 @@ export interface GetLeaderboardParams extends RequestOptions {
 const requestOptions = ({ signal }: RequestOptions) => ({ signal });
 
 function toGamePlayer(player: HistoryGamePlayer): GamePlayer {
-  return { ...player };
+  return {
+    ...player,
+    displayName: player.displayName ?? (player.isAI ? 'AI' : `玩家 ${player.playerID}`),
+  };
 }
 
 function toGame(game: HistoryGame): Game {
@@ -99,7 +102,10 @@ export async function getGameDetail(
   return {
     game: toGame(response.data.game),
     players: response.data.players.map(toGamePlayer),
-    events: response.data.events,
+    events: response.data.events.map(event => ({
+      ...event,
+      displayName: event.displayName ?? `玩家 ${event.playerID}`,
+    })),
   };
 }
 

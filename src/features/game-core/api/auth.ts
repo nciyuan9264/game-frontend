@@ -8,6 +8,7 @@ export interface AuthProfile {
   id: string;
   email: string;
   name: string;
+  displayName: string;
   avatar: string;
 }
 
@@ -17,10 +18,12 @@ export async function refreshToken() {
 
 export async function getProfile(): Promise<AuthProfile> {
   const response = await GetProfile();
+  const displayName = response.data.display_name ?? response.data.name ?? '';
   return {
     id: response.data.user_id,
     email: response.data.email ?? '',
-    name: response.data.name ?? response.data.display_name ?? '',
+    name: displayName,
+    displayName,
     avatar: response.data.avatar ?? '',
   };
 }

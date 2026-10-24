@@ -5,7 +5,6 @@ import { ArrowRight, Check, Copy, Globe, KeyRound, Lock, QrCode, ShieldCheck } f
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
-import { profile2BackendName } from '@/util/user';
 import { createAcquireRoom, lookupRoom } from '../../api/room';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -40,8 +39,7 @@ export default function Lobby() {
   const action = useLatestAsyncAction();
   const { error, pending } = action;
   const userID = profile.data?.id ?? '';
-  const playerID = profile2BackendName(profile.data);
-  const identity = { userID, playerID };
+  const identity = { userID };
   const onEnter = (room: AcquireRoom) => {
     if (roomEntry(room, identity).allowed) navigate(`/game/acquire/match?roomID=${encodeURIComponent(room.roomID)}`);
   };
@@ -74,7 +72,7 @@ export default function Lobby() {
     action.reset();
   };
   const props = {
-    lobby, profile: profile.data, stats: stats.data, statsError: stats.error, userID, playerID, code, setCode,
+    lobby, profile: profile.data, stats: stats.data, statsError: stats.error, userID, code, setCode,
     onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
     onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
@@ -110,7 +108,7 @@ export default function Lobby() {
       </form>
       {error && <Feedback error>{error}</Feedback>}
       <div className={styles.joinHint}><ShieldCheck size={16} /><span>输入朋友分享的完整房间号。</span></div>
-      {foundRoom && <RoomCard room={foundRoom} userID={userID} playerID={playerID} onEnter={onEnter} />}
+      {foundRoom && <RoomCard room={foundRoom} userID={userID} onEnter={onEnter} />}
     </ResponsiveDialog>}
     {panel === 'share' && <ResponsiveDialog title="分享 Acquire" eyebrow="INVITE SOMEONE TO THE TABLE" className={styles.shareDialog} onClose={close}
       footer={<><ActionButton onClick={close}>关闭</ActionButton><ActionButton variant="primary" onClick={() => void copyShareURL()}>

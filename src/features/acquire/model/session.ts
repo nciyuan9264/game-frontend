@@ -9,6 +9,7 @@ import type {
   SessionPendingCommand,
   SessionSnapshotBase,
 } from '@/features/game-core/model/session';
+import { playerDisplayName } from '@/features/game-core/model/room';
 import {
   parseRealtimeEnvelope,
   type RealtimeCommandResult,
@@ -134,7 +135,7 @@ export const endGameState = (snapshot: GameSnapshot) =>
 export const playerName = (
   id: string,
   players: Record<string, AcquirePlayer>,
-) => players[id]?.name || id.replace(/-\d+$/, '');
+) => playerDisplayName(players[id], id);
 
 function normalizePlayers(
   players: Record<string, AcquirePlayer>,

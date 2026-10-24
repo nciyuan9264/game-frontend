@@ -5,6 +5,7 @@ import type {
   PendingCommand,
   Snapshot,
 } from './session';
+import { playerName } from './session';
 import {
   cardColors,
   gemColors,
@@ -196,9 +197,12 @@ export function phaseCopy(data: GameSnapshot) {
   return mine ? ['轮到你选择', '拿宝石、购买发展卡或预留一张卡'] : ['等待其他收藏家', '你可以检查卡牌成本与自己的资源'];
 }
 
-export function lastActionCopy(action?: LastAction | null) {
+export function lastActionCopy(
+  action?: LastAction | null,
+  players?: GameSnapshot['roomData']['players'],
+) {
   if (!action) return '';
-  const actor = action.playerID.replace(/-\d+$/, '');
+  const actor = playerName(action.playerID, players);
   switch (action.action) {
     case 'get_gem': {
       const payload = action.payload as {

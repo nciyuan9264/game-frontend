@@ -28,7 +28,8 @@ vi.mock('@/features/game-core/api/history', () => ({
 function leaderboardEntry(index: number): LeaderboardEntry {
   return {
     userID: index,
-    playerID: `玩家 ${index}-${index}`,
+    playerID: String(index),
+    displayName: `玩家 ${index}-${index}`,
     totalGames: index,
     avgRank: 1 + index / 10,
   };
@@ -144,7 +145,7 @@ describe('Acquire community rankings', () => {
       <Rankings />
     </MemoryRouter>);
 
-    await screen.findByText('玩家 1');
+    await screen.findByText('玩家 1-1');
     expect(screen.queryByText(/按平均名次/)).toBeNull();
 
     await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledTimes(2));
@@ -154,7 +155,7 @@ describe('Acquire community rankings', () => {
     expect(api.getLeaderboard).toHaveBeenNthCalledWith(2, {
       gameType: 'acquire', limit: 8, offset: 8, sort: 'metric', signal: expect.any(AbortSignal),
     });
-    expect(await screen.findByText('玩家 9')).toBeTruthy();
+    expect(await screen.findByText('玩家 9-9')).toBeTruthy();
   });
 
   it('reloads from the first page with total games sort when switching ranking mode', async () => {
@@ -162,7 +163,7 @@ describe('Acquire community rankings', () => {
       <Rankings />
     </MemoryRouter>);
 
-    await screen.findByText('玩家 1');
+    await screen.findByText('玩家 1-1');
     fireEvent.click(screen.getByRole('tab', { name: '场次榜' }));
 
     await waitFor(() => expect(api.getLeaderboard).toHaveBeenCalledWith({

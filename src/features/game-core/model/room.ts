@@ -37,23 +37,27 @@ export type LobbyFilter = 'all' | 'joinable' | 'playing';
 
 export interface RoomEntryIdentity {
   userID: string;
-  playerID: string;
 }
 
-export function legacyPlayerName(playerID: string) {
-  return playerID.replace(/-\d+$/, '');
+export function playerDisplayName(
+  player: Pick<LobbyPlayerLike, 'playerID' | 'displayName' | 'name' | 'ai'> | undefined,
+  playerID = player?.playerID ?? '',
+) {
+  return player?.displayName
+    || player?.name
+    || (player?.ai ? 'AI' : playerID ? `玩家 ${playerID}` : '玩家');
 }
 
 export function roomOwnerName(room: LobbyRoomLike) {
+  const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
   return room.ownerName
-    || room.roomPlayer.find(player => player.playerID === room.ownerID)?.name
-    || legacyPlayerName(room.ownerID);
+    || playerDisplayName(owner, room.ownerID);
 }
 
 export function roomEntry(room: LobbyRoomLike, identity: RoomEntryIdentity) {
   const member = room.roomPlayer.some(player =>
-    player.playerID === identity.playerID
-    || (!!identity.userID && player.userID === identity.userID)
+    !!identity.userID
+    && (player.userID === identity.userID || player.playerID === identity.userID)
   );
   if (member) {
     return { allowed: true, label: room.status === 'match' ? '返回房间' : '进入对局' };

@@ -29,6 +29,7 @@ export interface ReplayEvent {
   playerID: string;
   cmdType: string;
   payloadJSON?: string;
+  displayName?: string;
 }
 
 export interface GamePlatformError {
@@ -432,6 +433,7 @@ export interface HistoryGamePlayer {
   finalRank?: number;
   isWinner: boolean;
   createdAt: ISODateTime;
+  displayName?: string;
 }
 
 export interface HistoryGame {
@@ -454,6 +456,7 @@ export interface HistoryEventMeta {
   seq: number;
   playerID: string;
   cmdType: string;
+  displayName?: string;
 }
 
 export interface HistoryStats {
@@ -477,6 +480,7 @@ export interface LeaderboardEntry {
   playerID: string;
   totalGames: number;
   metric: LeaderboardMetric;
+  displayName?: string;
 }
 
 export interface ListHistoryGamesReq {

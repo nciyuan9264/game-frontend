@@ -24,8 +24,8 @@ describe('game collection hooks', () => {
       .mockResolvedValueOnce({
         gameType: 'davinci',
         entries: [
-          { userID: 1, playerID: 'A-1', totalGames: 3, wins: 2, winRate: .67 },
-          { userID: 2, playerID: 'B-2', totalGames: 2, wins: 1, winRate: .5 },
+          { userID: 1, playerID: '1', displayName: 'A-1', totalGames: 3, wins: 2, winRate: .67 },
+          { userID: 2, playerID: '2', displayName: 'B-2', totalGames: 2, wins: 1, winRate: .5 },
         ],
       })
       .mockResolvedValueOnce({ gameType: 'davinci', entries: [] });

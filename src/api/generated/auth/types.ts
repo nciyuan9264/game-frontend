@@ -137,6 +137,25 @@ export interface GetUserReq {
   user_id: string;
 }
 
+export interface PublicUserProfile {
+  user_id: string;
+  display_name: string;
+}
+
+export interface BatchGetPublicProfilesReq {
+  user_ids: string[];
+}
+
+export interface BatchGetPublicProfilesData {
+  profiles: PublicUserProfile[];
+}
+
+export interface BatchGetPublicProfilesResp {
+  status_code: number;
+  message: string;
+  data: BatchGetPublicProfilesData;
+}
+
 export interface AuthUserRecord {
   identity: UserIdentity;
   created_at_unix: string;

@@ -26,7 +26,7 @@ import styles from './index.module.less';
 interface ReplaySnapshot {
   seq: number;
   totalEvents: number;
-  currentEvent?: { seq: number; playerID: string; cmdType: string; payload: unknown };
+  currentEvent?: { seq: number; playerID: string; displayName: string; cmdType: string; payload: unknown };
   roomData: {
     normalCards: Record<string, DevelopmentCard>;
     nobleCards: Record<string, Noble>;
@@ -143,7 +143,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       </article>;
     })}</section>
       <main className={styles.table}><section className={styles.market}><header><div><small>DEVELOPMENT MARKET</small>
-        <h2>{event ? `${event.playerID.replace(/-\d+$/, '')} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2></div>
+        <h2>{event ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2></div>
         <span>第 {replay.selectedIndex} / {Math.max(0, replay.totalSnapshots - 1)} 步</span></header>
         <div className={styles.nobles}><span><Crown size={14} />贵族的青睐</span>
           <div>{data.roomData.nobles.map(noble => <NobleTile key={noble.id} noble={noble} progress={viewerDiscounts} compact />)}</div></div>

@@ -5,6 +5,7 @@ import { getProfile } from '@/features/game-core/api/auth';
 
 export interface UserProfile {
   name: string;
+  displayName: string;
   email: string;
   avatar?: string;
   id: string;
@@ -12,6 +13,7 @@ export interface UserProfile {
 export const useProfile = () => {
   const [userProfile, setUserProfile] = useState<UserProfile>({
     name: '',
+    displayName: '',
     email: '',
     avatar: '',
     id: '',
@@ -21,7 +23,14 @@ export const useProfile = () => {
     async () => {
       const profile = localStorage.getItem('profile');
       if (profile) {
-        return JSON.parse(profile);
+        const cached = JSON.parse(profile) as Partial<UserProfile>;
+        return {
+          name: cached.displayName ?? cached.name ?? '',
+          displayName: cached.displayName ?? cached.name ?? '',
+          email: cached.email ?? '',
+          avatar: cached.avatar ?? '',
+          id: cached.id ?? '',
+        };
       }
       return await getProfile();
     },

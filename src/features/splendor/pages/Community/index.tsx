@@ -85,8 +85,8 @@ export function Rankings() {
       {!!podium.length && <div className={styles.podium}>{podium.map((entry, index) =>
         <div key={entry.userID} className={index === 1 ? styles.first : ''}>
           <span>{index === 1 ? <Crown size={22} /> : index === 0 ? '02' : '03'}</span>
-          <PlayerAvatar name={entry.playerID.replace(/-\d+$/, '')} size={index === 1 ? 78 : 64} />
-          <strong>{entry.playerID.replace(/-\d+$/, '')}</strong>
+          <PlayerAvatar name={entry.displayName} size={index === 1 ? 78 : 64} />
+          <strong>{entry.displayName}</strong>
           <b>{mode === 'games' ? entry.totalGames : 'avgRank' in entry ? entry.avgRank.toFixed(2) : '—'}
             <small>{mode === 'games' ? '完成对局' : '平均名次'}</small></b>
         </div>)}</div>}
@@ -102,8 +102,8 @@ export function Rankings() {
         const mine = String(entry.userID) === String(profile.data?.id);
         return <div className={`${styles.rankRow} ${mine ? styles.mine : ''}`} key={entry.userID}>
           <span className={styles.rankNumber}>{String(index + 1).padStart(2, '0')}</span>
-          <span className={styles.rankPlayer}><PlayerAvatar name={entry.playerID.replace(/-\d+$/, '')} size={37} />
-            <strong>{entry.playerID.replace(/-\d+$/, '')}</strong>{mine && <em>你</em>}</span>
+          <span className={styles.rankPlayer}><PlayerAvatar name={entry.displayName} size={37} />
+            <strong>{entry.displayName}</strong>{mine && <em>你</em>}</span>
           <span>{entry.totalGames}</span><b>{'avgRank' in entry ? entry.avgRank.toFixed(2) : '—'}</b>
         </div>;
       })}

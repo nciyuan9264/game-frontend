@@ -22,7 +22,7 @@ beforeEach(() => {
   api.getProfile.mockResolvedValue({ id: '1', name: 'Alice', email: '', avatar: '' });
   api.getLeaderboard.mockResolvedValue({
     gameType: 'davinci',
-    entries: [{ userID: 1, playerID: 'Alice-1', totalGames: 2, wins: 1, winRate: .5 }],
+    entries: [{ userID: 1, playerID: '1', displayName: 'Alice-1', totalGames: 2, wins: 1, winRate: .5 }],
   });
 });
 afterEach(() => {

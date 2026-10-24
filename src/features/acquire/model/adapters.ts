@@ -1,6 +1,5 @@
 import {
   gameInviteURL,
-  legacyPlayerName,
   roomEntry as sharedRoomEntry,
   roomOwnerName as sharedRoomOwnerName,
   type RoomEntryIdentity,
@@ -13,7 +12,6 @@ export function acquireRoomInviteURL(roomID: string) {
   return gameInviteURL('acquire', roomID);
 }
 
-export const playerName = legacyPlayerName;
 export function roomOwnerName(room: AcquireRoom) {
   return sharedRoomOwnerName(room);
 }

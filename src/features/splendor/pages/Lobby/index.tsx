@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
-import { profile2BackendName } from '@/util/user';
+import { playerDisplayName } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -30,14 +30,13 @@ const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'playing', label: '对局中' },
 ];
 
-function RoomCard({ room, userID, playerID, onEnter, artIndex }: {
+function RoomCard({ room, userID, onEnter, artIndex }: {
   room: SplendorRoom;
   userID: string;
-  playerID: string;
   onEnter: (room: SplendorRoom) => void;
   artIndex: number;
 }) {
-  const entry = roomEntry(room, { userID, playerID });
+  const entry = roomEntry(room, { userID });
   const owner = roomOwnerName(room);
   const players = room.roomPlayer;
   return <article className={styles.roomCard}>
@@ -47,7 +46,7 @@ function RoomCard({ room, userID, playerID, onEnter, artIndex }: {
     <div className={styles.roomTitle}><div><h3>{owner} 的商会</h3><p>经典对局 · {room.visibility === 'private' ? '私密' : '公开'}</p></div>
       <Artwork index={artIndex} /></div>
     <div className={styles.people}>{players.slice(0, 3).map(player =>
-      <PlayerAvatar key={player.playerID} name={player.name || player.playerID}
+      <PlayerAvatar key={player.playerID} name={playerDisplayName(player)}
         avatar={player.avatar} ai={player.ai} size={31} />)}
       {players.length < room.maxPlayers && <span>+</span>}
       <strong>{players.length} <small>/ {room.maxPlayers} 人</small></strong></div>
@@ -70,8 +69,7 @@ export default function Lobby() {
   const action = useLatestAsyncAction();
   const { error, pending } = action;
   const userID = profile.data?.id ?? '';
-  const playerID = profile2BackendName(profile.data);
-  const identity = { userID, playerID };
+  const identity = { userID };
 
   const enter = (room: SplendorRoom) => {
     if (roomEntry(room, identity).allowed) {
@@ -130,7 +128,7 @@ export default function Lobby() {
             {lobby.query && <button type="button" aria-label="清空搜索" onClick={() => lobby.setQuery('')}><X size={14} /></button>}</label></div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
         <div className={styles.roomGrid}>{lobby.filteredRooms.map((room, index) =>
-          <RoomCard key={room.roomID} room={room} userID={userID} playerID={playerID} onEnter={enter} artIndex={[4, 5, 7][index % 3]} />)}</div>
+          <RoomCard key={room.roomID} room={room} userID={userID} onEnter={enter} artIndex={[4, 5, 7][index % 3]} />)}</div>
         {!lobby.error && !lobby.filteredRooms.length && <div className={styles.empty}><Search size={32} />
           <h3>还没有找到这间商会</h3><p>换个关键词，或开一间自己的房间。</p>
           <ActionButton onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清空筛选</ActionButton></div>}
@@ -173,7 +171,7 @@ export default function Lobby() {
         <label>房间号<input aria-label="房间号" value={code} onChange={event => { setCode(event.target.value); setFoundRoom(undefined); action.reset(); }}
           placeholder="输入完整房间号" autoCapitalize="off" autoCorrect="off" spellCheck={false} /></label></form>
       {error && <Feedback error>{error}</Feedback>}
-      {foundRoom && <RoomCard room={foundRoom} userID={userID} playerID={playerID} onEnter={enter} artIndex={4} />}
+      {foundRoom && <RoomCard room={foundRoom} userID={userID} onEnter={enter} artIndex={4} />}
     </Dialog>}
   </AppShell>;
 }

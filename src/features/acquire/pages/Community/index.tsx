@@ -115,7 +115,7 @@ export function Rankings() {
       <div className={styles.rankRow + ' ' + styles.rankHead}><span>名次</span><span>玩家</span><span>完成对局</span><span>平均名次</span></div>
       <Status resource={{ loading: loading && !entries.length, error: error && !entries.length ? error : '', retry }} />{sorted.map((entry, index) => { const mine = String(entry.userID) === String(profile.data?.id); return <div className={styles.rankRow + (mine ? ' ' + styles.rankSelf : '')} key={entry.userID}>
         <span className={styles.rankNumber}>{index === 0 ? <Trophy size={22} /> : String(index + 1).padStart(2, '0')}</span>
-        <span className={styles.rankPlayer}><PlayerAvatar name={entry.playerID.replace(/-\d+$/, '')} size={36} /><b>{entry.playerID.replace(/-\d+$/, '')}</b>{mine && <em>你</em>}</span>
+        <span className={styles.rankPlayer}><PlayerAvatar name={entry.displayName} size={36} /><b>{entry.displayName}</b>{mine && <em>你</em>}</span>
         <span>{entry.totalGames}<small>场</small></span><span>{'avgRank' in entry ? entry.avgRank.toFixed(2) : '—'}</span>
       </div>; })}
       {!loading && !error && !sorted.length && <Feedback>暂时还没有排名记录，来完成一局吧。</Feedback>}

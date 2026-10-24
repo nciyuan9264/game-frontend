@@ -11,6 +11,7 @@ const players: GamePlayer[] = [{
   gameID: 1,
   userID: 7,
   playerID: 'me',
+  displayName: 'Player',
   seatIndex: 0,
   isAI: false,
   finalStocks: 0,

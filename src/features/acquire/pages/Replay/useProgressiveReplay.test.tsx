@@ -89,6 +89,7 @@ function detail(gameID: number): GameDetailData {
       gameID,
       userID: 7,
       playerID: 'me',
+      displayName: 'Player',
       seatIndex: 0,
       isAI: false,
       finalStocks: 0,

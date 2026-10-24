@@ -53,13 +53,13 @@ export function useSplendorPlayUI(data: GameSnapshot) {
   }, [phaseVersion]);
 
   useEffect(() => {
-    const text = lastActionCopy(data.roomData.lastData);
+    const text = lastActionCopy(data.roomData.lastData, data.roomData.players);
     if (!text) return;
     const key = `${data.phaseVersion}:${JSON.stringify(data.roomData.lastData)}`;
     setActivities(current => current.some(entry => entry.key === key)
       ? current
       : [{ key, turnNumber: data.turnNumber, text }, ...current].slice(0, 40));
-  }, [data.phaseVersion, data.roomData.lastData, data.turnNumber]);
+  }, [data.phaseVersion, data.roomData.lastData, data.roomData.players, data.turnNumber]);
 
   const openCard = useCallback((cardID: number) => {
     setSelectedCardID(cardID);

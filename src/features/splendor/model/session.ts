@@ -2,6 +2,7 @@ import type {
   SessionPendingCommand,
   SessionSnapshotBase,
 } from '@/features/game-core/model/session';
+import { playerDisplayName } from '@/features/game-core/model/room';
 import {
   parseRealtimeEnvelope,
   type RealtimeCommandResult,
@@ -176,4 +177,4 @@ export const selfID = (snapshot: Snapshot) =>
 export const playerName = (
   id: string,
   players?: Record<string, SplendorPlayer>,
-) => players?.[id]?.name || id.replace(/-\d+$/, '');
+) => playerDisplayName(players?.[id], id);

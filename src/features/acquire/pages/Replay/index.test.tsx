@@ -57,7 +57,7 @@ beforeEach(() => {
   api.getProfile.mockResolvedValue({ id: '7', name: 'Player', email: '', avatar: '' });
   api.getGameDetail.mockResolvedValue({
     game: { id: 1, roomID: 'replay-room', gameType: 'acquire', startedAt: '', durationSeconds: 0, maxPlayers: 6, createdAt: '', updatedAt: '' },
-    players: [{ id: 1, gameID: 1, userID: 7, playerID: 'me', seatIndex: 0, isAI: false, finalStocks: 0, isWinner: true, createdAt: '' }],
+    players: [{ id: 1, gameID: 1, userID: 7, playerID: 'me', displayName: 'Player', seatIndex: 0, isAI: false, finalStocks: 0, isWinner: true, createdAt: '' }],
     events: [],
   } as GameDetailData);
   api.getSnapshotPage.mockResolvedValue({

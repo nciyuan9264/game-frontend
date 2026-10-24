@@ -1,6 +1,5 @@
 import {
   gameInviteURL,
-  legacyPlayerName as sharedLegacyPlayerName,
   roomEntry as sharedRoomEntry,
   roomOwnerName as sharedRoomOwnerName,
   type RoomEntryIdentity,
@@ -12,8 +11,6 @@ export const SPLENDOR_PUBLIC_URL = 'https://board.gamebus.online/game/splendor';
 export function splendorRoomInviteURL(roomID: string) {
   return gameInviteURL('splendor', roomID);
 }
-
-export const legacyPlayerName = sharedLegacyPlayerName;
 
 export function roomOwnerName(room: SplendorRoom) {
   return sharedRoomOwnerName(room);

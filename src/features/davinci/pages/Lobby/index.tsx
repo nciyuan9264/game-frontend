@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
-import { profile2BackendName } from '@/util/user';
+import { playerDisplayName } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -36,13 +36,12 @@ const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'playing', label: '对局中' },
 ];
 
-function RoomCard({ room, userID, playerID, onEnter }: {
+function RoomCard({ room, userID, onEnter }: {
   room: DavinciRoom;
   userID: string;
-  playerID: string;
   onEnter: (room: DavinciRoom) => void;
 }) {
-  const entry = roomEntry(room, { userID, playerID });
+  const entry = roomEntry(room, { userID });
   const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
   const progress = Math.max(0, Math.min(100, ((26 - (room.boardCardCount ?? 26)) / 26) * 100));
   return <article className={styles.roomCard}>
@@ -53,8 +52,8 @@ function RoomCard({ room, userID, playerID, onEnter }: {
       {Array.from({ length: room.maxPlayers }, (_, index) => {
         const player = room.roomPlayer.find(item => item.seatIndex === index) ?? room.roomPlayer[index];
         return <span key={index} className={player ? styles.occupied : ''}>
-          {player ? <PlayerAvatar name={player.name || player.playerID} avatar={player.avatar} ai={player.ai} size={28} /> : <UserRound size={15} />}
-          <small>{player ? player.ai ? 'AI' : player.name || player.playerID.replace(/-\d+$/, '') : '空位'}</small>
+          {player ? <PlayerAvatar name={playerDisplayName(player)} avatar={player.avatar} ai={player.ai} size={28} /> : <UserRound size={15} />}
+          <small>{player ? playerDisplayName(player) : '空位'}</small>
         </span>;
       })}
     </div>
@@ -78,8 +77,7 @@ export default function Lobby() {
   const createAction = useLatestAsyncAction();
   const { pending, error: createError } = createAction;
   const userID = profile.data?.id ?? '';
-  const playerID = profile2BackendName(profile.data);
-  const identity = { userID, playerID };
+  const identity = { userID };
 
   const enter = (room: DavinciRoom) => {
     if (roomEntry(room, identity).allowed) {
@@ -146,7 +144,7 @@ export default function Lobby() {
         </div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
         <div className={styles.roomGrid}>{lobby.filteredRooms.map(room =>
-          <RoomCard key={room.roomID} room={room} userID={userID} playerID={playerID} onEnter={enter} />)}</div>
+          <RoomCard key={room.roomID} room={room} userID={userID} onEnter={enter} />)}</div>
         {!lobby.error && !lobby.filteredRooms.length && <div className={styles.empty}><KeyRound size={25} /><h3>当前没有匹配的密码桌</h3><p>创建一个房间，或清空筛选条件查看全部。</p></div>}
       </section>
       <aside className={styles.side}>
