@@ -3,3 +3,6 @@ node_modules
 showcase/
 .env*.local
 .DS_Store
+.dbg/
+.trae/
+debug-*.md

@@ -1,7 +1,7 @@
 import { ArrowRight, BookOpen, Building2, KeyRound, Plus, RefreshCw, Search, Share2 } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import type { UserProfile } from '@/hooks/request/useProfile';
+import type { AuthProfile } from '@/features/game-core/api/auth';
 import type { Stats } from '@/features/game-core/model/history';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
@@ -16,7 +16,7 @@ import styles from './index.module.less';
 
 export interface LobbyViewProps {
   lobby: ReturnType<typeof useAcquireLobby>;
-  profile?: UserProfile;
+  profile?: AuthProfile;
   stats?: Stats;
   statsError: string;
   userID: string;

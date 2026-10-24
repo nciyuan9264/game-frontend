@@ -2,10 +2,14 @@ import type { ReactNode } from 'react';
 import { BookOpen, ChevronRight, LayoutGrid, Trophy, UserRound } from 'lucide-react';
 import { GameAppShell } from '@/components/GameUI/GameAppShell';
 import { GameAvatar } from '@/components/GameUI/GameAvatar';
-import type { UserProfile } from '@/hooks/request/useProfile';
+import type { AuthProfile } from '@/features/game-core/api/auth';
 import { ClickFeedback } from '../ClickFeedback';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
+
+type ShellProfile = Pick<AuthProfile, 'name'> & {
+  avatar?: AuthProfile['avatar'];
+};
 
 const navigation = [
   { path: '/game/acquire', title: '大厅', icon: <LayoutGrid size={21} />, mobileIcon: <LayoutGrid size={20} /> },
@@ -39,7 +43,7 @@ export function PlayerAvatar({ name, avatar, ai, size = 36 }: { name: string; av
     renderFallback={() => <AvatarArt variant={variant} bot={ai} />} />;
 }
 export function AppShell({ children, title, profile, inMatch = false, hideRail = false, hideHeader = false, tools }: {
-  children: ReactNode; title: string; profile?: Pick<UserProfile, 'name' | 'avatar'>;
+  children: ReactNode; title: string; profile?: ShellProfile;
   inMatch?: boolean; hideRail?: boolean; hideHeader?: boolean; tools?: ReactNode;
 }) {
   return <GameAppShell

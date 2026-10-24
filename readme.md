@@ -1,14 +1,35 @@
-# 游戏前端项目 (Game Frontend)
-这是一个基于 React + TypeScript + Vite 开发的桌游前端项目，实现了两个经典桌游的在线版本： Splendor（璀璨宝石） 和 Acquire（并购） 。
+# Game Frontend
 
-## 🎮 游戏介绍
-### Splendor（璀璨宝石）
-- 游戏类型 ：策略与资源管理
-- 游戏描述 ：璀璨宝石：策略与资源管理的经典桌游
-- 支持人数 ：2-4人
-- 游戏特色 ：通过收集宝石来购买发展卡片，获得贵族青睐
-### Acquire（并购）
-- 游戏类型 ：并购与股市对战
-- 游戏描述 ：并购：并购与股市对战的烧脑游戏
-- 支持人数 ：2-6人
-- 游戏特色 ：通过建立酒店连锁和股票投资来获得最高财富
+基于 React、TypeScript 和 Vite 的桌游前端，当前包含：
+
+- Acquire（并购）
+- DaVinci Code（达芬奇密码）
+- Splendor（璀璨宝石）
+
+## 开发
+
+```bash
+pnpm install --frozen-lockfile
+pnpm dev
+```
+
+质量门禁：
+
+```bash
+pnpm lint
+pnpm test
+pnpm build
+```
+
+## API 客户端
+
+`src/api/generated` 由固定版本的 PAM IDL 生成并提交到仓库。生成代码由部署直接使用，不在生产构建阶段临时拉取或重新生成。
+
+需要刷新客户端时，先准备相邻的 `pam-generate`，再运行：
+
+```bash
+pnpm generate:api
+pnpm check:generated
+```
+
+不要手工修改生成目录。

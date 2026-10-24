@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import {
   BookOpen, Bot, ChevronDown, LayoutGrid, Settings2, Trophy, UserRound,
 } from 'lucide-react';
-import type { UserProfile } from '@/hooks/request/useProfile';
+import type { AuthProfile } from '@/features/game-core/api/auth';
 import { GameAppShell } from '@/components/GameUI/GameAppShell';
 import { GameAvatar } from '@/components/GameUI/GameAvatar';
 import { ClickFeedback } from '@/components/GameUI/ClickFeedback';
@@ -13,6 +13,10 @@ import { Dialog } from '../Dialog';
 import { useSplendorPreferences } from '../../hooks/useSplendorPreferences';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
+
+type ShellProfile = Pick<AuthProfile, 'name'> & {
+  avatar?: AuthProfile['avatar'];
+};
 
 const navigation = [
   { path: '/game/splendor', title: '游戏大厅', desktopLabel: '大厅', mobileLabel: '大厅', icon: <LayoutGrid size={21} strokeWidth={1.6} />, mobileIcon: <LayoutGrid size={21} /> },
@@ -58,7 +62,7 @@ export function AppShell({
 }: {
   children: ReactNode;
   title: string;
-  profile?: Pick<UserProfile, 'name' | 'avatar'>;
+  profile?: ShellProfile;
   inMatch?: boolean;
   hideHeader?: boolean;
   tools?: ReactNode;
