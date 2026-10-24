@@ -113,6 +113,51 @@ function endedSnapshot() {
   };
 }
 
+function initializationSnapshot() {
+  const players = {
+    [human.playerID]: human,
+    [ai.playerID]: ai,
+  };
+  return {
+    schemaVersion: 2,
+    type: 'ROOM_SYNC',
+    roomID,
+    matchID,
+    seq: 3,
+    view: {
+      davinci: {
+        playerId: human.playerID,
+        ownerID: human.playerID,
+        roomData: {
+          currentPlayer: '',
+          gameStatus: 'initialize',
+          players,
+          boardCards: {},
+          turnDeadline: new Date(Date.now() + 15_000).toISOString(),
+          turnTimeoutMs: '15000',
+        },
+        cardData: {
+          self: [
+            { id: 'white-1', color: 0, num: 1, index: 0 },
+            { id: 'black-3', color: 1, num: 3, index: 1 },
+            { id: 'white-5', color: 0, num: 5, index: 2 },
+            { id: 'black-7', color: 1, num: 7, index: 3 },
+            { id: 'white-9', color: 0, num: 9, index: 4 },
+          ],
+          opponents: [
+            { id: 'opponent-1', color: 1, index: 0 },
+            { id: 'opponent-2', color: 0, index: 1 },
+            { id: 'opponent-3', color: 1, index: 2 },
+            { id: 'opponent-4', color: 0, index: 3 },
+            { id: 'opponent-5', color: 1, index: 4 },
+          ],
+          initialHandReady: false,
+        },
+      },
+    },
+  };
+}
+
 async function expectNoHorizontalOverflow(page: Page) {
   await expect.poll(() => page.evaluate(() => ({
     viewport: window.innerWidth,
@@ -141,4 +186,25 @@ test('DaVinci final board can reopen the results panel on mobile', async ({ page
 
   await page.getByRole('button', { name: '打开终局结算' }).click();
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();
+});
+
+test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }) => {
+  await mockSession(page, initializationSnapshot());
+  await page.goto(`/game/davinci/match?roomID=${roomID}`);
+
+  await expect(page.getByText('确认初始密码')).toBeVisible();
+  await expect(page.getByRole('button', { name: /确认牌序/ })).toBeEnabled();
+  const canvas = page.locator('canvas');
+  await expect(canvas).toBeVisible();
+  const portraitBox = await canvas.boundingBox();
+  expect(portraitBox?.width).toBeGreaterThan(0);
+  expect(portraitBox?.height).toBeGreaterThan(0);
+  await expectNoHorizontalOverflow(page);
+
+  await page.setViewportSize({ width: 844, height: 390 });
+  await expect(page.getByRole('button', { name: /确认牌序/ })).toBeVisible();
+  const landscapeBox = await canvas.boundingBox();
+  expect(landscapeBox?.width).toBeGreaterThan(0);
+  expect(landscapeBox?.height).toBeGreaterThan(0);
+  await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

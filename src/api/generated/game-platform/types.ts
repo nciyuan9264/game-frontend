@@ -619,6 +619,7 @@ export interface DavinciRoomData {
 export interface DavinciCardData {
   self: DavinciCard[];
   opponents: DavinciCard[];
+  initialHandReady?: boolean;
 }
 
 export interface DavinciResult {
@@ -647,10 +648,20 @@ export interface DavinciSetCardPayload {
   index: number;
 }
 
+export interface DavinciJokerPlacement {
+  id: string;
+  index: number;
+}
+
+export interface DavinciInitializeHandPayload {
+  jokerPlacements: DavinciJokerPlacement[];
+}
+
 export type DavinciCommandPayload =
-  | { getCard: DavinciGetCardPayload; guessCard?: never; setCard?: never }
-  | { getCard?: never; guessCard: DavinciGuessCardPayload; setCard?: never }
-  | { getCard?: never; guessCard?: never; setCard: DavinciSetCardPayload };
+  | { getCard: DavinciGetCardPayload; guessCard?: never; setCard?: never; initializeHand?: never }
+  | { getCard?: never; guessCard: DavinciGuessCardPayload; setCard?: never; initializeHand?: never }
+  | { getCard?: never; guessCard?: never; setCard: DavinciSetCardPayload; initializeHand?: never }
+  | { getCard?: never; guessCard?: never; setCard?: never; initializeHand: DavinciInitializeHandPayload };
 
 export interface MatchReadyPayload {
   ready: boolean;

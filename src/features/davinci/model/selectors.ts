@@ -37,6 +37,9 @@ export function confirmsCommand(command: PendingCommand, next: Snapshot): boolea
       case 'game_set_card':
         return next.cardData.self.some(card =>
           card.id === command.payload.id && card.index === command.payload.index);
+      case 'game_initialize_hand':
+        return next.cardData.initialHandReady === true
+          || next.roomData.gameStatus !== 'initialize';
       default:
         return false;
     }
@@ -53,6 +56,8 @@ export function winner(data: GameSnapshot): string {
 export function phaseCopy(data: GameSnapshot) {
   const mine = data.roomData.currentPlayer === data.playerId;
   switch (data.roomData.gameStatus) {
+    case 'initialize':
+      return ['确认初始密码', '双方正在同时确认密码牌序'];
     case 'getCard':
       return mine ? ['抽取新牌', '从公共牌池选择一张黑牌或白牌'] : ['等待对手抽牌', '留意牌池颜色与剩余数量'];
     case 'guessCard':

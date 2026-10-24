@@ -69,6 +69,7 @@ export type CommandType =
   | 'game_get_card'
   | 'game_guess_card'
   | 'game_set_card'
+  | 'game_initialize_hand'
   | 'game_play_audio';
 export type CommandPayload = Record<string, unknown>;
 export type PendingCommand = SessionPendingCommand<
@@ -129,6 +130,7 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     cardData: {
       self: view.cardData.self as Card[],
       opponents: view.cardData.opponents as Card[],
+      initialHandReady: view.cardData.initialHandReady === true,
     },
     result: view.result,
     roomData: {

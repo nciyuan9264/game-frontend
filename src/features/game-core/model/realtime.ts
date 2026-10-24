@@ -196,6 +196,14 @@ function gamePayload(
             setCard: objectPayload as { id: string; index: number },
           },
         };
+      case 'game_initialize_hand':
+        return {
+          davinci: {
+            initializeHand: objectPayload as {
+              jokerPlacements: Array<{ id: string; index: number }>;
+            },
+          },
+        };
     }
   }
   if (gameType === 'splendor') {

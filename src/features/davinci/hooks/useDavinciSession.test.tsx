@@ -84,4 +84,28 @@ describe('DaVinci v2 session', () => {
       },
     });
   });
+
+  it('serializes initial Joker placements through the generated union', () => {
+    const { result } = renderHook(() => useDavinciSession('room', 'match'));
+    receive(snapshot());
+    act(() => {
+      result.current.submit('game_initialize_hand', {
+        jokerPlacements: [{ id: 'joker-1', index: 2 }],
+      });
+    });
+
+    expect(transport.send).toHaveBeenCalledWith({
+      schemaVersion: 2,
+      commandID: expect.any(String),
+      matchID: 'match',
+      type: 'game_initialize_hand',
+      payload: {
+        davinci: {
+          initializeHand: {
+            jokerPlacements: [{ id: 'joker-1', index: 2 }],
+          },
+        },
+      },
+    });
+  });
 });

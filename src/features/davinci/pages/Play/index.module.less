@@ -1,4 +1,5 @@
 .play { height: 100dvh; min-width: 0; display: grid; grid-template-rows: 66px 42px minmax(0,1fr) 34px; overflow: hidden; background: #101210; }
+.initializing { grid-template-rows: 66px 42px minmax(0,1fr) 50px; }
 .topbar { min-width: 0; display: grid; grid-template-columns: 220px minmax(0,1fr) 220px; align-items: center; gap: 15px; padding: 0 18px; border-bottom: 1px solid #3b423d; background: #151815; }
 .roomTools { display: flex; align-items: center; gap: 11px; min-width: 0;
   > button, .ruleButton { width: 34px; height: 34px; display: grid; place-items: center; padding: 0; border: 1px solid #444b46; border-radius: 6px; color: #acb4ae; background: #222623; }
@@ -32,6 +33,10 @@
   span { display: flex; align-items: center; gap: 5px; } i { width: 8px; height: 8px; border: 1px solid #686f69; border-radius: 2px; }
   em { margin-left: auto; color: #c4a973; font-style: normal; }
 }
+.initializationBar {
+  em { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  > button { min-width: 112px; min-height: 34px; flex-shrink: 0; }
+}
 .ivory { background: #eee9dc; }
 .graphite { background: #282b29; }
 .green { background: #5da678; }
@@ -53,6 +58,7 @@
 
 @media (max-width: 767px) {
   .play { grid-template-rows: 56px 38px minmax(0,1fr) 31px; }
+  .initializing { grid-template-rows: 56px 38px minmax(0,1fr) 48px; }
   .topbar { grid-template-columns: 115px minmax(0,1fr) 85px; gap: 7px; padding: 0 8px; }
   .roomTools { gap: 6px; > button { width: 31px; height: 31px; } }
   .phase { gap: 6px; strong { font-size: 11px; } small { font-size: 7px; } }
@@ -67,15 +73,20 @@
   .timer { min-width: 48px; height: 31px; small { display: none; } }
   .activity { font-size: 9px; }
   .legend { gap: 10px; padding: 0 9px; em { font-size: 8px; } }
+  .initializationBar {
+    > span { display: none; }
+    > button { min-width: 106px; min-height: 32px; }
+  }
   .boardLabel { left: 8px; span { font-size: 8px; } small { display: none; } }
   .rules > div { grid-template-columns: 1fr; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
   .play { grid-template-rows: 45px 30px minmax(0,1fr) 26px; }
+  .initializing { grid-template-rows: 45px 30px minmax(0,1fr) 42px; }
   .topbar { grid-template-columns: 140px minmax(0,1fr) 90px; }
   .roomTools > button, .ruleButton, .timer { height: 28px; }
   .phase small { display: none; }
   .activity { font-size: 8px; }
   .boardLabel { display: none; }
-  .legend { span:nth-child(-n+2) { display: none; } }
+  .legend { > span:nth-child(-n+2) { display: none; } }
 }

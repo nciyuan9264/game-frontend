@@ -1,4 +1,4 @@
-import { cleanup, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
 import type { GameSnapshot } from '../../model/session';
@@ -40,6 +40,23 @@ function snapshot(currentPlayer: string): GameSnapshot {
   } as unknown as GameSnapshot;
 }
 
+function initializationSnapshot(ready = false): GameSnapshot {
+  return {
+    ...snapshot(''),
+    cardData: {
+      self: [{ id: 'two', color: 0, num: 2, index: 0 }],
+      opponents: [{ id: 'hidden', color: 1, index: 0 }],
+      initialHandReady: ready,
+    },
+    roomData: {
+      ...snapshot('').roomData,
+      currentPlayer: '',
+      gameStatus: 'initialize',
+      turnDeadline: '2026-10-25T10:00:15Z',
+    },
+  } as GameSnapshot;
+}
+
 describe('DaVinci turn countdown', () => {
   it('shows the countdown only during the local player turn', () => {
     vi.useFakeTimers();
@@ -56,5 +73,25 @@ describe('DaVinci turn countdown', () => {
     rerender(<Play session={session} data={snapshot('guest')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
     expect(screen.getByText('--')).toBeTruthy();
+  });
+
+  it('shows the shared initialization timer and requires a no-Joker confirmation', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2026-10-25T10:00:00Z'));
+    const submit = vi.fn(() => true);
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit,
+    } as unknown as DavinciSession;
+
+    const { rerender } = render(<Play session={session} data={initializationSnapshot()} onLeave={vi.fn()} />);
+    expect(screen.getByText('15s')).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: /确认牌序/ }));
+    expect(submit).toHaveBeenCalledWith('game_initialize_hand', { jokerPlacements: [] });
+
+    rerender(<Play session={session} data={initializationSnapshot(true)} onLeave={vi.fn()} />);
+    expect(screen.queryByRole('button', { name: /确认牌序/ })).toBeNull();
+    expect(screen.getAllByText('牌序已确认，等待对手').length).toBeGreaterThan(0);
   });
 });

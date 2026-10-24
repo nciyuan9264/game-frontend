@@ -5,6 +5,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { GameCanvas, type GameCanvasHandle } from '../../components/GameCanvas';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
+import { useInitialHandSetup } from '../../hooks/useInitialHandSetup';
 import type { Card } from '../../model/types';
 import { lastGuess, phaseCopy } from '../../model/selectors';
 import type { GameSnapshot } from '../../model/session';
@@ -16,7 +17,7 @@ const ruleSections = [
   ['目标与牌序', ['率先公开对手全部密码牌的一方获胜。', '数字从小到大排列；相同数字中，黑牌排在白牌之前。']],
   ['回合流程', ['先从公共牌池抽一张牌，再猜测对手一张暗牌。', '猜对后可以继续猜，也可以把新牌放回并结束回合。']],
   ['猜错代价', ['目标牌不会公开真实数字。', '本回合抽到的新牌会公开并放回你的序列，然后轮到对手。']],
-  ['JOKER', ['JOKER 显示为横杠，不受数字排序限制。', '放回 JOKER 时可以选择任意合法槽位。']],
+  ['JOKER', ['JOKER 显示为横杠，不受数字排序限制。', '开局有最多 15 秒设置位置；超时后默认放在末尾。']],
 ] as const;
 
 export function Play({
@@ -37,8 +38,18 @@ export function Play({
   const [showResults, setShowResults] = useState(data.roomData.gameStatus === 'end');
   const canvasRef = useRef<GameCanvasHandle>(null);
   const lastActionKey = useRef('');
+  const initializing = data.roomData.gameStatus === 'initialize';
+  const initialHandReady = data.cardData.initialHandReady === true;
+  const initialHand = useInitialHandSetup({
+    matchID: data.matchID,
+    status: data.roomData.gameStatus,
+    cards: data.cardData.self,
+    ready: initialHandReady,
+  });
   const playerTurn = data.roomData.currentPlayer === data.playerId;
-  const interactive = playerTurn && !session.pending && session.connection.status === 'connected';
+  const connected = session.connection.status === 'connected';
+  const interactive = !initializing && playerTurn && !session.pending && connected;
+  const initializationInteractive = initializing && !initialHandReady && !session.pending && connected;
   const [phaseTitle, phaseDescription] = phaseCopy(data);
   const guess = useMemo(() => lastGuess(data), [data]);
 
@@ -75,7 +86,13 @@ export function Play({
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
-  return <div className={styles.play}>
+  const initializationCopy = initialHandReady
+    ? '牌序已确认，等待对手'
+    : initialHand.activeJoker
+      ? `放置${initialHand.activeJoker.color === 0 ? '白色' : '黑色'} JOKER`
+      : '确认当前初始牌序';
+
+  return <div className={`${styles.play} ${initializing ? styles.initializing : ''}`}>
     <header className={`${styles.topbar} ${data.roomData.gameStatus === 'end' ? styles.endedTopbar : ''}`}>
       <div className={styles.roomTools}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={18} /></button>
         <span><small>ROOM</small><b>{data.roomID}</b></span></div>
@@ -87,27 +104,44 @@ export function Play({
           aria-label="打开终局结算" title="查看结算" onClick={() => setShowResults(true)}>
           <Eye size={15} /><span>查看结算</span></ActionButton>}
         <button type="button" className={styles.ruleButton} aria-label="查看游戏规则" onClick={() => setRulesOpen(true)}><CircleHelp size={18} /></button>
-        <span className={styles.timer}><small>TIME</small>{data.roomData.turnDeadline && playerTurn && data.roomData.gameStatus !== 'end'
+        <span className={styles.timer}><small>TIME</small>{data.roomData.turnDeadline
+          && (initializing || playerTurn) && data.roomData.gameStatus !== 'end'
           ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
           : <b>--</b>}</span>
       </div>
     </header>
     <div className={`${styles.activity} ${guess ? guess.correct ? styles.correct : styles.wrong : ''}`} aria-live="polite">
-      {guess ? <><b>{guess.correct ? '猜对' : '猜错'}</b><span>{guess.actor === data.playerId ? '你' : '对手'}猜测 {guess.value}，{guess.correct ? '目标牌已公开' : '回合即将交换'}</span></>
+      {initializing ? <><ShieldCheck size={14} /><span>{initializationCopy}</span></>
+        : guess ? <><b>{guess.correct ? '猜对' : '猜错'}</b><span>{guess.actor === data.playerId ? '你' : '对手'}猜测 {guess.value}，{guess.correct ? '目标牌已公开' : '回合即将交换'}</span></>
         : <><Hash size={14} /><span>{phaseDescription}</span></>}
     </div>
     <main className={styles.board}>
       <div className={styles.boardLabel + ' ' + styles.opponentLabel}><span>对手密码</span><small>{data.cardData.opponents.filter(card => !card.isRevealed).length} 张暗牌</small></div>
-      <GameCanvas ref={canvasRef} playerHand={data.cardData.self} opponentHand={data.cardData.opponents}
-        pool={Object.values(data.roomData.boardCards)} isPlayerTurn={interactive}
+      <GameCanvas ref={canvasRef} playerHand={initializing ? initialHand.cards : data.cardData.self}
+        opponentHand={data.cardData.opponents}
+        pool={Object.values(data.roomData.boardCards)} isPlayerTurn={interactive || initializationInteractive}
         gameStatus={data.roomData.gameStatus} onTileClick={handleTile}
         onSelectInsertPosition={(index, tileID) => {
-          if (tileID) session.submit('game_set_card', { id: tileID, index });
+          if (initializing) {
+            initialHand.placeJoker(index, tileID);
+          } else if (tileID) {
+            session.submit('game_set_card', { id: tileID, index });
+          }
         }} />
-      <div className={styles.boardLabel + ' ' + styles.selfLabel}><span>我的密码</span><small>{data.cardData.self.filter(card => !card.isRevealed).length} 张暗牌</small></div>
+      <div className={styles.boardLabel + ' ' + styles.selfLabel}><span>我的密码</span><small>{initialHand.cards.filter(card => !card.isRevealed).length} 张暗牌</small></div>
     </main>
-    <footer className={styles.legend}><span><i className={styles.ivory} />白牌</span><span><i className={styles.graphite} />黑牌</span>
-      <span><i className={styles.green} />可操作</span><em>{session.pending ? '等待服务端确认…' : playerTurn ? '你的回合' : '对手回合'}</em></footer>
+    {initializing ? <footer className={`${styles.legend} ${styles.initializationBar}`}>
+      <span><i className={styles.ivory} />白牌</span><span><i className={styles.graphite} />黑牌</span>
+      <em>{session.pending ? '等待服务端确认…' : initializationCopy}</em>
+      {!initialHandReady && <ActionButton variant="primary"
+        disabled={!initialHand.canConfirm || !!session.pending || !connected}
+        onClick={() => session.submit('game_initialize_hand', {
+          jokerPlacements: initialHand.jokerPlacements,
+        })}>
+        <ShieldCheck size={14} />确认牌序
+      </ActionButton>}
+    </footer> : <footer className={styles.legend}><span><i className={styles.ivory} />白牌</span><span><i className={styles.graphite} />黑牌</span>
+      <span><i className={styles.green} />可操作</span><em>{session.pending ? '等待服务端确认…' : playerTurn ? '你的回合' : '对手回合'}</em></footer>}
 
     {selectedGuess && <ResponsiveDialog title="猜测这张密码牌" eyebrow="MAKE YOUR DEDUCTION" themeClassName={rootStyles.root}
       onClose={() => setSelectedGuess(undefined)} footer={<ActionButton onClick={() => setSelectedGuess(undefined)}>取消</ActionButton>}>

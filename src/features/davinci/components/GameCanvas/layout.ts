@@ -12,3 +12,18 @@ export function computeInsertIndex(cards: Card[], newCard: Card) {
   });
   return index === -1 ? ordered.length : index;
 }
+
+export function insertPendingCard(cards: Card[], cardID: string, index: number): Card[] {
+  const pending = cards.find(card => card.id === cardID && (card.index ?? -1) < 0);
+  const arranged = cards
+    .filter(card => (card.index ?? -1) >= 0)
+    .sort((left, right) => (left.index ?? 0) - (right.index ?? 0));
+  if (!pending || index < 0 || index > arranged.length) return cards;
+
+  const ordered = [...arranged];
+  ordered.splice(index, 0, pending);
+  const indexes = new Map(ordered.map((card, position) => [card.id, position]));
+  return cards.map(card => indexes.has(card.id)
+    ? { ...card, index: indexes.get(card.id) }
+    : card);
+}

@@ -674,8 +674,9 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
     const SPACING_X_BASE = Math.max(5, Math.min(10, width * 0.02));
     const SPACING_Y = Math.max(5, Math.min(10, height * 0.02));
     const newlyDrawn = playerHand.find(t => (t.index ?? -1) < 0);
-    const isSetCard = isPlayerTurn && gameStatus === 'setCard';
-    const openAllSlots = Boolean(isSetCard && newlyDrawn && newlyDrawn.num === -1);
+    const isPlacementPhase = isPlayerTurn
+      && (gameStatus === 'setCard' || gameStatus === 'initialize');
+    const openAllSlots = Boolean(isPlacementPhase && newlyDrawn && newlyDrawn.num === -1);
     const SPACING_X_PLAYER = SPACING_X_BASE * (openAllSlots ? 1.8 : 1);
     const EFFECTIVE_TILE_W_BASE = tileWidth + SPACING_X_BASE;
     const EFFECTIVE_TILE_W_PLAYER = tileWidth + SPACING_X_PLAYER;
@@ -878,7 +879,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
     const playerSpacingX = Math.floor(SPACING_X_PLAYER * playerScale);
     const playerEffectiveTileH = playerDims.tileHeight + SPACING_Y;
     let playerPositions: { x: number; y: number }[] = [];
-    if (isSetCard && newlyDrawn && newlyDrawn.num !== -1) {
+    if (isPlacementPhase && newlyDrawn && newlyDrawn.num !== -1) {
       const insertIdx = computeInsertIndex(arrangedSorted, newlyDrawn);
       const positionsWithGap = getWrappedPositions(
         arrangedSorted.length + 1,
@@ -1049,8 +1050,8 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
       }
     });
 
-    // Slot markers for setCard
-    if (isPlayerTurn && gameStatus === 'setCard') {
+    // Slot markers for turn placement and initial Joker setup.
+    if (isPlacementPhase) {
       const slotCount = arrangedSorted.length + 1;
       const activeSlotIds = new Set<string>();
       let allowedIndices: number[] = [];
@@ -1077,7 +1078,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
           slot.addChild(bg);
           slot.hitArea = new PIXI.Rectangle(0, 0, buttonW, buttonH);
           const label = new PIXI.Text({
-            text: '放\n回',
+            text: gameStatus === 'initialize' ? '放\n置' : '放\n回',
             style: {
               fontFamily: 'Noto Sans SC, Arial, sans-serif',
               fontSize: Math.max(12, Math.floor(buttonH * 0.3)),

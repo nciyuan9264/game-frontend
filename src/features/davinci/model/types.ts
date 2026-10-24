@@ -4,7 +4,7 @@ import type {
 } from '@/features/game-core/model/room';
 export type { LobbyFilter } from '@/features/game-core/model/room';
 
-export type GameStatus = 'match' | 'waiting' | 'getCard' | 'guessCard' | 'setCard' | 'end';
+export type GameStatus = 'match' | 'initialize' | 'waiting' | 'getCard' | 'guessCard' | 'setCard' | 'end';
 
 export interface Card {
   id: string;
