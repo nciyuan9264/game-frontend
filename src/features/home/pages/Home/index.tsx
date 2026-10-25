@@ -5,15 +5,18 @@ import {
   ArrowRight,
   Brain,
   Coins,
+  CircleDot,
   Cpu,
   Crown,
   EyeOff,
   Gem,
   Hash,
   Monitor,
+  Move,
   Puzzle,
   Smartphone,
   Sparkles,
+  Trophy,
   TrendingUp,
   Users,
 } from 'lucide-react';
@@ -75,6 +78,25 @@ const gameConfigs = [
       { icon: <Coins size={20} />, title: '引擎构筑', desc: '发展卡叠加，越滚越强' },
       { icon: <Crown size={20} />, title: '贵族加冕', desc: '满足条件，坐拥额外声望' },
       { icon: <Sparkles size={20} />, title: '15 分制胜', desc: '率先达成者赢得对局' },
+    ],
+  },
+  {
+    key: 'yinsh',
+    tabTitle: '圈套棋',
+    tabSubtitle: 'YINSH',
+    tabStatus: '抽象策略',
+    badge: '黑白翻转 · 经典三环对决',
+    title: 'YINSH',
+    subtitle: '圈套棋',
+    description: '移动圆环，留下棋子，翻转黑白。连成五子便取走一环，在越来越少的选择里，率先拿下第三环。',
+    route: '/game/yinsh',
+    cta: '进入 YINSH 大厅',
+    footer: 'The Quiet Strategy',
+    features: [
+      { icon: <CircleDot size={20} />, title: '圆环移动', desc: '六向直线，落点由局势决定' },
+      { icon: <Move size={20} />, title: '黑白翻转', desc: '每次跨越都改变棋盘归属' },
+      { icon: <Brain size={20} />, title: '搜索型 AI', desc: '威胁判断与战术防守' },
+      { icon: <Trophy size={20} />, title: '三环制胜', desc: '越接近胜利，行动工具越少' },
     ],
   },
 ] as const;
@@ -299,6 +321,40 @@ const SplendorVisual = () => (
   </>
 );
 
+const YinshVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: 0.82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: 0.92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.yinshMockup}`}
+    >
+      <div className={styles.yinshUI}>
+        <div className={styles.yinshHeader}><span>YOUR TURN</span><b>2 / 3</b></div>
+        <div className={styles.yinshBoard}>
+          <div className={styles.yinshGrid}>
+            {Array.from({ length: 49 }, (_, index) => <i key={index} />)}
+          </div>
+          <span className={`${styles.homeRing} ${styles.ringWhite} ${styles.ringOne}`} />
+          <span className={`${styles.homeRing} ${styles.ringBlack} ${styles.ringTwo}`} />
+          <span className={`${styles.homeRing} ${styles.ringWhite} ${styles.ringThree}`} />
+          <span className={`${styles.homeMarker} ${styles.markerBlack} ${styles.markerOne}`} />
+          <span className={`${styles.homeMarker} ${styles.markerWhite} ${styles.markerTwo}`} />
+          <span className={`${styles.homeMarker} ${styles.markerBlack} ${styles.markerThree}`} />
+        </div>
+        <div className={styles.yinshFooter}><span>85 INTERSECTIONS</span><span>3 RINGS · VICTORY</span></div>
+      </div>
+    </motion.div>
+    <motion.div animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingRing} ${styles.light}`} />
+    <motion.div animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingRing} ${styles.dark}`} />
+  </>
+);
+
 export default function Home() {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState<GameKey>('acquire');
@@ -307,11 +363,13 @@ export default function Home() {
     acquire: styles.themeAcquire,
     davinci: styles.themeDavinci,
     splendor: styles.themeSplendor,
+    yinsh: styles.themeYinsh,
   } as const;
   const tabThemeMap = {
     acquire: styles.gameTabAcquire,
     davinci: styles.gameTabDavinci,
     splendor: styles.gameTabSplendor,
+    yinsh: styles.gameTabYinsh,
   } as const;
   const themeClass = themeMap[activeGame.key];
 
@@ -402,7 +460,13 @@ export default function Home() {
           <div className={styles.visualArea}>
             <AnimatePresence mode="wait">
               <motion.div key={`${activeGame.key}-visual`} className={styles.visualMotion}>
-                {activeGame.key === 'acquire' ? <AcquireVisual /> : activeGame.key === 'davinci' ? <DaVinciVisual /> : <SplendorVisual />}
+                {activeGame.key === 'acquire'
+                  ? <AcquireVisual />
+                  : activeGame.key === 'davinci'
+                    ? <DaVinciVisual />
+                    : activeGame.key === 'splendor'
+                      ? <SplendorVisual />
+                      : <YinshVisual />}
               </motion.div>
             </AnimatePresence>
           </div>

@@ -5,6 +5,7 @@ import { LoadingBlock } from '@/components/LoadingBlock/index.tsx';
 import { AcquireLoading } from '@/features/acquire/components/LoadingState';
 import { DavinciLoading } from '@/features/davinci/components/LoadingState';
 import { SplendorLoading } from '@/features/splendor/components/LoadingState';
+import { YinshLoading } from '@/features/yinsh/components/LoadingState';
 
 /**
  * 渲染路由
@@ -19,6 +20,8 @@ export const RenderRoutes = () => {
                     ? <DavinciLoading fullScreen />
                     : route.path.startsWith('/game/splendor')
                         ? <SplendorLoading fullScreen />
+                        : route.path.startsWith('/game/yinsh')
+                            ? <YinshLoading fullScreen />
                         : <LoadingBlock />;
             return (
                 <Route

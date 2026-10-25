@@ -66,6 +66,12 @@ export interface SplendorRoomMetrics {
   progressTotal: number;
 }
 
+export interface YinshRoomMetrics {
+  ringsRemoved: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -141,9 +147,10 @@ export interface StartNextMatchResp {
 }
 
 export type RoomMetrics =
-  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never }
-  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomMetrics };
+  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never }
+  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never }
+  | { acquire?: never; davinci?: never; splendor: SplendorRoomMetrics; yinsh?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics };
 
 export interface AcquireTile {
   id: string;
@@ -420,6 +427,98 @@ export type SplendorCommandPayload =
   | { getGem?: never; buyCard: SplendorBuyCardPayload; preserveCard?: never }
   | { getGem?: never; buyCard?: never; preserveCard: SplendorPreserveCardPayload };
 
+export type YinshSide = string;
+
+export interface YinshMoveOption {
+  to: string;
+  flips: string[];
+}
+
+export interface YinshRow {
+  id: string;
+  points: string[];
+  owner: YinshSide;
+}
+
+export interface YinshPlayerState {
+  side: YinshSide;
+  ringsRemoved: number;
+}
+
+export interface YinshLastAction {
+  action: string;
+  playerID: string;
+  payloadJSON?: string;
+}
+
+export interface YinshRoomData {
+  rings: Record<string, YinshSide>;
+  markers: Record<string, YinshSide>;
+  currentPlayer: string;
+  moverPlayer?: string;
+  resolverPlayer?: string;
+  gameStatus: string;
+  placedRings: Record<string, number>;
+  markerPool: number;
+  legalMoves: Record<string, YinshMoveOption[]>;
+  candidateRows: YinshRow[];
+  lastAction?: YinshLastAction;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+  roundNo: number;
+  activity?: YinshLastAction[];
+}
+
+export interface YinshResult {
+  winnerID?: string;
+  reason: string;
+  ringsRemoved: Record<string, number>;
+}
+
+export interface YinshRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, YinshPlayerState>;
+  roomData: YinshRoomData;
+  result?: YinshResult;
+}
+
+export interface YinshReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: YinshRoomData;
+  playersData: Record<string, YinshPlayerState>;
+  result: YinshResult;
+}
+
+export interface YinshPlaceRingPayload {
+  pointID: string;
+}
+
+export interface YinshMoveRingPayload {
+  from: string;
+  to: string;
+}
+
+export interface YinshRemoveRowPayload {
+  rowID: string;
+}
+
+export interface YinshRemoveRingPayload {
+  pointID: string;
+}
+
+export type YinshCommandPayload =
+  | { placeRing: YinshPlaceRingPayload; moveRing?: never; removeRow?: never; removeRing?: never; resign?: never }
+  | { placeRing?: never; moveRing: YinshMoveRingPayload; removeRow?: never; removeRing?: never; resign?: never }
+  | { placeRing?: never; moveRing?: never; removeRow: YinshRemoveRowPayload; removeRing?: never; resign?: never }
+  | { placeRing?: never; moveRing?: never; removeRow?: never; removeRing: YinshRemoveRingPayload; resign?: never }
+  | { placeRing?: never; moveRing?: never; removeRow?: never; removeRing?: never; resign: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -473,6 +572,11 @@ export interface DavinciLeaderboardMetric {
 
 export interface RankLeaderboardMetric {
   avgRank: number;
+}
+
+export interface YinshLeaderboardMetric {
+  wins: number;
+  winRate: number;
 }
 
 export interface LeaderboardEntry {
@@ -579,10 +683,14 @@ export interface LeaderboardResp {
 }
 
 export type LeaderboardMetric =
-  { davinci: DavinciLeaderboardMetric; rank?: never } | { davinci?: never; rank: RankLeaderboardMetric };
+  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never }
+  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never }
+  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric };
 
 export type ReplaySnapshot =
-  { acquire: AcquireReplaySnapshot; splendor?: never } | { acquire?: never; splendor: SplendorReplaySnapshot };
+  | { acquire: AcquireReplaySnapshot; splendor?: never; yinsh?: never }
+  | { acquire?: never; splendor: SplendorReplaySnapshot; yinsh?: never }
+  | { acquire?: never; splendor?: never; yinsh: YinshReplaySnapshot };
 
 export interface DavinciCard {
   id: string;
@@ -756,15 +864,17 @@ export type CommonCommandPayload =
   | { matchReady?: never; matchSeat?: never; removePlayer?: never; roomSettings?: never; empty: EmptyPayload };
 
 export type ClientCommandPayload =
-  | { common: CommonCommandPayload; acquire?: never; davinci?: never; splendor?: never }
-  | { common?: never; acquire: AcquireCommandPayload; davinci?: never; splendor?: never }
-  | { common?: never; acquire?: never; davinci: DavinciCommandPayload; splendor?: never }
-  | { common?: never; acquire?: never; davinci?: never; splendor: SplendorCommandPayload };
+  | { common: CommonCommandPayload; acquire?: never; davinci?: never; splendor?: never; yinsh?: never }
+  | { common?: never; acquire: AcquireCommandPayload; davinci?: never; splendor?: never; yinsh?: never }
+  | { common?: never; acquire?: never; davinci: DavinciCommandPayload; splendor?: never; yinsh?: never }
+  | { common?: never; acquire?: never; davinci?: never; splendor: SplendorCommandPayload; yinsh?: never }
+  | { common?: never; acquire?: never; davinci?: never; splendor?: never; yinsh: YinshCommandPayload };
 
 export type RoomView =
-  | { acquire: AcquireRoomView; davinci?: never; splendor?: never }
-  | { acquire?: never; davinci: DavinciRoomView; splendor?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomView };
+  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never }
+  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never }
+  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView };
 
 export type ServerMessage =
   | { matchSync: MatchSync; roomSync?: never; commandResult?: never; error?: never }

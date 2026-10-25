@@ -11,7 +11,7 @@ import type {
 } from '@/api/generated/game-platform';
 
 export type GameID = string | number;
-export type HistoryGameType = 'acquire' | 'davinci' | 'splendor';
+export type HistoryGameType = 'acquire' | 'davinci' | 'splendor' | 'yinsh';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -114,6 +114,7 @@ export interface RankLeaderboardEntry extends LeaderboardEntryBase {
 
 export type AcquireLeaderboardEntry = RankLeaderboardEntry;
 export type SplendorLeaderboardEntry = RankLeaderboardEntry;
+export type YinshLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export interface LeaderboardData {
@@ -132,6 +133,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.davinci.wins,
       winRate: entry.metric.davinci.winRate,
+    };
+  }
+  if (entry.metric.yinsh) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.yinsh.wins,
+      winRate: entry.metric.yinsh.winRate,
     };
   }
   return {

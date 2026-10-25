@@ -16,6 +16,12 @@ import {
   My as SplendorMy,
   Rankings as SplendorRankings,
 } from "@/features/splendor/pages/Community";
+import YinshLobby from "@/features/yinsh/pages/Lobby";
+import {
+  Guide as YinshGuide,
+  My as YinshMy,
+  Rankings as YinshRankings,
+} from "@/features/yinsh/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -24,6 +30,8 @@ const AcquireReplayPage = lazy(() => import("@/features/acquire/pages/Replay"));
 const SplendorSession = lazy(() => import("@/features/splendor/pages/Session"));
 const SplendorReplay = lazy(() => import("@/features/splendor/pages/Replay"));
 const DavinciSession = lazy(() => import("@/features/davinci/pages/Session"));
+const YinshSession = lazy(() => import("@/features/yinsh/pages/Session"));
+const YinshReplay = lazy(() => import("@/features/yinsh/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -68,6 +76,15 @@ export const routes: AppRoute[] = [
   { path: "/game/splendor/me", element: <SplendorMy /> },
   { path: "/game/splendor/match", element: <SplendorSession /> },
   { path: "/game/splendor/replay/:gameId", element: <SplendorReplay /> },
+  {
+    path: "/game/yinsh",
+    element: <YinshLobby />
+  },
+  { path: "/game/yinsh/rankings", element: <YinshRankings /> },
+  { path: "/game/yinsh/guide", element: <YinshGuide /> },
+  { path: "/game/yinsh/me", element: <YinshMy /> },
+  { path: "/game/yinsh/match", element: <YinshSession /> },
+  { path: "/game/yinsh/replay/:gameId", element: <YinshReplay /> },
   {
     path: "/",
     element: <Home />

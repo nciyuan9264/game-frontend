@@ -238,6 +238,36 @@ function gamePayload(
         };
     }
   }
+  if (gameType === 'yinsh') {
+    switch (commandType) {
+      case 'game_place_ring':
+        return {
+          yinsh: {
+            placeRing: objectPayload as { pointID: string },
+          },
+        };
+      case 'game_move_ring':
+        return {
+          yinsh: {
+            moveRing: objectPayload as { from: string; to: string },
+          },
+        };
+      case 'game_remove_row':
+        return {
+          yinsh: {
+            removeRow: objectPayload as { rowID: string },
+          },
+        };
+      case 'game_remove_ring':
+        return {
+          yinsh: {
+            removeRing: objectPayload as { pointID: string },
+          },
+        };
+      case 'game_resign':
+        return { yinsh: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

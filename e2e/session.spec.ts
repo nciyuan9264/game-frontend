@@ -16,6 +16,7 @@ const games: Array<{
   { gameType: 'acquire', playMarker: /股价速查/ },
   { gameType: 'davinci', playMarker: /查看游戏规则/ },
   { gameType: 'splendor', playMarker: /宝石池/ },
+  { gameType: 'yinsh', playMarker: /轮到你布环/ },
 ];
 
 test.beforeEach(async ({ context }) => {

@@ -31,6 +31,7 @@ export interface LobbyRoomLike {
   emptyTileCount?: number;
   boardCardCount?: number;
   maxScore?: number;
+  ringsRemoved?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -107,6 +108,7 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     emptyTileCount: room.metrics.acquire?.emptyTileCount,
     boardCardCount: room.metrics.davinci?.boardCardCount,
     maxScore: room.metrics.splendor?.maxScore,
+    ringsRemoved: room.metrics.yinsh?.ringsRemoved,
   };
 }
 

@@ -17,6 +17,11 @@ const games = [
     lobbyHeading: /从一颗宝石/,
     profileHeading: '你的眼光，值得珍藏。',
   },
+  {
+    gameType: 'yinsh',
+    lobbyHeading: /进退之间/,
+    profileHeading: '你的每一步，都值得回看。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {
