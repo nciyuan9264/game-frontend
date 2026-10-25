@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const roomID = 'davinci_mobilelayout';
 const matchID = `${roomID}-r1`;
@@ -165,14 +165,40 @@ async function expectNoHorizontalOverflow(page: Page) {
   }))).toEqual({ viewport: 390, document: 390 });
 }
 
+async function expectVerticalScroll(anchor: Locator) {
+  const state = await anchor.evaluate(element => {
+    let current: HTMLElement | null = element as HTMLElement;
+    while (current) {
+      const overflowY = getComputedStyle(current).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll') {
+        current.scrollTop = current.scrollHeight;
+        return {
+          overflowY,
+          clientHeight: current.clientHeight,
+          scrollHeight: current.scrollHeight,
+          scrollTop: current.scrollTop,
+        };
+      }
+      current = current.parentElement;
+    }
+    return null;
+  });
+  expect(state?.overflowY).toBe('auto');
+  expect(state?.scrollHeight).toBeGreaterThan(state?.clientHeight ?? 0);
+  expect(state?.scrollTop).toBeGreaterThan(0);
+}
+
 test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
   await mockSession(page, matchSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
-  await expect(page.getByRole('heading', { name: new RegExp(roomID) })).toBeVisible();
+  const heading = page.getByRole('heading', { name: new RegExp(roomID) });
+  await expect(heading).toBeVisible();
   await expect(page.getByRole('button', { name: '邀请好友' })).toBeVisible();
   await expect(page.getByText('空席位')).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await page.setViewportSize({ width: 390, height: 430 });
+  await expectVerticalScroll(heading);
 });
 
 test('DaVinci final board can reopen the results panel on mobile', async ({ page }) => {
@@ -199,6 +225,20 @@ test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }
   const portraitBox = await canvas.boundingBox();
   expect(portraitBox?.width).toBeGreaterThan(0);
   expect(portraitBox?.height).toBeGreaterThan(0);
+  const scrollContract = await canvas.evaluate(element => {
+    let current = element.parentElement;
+    while (current && getComputedStyle(current).overflowY !== 'auto') {
+      current = current.parentElement;
+    }
+    return {
+      canvasTouchAction: getComputedStyle(element).touchAction,
+      playOverflowY: current ? getComputedStyle(current).overflowY : '',
+    };
+  });
+  expect(scrollContract).toEqual({
+    canvasTouchAction: 'pan-y',
+    playOverflowY: 'auto',
+  });
   await expectNoHorizontalOverflow(page);
 
   await page.setViewportSize({ width: 844, height: 390 });

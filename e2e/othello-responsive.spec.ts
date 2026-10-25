@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 const roomID = 'othello_layout';
 const matchID = `${roomID}-r1`;
@@ -134,6 +134,27 @@ async function expectNoOverflow(page: Page) {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+async function expectVerticalScroll(anchor: Locator) {
+  const state = await anchor.evaluate(element => {
+    let current: HTMLElement | null = element as HTMLElement;
+    while (current) {
+      const overflowY = getComputedStyle(current).overflowY;
+      if (overflowY === 'auto' || overflowY === 'scroll') {
+        current.scrollTop = current.scrollHeight;
+        return {
+          clientHeight: current.clientHeight,
+          scrollHeight: current.scrollHeight,
+          scrollTop: current.scrollTop,
+        };
+      }
+      current = current.parentElement;
+    }
+    return null;
+  });
+  expect(state?.scrollHeight).toBeGreaterThan(state?.clientHeight ?? 0);
+  expect(state?.scrollTop).toBeGreaterThan(0);
+}
+
 test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
   page.on('pageerror', error => pageErrors.push(error));
@@ -153,6 +174,8 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   expect(box?.width).toBeGreaterThan(300);
   expect(box?.height).toBeGreaterThan(300);
   await expectNoOverflow(page);
+  await page.setViewportSize({ width: 390, height: 667 });
+  await expectVerticalScroll(board);
   expect(pageErrors).toEqual([]);
 });
 
