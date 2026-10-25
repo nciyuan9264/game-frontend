@@ -32,6 +32,9 @@ export interface LobbyRoomLike {
   boardCardCount?: number;
   maxScore?: number;
   ringsRemoved?: number;
+  occupiedCount?: number;
+  progressCurrent?: number;
+  progressTotal?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -109,6 +112,9 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     boardCardCount: room.metrics.davinci?.boardCardCount,
     maxScore: room.metrics.splendor?.maxScore,
     ringsRemoved: room.metrics.yinsh?.ringsRemoved,
+    occupiedCount: room.metrics.othello?.occupiedCount,
+    progressCurrent: room.metrics.othello?.progressCurrent,
+    progressTotal: room.metrics.othello?.progressTotal,
   };
 }
 

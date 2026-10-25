@@ -99,6 +99,25 @@ const gameConfigs = [
       { icon: <Trophy size={20} />, title: '三环制胜', desc: '越接近胜利，行动工具越少' },
     ],
   },
+  {
+    key: 'othello',
+    tabTitle: '黑白棋',
+    tabSubtitle: 'OTHELLO',
+    tabStatus: '翻转策略',
+    badge: '六十四格 · 经典黑白对弈',
+    title: 'OTHELLO',
+    subtitle: '黑白棋',
+    description: '落下一子，夹住并翻转对方棋子。争夺角落、控制行动力，在黑白反复转换之间，让终局盘面站在你这一边。',
+    route: '/game/othello',
+    cta: '进入黑白棋大厅',
+    footer: 'The Art of Reversal',
+    features: [
+      { icon: <CircleDot size={20} />, title: '八向翻转', desc: '横竖斜线，一步改变多处归属' },
+      { icon: <Move size={20} />, title: '行动力争夺', desc: '压缩落点，掌握回合主动' },
+      { icon: <Brain size={20} />, title: '启发式 AI', desc: '角落、边线与终局综合判断' },
+      { icon: <Trophy size={20} />, title: '实际子数', desc: '双方无子可下时，多者获胜' },
+    ],
+  },
 ] as const;
 
 type GameKey = typeof gameConfigs[number]['key'];
@@ -355,6 +374,43 @@ const YinshVisual = () => (
   </>
 );
 
+const OthelloVisual = () => {
+  const discs: Record<number, 'black' | 'white'> = {
+    19: 'black',
+    26: 'white',
+    27: 'black',
+    28: 'black',
+    29: 'white',
+    34: 'white',
+    35: 'black',
+    36: 'white',
+    37: 'white',
+    44: 'black',
+  };
+  return <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: 3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: -3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.othelloMockup}`}
+    >
+      <div className={styles.othelloUI}>
+        <div className={styles.othelloHeader}><span>YOUR TURN</span><b>BLACK · 06</b></div>
+        <div className={styles.othelloBoard}>{Array.from({ length: 64 }, (_, index) =>
+          <i key={index}>{discs[index] && <span className={styles[discs[index]]} />}</i>)}</div>
+        <div className={styles.othelloFooter}><span>8 × 8 CLASSIC</span><span>EVERY MOVE MATTERS</span></div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingOthelloDisc} ${styles.black}`} />
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingOthelloDisc} ${styles.white}`} />
+  </>;
+};
+
 export default function Home() {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState<GameKey>('acquire');
@@ -364,12 +420,14 @@ export default function Home() {
     davinci: styles.themeDavinci,
     splendor: styles.themeSplendor,
     yinsh: styles.themeYinsh,
+    othello: styles.themeOthello,
   } as const;
   const tabThemeMap = {
     acquire: styles.gameTabAcquire,
     davinci: styles.gameTabDavinci,
     splendor: styles.gameTabSplendor,
     yinsh: styles.gameTabYinsh,
+    othello: styles.gameTabOthello,
   } as const;
   const themeClass = themeMap[activeGame.key];
 
@@ -466,7 +524,9 @@ export default function Home() {
                     ? <DaVinciVisual />
                     : activeGame.key === 'splendor'
                       ? <SplendorVisual />
-                      : <YinshVisual />}
+                      : activeGame.key === 'yinsh'
+                        ? <YinshVisual />
+                        : <OthelloVisual />}
               </motion.div>
             </AnimatePresence>
           </div>

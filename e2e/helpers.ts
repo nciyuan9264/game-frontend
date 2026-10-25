@@ -5,7 +5,12 @@ import {
   type Page,
 } from '@playwright/test';
 
-export type GameType = 'acquire' | 'davinci' | 'splendor' | 'yinsh';
+export type GameType =
+  | 'acquire'
+  | 'davinci'
+  | 'splendor'
+  | 'yinsh'
+  | 'othello';
 
 interface RoomInfo {
   roomID: string;

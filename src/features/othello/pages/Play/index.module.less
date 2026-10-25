@@ -1,0 +1,368 @@
+.play { min-height:100dvh; background:var(--paper); color:var(--ink); }
+.topbar {
+  position:sticky;
+  top:0;
+  z-index:40;
+  display:flex;
+  height:72px;
+  align-items:center;
+  gap:17px;
+  padding:0 30px;
+  border-bottom:1px solid var(--line);
+  background:#faf7f1f5;
+  backdrop-filter:blur(12px);
+  > button { display:grid; width:40px; height:40px; place-items:center; color:#786b61; }
+}
+.divider { width:1px; height:24px; background:var(--line); }
+.room {
+  min-width:0;
+  strong { display:block; overflow:hidden; max-width:220px; color:#67584c; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+  small { display:block; margin-top:5px; color:#a0907f; font-size:8px; letter-spacing:.7px; }
+}
+.spacer { flex:1; }
+.timer {
+  display:flex;
+  min-width:48px;
+  align-items:center;
+  justify-content:center;
+  flex-direction:column;
+  color:#78515b;
+  small { color:#aa9987; font-size:7px; letter-spacing:1.2px; }
+  b { margin-top:3px; font:600 16px var(--serif); }
+}
+.live { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
+.content { width:min(1380px,100%); margin:auto; padding:22px 30px 34px; }
+.matchHeading {
+  display:flex;
+  min-height:56px;
+  align-items:center;
+  justify-content:space-between;
+  gap:20px;
+  margin-bottom:17px;
+  h1 { margin-top:5px; color:#695341; font-size:27px; line-height:1.5; letter-spacing:1.2px; }
+  > div:last-child { display:flex; gap:21px; color:#9b8b74; font-size:10px; span { display:flex; align-items:center; gap:6px; } }
+}
+.eyebrow { display:flex; align-items:center; gap:10px; color:#a1815b; font:8px/1.4 Georgia,serif; letter-spacing:2px;
+  > i { width:22px; border-top:1px solid currentColor; }
+}
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 302px; gap:25px; align-items:start; }
+.boardColumn { min-width:0; }
+.desktopPlayers { display:grid; grid-template-columns:minmax(0,1fr) 76px minmax(0,1fr); align-items:center; margin-bottom:13px; }
+.playerCard {
+  display:grid;
+  position:relative;
+  min-height:76px;
+  align-items:center;
+  grid-template-columns:auto minmax(0,1fr) auto;
+  gap:12px;
+  overflow:hidden;
+  padding:12px 17px;
+  border:1px solid #e2d7c7;
+  border-radius:8px;
+  background:#faf7ef;
+}
+.activePlayer { border-color:#bfa0ac; background:#f5ecee; }
+.avatarWrap {
+  position:relative;
+  > span:last-child { position:absolute; right:-3px; bottom:-2px; width:13px; height:13px; padding:2px; border:1px solid #d3c8b4; background:#faf6ed; }
+}
+.playerInfo {
+  min-width:0;
+  strong { display:flex; align-items:center; gap:7px; overflow:hidden; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+  em { padding:2px 4px; border-radius:2px; background:#e8dadd; color:#906572; font-size:9px; font-style:normal; font-weight:400; }
+  > span { display:block; margin-top:8px; color:#a18e75; font-size:10px; white-space:nowrap; }
+}
+.playerScore {
+  display:flex;
+  align-items:flex-end;
+  flex-direction:column;
+  gap:3px;
+  > span { display:flex; align-items:center; gap:5px; color:#a08b73; font-size:8px; white-space:nowrap;
+    i { width:4px; height:4px; border-radius:50%; background:var(--wine); }
+  }
+  > strong { display:flex; align-items:baseline; gap:5px; color:#7d6152; font:500 27px/1 var(--serif);
+    small { color:#9b846d; font:9px sans-serif; }
+  }
+}
+.activeLine { position:absolute; right:17px; bottom:0; left:17px; height:2px; background:#b68e9e; }
+.versus { text-align:center; color:#b5a184; font:500 22px var(--serif);
+  small { display:block; margin-top:4px; color:#af9a7b; font:8px sans-serif; }
+}
+.mobileOpponent,.mobileSelf { display:none; }
+.arena {
+  overflow:hidden;
+  border:1px solid #dcccaf;
+  border-radius:9px;
+  background:#eee7d9;
+  box-shadow:inset 0 0 0 5px #f2ecdf80;
+  > header {
+    display:flex;
+    height:42px;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    margin:0 18px;
+    border-bottom:1px solid #dfd3be;
+    color:#8f7959;
+    font-size:10px;
+    > span { display:flex; align-items:center; gap:8px;
+      > i { width:7px; height:7px; border:1.5px solid #a18b66; border-radius:50%; }
+      small { color:#a18c6c; font-size:9px; }
+    }
+    > div { display:flex; align-items:center; gap:17px; }
+    button { display:flex; align-items:center; gap:6px; padding:7px 0; color:#a18b65; font-size:10px; }
+  }
+  > footer {
+    display:flex;
+    min-height:33px;
+    align-items:center;
+    justify-content:space-between;
+    gap:10px;
+    padding:0 18px;
+    border-top:1px solid #dfd2ba;
+    color:#a28a65;
+    font-size:9px;
+    > span { display:flex; align-items:center; gap:6px; }
+    > span:last-child { font:8px Georgia,serif; letter-spacing:1.5px; }
+    i { width:5px; height:5px; border-radius:50%; background:#81937e; }
+    em { width:7px; height:7px; margin-left:7px; border:1px solid #b79e6d; border-radius:50%; }
+  }
+}
+.toolActive { color:#92774f!important; }
+.boardStage {
+  display:flex;
+  position:relative;
+  min-height:492px;
+  align-items:center;
+  justify-content:center;
+  padding:8px 14px;
+}
+.boardCorner,.boardEdition { position:absolute; color:#b09c78; font:8px/1.8 Georgia,serif; letter-spacing:1.4px; pointer-events:none; }
+.boardCorner { top:24px; left:25px; }
+.boardCorner i,.boardEdition i { display:block; width:24px; margin:13px 0; border-top:1px solid #d4c5a9; }
+.boardEdition { right:26px; bottom:28px; text-align:right;
+  strong { display:block; color:#c1ad87; font:400 42px/.9 var(--serif); }
+}
+.footnote { display:flex; min-height:30px; align-items:center; gap:7px; padding:5px 3px; color:#a08f77; font-size:9px; }
+.sidebar { display:flex; flex-direction:column; gap:15px; }
+.actionCard {
+  padding:17px 20px 14px;
+  border:1px solid #d8bac4;
+  border-radius:8px;
+  background:#f8eff1;
+  color:var(--wine);
+  > button[data-game-action-button] { width:100%; min-height:43px; justify-content:space-between; }
+}
+.actionEyebrow { display:flex; align-items:center; justify-content:space-between;
+  .eyebrow { color:#b28796; letter-spacing:1.8px; }
+  > i { width:6px; height:6px; border-radius:50%; background:#a76f89; box-shadow:0 0 0 4px #eedee444; }
+}
+.turnCopy {
+  display:flex;
+  align-items:center;
+  gap:10px;
+  margin:13px 0 9px;
+  > span { display:none; }
+  h2 { color:var(--wine); font-size:23px; line-height:1.5; }
+  p { margin-top:5px; color:#ac8995; font-size:10px; line-height:1.75; }
+}
+.movePreview {
+  display:flex;
+  position:relative;
+  min-height:55px;
+  align-items:center;
+  gap:16px;
+  margin:10px 0 12px;
+  padding:8px 0;
+  border-top:1px solid #e7d4da;
+  border-bottom:1px solid #e7d4da;
+  > div { display:flex; min-width:62px; flex-direction:column; gap:5px;
+    > span { color:#ad8c98; font-size:9px; }
+    > strong { display:flex; min-height:23px; align-items:center; gap:5px; font:500 24px/.95 var(--serif);
+      > span { width:19px; height:19px; }
+      small { margin-top:3px; color:#a78191; font:9px sans-serif; }
+    }
+  }
+  > i { width:1px; height:30px; background:#e4cfd6; }
+  > small { align-self:flex-end; margin:0 0 4px auto; color:#aa8793; font-size:9px; white-space:nowrap; }
+}
+.cancel { display:flex; width:100%; min-height:31px; align-items:center; justify-content:center; gap:5px; color:#ad8795; font-size:9px; }
+.passCard { border-color:#d8c6a1; background:#f5f0e4; color:#8c7047;
+  .turnCopy h2 { color:#8c7047; }
+  .turnCopy p { color:#a48f6b; }
+  .movePreview { border-color:#e1d5bd; }
+}
+.goal {
+  position:relative;
+  overflow:hidden;
+  padding:18px 20px 16px;
+  border:1px solid #795260;
+  border-radius:8px;
+  background:#6c4654;
+  color:#ecddbf;
+  > svg { position:absolute; top:17px; right:18px; color:#c4ac81; }
+  .eyebrow { color:#bea588; letter-spacing:1.6px; }
+  h3 { margin:12px 0 9px; color:#ecdec2; font:500 22px/1.35 var(--serif); letter-spacing:1px; }
+  > div { display:flex; align-items:center; gap:6px; margin:9px 0;
+    > span { width:18px; height:18px; }
+    > svg { margin:0 4px; color:#c3a27b; }
+  }
+  p { color:#c9b39e; font-size:10px; line-height:1.75; }
+}
+.journalCard {
+  overflow:hidden;
+  border:1px solid var(--line);
+  border-radius:8px;
+  background:#faf7ef;
+  > header { display:flex; align-items:center; justify-content:space-between; padding:13px 18px 7px;
+    h3 { color:#806b55; font-size:12px; font-weight:500; }
+    button { display:flex; align-items:center; gap:2px; padding:3px 0; color:#a9957b; font-size:9px; }
+  }
+  > footer { display:flex; height:29px; align-items:center; justify-content:space-between; margin:7px 18px 0; border-top:1px solid #e3d7c5; color:#a38c6d; font-size:9px;
+    span { display:flex; align-items:baseline; gap:4px; }
+    strong { color:#73515a; font:500 18px var(--serif); }
+    small { font-size:8px; }
+  }
+}
+.journal {
+  > div { display:grid; position:relative; min-height:28px; align-items:center; grid-template-columns:18px 15px 1fr; gap:8px; margin:0 18px; border-bottom:1px solid #ece2d4; color:#87745c;
+    > span:nth-child(2) { width:14px; height:14px; }
+    > i { position:absolute; left:-7px; width:3px; height:3px; border-radius:50%; background:var(--wine); }
+  }
+  p { min-width:0; font-size:9px; line-height:1.4;
+    strong { margin-right:7px; font:500 12px Georgia,serif; }
+    span { color:#a59074; }
+  }
+}
+.journalIndex { color:#b5a489; font:10px Georgia,serif; }
+.emptyJournal { display:flex; min-height:82px; align-items:center; justify-content:center; flex-direction:column; gap:7px; color:#a18e73; font:16px var(--serif)!important;
+  small { color:#b3a185; font:9px sans-serif; }
+}
+.fullJournal { max-height:52vh; overflow:auto;
+  > div { min-height:45px; margin:0; padding:0 4px; }
+}
+.strategyNote { display:flex; align-items:flex-start; gap:10px; padding:0 3px; color:#ae9670;
+  svg { margin-top:2px; }
+  strong { color:#9b8260; font-size:10px; font-weight:500; }
+  p { margin-top:5px; color:#b4a084; font-size:9px; }
+}
+.mobileDock { display:none; }
+.rules {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:9px;
+  article { display:grid; grid-template-columns:28px 1fr; gap:8px; padding:14px; border:1px solid #e6dbcd; border-radius:5px; background:#fffaf3;
+    > span { color:#a1815d; font:10px Georgia,serif; }
+    h3 { color:#694f4b; font-size:12px; }
+    p { margin-top:7px; color:#8d7e70; font-size:10px; line-height:1.7; }
+  }
+  > p { display:flex; grid-column:1/-1; gap:7px; padding:12px; background:#edf1e9; color:#657657; font-size:10px; }
+}
+.settings {
+  > div { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px 0; border-bottom:1px solid #e7ddce;
+    b { display:block; font-size:12px; }
+    small { display:block; margin-top:5px; color:#a18f79; font-size:9px; }
+    button { display:flex; width:39px; height:23px; flex:none; padding:3px; border-radius:20px; background:#d5c9bb!important;
+      i { width:17px; height:17px; border-radius:50%; background:#fff; transition:transform .2s; }
+    }
+    .switchOn { background:var(--wine)!important; i { transform:translateX(16px); } }
+  }
+}
+.menu { display:grid; gap:5px;
+  button { display:grid; min-height:60px; align-items:center; grid-template-columns:26px 1fr auto; gap:8px; padding:9px 6px; border-bottom:1px solid #eee5d9!important; text-align:left;
+    span { min-width:0; }
+    b { display:block; font-size:12px; }
+    small { display:block; margin-top:5px; color:#9c8e80; font-size:9px; }
+  }
+}
+.danger { color:#9e4f55!important; }
+.resign { display:flex; gap:9px; padding:14px; border:1px solid #e5d7c8; border-radius:5px; background:#fff8ee; color:#826f61; font-size:11px; line-height:1.7; }
+.zoomStatus { display:flex; align-items:center; gap:8px; margin-bottom:15px; color:var(--wine);
+  > span:first-child { width:21px; height:21px; }
+  strong { font-size:12px; font-weight:500; }
+  > span:last-child { margin-left:auto; font:16px var(--serif); }
+}
+.zoomBoard { display:flex; justify-content:center; }
+.zoomInstruction { margin:15px 0; color:#a58b6b; font-size:11px; line-height:1.8; text-align:center; }
+.zoomActions { display:flex; justify-content:center; gap:12px; > button:last-child { width:220px; } }
+.reduceMotion * { animation:none!important; transition:none!important; }
+
+@media(max-width:1199px) and (min-width:768px) {
+  .layout { grid-template-columns:minmax(0,1fr) 284px; gap:20px; }
+  .boardCorner,.boardEdition { display:none; }
+  .desktopPlayers { grid-template-columns:1fr 53px 1fr; }
+  .playerCard { gap:9px; padding:10px 12px; }
+}
+@media(max-width:767px) {
+  .play { padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
+  .topbar {
+    height:54px;
+    gap:8px;
+    padding:0 9px;
+    > button { width:31px; height:36px; }
+    > span:nth-of-type(1),.divider,.room small { display:none; }
+    .room { flex:1; }
+    .room strong { max-width:none; color:#725a44; font-size:13px; }
+    .spacer { display:none; }
+    > button[aria-label='玩法指南'] { display:none; }
+    > button[data-game-action-button] { display:none; }
+  }
+  .timer { min-width:34px; }
+  .content { width:100%; max-width:470px; padding:10px 12px 8px; }
+  .matchHeading,.desktopPlayers,.strategyNote { display:none; }
+  .layout { display:flex; flex-direction:column; gap:8px; }
+  .boardColumn { width:100%; }
+  .mobileOpponent,.mobileSelf { display:block; }
+  .mobileOpponent { margin-bottom:8px; }
+  .mobileSelf { margin-top:8px; }
+  .compactPlayer { min-height:54px; padding:8px 12px; border-radius:7px;
+    .avatarWrap>span:first-child { width:32px!important; height:32px!important; }
+    .playerInfo strong { font-size:13px; }
+    .playerInfo>span { margin-top:4px; font-size:9px; }
+    .playerScore { flex-direction:row-reverse; align-items:center; gap:11px;
+      > strong { font-size:27px; }
+    }
+  }
+  .arena { border-radius:7px; box-shadow:none;
+    > header { height:34px; margin:0 9px;
+      > span { gap:6px; font-size:9px; small { font-size:8px; } }
+      > div { gap:12px; }
+      button { padding:7px 0; b { display:none; } svg { width:14px; height:14px; } }
+    }
+    > footer { min-height:26px; padding:0 9px; font-size:8px;
+      > span:last-child { display:none; }
+    }
+  }
+  .boardStage { min-height:0; aspect-ratio:1.025; padding:4px; }
+  .boardCorner,.boardEdition,.footnote { display:none; }
+  .sidebar { display:contents; }
+  .actionCard { order:2; width:100%; min-height:63px; padding:10px 12px; border-color:#e7d2d9; border-radius:6px; background:#faf2f3;
+    > button[data-game-action-button],.actionEyebrow,.movePreview,.cancel { display:none; }
+  }
+  .turnCopy { gap:11px; margin:0;
+    > span { display:inline-block; width:25px; height:25px; }
+    h2 { font-size:16px; line-height:1.45; }
+    p { margin-top:4px; font-size:10px; line-height:1.6; }
+  }
+  .goal,.journalCard { display:none; }
+  .mobileDock {
+    display:grid;
+    position:fixed;
+    inset:auto 0 0;
+    z-index:50;
+    min-height:calc(68px + env(safe-area-inset-bottom));
+    align-items:start;
+    grid-template-columns:45px 1fr;
+    gap:10px;
+    padding:10px 15px env(safe-area-inset-bottom);
+    border-top:1px solid #e5d6bd;
+    background:#faf6edf5;
+    backdrop-filter:blur(12px);
+    > button { height:44px; }
+    > button:first-child { display:grid; place-items:center; border:1px solid #e3d3b7!important; border-radius:6px; background:#f5eee0!important; color:#af9269; }
+    > button[data-game-action-button] { min-width:0; justify-content:space-between; font-size:12px; }
+  }
+  .rules { grid-template-columns:1fr; > p { grid-column:1; } }
+  .zoomBoard { width:100%; }
+  .zoomActions { > button:last-child { width:auto; flex:1; } }
+}

@@ -5,6 +5,8 @@
 - Acquire（并购）
 - DaVinci Code（达芬奇密码）
 - Splendor（璀璨宝石）
+- YINSH（圈套棋）
+- Othello（黑白棋）
 
 ## 开发
 

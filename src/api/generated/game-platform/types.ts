@@ -72,6 +72,12 @@ export interface YinshRoomMetrics {
   progressTotal: number;
 }
 
+export interface OthelloRoomMetrics {
+  occupiedCount: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -147,10 +153,11 @@ export interface StartNextMatchResp {
 }
 
 export type RoomMetrics =
-  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never }
-  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomMetrics; yinsh?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics };
+  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci?: never; splendor: SplendorRoomMetrics; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics; othello?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomMetrics };
 
 export interface AcquireTile {
   id: string;
@@ -519,6 +526,84 @@ export type YinshCommandPayload =
   | { placeRing?: never; moveRing?: never; removeRow?: never; removeRing: YinshRemoveRingPayload; resign?: never }
   | { placeRing?: never; moveRing?: never; removeRow?: never; removeRing?: never; resign: EmptyPayload };
 
+export type OthelloSide = string;
+
+export type OthelloDisc = string;
+
+export interface OthelloLegalMove {
+  index: number;
+  flips: number[];
+  lines: number[][];
+}
+
+export interface OthelloMoveEntry {
+  id: number;
+  kind: string;
+  playerID: string;
+  side: OthelloSide;
+  index?: number;
+  flips: number[];
+  automatic: boolean;
+}
+
+export interface OthelloPlayerState {
+  side: OthelloSide;
+  discCount: number;
+}
+
+export interface OthelloRoomData {
+  board: OthelloDisc[];
+  currentPlayer: string;
+  currentSide: OthelloSide;
+  blackPlayerID: string;
+  whitePlayerID: string;
+  roundNo: number;
+  gameStatus: string;
+  legalMoves: OthelloLegalMove[];
+  moveLog: OthelloMoveEntry[];
+  lastData?: OthelloMoveEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface OthelloResult {
+  blackCount: number;
+  whiteCount: number;
+  winnerID?: string;
+  winnerSide?: OthelloSide;
+  draw: boolean;
+  reason: string;
+}
+
+export interface OthelloRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, OthelloPlayerState>;
+  roomData: OthelloRoomData;
+  result?: OthelloResult;
+}
+
+export interface OthelloReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: OthelloRoomData;
+  playersData: Record<string, OthelloPlayerState>;
+  result: OthelloResult;
+}
+
+export interface OthelloPlaceDiscPayload {
+  index: number;
+}
+
+export type OthelloCommandPayload =
+  | { placeDisc: OthelloPlaceDiscPayload; pass?: never; resign?: never }
+  | { placeDisc?: never; pass: EmptyPayload; resign?: never }
+  | { placeDisc?: never; pass?: never; resign: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -575,6 +660,11 @@ export interface RankLeaderboardMetric {
 }
 
 export interface YinshLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface OthelloLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -683,14 +773,16 @@ export interface LeaderboardResp {
 }
 
 export type LeaderboardMetric =
-  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never }
-  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never }
-  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric };
+  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never; othello?: never }
+  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never; othello?: never }
+  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric; othello?: never }
+  | { davinci?: never; rank?: never; yinsh?: never; othello: OthelloLeaderboardMetric };
 
 export type ReplaySnapshot =
-  | { acquire: AcquireReplaySnapshot; splendor?: never; yinsh?: never }
-  | { acquire?: never; splendor: SplendorReplaySnapshot; yinsh?: never }
-  | { acquire?: never; splendor?: never; yinsh: YinshReplaySnapshot };
+  | { acquire: AcquireReplaySnapshot; splendor?: never; yinsh?: never; othello?: never }
+  | { acquire?: never; splendor: SplendorReplaySnapshot; yinsh?: never; othello?: never }
+  | { acquire?: never; splendor?: never; yinsh: YinshReplaySnapshot; othello?: never }
+  | { acquire?: never; splendor?: never; yinsh?: never; othello: OthelloReplaySnapshot };
 
 export interface DavinciCard {
   id: string;
@@ -864,17 +956,47 @@ export type CommonCommandPayload =
   | { matchReady?: never; matchSeat?: never; removePlayer?: never; roomSettings?: never; empty: EmptyPayload };
 
 export type ClientCommandPayload =
-  | { common: CommonCommandPayload; acquire?: never; davinci?: never; splendor?: never; yinsh?: never }
-  | { common?: never; acquire: AcquireCommandPayload; davinci?: never; splendor?: never; yinsh?: never }
-  | { common?: never; acquire?: never; davinci: DavinciCommandPayload; splendor?: never; yinsh?: never }
-  | { common?: never; acquire?: never; davinci?: never; splendor: SplendorCommandPayload; yinsh?: never }
-  | { common?: never; acquire?: never; davinci?: never; splendor?: never; yinsh: YinshCommandPayload };
+  | { common: CommonCommandPayload; acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
+  | {
+      common?: never;
+      acquire: AcquireCommandPayload;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci: DavinciCommandPayload;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor: SplendorCommandPayload;
+      yinsh?: never;
+      othello?: never;
+    }
+  | { common?: never; acquire?: never; davinci?: never; splendor?: never; yinsh: YinshCommandPayload; othello?: never }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello: OthelloCommandPayload;
+    };
 
 export type RoomView =
-  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never }
-  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView };
+  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never; othello?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView; othello?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomView };
 
 export type ServerMessage =
   | { matchSync: MatchSync; roomSync?: never; commandResult?: never; error?: never }

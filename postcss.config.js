@@ -8,7 +8,7 @@ export default {
             replace: true,
             mediaQuery: false,
             minPixelValue: 0,
-            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/]splendor[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci)|components[\\/]GameUI)[\\/])/,
+            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/](?:splendor|othello)[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci)|components[\\/]GameUI)[\\/])/,
         },
     },
 };

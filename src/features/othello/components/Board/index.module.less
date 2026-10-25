@@ -1,0 +1,167 @@
+.frame {
+  position:relative;
+  z-index:1;
+  width:478px;
+  max-width:100%;
+  aspect-ratio:1;
+  flex:none;
+  padding:7px;
+  border:1px solid #d4c2a0;
+  border-radius:5px;
+  background:#557460;
+  box-shadow:0 6px 11px #3d453424,0 1px 3px #263d3b15,inset 0 0 0 3px #41644f99;
+}
+.coordinateBoard {
+  display:grid;
+  width:100%;
+  aspect-ratio:1;
+  grid-template-columns:18px minmax(0,1fr) 18px;
+  grid-template-rows:18px minmax(0,1fr) 18px;
+}
+.coordinates {
+  display:grid;
+  color:#dddfc8;
+  font:10px/1 Georgia,serif;
+  opacity:.75;
+  user-select:none;
+}
+.top,.bottom {
+  grid-column:2;
+  grid-template-columns:repeat(8,1fr);
+  align-items:center;
+  text-align:center;
+}
+.top { grid-row:1; }
+.bottom { grid-row:3; }
+.left,.right {
+  grid-row:2;
+  grid-template-rows:repeat(8,1fr);
+  align-items:center;
+  text-align:center;
+}
+.left { grid-column:1; }
+.right { grid-column:3; }
+.highlight { color:#fff6cf; font-weight:700; }
+.withoutCoordinates .coordinates { visibility:hidden; }
+.grid {
+  display:grid;
+  position:relative;
+  grid-row:2;
+  grid-column:2;
+  grid-template:repeat(8,1fr)/repeat(8,1fr);
+  aspect-ratio:1;
+  overflow:hidden;
+  isolation:isolate;
+  border:1px solid #acb49a80;
+  background:linear-gradient(135deg,#79918228,transparent 55%,#28563812),#648371;
+  box-shadow:inset 0 2px 4px #274d3438;
+}
+.cell {
+  display:flex;
+  position:relative;
+  z-index:1;
+  min-width:0;
+  min-height:0;
+  align-items:center;
+  justify-content:center;
+  padding:0;
+  border-right:1px solid #b7bfab38;
+  border-bottom:1px solid #b7bfab38;
+  border-radius:0;
+  outline-offset:-3px!important;
+  cursor:default;
+  transition:background .18s;
+  &:nth-of-type(8n) { border-right:0; }
+  &:nth-last-of-type(-n+8) { border-bottom:0; }
+  &:focus-visible { outline:2px solid #f4dda3; }
+  > * { pointer-events:none; }
+}
+.legal { cursor:pointer; }
+.legal:hover,.target { background:#ecdf9820; filter:none; }
+.boardDisc { width:76%; height:76%; max-width:46px; max-height:46px; }
+.ghostDisc { opacity:.58; }
+.legalDot {
+  position:relative;
+  width:10px;
+  height:10px;
+  border:1px solid #ecdec29c;
+  border-radius:50%;
+  background:#e7ddb923;
+  box-shadow:0 0 0 4px #eee2c60b;
+  &::after { position:absolute; inset:3px; border-radius:50%; background:#f0e3b9; content:''; }
+}
+.lastMark {
+  position:absolute;
+  top:calc(50% - 3px);
+  left:calc(50% - 3px);
+  width:6px;
+  height:6px;
+  border:1px solid #b1965b;
+  border-radius:50%;
+  background:#e6d2a2;
+  box-shadow:0 0 0 2px #544f4920;
+}
+.flipOutline {
+  position:absolute;
+  width:86%;
+  height:86%;
+  border:1.5px solid #e7cc80;
+  border-radius:50%;
+  box-shadow:0 0 9px #e2c57445;
+}
+.targetCorners {
+  position:absolute;
+  inset:3px;
+  border:1px solid #e3ce8b;
+  border-radius:2px;
+}
+.flipBadge {
+  display:flex;
+  position:absolute;
+  right:1px;
+  bottom:1px;
+  min-width:16px;
+  height:16px;
+  align-items:center;
+  justify-content:center;
+  border:1px solid #f3e7bf;
+  border-radius:50%;
+  background:#edd9a3;
+  box-shadow:0 1px 2px #34504130;
+  color:#4c543f;
+  font:10px Georgia,serif;
+}
+.star {
+  position:absolute;
+  z-index:0;
+  width:4px;
+  height:4px;
+  transform:translate(-2px,-2px);
+  border-radius:50%;
+  background:#c1c7ac95;
+}
+.previewLines {
+  position:absolute;
+  inset:0;
+  z-index:0;
+  width:100%;
+  height:100%;
+  overflow:visible;
+  pointer-events:none;
+  line { stroke:#ebd28c; stroke-width:2; stroke-dasharray:5 6; opacity:.9; }
+}
+.justFlipped .boardDisc>span { animation:flip .5s cubic-bezier(.24,.62,.25,1); }
+@keyframes flip { from { transform:rotateY(90deg); } }
+@media(max-width:767px) {
+  .frame { width:100%; padding:3px; border-radius:3px; box-shadow:0 2px 5px #3b4f342a,inset 0 0 0 2px #49695166; }
+  .coordinateBoard { grid-template-columns:13px minmax(0,1fr) 13px; grid-template-rows:13px minmax(0,1fr) 13px; }
+  .coordinates { font-size:8px; }
+  .boardDisc { width:77%; height:77%; }
+  .legalDot { width:8px; height:8px; box-shadow:0 0 0 3px #eee2c609; &::after { inset:2px; } }
+  .targetCorners { inset:2px; }
+  .flipBadge { right:0; bottom:0; min-width:13px; height:13px; font-size:8px; }
+  .lastMark { top:calc(50% - 2.5px); left:calc(50% - 2.5px); width:5px; height:5px; }
+}
+@media(prefers-reduced-motion:reduce) {
+  .justFlipped .boardDisc>span { animation:none; }
+}

@@ -73,7 +73,9 @@ function unwrapReplaySnapshot<TSnapshot>(
       ? value.splendor
       : gameType === 'yinsh'
         ? value.yinsh
-        : undefined;
+        : gameType === 'othello'
+          ? value.othello
+          : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);
   }

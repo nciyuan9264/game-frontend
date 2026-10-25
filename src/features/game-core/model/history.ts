@@ -11,7 +11,12 @@ import type {
 } from '@/api/generated/game-platform';
 
 export type GameID = string | number;
-export type HistoryGameType = 'acquire' | 'davinci' | 'splendor' | 'yinsh';
+export type HistoryGameType =
+  | 'acquire'
+  | 'davinci'
+  | 'splendor'
+  | 'yinsh'
+  | 'othello';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -115,6 +120,7 @@ export interface RankLeaderboardEntry extends LeaderboardEntryBase {
 export type AcquireLeaderboardEntry = RankLeaderboardEntry;
 export type SplendorLeaderboardEntry = RankLeaderboardEntry;
 export type YinshLeaderboardEntry = DavinciLeaderboardEntry;
+export type OthelloLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export interface LeaderboardData {
@@ -143,6 +149,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.yinsh.wins,
       winRate: entry.metric.yinsh.winRate,
+    };
+  }
+  if (entry.metric.othello) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.othello.wins,
+      winRate: entry.metric.othello.winRate,
     };
   }
   return {

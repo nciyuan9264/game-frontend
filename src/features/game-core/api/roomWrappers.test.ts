@@ -13,6 +13,11 @@ import {
   listSplendorRooms,
   lookupSplendorRoom,
 } from '@/features/splendor/api/room';
+import {
+  createOthelloRoom,
+  listOthelloRooms,
+  lookupOthelloRoom,
+} from '@/features/othello/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -81,6 +86,26 @@ describe('game room API wrappers', () => {
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'splendor',
       'room-2',
+      options
+    );
+  });
+
+  it('injects Othello fixed seats, visibility, and redirect policy', () => {
+    const signal = new AbortController().signal;
+    createOthelloRoom('private', signal);
+    listOthelloRooms(signal);
+    lookupOthelloRoom('room-3', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'othello',
+      { visibility: 'private', maxPlayers: 2 },
+      options
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('othello', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'othello',
+      'room-3',
       options
     );
   });

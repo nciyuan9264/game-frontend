@@ -6,6 +6,7 @@ import { AcquireLoading } from '@/features/acquire/components/LoadingState';
 import { DavinciLoading } from '@/features/davinci/components/LoadingState';
 import { SplendorLoading } from '@/features/splendor/components/LoadingState';
 import { YinshLoading } from '@/features/yinsh/components/LoadingState';
+import { OthelloLoading } from '@/features/othello/components/LoadingState';
 
 /**
  * 渲染路由
@@ -22,6 +23,8 @@ export const RenderRoutes = () => {
                         ? <SplendorLoading fullScreen />
                         : route.path.startsWith('/game/yinsh')
                             ? <YinshLoading fullScreen />
+                            : route.path.startsWith('/game/othello')
+                                ? <OthelloLoading fullScreen />
                         : <LoadingBlock />;
             return (
                 <Route

@@ -268,6 +268,20 @@ function gamePayload(
         return { yinsh: { resign: {} } };
     }
   }
+  if (gameType === 'othello') {
+    switch (commandType) {
+      case 'game_place_disc':
+        return {
+          othello: {
+            placeDisc: { index: Number(objectPayload.index) },
+          },
+        };
+      case 'game_pass':
+        return { othello: { pass: {} } };
+      case 'game_resign':
+        return { othello: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

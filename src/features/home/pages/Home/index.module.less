@@ -60,6 +60,13 @@
   --accent-border: rgba(166, 95, 114, 0.38);
 }
 
+.themeOthello {
+  --accent-primary: #d0b177;
+  --accent-secondary: #5f8972;
+  --accent-soft: rgba(208, 177, 119, 0.14);
+  --accent-border: rgba(95, 137, 114, 0.42);
+}
+
 .backgroundDecor {
   position: fixed;
   inset: 0;
@@ -138,7 +145,7 @@
 .gameSwitcher {
   min-height: 72px;
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(5, minmax(0, 1fr));
   gap: 0.65rem;
   padding: 0.85rem;
   background:
@@ -265,6 +272,19 @@
       radial-gradient(circle at 24% 32%, rgba(196, 119, 138, 0.2), transparent 29%),
       radial-gradient(circle at 78% 68%, rgba(147, 164, 124, 0.17), transparent 31%),
       repeating-linear-gradient(60deg, transparent 0 14px, rgba(255, 255, 255, 0.045) 14px 15px);
+  }
+}
+
+.gameTabOthello {
+  --tab-primary: #d0b177;
+  --tab-secondary: #6f9a82;
+  --tab-border: rgba(208, 177, 119, 0.5);
+
+  &::before {
+    background-image:
+      linear-gradient(90deg, rgba(95, 137, 114, 0.2), rgba(208, 177, 119, 0.12)),
+      repeating-linear-gradient(90deg, transparent 0 13px, rgba(255, 255, 255, 0.05) 13px 14px),
+      repeating-linear-gradient(0deg, transparent 0 13px, rgba(255, 255, 255, 0.05) 13px 14px);
   }
 }
 
@@ -1136,6 +1156,85 @@
     left:.2rem;
     border-color:#3a3537;
     background:rgba(0,0,0,.08);
+  }
+}
+
+.othelloMockup {
+  border-color:#9c9175;
+  background:linear-gradient(180deg,#d7caaa,#627c6a);
+}
+
+.othelloUI {
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  gap:.65rem;
+  padding:1rem;
+  background:#e8dfce;
+  color:#4c443b;
+}
+
+.othelloHeader,.othelloFooter {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#766550;
+  font-size:.61rem;
+  font-weight:800;
+  letter-spacing:.09em;
+}
+
+.othelloHeader b { color:#6f4652; font-size:.72rem; }
+
+.othelloBoard {
+  display:grid;
+  flex:1;
+  grid-template:repeat(8,1fr)/repeat(8,1fr);
+  overflow:hidden;
+  border:.45rem solid #456650;
+  border-radius:.35rem;
+  background:#62816d;
+  box-shadow:inset 0 2px 7px rgba(18,54,32,.35),0 8px 16px rgba(42,50,36,.2);
+
+  > i {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    border-right:1px solid rgba(215,222,191,.17);
+    border-bottom:1px solid rgba(215,222,191,.17);
+  }
+
+  span {
+    width:76%;
+    aspect-ratio:1;
+    border-radius:50%;
+    box-shadow:inset 0 1px 2px rgba(255,255,255,.25),0 3px 4px rgba(24,39,27,.4);
+  }
+
+  .black { border:1px solid #222b24; background:radial-gradient(circle at 30% 24%,#62635b,#262b26 67%); }
+  .white { border:1px solid #dedbc8; background:radial-gradient(circle at 30% 24%,#fffef3,#d5d3c1 76%); }
+}
+
+.floatingOthelloDisc {
+  position:absolute;
+  z-index:2;
+  width:5rem;
+  height:5rem;
+  border-radius:50%;
+  box-shadow:inset 0 2px 3px rgba(255,255,255,.25),0 24px 42px rgba(0,0,0,.36);
+
+  &.black {
+    top:4.5rem;
+    right:.3rem;
+    border:1px solid #262c27;
+    background:radial-gradient(circle at 30% 24%,#66675f,#252a25 68%);
+  }
+
+  &.white {
+    bottom:5rem;
+    left:.2rem;
+    border:1px solid #d9d5c2;
+    background:radial-gradient(circle at 30% 24%,#fffef4,#d5d2bf 76%);
   }
 }
 
