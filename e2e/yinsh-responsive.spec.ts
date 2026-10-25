@@ -176,6 +176,8 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
   const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
   await expect(board).toBeVisible();
+  await expect.poll(() => board.evaluate(element =>
+    getComputedStyle(element).colorScheme)).toBe('light only');
   await expect(page.getByRole('heading', { name: '选择你的下一步' })).toBeVisible();
   await expect(page.getByText(/^公共池/).first()).toBeVisible();
   const initialBoardBox = await board.boundingBox();

@@ -82,14 +82,6 @@ export function Board({
       </div>
       <div className={styles.grid} role="group"
         aria-label="黑白棋棋盘，8 行 8 列。方向键移动，回车落子。">
-        {[18, 21, 42, 45].map(index => <i
-          key={index}
-          className={styles.star}
-          style={{
-            left: `${column(index) * 12.5}%`,
-            top: `${row(index) * 12.5}%`,
-          }}
-        />)}
         {preview && <svg viewBox="0 0 800 800" className={styles.previewLines} aria-hidden="true">
           {preview.lines.map((line, index) => {
             const end = line[line.length - 1];

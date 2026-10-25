@@ -239,7 +239,7 @@ export function Play({
             {whiteID && <PlayerCard playerID={whiteID} data={data}
               active={data.roomData.currentPlayer === whiteID} />}
           </div>
-          <div className={styles.mobileOpponent}>
+          <div className={styles.mobileOpponent} data-testid="mobile-opponent">
             {data.roomData.playerOrder.filter(id => id !== data.playerId).map(id =>
               <PlayerCard key={id} playerID={id} data={data}
                 active={data.roomData.currentPlayer === id} compact />)}
@@ -269,7 +269,7 @@ export function Play({
                   : `${sideName(data.roomData.currentSide)}行棋 · 从中心开始`}</span>
               <span>8 × 8 · CLASSIC</span></footer>
           </section>
-          <div className={styles.mobileSelf}>
+          <div className={styles.mobileSelf} data-testid="mobile-self">
             <PlayerCard playerID={data.playerId} data={data}
               active={data.roomData.currentPlayer === data.playerId} compact />
           </div>
@@ -277,7 +277,8 @@ export function Play({
             <span>合法落点、翻转与计分均由服务端验证 · 超时自动代下</span></div>
         </section>
         <aside className={styles.sidebar}>
-          <section className={`${styles.actionCard} ${mustPass ? styles.passCard : ''}`}>
+          <section data-testid="turn-status"
+            className={`${styles.actionCard} ${mustPass ? styles.passCard : ''}`}>
             <div className={styles.actionEyebrow}><span className={styles.eyebrow}>
               {ended ? 'THE FINAL CHAPTER' : myTurn ? 'YOUR TURN' : 'OPPONENT’S TURN'}
             </span><i /></div>

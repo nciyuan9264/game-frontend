@@ -166,6 +166,24 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   });
   await expect(board).toBeVisible();
   await expect(page.getByRole('heading', { name: '轮到你了' })).toBeVisible();
+  await expect(board.locator(':scope > i')).toHaveCount(0);
+  await expect.poll(() => page.getByTestId('cell-A1').evaluate(element => ({
+    right: getComputedStyle(element).borderRightWidth,
+    bottom: getComputedStyle(element).borderBottomWidth,
+  }))).toEqual({ right: '1px', bottom: '1px' });
+  const [turnBox, opponentBox, selfBox] = await Promise.all([
+    page.getByTestId('turn-status').boundingBox(),
+    page.getByTestId('mobile-opponent').boundingBox(),
+    page.getByTestId('mobile-self').boundingBox(),
+  ]);
+  expect((turnBox?.y ?? 0) + (turnBox?.height ?? 0))
+    .toBeLessThanOrEqual(opponentBox?.y ?? 0);
+  expect(Math.abs((opponentBox?.y ?? 0) - (selfBox?.y ?? 0)))
+    .toBeLessThanOrEqual(1);
+  expect(Math.abs((opponentBox?.width ?? 0) - (selfBox?.width ?? 0)))
+    .toBeLessThanOrEqual(1);
+  await expect.poll(() => board.evaluate(element =>
+    getComputedStyle(element).colorScheme)).toBe('light only');
   const topbarBox = await page.locator('header').first().boundingBox();
   expect(topbarBox?.height).toBe(50);
   await page.getByRole('button', { name: 'D3，可落子，翻转 1 枚' }).click();
