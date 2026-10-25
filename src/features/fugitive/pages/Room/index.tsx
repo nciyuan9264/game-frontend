@@ -53,7 +53,13 @@ export function Room({
   >();
   const [target, setTarget] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
-  const [name, setName] = useState(room?.displayName || '午夜追缉');
+  const [displayName, setDisplayName] = useState(
+    room?.displayName || '午夜追缉',
+  );
+  const [configuredTimeout, setConfiguredTimeout] = useState(
+    room?.turnTimeoutSeconds ?? 60,
+  );
+  const [name, setName] = useState(displayName);
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
   const [turnTimeoutSeconds, setTurnTimeoutSeconds] = useState(
     room?.turnTimeoutSeconds ?? 60,
@@ -70,7 +76,7 @@ export function Room({
   const allReady = players.length === 2
     && players.every(([, player]) => (player.online || player.ai) && player.ready);
   const inviteURL = fugitiveRoomInviteURL(data.roomID);
-  const roomName = room?.displayName || name || '午夜追缉';
+  const roomName = displayName || '午夜追缉';
   const close = () => setPanel(undefined);
   const copy = async (value: string, message: string) => {
     try {
@@ -81,9 +87,9 @@ export function Room({
     }
   };
   const openSettings = () => {
-    setName(room?.displayName || '午夜追缉');
+    setName(displayName);
     setVisibility(data.visibility);
-    setTurnTimeoutSeconds(room?.turnTimeoutSeconds ?? 60);
+    setTurnTimeoutSeconds(configuredTimeout);
     setPanel('settings');
   };
 
@@ -168,7 +174,7 @@ export function Room({
           : '显示在在线大厅，等待另一位玩家加入。'}</small></span>
     </div><dl>
       <div><dt>规则</dt><dd>二版基础 · 固定 2 人</dd></div>
-      <div><dt>思考时间</dt><dd>{timeoutLabel(room?.turnTimeoutSeconds)}</dd></div>
+      <div><dt>思考时间</dt><dd>{timeoutLabel(configuredTimeout)}</dd></div>
       <div><dt>身份</dt><dd>{roleName(selfRole)}</dd></div>
       <div><dt>准备状态</dt><dd>{players.filter(([, player]) => player.ready).length} / {players.length} 人</dd></div>
     </dl><p className="room-seat-note">手牌、抽牌号码和暗置路线按身份隔离；开局后身份锁定。</p>
@@ -202,7 +208,11 @@ export function Room({
             visibility,
             displayName: name.trim(),
             turnTimeoutSeconds,
-          })) close();
+          })) {
+            setDisplayName(name.trim());
+            setConfiguredTimeout(turnTimeoutSeconds);
+            close();
+          }
         }}>保存设置<Check size={15} /></button></>
         : <button className="button primary full" type="button" onClick={close}>知道了</button>}>
       <label className="form-label" htmlFor="room-settings-name">房间名称</label>
