@@ -4,7 +4,8 @@ export interface YinshPreferences {
   coordinates: boolean;
   hints: boolean;
   confirmMoves: boolean;
-  reduceMotion: boolean;
+  quickMotion: boolean;
+  motionMode: 'system' | 'full' | 'reduced';
 }
 
 const STORAGE_KEY = 'yinsh-display-preferences';
@@ -12,9 +13,11 @@ const defaults: YinshPreferences = {
   coordinates: true,
   hints: true,
   confirmMoves: false,
-  reduceMotion: false,
+  quickMotion: false,
+  motionMode: 'system',
 };
 const listeners = new Set<() => void>();
+const mediaListeners = new Set<() => void>();
 let current = readPreferences();
 
 function readPreferences(): YinshPreferences {
@@ -33,9 +36,16 @@ function readPreferences(): YinshPreferences {
       confirmMoves: typeof record.confirmMoves === 'boolean'
         ? record.confirmMoves
         : defaults.confirmMoves,
-      reduceMotion: typeof record.reduceMotion === 'boolean'
-        ? record.reduceMotion
-        : defaults.reduceMotion,
+      quickMotion: typeof record.quickMotion === 'boolean'
+        ? record.quickMotion
+        : defaults.quickMotion,
+      motionMode: record.motionMode === 'system'
+        || record.motionMode === 'full'
+        || record.motionMode === 'reduced'
+        ? record.motionMode
+        : typeof record.reduceMotion === 'boolean'
+          ? record.reduceMotion ? 'reduced' : 'full'
+          : defaults.motionMode,
     };
   } catch {
     return defaults;
@@ -63,6 +73,10 @@ if (typeof window !== 'undefined') {
     current = readPreferences();
     listeners.forEach(listener => listener());
   });
+  const media = window.matchMedia?.('(prefers-reduced-motion: reduce)');
+  media?.addEventListener('change', () => {
+    mediaListeners.forEach(listener => listener());
+  });
 }
 
 export function useYinshPreferences() {
@@ -71,11 +85,29 @@ export function useYinshPreferences() {
     () => current,
     () => defaults,
   );
+  const systemReduced = useSyncExternalStore(
+    listener => {
+      mediaListeners.add(listener);
+      return () => mediaListeners.delete(listener);
+    },
+    () => window.matchMedia?.('(prefers-reduced-motion: reduce)').matches ?? false,
+    () => false,
+  );
+  const reduceMotion = preferences.motionMode === 'system'
+    ? systemReduced
+    : preferences.motionMode === 'reduced';
   return {
     ...preferences,
+    reduceMotion,
+    followsSystemMotion: preferences.motionMode === 'system',
+    systemReducedMotion: systemReduced,
     setCoordinates: (value: boolean) => update({ coordinates: value }),
     setHints: (value: boolean) => update({ hints: value }),
     setConfirmMoves: (value: boolean) => update({ confirmMoves: value }),
-    setReduceMotion: (value: boolean) => update({ reduceMotion: value }),
+    setQuickMotion: (value: boolean) => update({ quickMotion: value }),
+    setReduceMotion: (value: boolean) => update({
+      motionMode: value ? 'reduced' : 'full',
+    }),
+    followSystemMotion: () => update({ motionMode: 'system' }),
   };
 }

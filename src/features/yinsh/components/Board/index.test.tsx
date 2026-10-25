@@ -5,7 +5,7 @@ import { Board } from '.';
 afterEach(cleanup);
 
 describe('YINSH board', () => {
-  it('renders a stable 85-point SVG and submits only active points', () => {
+  it('renders 85 keyboard points and forwards choices for page-level feedback', () => {
     const onPoint = vi.fn();
     render(<Board
       rings={{ E4: 'white', D3: 'black' }}
@@ -27,6 +27,7 @@ describe('YINSH board', () => {
     fireEvent.click(screen.getByRole('button', { name: '移动到 E7' }));
     expect(onPoint).toHaveBeenCalledWith('E7');
     fireEvent.click(screen.getByRole('button', { name: '交点 A2' }));
-    expect(onPoint).toHaveBeenCalledTimes(1);
+    expect(onPoint).toHaveBeenLastCalledWith('A2');
+    expect(onPoint).toHaveBeenCalledTimes(2);
   });
 });

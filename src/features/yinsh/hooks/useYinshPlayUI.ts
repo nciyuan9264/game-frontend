@@ -6,7 +6,8 @@ export type YinshPanel =
   | 'rules'
   | 'settings'
   | 'menu'
-  | 'resign';
+  | 'resign'
+  | 'points';
 
 export function useYinshPlayUI(data: GameSnapshot) {
   const [panel, setPanel] = useState<YinshPanel>();
@@ -14,6 +15,13 @@ export function useYinshPlayUI(data: GameSnapshot) {
   const [hoveredPoint, setHoveredPoint] = useState<string>();
   const [pendingPoint, setPendingPoint] = useState<string>();
   const [selectedRowID, setSelectedRowID] = useState<string>();
+  const [zoomed, setZoomed] = useState(false);
+  const [feedback, setFeedback] = useState<{
+    id: number;
+    text: string;
+    error: boolean;
+    errorPoint?: string;
+  }>();
   const [showResults, setShowResults] = useState(
     data.roomData.gameStatus === 'end',
   );
@@ -39,6 +47,15 @@ export function useYinshPlayUI(data: GameSnapshot) {
     setHoveredPoint(undefined);
     setPendingPoint(undefined);
     setSelectedRowID(undefined);
+    setFeedback(undefined);
+  }, []);
+
+  const notify = useCallback((
+    text: string,
+    error = true,
+    errorPoint?: string,
+  ) => {
+    setFeedback({ id: Date.now(), text, error, errorPoint });
   }, []);
 
   useEffect(() => {
@@ -48,6 +65,20 @@ export function useYinshPlayUI(data: GameSnapshot) {
   useEffect(() => {
     if (data.roomData.gameStatus === 'end') setShowResults(true);
   }, [data.roomData.gameStatus]);
+
+  useEffect(() => {
+    if (!feedback) return;
+    const feedbackTimer = setTimeout(() => setFeedback(undefined), 4800);
+    const pointTimer = setTimeout(() => {
+      setFeedback(current => current
+        ? { ...current, errorPoint: undefined }
+        : undefined);
+    }, 800);
+    return () => {
+      clearTimeout(feedbackTimer);
+      clearTimeout(pointTimer);
+    };
+  }, [feedback?.id]);
 
   return {
     panel,
@@ -64,6 +95,10 @@ export function useYinshPlayUI(data: GameSnapshot) {
     preview,
     selectedRow,
     clearSelection,
+    feedback,
+    notify,
+    zoomed,
+    setZoomed,
     showResults,
     setShowResults,
   };
