@@ -49,7 +49,7 @@ function gameSnapshot() {
           placedRings: { white: 5, black: 5 },
           markerPool: 47,
           legalMoves: {
-            E4: [{ to: 'E7', flips: ['E5', 'E6'] }],
+            E4: [{ to: 'E7', flips: null }],
           },
           candidateRows: [],
           activity: [{
@@ -117,17 +117,21 @@ async function expectNoOverflow(page: Page) {
 }
 
 test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
+  const pageErrors: Error[] = [];
+  page.on('pageerror', error => pageErrors.push(error));
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
   await expect(page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' })).toBeVisible();
   await page.getByRole('button', { name: '选择白环 E4' }).click();
+  await page.getByRole('button', { name: '移动到 E7' }).hover();
   await expect(page.getByRole('button', { name: '移动到 E7' })).toBeVisible();
   await expect(page.getByRole('button', { name: '选择高亮落点' })).toBeVisible();
   const box = await page.locator('svg[aria-label^="YINSH 棋盘"]').boundingBox();
   expect(box?.width).toBeGreaterThan(300);
   expect(box?.height).toBeGreaterThan(300);
   await expectNoOverflow(page);
+  expect(pageErrors).toEqual([]);
 });
 
 test('YINSH desktop keeps board and sidebar visible at 1440x900', async ({ page }) => {
@@ -138,4 +142,15 @@ test('YINSH desktop keeps board and sidebar visible at 1440x900', async ({ page 
   await expect(page.getByText('取三环，赢一局。')).toBeVisible();
   await expect(page.getByText('公共棋子池')).toBeVisible();
   await expectNoOverflow(page);
+  const scroll = await page.getByTestId('yinsh-play').evaluate((play) => {
+    const shell = play.parentElement?.parentElement?.parentElement;
+    if (!shell) return;
+    return {
+      overflowY: getComputedStyle(shell).overflowY,
+      clientHeight: shell.clientHeight,
+      scrollHeight: shell.scrollHeight,
+    };
+  });
+  expect(scroll?.overflowY).toBe('auto');
+  expect(scroll?.scrollHeight).toBeGreaterThan(scroll?.clientHeight ?? 0);
 });

@@ -86,15 +86,53 @@ export type ServerMessage =
   | RealtimeErrorMessage;
 
 function normalizePlayers(
-  players: Record<string, RoomPlayer>,
+  players: Record<string, RoomPlayer> | null | undefined,
 ): Record<string, YinshPlayer> {
-  return Object.fromEntries(Object.entries(players).map(([id, player]) => [
+  return Object.fromEntries(Object.entries(players ?? {}).map(([id, player]) => [
     id,
     {
       ...player,
       name: player.displayName,
     },
   ]));
+}
+
+function recordValue(value: unknown): Record<string, unknown> {
+  return value && typeof value === 'object' && !Array.isArray(value)
+    ? value as Record<string, unknown>
+    : {};
+}
+
+function stringArray(value: unknown): string[] {
+  return Array.isArray(value)
+    ? value.filter((item): item is string => typeof item === 'string')
+    : [];
+}
+
+function normalizeMoves(value: unknown): Record<string, MoveOption[]> {
+  return Object.fromEntries(Object.entries(recordValue(value)).map(([pointID, moves]) => [
+    pointID,
+    Array.isArray(moves) ? moves.flatMap(move => {
+      const candidate = recordValue(move);
+      return typeof candidate.to === 'string'
+        ? [{ to: candidate.to, flips: stringArray(candidate.flips) }]
+        : [];
+    }) : [],
+  ]));
+}
+
+function normalizeRows(value: unknown): Row[] {
+  if (!Array.isArray(value)) return [];
+  return value.flatMap(row => {
+    const candidate = recordValue(row);
+    const points = stringArray(candidate.points);
+    const owner = candidate.owner;
+    return typeof candidate.id === 'string'
+      && points.length >= 5
+      && (owner === 'white' || owner === 'black')
+      ? [{ id: candidate.id, points, owner }]
+      : [];
+  });
 }
 
 function parsePayloadJSON(value?: string): Record<string, unknown> | undefined {
@@ -113,7 +151,7 @@ function normalizeAction(action?: {
   action: string;
   playerID: string;
   payloadJSON?: string;
-}): LastAction | undefined {
+} | null): LastAction | undefined {
   if (!action) return;
   return {
     action: action.action,
@@ -146,7 +184,7 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
       players: normalizePlayers(envelope.players),
       visibility: envelope.visibility as Visibility,
       maxPlayers: envelope.maxPlayers,
-      playerOrder: envelope.playerOrder,
+      playerOrder: stringArray(envelope.playerOrder),
     };
   }
   const view = envelope.view.yinsh;
@@ -169,10 +207,10 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
       gameStatus: room.gameStatus as GameStatus,
       placedRings: room.placedRings as Record<Side, number>,
       markerPool: room.markerPool,
-      legalMoves: room.legalMoves as Record<string, MoveOption[]>,
-      candidateRows: room.candidateRows as Row[],
+      legalMoves: normalizeMoves(room.legalMoves),
+      candidateRows: normalizeRows(room.candidateRows),
       lastAction: normalizeAction(room.lastAction),
-      activity: (room.activity ?? []).flatMap(action => {
+      activity: (Array.isArray(room.activity) ? room.activity : []).flatMap(action => {
         const normalized = normalizeAction(action);
         return normalized ? [normalized] : [];
       }),
@@ -181,7 +219,7 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
         ? undefined
         : Number(room.turnTimeoutMs),
       players: normalizePlayers(room.players),
-      playerOrder: room.playerOrder,
+      playerOrder: stringArray(room.playerOrder),
       roundNo: room.roundNo,
     },
   };

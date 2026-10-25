@@ -161,7 +161,7 @@ export function Play({
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
-  return <div className={`${styles.play} ${preferences.reduceMotion ? styles.reduceMotion : ''}`}>
+  return <div data-testid="yinsh-play" className={`${styles.play} ${preferences.reduceMotion ? styles.reduceMotion : ''}`}>
     <header className={styles.topbar}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={20} /></button>
       <Brand /><span className={styles.divider} />
       <div className={styles.room}><strong>{data.roomID}</strong>

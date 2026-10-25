@@ -66,6 +66,55 @@ describe('yinsh protocol', () => {
     expect(snapshot.roomData.activity[0].payload).toEqual({ pointID: 'E4' });
   });
 
+  it('normalizes nullable collections from authoritative snapshots', () => {
+    const message = parseServerMessage(JSON.stringify({
+      schemaVersion: 2,
+      type: 'ROOM_SYNC',
+      roomID: 'yinsh-room',
+      matchID: 'yinsh-room-r1',
+      seq: 5,
+      view: {
+        yinsh: {
+          playerId: '7',
+          ownerID: '7',
+          visibility: 'private',
+          playerData: {
+            '7': { side: 'white', ringsRemoved: 0 },
+            ai_2: { side: 'black', ringsRemoved: 0 },
+          },
+          roomData: {
+            rings: { E4: 'white' },
+            markers: {},
+            currentPlayer: '7',
+            gameStatus: 'move',
+            placedRings: { white: 5, black: 5 },
+            markerPool: 51,
+            legalMoves: {
+              E4: [{ to: 'E7', flips: null }],
+              G3: null,
+            },
+            candidateRows: null,
+            activity: null,
+            players: {
+              '7': player,
+              ai_2: { ...player, userID: undefined, playerID: 'ai_2', displayName: '墨白', seatIndex: 1, ai: true },
+            },
+            playerOrder: null,
+            roundNo: 1,
+          },
+        },
+      },
+    })) as GameSnapshot;
+
+    expect(message.roomData.legalMoves).toEqual({
+      E4: [{ to: 'E7', flips: [] }],
+      G3: [],
+    });
+    expect(message.roomData.candidateRows).toEqual([]);
+    expect(message.roomData.activity).toEqual([]);
+    expect(message.roomData.playerOrder).toEqual([]);
+  });
+
   it('serializes every public yinsh command through the generated union', () => {
     expect(createClientCommand('yinsh', 'match-1', 'cmd-1', 'game_place_ring', {
       pointID: 'E4',
