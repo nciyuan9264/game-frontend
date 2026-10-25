@@ -9,11 +9,13 @@ import {
   Cpu,
   Crown,
   EyeOff,
+  Footprints,
   Gem,
   Hash,
   Monitor,
   Move,
   Puzzle,
+  Search,
   Smartphone,
   Sparkles,
   Trophy,
@@ -116,6 +118,25 @@ const gameConfigs = [
       { icon: <Move size={20} />, title: '行动力争夺', desc: '压缩落点，掌握回合主动' },
       { icon: <Brain size={20} />, title: '启发式 AI', desc: '角落、边线与终局综合判断' },
       { icon: <Trophy size={20} />, title: '实际子数', desc: '双方无子可下时，多者获胜' },
+    ],
+  },
+  {
+    key: 'fugitive',
+    tabTitle: '逃亡者',
+    tabSubtitle: 'FUGITIVE',
+    tabStatus: '非对称推理',
+    badge: '午夜追逃 · 二版基础规则',
+    title: 'FUGITIVE',
+    subtitle: '逃亡者',
+    description: '一人暗置路线奔向 42，一人借手中线索逐步搜查。规划冲刺、制造疑点，在不对称信息中决定这场午夜追逐。',
+    route: '/game/fugitive',
+    cta: '进入追逃大厅',
+    footer: 'The Midnight Run',
+    features: [
+      { icon: <Footprints size={20} />, title: '暗置路线', desc: '藏身点与冲刺牌按身份隔离' },
+      { icon: <Search size={20} />, title: '线索搜查', desc: '排除手牌，锁定未知号码' },
+      { icon: <Brain size={20} />, title: '公平 AI', desc: '只依据当前角色可见信息决策' },
+      { icon: <EyeOff size={20} />, title: '最终追缉', desc: '一次失误，逃亡者立即脱身' },
     ],
   },
 ] as const;
@@ -411,6 +432,40 @@ const OthelloVisual = () => {
   </>;
 };
 
+const FugitiveVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.fugitiveMockup}`}
+    >
+      <div className={styles.fugitiveUI}>
+        <div className={styles.fugitiveHeader}><span>THE ESCAPE ROUTE</span><b>09 · 42</b></div>
+        <div className={styles.fugitiveRoute}>
+          {[0, 7, -1, 18, -1, 31, 42].map((number, index) =>
+            <span key={`${number}-${index}`} className={number < 0 ? styles.hidden : ''}>
+              <small>{index === 0 ? 'START' : index === 6 ? 'ESCAPE' : `0${index}`}</small>
+              <b>{number < 0 ? '?' : String(number).padStart(2, '0')}</b>
+              {number < 0 && <i />}
+            </span>)}
+        </div>
+        <div className={styles.fugitiveDecks}>
+          <span><b>Ⅰ</b>04—14</span><span><b>Ⅱ</b>15—28</span><span><b>Ⅲ</b>29—41</span>
+        </div>
+        <div className={styles.fugitiveFooter}><span>HIDE · SPRINT · ESCAPE</span><span>2 PLAYERS</span></div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingFugitiveCard} ${styles.routeCard}`}>27</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingFugitiveCard} ${styles.clueCard}`}>?</motion.span>
+  </>
+);
+
 export default function Home() {
   const navigate = useNavigate();
   const [activeKey, setActiveKey] = useState<GameKey>('acquire');
@@ -421,6 +476,7 @@ export default function Home() {
     splendor: styles.themeSplendor,
     yinsh: styles.themeYinsh,
     othello: styles.themeOthello,
+    fugitive: styles.themeFugitive,
   } as const;
   const tabThemeMap = {
     acquire: styles.gameTabAcquire,
@@ -428,6 +484,7 @@ export default function Home() {
     splendor: styles.gameTabSplendor,
     yinsh: styles.gameTabYinsh,
     othello: styles.gameTabOthello,
+    fugitive: styles.gameTabFugitive,
   } as const;
   const themeClass = themeMap[activeGame.key];
 
@@ -526,7 +583,9 @@ export default function Home() {
                       ? <SplendorVisual />
                       : activeGame.key === 'yinsh'
                         ? <YinshVisual />
-                        : <OthelloVisual />}
+                        : activeGame.key === 'othello'
+                          ? <OthelloVisual />
+                          : <FugitiveVisual />}
               </motion.div>
             </AnimatePresence>
           </div>

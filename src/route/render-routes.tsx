@@ -7,6 +7,7 @@ import { DavinciLoading } from '@/features/davinci/components/LoadingState';
 import { SplendorLoading } from '@/features/splendor/components/LoadingState';
 import { YinshLoading } from '@/features/yinsh/components/LoadingState';
 import { OthelloLoading } from '@/features/othello/components/LoadingState';
+import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 
 /**
  * 渲染路由
@@ -25,6 +26,8 @@ export const RenderRoutes = () => {
                             ? <YinshLoading fullScreen />
                             : route.path.startsWith('/game/othello')
                                 ? <OthelloLoading fullScreen />
+                                : route.path.startsWith('/game/fugitive')
+                                    ? <FugitiveLoading fullScreen />
                         : <LoadingBlock />;
             return (
                 <Route

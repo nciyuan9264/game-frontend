@@ -44,6 +44,7 @@ export interface GetLeaderboardParams extends RequestOptions {
   limit?: number;
   offset?: number;
   sort?: LeaderboardSortDim;
+  gameRole?: string;
 }
 
 const requestOptions = ({ signal }: RequestOptions) => ({ signal });
@@ -166,6 +167,7 @@ export async function getLeaderboard(
     limit = 50,
     offset = 0,
     sort = 'metric',
+    gameRole,
     signal,
   }: GetLeaderboardParams,
 ): Promise<LeaderboardData> {
@@ -175,6 +177,7 @@ export async function getLeaderboard(
       limit,
       offset,
       sort,
+      game_role: gameRole,
     },
     requestOptions({ signal }),
   );

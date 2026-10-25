@@ -174,7 +174,14 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
-  await expect(page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' })).toBeVisible();
+  const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
+  await expect(board).toBeVisible();
+  await expect(page.getByRole('heading', { name: '选择你的下一步' })).toBeVisible();
+  await expect(page.getByText(/^公共池/).first()).toBeVisible();
+  const initialBoardBox = await board.boundingBox();
+  expect(initialBoardBox?.x).toBeGreaterThanOrEqual(10);
+  expect(initialBoardBox?.width).toBeGreaterThan(340);
+  expect(initialBoardBox?.width).toBeLessThanOrEqual(370);
   await page.getByRole('button', { name: '选择白环 E4' }).click();
   const destination = page.getByRole('button', { name: '移动到 E7' });
   const hitArea = destination.locator('circle').first();

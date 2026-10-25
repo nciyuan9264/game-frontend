@@ -46,6 +46,7 @@ export interface RoomPlayer {
   online: boolean;
   ai: boolean;
   ready: boolean;
+  gameRole?: string;
 }
 
 export interface AcquireRoomMetrics {
@@ -78,6 +79,13 @@ export interface OthelloRoomMetrics {
   progressTotal: number;
 }
 
+export interface FugitiveRoomMetrics {
+  highestRevealed: number;
+  hiddenHideoutCount: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -94,6 +102,8 @@ export interface RoomInfo {
   updatedAt: ISODateTime;
   players: RoomPlayer[];
   metrics: RoomMetrics;
+  displayName?: string;
+  turnTimeoutSeconds?: number;
 }
 
 export interface CreateRoomReq {
@@ -101,6 +111,8 @@ export interface CreateRoomReq {
   visibility?: Visibility;
   max_players?: number;
   request_id: string;
+  display_name?: string;
+  turn_timeout_seconds?: number;
 }
 
 export interface ListRoomsReq {
@@ -153,11 +165,26 @@ export interface StartNextMatchResp {
 }
 
 export type RoomMetrics =
-  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomMetrics; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics; othello?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomMetrics };
+  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor: SplendorRoomMetrics;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+    }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomMetrics; fugitive?: never }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive: FugitiveRoomMetrics;
+    };
 
 export interface AcquireTile {
   id: string;
@@ -618,6 +645,7 @@ export interface HistoryGamePlayer {
   isWinner: boolean;
   createdAt: ISODateTime;
   displayName?: string;
+  gameRole?: string;
 }
 
 export interface HistoryGame {
@@ -634,6 +662,7 @@ export interface HistoryGame {
   createdAt: ISODateTime;
   updatedAt: ISODateTime;
   players?: HistoryGamePlayer[];
+  roomDisplayName?: string;
 }
 
 export interface HistoryEventMeta {
@@ -648,6 +677,8 @@ export interface HistoryStats {
   wins: number;
   winRate: number;
   avgScore: number;
+  gamesByRole?: Record<string, number>;
+  winsByRole?: Record<string, number>;
 }
 
 export interface DavinciLeaderboardMetric {
@@ -665,6 +696,11 @@ export interface YinshLeaderboardMetric {
 }
 
 export interface OthelloLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface FugitiveLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -710,6 +746,7 @@ export interface GetLeaderboardReq {
   sort?: string;
   limit?: number;
   offset?: number;
+  game_role?: string;
 }
 
 export interface HistoryListData {
@@ -773,10 +810,11 @@ export interface LeaderboardResp {
 }
 
 export type LeaderboardMetric =
-  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never; othello?: never }
-  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never; othello?: never }
-  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric; othello?: never }
-  | { davinci?: never; rank?: never; yinsh?: never; othello: OthelloLeaderboardMetric };
+  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never; othello?: never; fugitive?: never }
+  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric; othello?: never; fugitive?: never }
+  | { davinci?: never; rank?: never; yinsh?: never; othello: OthelloLeaderboardMetric; fugitive?: never }
+  | { davinci?: never; rank?: never; yinsh?: never; othello?: never; fugitive: FugitiveLeaderboardMetric };
 
 export type ReplaySnapshot =
   | { acquire: AcquireReplaySnapshot; splendor?: never; yinsh?: never; othello?: never }
@@ -863,6 +901,150 @@ export type DavinciCommandPayload =
   | { getCard?: never; guessCard?: never; setCard: DavinciSetCardPayload; initializeHand?: never }
   | { getCard?: never; guessCard?: never; setCard?: never; initializeHand: DavinciInitializeHandPayload };
 
+export type FugitiveRole = string;
+
+export interface FugitiveCard {
+  number: number;
+  sprint: number;
+}
+
+export interface FugitiveRouteCard {
+  index: number;
+  revealed: boolean;
+  sprintCount: number;
+  card?: FugitiveCard;
+  sprints?: FugitiveCard[];
+}
+
+export interface FugitiveDeckState {
+  deckIndex: number;
+  min: number;
+  max: number;
+  remaining: number;
+}
+
+export interface FugitiveActionLog {
+  id: number;
+  roundNo: number;
+  kind: string;
+  playerID: string;
+  role: FugitiveRole;
+  deckIndex?: number;
+  numbers?: number[];
+  destination?: number;
+  sprintCount: number;
+  success?: boolean;
+  automatic: boolean;
+  private?: boolean;
+}
+
+export interface FugitivePlayerState {
+  role: FugitiveRole;
+  handCount: number;
+}
+
+export interface FugitiveRoomData {
+  currentPlayer: string;
+  gameStatus: string;
+  roundNo: number;
+  drawsRemaining: number;
+  highestRevealed: number;
+  hiddenHideoutCount: number;
+  route: FugitiveRouteCard[];
+  decks: FugitiveDeckState[];
+  activityLog: FugitiveActionLog[];
+  lastData?: FugitiveActionLog;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+  openingHideoutsPlaced: number;
+}
+
+export interface FugitiveResult {
+  winnerID: string;
+  winnerRole: FugitiveRole;
+  reason: string;
+  searches: number;
+}
+
+export interface FugitiveRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, FugitivePlayerState>;
+  roomData: FugitiveRoomData;
+  hand: FugitiveCard[];
+  result?: FugitiveResult;
+}
+
+export interface FugitiveSelectRolePayload {
+  role: FugitiveRole;
+}
+
+export interface FugitiveDrawCardPayload {
+  deckIndex: number;
+}
+
+export interface FugitivePlayHideoutPayload {
+  hideout: number;
+  sprints: number[];
+}
+
+export interface FugitiveSearchHideoutsPayload {
+  numbers: number[];
+}
+
+export type FugitiveCommandPayload =
+  | {
+      selectRole: FugitiveSelectRolePayload;
+      drawCard?: never;
+      playHideout?: never;
+      finishOpening?: never;
+      layLow?: never;
+      searchHideouts?: never;
+    }
+  | {
+      selectRole?: never;
+      drawCard: FugitiveDrawCardPayload;
+      playHideout?: never;
+      finishOpening?: never;
+      layLow?: never;
+      searchHideouts?: never;
+    }
+  | {
+      selectRole?: never;
+      drawCard?: never;
+      playHideout: FugitivePlayHideoutPayload;
+      finishOpening?: never;
+      layLow?: never;
+      searchHideouts?: never;
+    }
+  | {
+      selectRole?: never;
+      drawCard?: never;
+      playHideout?: never;
+      finishOpening: EmptyPayload;
+      layLow?: never;
+      searchHideouts?: never;
+    }
+  | {
+      selectRole?: never;
+      drawCard?: never;
+      playHideout?: never;
+      finishOpening?: never;
+      layLow: EmptyPayload;
+      searchHideouts?: never;
+    }
+  | {
+      selectRole?: never;
+      drawCard?: never;
+      playHideout?: never;
+      finishOpening?: never;
+      layLow?: never;
+      searchHideouts: FugitiveSearchHideoutsPayload;
+    };
+
 export interface MatchReadyPayload {
   ready: boolean;
 }
@@ -877,6 +1059,8 @@ export interface MatchRemovePlayerPayload {
 
 export interface RoomUpdateSettingsPayload {
   visibility: Visibility;
+  displayName?: string;
+  turnTimeoutSeconds?: number;
 }
 
 export interface ClientCommand {
@@ -956,7 +1140,15 @@ export type CommonCommandPayload =
   | { matchReady?: never; matchSeat?: never; removePlayer?: never; roomSettings?: never; empty: EmptyPayload };
 
 export type ClientCommandPayload =
-  | { common: CommonCommandPayload; acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
+  | {
+      common: CommonCommandPayload;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+    }
   | {
       common?: never;
       acquire: AcquireCommandPayload;
@@ -964,6 +1156,7 @@ export type ClientCommandPayload =
       splendor?: never;
       yinsh?: never;
       othello?: never;
+      fugitive?: never;
     }
   | {
       common?: never;
@@ -972,6 +1165,7 @@ export type ClientCommandPayload =
       splendor?: never;
       yinsh?: never;
       othello?: never;
+      fugitive?: never;
     }
   | {
       common?: never;
@@ -980,8 +1174,17 @@ export type ClientCommandPayload =
       splendor: SplendorCommandPayload;
       yinsh?: never;
       othello?: never;
+      fugitive?: never;
     }
-  | { common?: never; acquire?: never; davinci?: never; splendor?: never; yinsh: YinshCommandPayload; othello?: never }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh: YinshCommandPayload;
+      othello?: never;
+      fugitive?: never;
+    }
   | {
       common?: never;
       acquire?: never;
@@ -989,14 +1192,25 @@ export type ClientCommandPayload =
       splendor?: never;
       yinsh?: never;
       othello: OthelloCommandPayload;
+      fugitive?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive: FugitiveCommandPayload;
     };
 
 export type RoomView =
-  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never; othello?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView; othello?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomView };
+  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView; othello?: never; fugitive?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomView; fugitive?: never }
+  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive: FugitiveRoomView };
 
 export type ServerMessage =
   | { matchSync: MatchSync; roomSync?: never; commandResult?: never; error?: never }

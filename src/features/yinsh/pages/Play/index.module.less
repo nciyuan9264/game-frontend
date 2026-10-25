@@ -36,6 +36,7 @@
   }
 }
 .arenaTools { display:flex; align-items:center; gap:4px; }
+.mobilePool { display:none; }
 .toolActive { background:#e8dbdf!important; color:var(--wine)!important; }
 .boardStage { position:relative; display:grid; min-height:560px; place-items:center; padding:6px 32px; background:radial-gradient(circle at 50% 45%,#f8f2e7,#e9dfd0); }
 .boardCorner,.boardEdition { position:absolute; z-index:1; color:#a4937e; font:7px Georgia,serif; letter-spacing:1px; pointer-events:none; }
@@ -55,12 +56,16 @@
   .turnCopy h2,.turnCopy p { color:#a05a47; }
 }
 .actionEyebrow { display:flex; align-items:center; justify-content:space-between; > i { width:6px; height:6px; border-radius:50%; background:#71845e; box-shadow:0 0 0 4px #71845e18; } }
-.turnCopy { display:flex; align-items:flex-start; gap:11px; margin:17px 0 13px; > span { margin-top:2px; } h2 { color:#61464d; font-size:20px; } p { margin-top:7px; color:#8e8175; font-size:10px; line-height:1.7; } }
+.turnCopy { display:flex; align-items:flex-start; gap:11px; margin:17px 0 13px; h2 { color:#61464d; font-size:20px; } p { margin-top:7px; color:#8e8175; font-size:10px; line-height:1.7; } }
+.turnRing { display:flex; margin-top:2px; }
 .steps { display:flex; align-items:center; justify-content:space-between; padding:10px 8px; border-radius:5px; background:#f6f0e7; color:#aa9c8e; font-size:8px;
   span { display:flex; align-items:center; gap:4px; } span>b { display:grid; width:16px; height:16px; place-items:center; border:1px solid #cfc1b1; border-radius:50%; font-size:8px; } > i { width:18px; border-top:1px solid #d9cdbf; }
 }
 .stepActive { color:var(--wine)!important; b { border-color:var(--wine)!important; } }
 .done { color:#71845e!important; b { border-color:#71845e!important; background:#e9eee6; } }
+.placementProgress { display:flex; align-items:center; gap:12px; margin:14px 0 0;
+  > span:last-child { margin-left:auto; color:#9d7580; font-size:11px; }
+}
 .movePreview { display:grid; align-items:center; grid-template-columns:1fr auto auto; gap:8px; margin-top:10px; padding:9px 10px; border:1px solid #e2d6c7; border-radius:5px; background:#fbf6ef;
   > span { display:flex; align-items:center; gap:6px; color:#72505a; font-size:11px; } small { color:#9a8877; font-size:8px; } button { display:grid; width:28px; height:28px; place-items:center; }
 }
@@ -142,19 +147,71 @@
 }
 @media (max-width:767px) {
   .play { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
-  .topbar { height:56px; gap:9px; padding:0 10px; > button:not([data-game-action-button]) { width:38px; } > span:nth-of-type(1) { transform:scale(.88); transform-origin:left center; } .divider,.room small { display:none; } .room strong { max-width:90px; font-size:10px; } > button[aria-label="玩法指南"] { display:none; } > button[data-game-action-button] { display:none; } }
+  .topbar { height:51px; gap:7px; padding:0 9px;
+    > button:not([data-game-action-button]) { width:30px; height:36px; }
+    > span:nth-of-type(1) { display:none; }
+    .divider,.room small { display:none; }
+    .room { flex:1; }
+    .room strong { max-width:none; color:#765a48; font-size:13px; }
+    .spacer { display:none; }
+    > button[aria-label="玩法指南"] { display:none; }
+    > button[data-game-action-button] { display:none; }
+  }
   .timer { min-width:36px; }
-  .content { padding:13px 0 4px; }
-  .matchHeading,.desktopPlayers,.sidebar { display:none; }
-  .layout { display:block; }
-  .mobileOpponent,.mobileSelf { display:block; margin:0 12px 8px; }
-  .mobileSelf { margin-top:8px; margin-bottom:0; }
-  .compactPlayer { min-height:55px; padding:8px 10px; .playerRings>span { display:none; } }
-  .arena { border-right:0; border-left:0; border-radius:0; > header { padding:0 12px; } > footer { padding:6px 12px; } }
-  .arenaTools button { min-width:32px; padding:0 6px!important; span { display:none; } }
+  .content { width:100%; max-width:470px; padding:9px 12px 8px; }
+  .matchHeading,.desktopPlayers { display:none; }
+  .layout { display:flex; flex-direction:column; gap:10px; }
+  .boardColumn { display:flex; width:100%; flex-direction:column; gap:8px; }
+  .mobileOpponent,.mobileSelf { display:block; width:100%; }
+  .compactPlayer { height:53px; min-height:53px; gap:9px; padding:8px 11px; border-radius:6px;
+    .playerInfo strong { font-size:11px; }
+    .playerInfo span { margin-top:5px; font-size:8px; }
+    .playerRings { > div { gap:7px; } > span { margin-top:5px; font-size:8px; } }
+    .playerRings>div>span { width:15px; height:15px; border-width:4px; }
+  }
+  .activeLine { right:12px; left:12px; height:1px; }
+  .arena { width:100%; border-color:#d8c8ad; border-radius:7px; background:#eee5d5; box-shadow:inset 0 0 0 4px #f9f2e438;
+    > header { height:40px; padding:0 11px; font-size:9px; }
+    > footer { min-height:26px; padding:0 11px; font-size:8px; }
+  }
+  .mobilePool { display:flex; align-items:center; gap:3px; margin-left:auto; color:#957958; font-size:8px;
+    b { color:#8c684a; font:500 14px var(--serif); }
+    small { font-size:7px; }
+  }
+  .arenaTools { gap:1px; }
+  .arenaTools button { min-width:32px; height:38px; padding:0 6px!important; span { display:none; } }
   .boardStage { width:100%; min-height:0; aspect-ratio:1; padding:0; }
   .boardCorner,.boardEdition { display:none; }
-  .footnote { margin:8px 12px; line-height:1.6; }
+  .footnote { display:none; }
+  .sidebar { display:block; width:100%; }
+  .actionCard { width:100%; min-height:0; padding:1px 2px 0; border:0; border-radius:0; background:transparent;
+    > button[data-game-action-button] { display:none; }
+  }
+  .actionMoving { min-height:0; }
+  .actionEyebrow { display:none; }
+  .turnCopy { align-items:center; gap:10px; margin:0;
+    > div { min-width:0; flex:1; }
+    h2 { color:#885463; font-family:inherit; font-size:12px; font-weight:500; letter-spacing:.2px; }
+    p { min-height:0; margin-top:4px; color:#ae8b7c; font-size:9px; line-height:1.75; }
+  }
+  .turnRing { width:30px; height:30px; align-items:center; justify-content:center; margin:0; flex:none; border:1px solid #d3baa2; border-radius:50%; background:#eee2d1;
+    > span { width:15px; height:15px; border-width:4px; }
+  }
+  .steps { justify-content:center; gap:11px; margin-top:12px; padding:8px 0 0; border-top:1px solid #e5d6c2; border-radius:0; background:transparent;
+    span { gap:6px; font-size:9px; }
+    span>b { width:15px; height:15px; }
+    > i { width:28px; }
+  }
+  .placementProgress { gap:13px; margin-top:12px; padding-left:40px;
+    > span:not(:last-child) { width:15px; height:15px; border-width:4px; }
+    > span:last-child { font-size:10px; }
+  }
+  .movePreview { margin-top:9px; padding:7px 12px; strong { font-size:17px; } small { font-size:9px; } }
+  .rowChoices { grid-template-columns:1fr 1fr; margin-top:10px; gap:5px;
+    button { gap:5px; padding:8px; font-size:9px; span { font-size:8px; } }
+  }
+  .motionStatus { margin-top:9px; }
+  .cancel,.goal,.journalCard { display:none; }
   .mobileDock { position:fixed; inset:auto 0 0; z-index:50; display:grid; min-height:calc(68px + env(safe-area-inset-bottom)); align-items:start; grid-template-columns:48px 1fr; gap:8px; padding:10px 12px env(safe-area-inset-bottom); border-top:1px solid #d9cebf; background:#faf7f1f5; backdrop-filter:blur(12px);
     > button { display:grid; height:44px; place-items:center; border:1px solid #ddd1c3!important; border-radius:5px; background:#fffdf8!important; }
     > button[data-game-action-button] { min-height:44px; }

@@ -128,7 +128,16 @@ function commonPayload(
     case 'room_update_settings':
       return {
         common: {
-          roomSettings: { visibility: String(payload.visibility ?? '') },
+          roomSettings: {
+            visibility: String(payload.visibility ?? ''),
+            displayName: typeof payload.displayName === 'string'
+              ? payload.displayName
+              : undefined,
+            turnTimeoutSeconds:
+              typeof payload.turnTimeoutSeconds === 'number'
+                ? payload.turnTimeoutSeconds
+                : undefined,
+          },
         },
       };
     case 'match_begin':
@@ -280,6 +289,41 @@ function gamePayload(
         return { othello: { pass: {} } };
       case 'game_resign':
         return { othello: { resign: {} } };
+    }
+  }
+  if (gameType === 'fugitive') {
+    switch (commandType) {
+      case 'match_select_role':
+        return {
+          fugitive: {
+            selectRole: objectPayload as { role: string },
+          },
+        };
+      case 'game_draw_card':
+        return {
+          fugitive: {
+            drawCard: { deckIndex: Number(objectPayload.deckIndex) },
+          },
+        };
+      case 'game_play_hideout':
+        return {
+          fugitive: {
+            playHideout: objectPayload as {
+              hideout: number;
+              sprints: number[];
+            },
+          },
+        };
+      case 'game_finish_opening':
+        return { fugitive: { finishOpening: {} } };
+      case 'game_lay_low':
+        return { fugitive: { layLow: {} } };
+      case 'game_search_hideouts':
+        return {
+          fugitive: {
+            searchHideouts: objectPayload as { numbers: number[] },
+          },
+        };
     }
   }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);

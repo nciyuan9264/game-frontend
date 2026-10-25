@@ -26,7 +26,8 @@
   }
 
   @media (max-width: 1023px) {
-    height: auto;
+    height: 100dvh;
+    min-height: 100dvh;
     align-items: flex-start;
     padding: 0;
   }
@@ -65,6 +66,13 @@
   --accent-secondary: #5f8972;
   --accent-soft: rgba(208, 177, 119, 0.14);
   --accent-border: rgba(95, 137, 114, 0.42);
+}
+
+.themeFugitive {
+  --accent-primary: #e2915d;
+  --accent-secondary: #86aa8d;
+  --accent-soft: rgba(226, 145, 93, 0.14);
+  --accent-border: rgba(134, 170, 141, 0.42);
 }
 
 .backgroundDecor {
@@ -136,16 +144,18 @@
   }
 
   @media (max-width: 1023px) {
+    height: 100%;
+    min-height: 0;
     border-radius: 0;
     border: none;
-    min-height: 100vh;
   }
 }
 
 .gameSwitcher {
+  flex-shrink: 0;
   min-height: 72px;
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(6, minmax(0, 1fr));
   gap: 0.65rem;
   padding: 0.85rem;
   background:
@@ -154,9 +164,20 @@
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 
   @media (max-width: 640px) {
-    min-height: initial;
-    padding: 0.7rem;
+    display: flex;
+    min-height: 0;
+    padding: 0.7rem max(0.7rem, env(safe-area-inset-right)) 0.7rem max(0.7rem, env(safe-area-inset-left));
     gap: 0.4rem;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-padding-inline: 0.7rem;
+    scroll-snap-type: x proximity;
+    scrollbar-width: none;
+    -webkit-overflow-scrolling: touch;
+
+    &::-webkit-scrollbar {
+      display: none;
+    }
   }
 }
 
@@ -221,6 +242,13 @@
       opacity: 1;
       transform: scaleX(1);
     }
+  }
+
+  @media (max-width: 640px) {
+    min-height: 4.4rem;
+    flex: 0 0 10.8rem;
+    padding: 0.7rem 0.9rem;
+    scroll-snap-align: start;
   }
 }
 
@@ -288,6 +316,18 @@
   }
 }
 
+.gameTabFugitive {
+  --tab-primary: #e2915d;
+  --tab-secondary: #86aa8d;
+  --tab-border: rgba(226, 145, 93, 0.5);
+
+  &::before {
+    background-image:
+      linear-gradient(100deg, rgba(226, 145, 93, 0.2), rgba(134, 170, 141, 0.12)),
+      repeating-linear-gradient(135deg, transparent 0 13px, rgba(255, 255, 255, 0.05) 13px 14px);
+  }
+}
+
 .tabText {
   position: relative;
   z-index: 1;
@@ -302,6 +342,7 @@
   font-size: 0.95rem;
   font-weight: 800;
   letter-spacing: 0.02em;
+  white-space: nowrap;
 
   @media (max-width: 640px) {
     font-size: 0.85rem;
@@ -1235,6 +1276,123 @@
     left:.2rem;
     border:1px solid #d9d5c2;
     background:radial-gradient(circle at 30% 24%,#fffef4,#d5d2bf 76%);
+  }
+}
+
+.fugitiveMockup {
+  border-color:#5f6f61;
+  background:#101713;
+}
+
+.fugitiveUI {
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  gap:.75rem;
+  padding:1rem;
+  color:#dce3d5;
+  background:#17231b;
+}
+
+.fugitiveHeader,.fugitiveFooter {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#819384;
+  font-size:.6rem;
+  font-weight:800;
+  letter-spacing:.09em;
+}
+
+.fugitiveHeader b { color:#e8a16f; font-size:.72rem; }
+
+.fugitiveRoute {
+  display:flex;
+  flex:1;
+  min-height:0;
+  flex-direction:column;
+  justify-content:space-around;
+  border-left:1px solid rgba(226,145,93,.42);
+  padding-left:.75rem;
+
+  > span {
+    position:relative;
+    display:flex;
+    min-height:2.4rem;
+    align-items:center;
+    justify-content:space-between;
+    border:1px solid rgba(134,170,141,.25);
+    border-radius:.45rem;
+    padding:.35rem .65rem;
+    background:#1f3025;
+
+    &::before {
+      content:'';
+      position:absolute;
+      left:-1rem;
+      width:.45rem;
+      height:.45rem;
+      border-radius:50%;
+      background:#e2915d;
+      box-shadow:0 0 0 3px #17231b;
+    }
+
+    small { color:#819384; font-size:.5rem; letter-spacing:.08em; }
+    b { font-size:1rem; color:#e9e7d6; }
+  }
+
+  .hidden {
+    background:#111a14;
+    border-color:#334439;
+
+    b { color:#75857a; }
+  }
+}
+
+.fugitiveDecks {
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:.35rem;
+
+  span {
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    border:1px solid rgba(134,170,141,.25);
+    border-radius:.4rem;
+    padding:.35rem .2rem;
+    color:#84988a;
+    font-size:.5rem;
+  }
+
+  b { color:#e0ab82; font-size:.7rem; }
+}
+
+.floatingFugitiveCard {
+  position:absolute;
+  z-index:2;
+  display:flex;
+  width:5.5rem;
+  height:7.6rem;
+  align-items:center;
+  justify-content:center;
+  border:1px solid rgba(255,255,255,.18);
+  border-radius:.75rem;
+  font:900 2rem ui-monospace,monospace;
+  box-shadow:0 24px 42px rgba(0,0,0,.36);
+
+  &.routeCard {
+    top:4.5rem;
+    right:.3rem;
+    color:#22170f;
+    background:#e2915d;
+  }
+
+  &.clueCard {
+    bottom:5rem;
+    left:.2rem;
+    color:#b9c9b8;
+    background:#1b2a20;
   }
 }
 

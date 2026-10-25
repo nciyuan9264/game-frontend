@@ -65,6 +65,8 @@ export function CreateRoom(req: CreateRoomReq, options?: any): Promise<RoomResp>
     visibility: req.visibility,
     maxPlayers: req.max_players,
     requestID: req.request_id,
+    displayName: req.display_name,
+    turnTimeoutSeconds: req.turn_timeout_seconds,
   };
   return GamePlatformServiceOptions.request({ url, method, data }, options);
 }
@@ -146,6 +148,12 @@ export function GetStats(req: GetStatsReq, options?: any): Promise<StatsResp> {
 export function GetLeaderboard(req: GetLeaderboardReq, options?: any): Promise<LeaderboardResp> {
   const url = genGamePlatformServiceBaseURL('/platform/rankings');
   const method = 'GET';
-  const params = { gameType: req.game_type, sort: req.sort, limit: req.limit, offset: req.offset };
+  const params = {
+    gameType: req.game_type,
+    sort: req.sort,
+    limit: req.limit,
+    offset: req.offset,
+    gameRole: req.game_role,
+  };
   return GamePlatformServiceOptions.request({ url, method, params }, options);
 }

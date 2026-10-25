@@ -18,6 +18,11 @@ import {
   listOthelloRooms,
   lookupOthelloRoom,
 } from '@/features/othello/api/room';
+import {
+  createFugitiveRoom,
+  listFugitiveRooms,
+  lookupFugitiveRoom,
+} from '@/features/fugitive/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -107,6 +112,35 @@ describe('game room API wrappers', () => {
       'othello',
       'room-3',
       options
+    );
+  });
+
+  it('injects Fugitive metadata, fixed seats, and redirect policy', () => {
+    const signal = new AbortController().signal;
+    createFugitiveRoom({
+      displayName: '午夜追缉',
+      visibility: 'private',
+      turnTimeoutSeconds: 90,
+    }, signal);
+    listFugitiveRooms(signal);
+    lookupFugitiveRoom('room-4', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'fugitive',
+      {
+        displayName: '午夜追缉',
+        visibility: 'private',
+        turnTimeoutSeconds: 90,
+        maxPlayers: 2,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('fugitive', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'fugitive',
+      'room-4',
+      options,
     );
   });
 });

@@ -16,7 +16,8 @@ export type HistoryGameType =
   | 'davinci'
   | 'splendor'
   | 'yinsh'
-  | 'othello';
+  | 'othello'
+  | 'fugitive';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -28,6 +29,7 @@ export interface GamePlayer {
   userID?: GameID;
   playerID: string;
   displayName: string;
+  gameRole?: string;
   seatIndex: number;
   isAI: boolean;
   finalScore?: number;
@@ -41,6 +43,7 @@ export interface GamePlayer {
 export interface Game {
   id: GameID;
   roomID: string;
+  roomDisplayName?: string;
   gameType: HistoryGameType;
   startedAt: string;
   endedAt?: string;
@@ -121,6 +124,7 @@ export type AcquireLeaderboardEntry = RankLeaderboardEntry;
 export type SplendorLeaderboardEntry = RankLeaderboardEntry;
 export type YinshLeaderboardEntry = DavinciLeaderboardEntry;
 export type OthelloLeaderboardEntry = DavinciLeaderboardEntry;
+export type FugitiveLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export interface LeaderboardData {
@@ -159,6 +163,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.othello.wins,
       winRate: entry.metric.othello.winRate,
+    };
+  }
+  if (entry.metric.fugitive) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.fugitive.wins,
+      winRate: entry.metric.fugitive.winRate,
     };
   }
   return {

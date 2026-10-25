@@ -10,6 +10,7 @@ export interface LobbyPlayerLike {
   name?: string;
   avatar?: string;
   seatIndex?: number;
+  gameRole?: string;
   online: boolean;
   ai: boolean;
   ready: boolean;
@@ -22,6 +23,8 @@ export interface LobbyRoomLike {
   maxPlayers: number;
   status: string;
   visibility?: string;
+  displayName?: string;
+  turnTimeoutSeconds?: number;
   currentMatchID?: string;
   currentMatchStatus?: string;
   nextRoundNo?: number;
@@ -33,6 +36,8 @@ export interface LobbyRoomLike {
   maxScore?: number;
   ringsRemoved?: number;
   occupiedCount?: number;
+  highestRevealed?: number;
+  hiddenHideoutCount?: number;
   progressCurrent?: number;
   progressTotal?: number;
 }
@@ -87,7 +92,9 @@ export function filterLobbyRooms<TRoom extends LobbyRoomLike>(
     const matchesFilter = filter === 'all'
       || (filter === 'joinable' ? joinable : room.status === 'playing');
     return matchesFilter
-      && `${room.roomID} ${getOwnerName(room)}`.toLowerCase().includes(search);
+      && `${room.roomID} ${room.displayName ?? ''} ${getOwnerName(room)}`
+        .toLowerCase()
+        .includes(search);
   });
 }
 
@@ -99,6 +106,8 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     maxPlayers: room.maxPlayers,
     status: room.status,
     visibility: room.visibility,
+    displayName: room.displayName,
+    turnTimeoutSeconds: room.turnTimeoutSeconds,
     currentMatchID: room.currentMatchID,
     currentMatchStatus: room.currentMatchStatus,
     nextRoundNo: room.nextRoundNo,
@@ -113,8 +122,12 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     maxScore: room.metrics.splendor?.maxScore,
     ringsRemoved: room.metrics.yinsh?.ringsRemoved,
     occupiedCount: room.metrics.othello?.occupiedCount,
-    progressCurrent: room.metrics.othello?.progressCurrent,
-    progressTotal: room.metrics.othello?.progressTotal,
+    highestRevealed: room.metrics.fugitive?.highestRevealed,
+    hiddenHideoutCount: room.metrics.fugitive?.hiddenHideoutCount,
+    progressCurrent: room.metrics.fugitive?.progressCurrent
+      ?? room.metrics.othello?.progressCurrent,
+    progressTotal: room.metrics.fugitive?.progressTotal
+      ?? room.metrics.othello?.progressTotal,
   };
 }
 

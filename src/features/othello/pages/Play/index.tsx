@@ -64,7 +64,7 @@ function PlayerCard({
         name={playerName(playerID, data.roomData.players)}
         avatar={player?.avatar}
         ai={player?.ai}
-        size={compact ? 34 : 39}
+        size={compact ? 32 : 39}
       />
       <Disc side={side} />
     </span>

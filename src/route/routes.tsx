@@ -28,6 +28,11 @@ import {
   My as OthelloMy,
   Rankings as OthelloRankings,
 } from "@/features/othello/pages/Community";
+import FugitiveLobby from "@/features/fugitive/pages/Lobby";
+import FugitiveGuide from "@/features/fugitive/pages/Guide";
+import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
+import FugitiveRankings from "@/features/fugitive/pages/Rankings";
+import FugitiveProfile from "@/features/fugitive/pages/Profile";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -40,6 +45,7 @@ const YinshSession = lazy(() => import("@/features/yinsh/pages/Session"));
 const YinshReplay = lazy(() => import("@/features/yinsh/pages/Replay"));
 const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
+const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 
 export interface AppRoute {
   path: string;
@@ -102,6 +108,15 @@ export const routes: AppRoute[] = [
   { path: "/game/othello/me", element: <OthelloMy /> },
   { path: "/game/othello/match", element: <OthelloSession /> },
   { path: "/game/othello/replay/:gameId", element: <OthelloReplay /> },
+  {
+    path: "/game/fugitive",
+    element: <FugitiveLobby />
+  },
+  { path: "/game/fugitive/rankings", element: <FugitiveRankings /> },
+  { path: "/game/fugitive/guide", element: <FugitiveGuide /> },
+  { path: "/game/fugitive/cards", element: <FugitiveCardLibrary /> },
+  { path: "/game/fugitive/me", element: <FugitiveProfile /> },
+  { path: "/game/fugitive/match", element: <FugitiveSession /> },
   {
     path: "/",
     element: <Home />

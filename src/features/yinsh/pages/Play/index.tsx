@@ -40,7 +40,7 @@ function PlayerCard({
   const side = state?.side ?? 'white';
   return <article className={`${styles.playerCard} ${styles[side]} ${active ? styles.activePlayer : ''} ${compact ? styles.compactPlayer : ''}`}>
     <PlayerAvatar name={playerName(playerID, data.roomData.players)}
-      avatar={player?.avatar} ai={player?.ai} size={compact ? 38 : 42} />
+      avatar={player?.avatar} ai={player?.ai} size={compact ? 32 : 42} />
     <div className={styles.playerInfo}><strong>{playerName(playerID, data.roomData.players)}
       {playerID === data.playerId && <em>你</em>}</strong>
       <span>{side === 'white' ? '执白 · 本局先手' : '执黑'}{player?.ai ? ' · AI 棋手' : ''}</span></div>
@@ -299,6 +299,7 @@ export function Play({
               : boardData.roomData.gameStatus === 'remove_ring' ? '取环计分'
                 : '经典棋盘'
         } <small>· {currentRound}</small></span>
+          <span className={styles.mobilePool}>公共池 <b>{boardData.roomData.markerPool}</b><small> / 51</small></span>
           <div className={styles.arenaTools}><button type="button"
             disabled={motionState.busy}
             className={preferences.hints ? styles.toolActive : ''}
@@ -336,7 +337,7 @@ export function Play({
       </section>
       <aside className={styles.sidebar}><section className={`${styles.actionCard} ${motionState.busy ? styles.actionMoving : ''} ${ui.feedback?.error ? styles.actionError : ''}`}>
         <div className={styles.actionEyebrow}><span className={styles.eyebrow}>{ended ? 'THE FINAL CHAPTER' : myTurn ? 'YOUR TURN' : 'OPPONENT’S TURN'}</span><i /></div>
-        <div className={styles.turnCopy}><RingIcon side={motionState.motion?.side ?? currentSide ?? 'white'} /><div>
+        <div className={styles.turnCopy}><span className={styles.turnRing}><RingIcon side={motionState.motion?.side ?? currentSide ?? 'white'} /></span><div>
           <h2>{motionState.busy ? '这一手，正在落定' : ui.feedback?.error ? '这里不能落子' : phaseTitle}</h2>
           <p>{motionState.busy ? motionCopy : ui.feedback?.text ?? phaseDescription}</p></div></div>
         {motionState.busy
@@ -349,6 +350,11 @@ export function Play({
         {data.roomData.gameStatus === 'move' && !motionState.busy && !motionState.receipt
           && <div className={styles.steps}><span className={ui.selectedRing ? styles.done : styles.stepActive}><b>{ui.selectedRing ? <Check size={10} /> : 1}</b>选环</span><i />
           <span className={ui.selectedRing ? styles.stepActive : ''}><b>2</b>移动</span><i /><span><b>3</b>翻子</span></div>}
+        {data.roomData.gameStatus === 'placement' && !motionState.busy && currentSide
+          && <div className={styles.placementProgress}>{[0, 1, 2, 3, 4].map(index =>
+            <RingIcon key={index} side={currentSide}
+              filled={index < (data.roomData.placedRings[currentSide] ?? 0)} />)}
+            <span>{data.roomData.placedRings[currentSide] ?? 0} / 5</span></div>}
         {ui.selectedRing && !motionState.busy && <div className={styles.movePreview}><span><strong>{ui.selectedRing}</strong><ArrowRight size={13} /><strong>{ui.preview?.to ?? '?'}</strong></span>
           <small>{ui.preview ? `翻转 ${ui.preview.flips.length} 子` : `${ui.moves.length} 个合法落点`}</small>
           <button type="button" aria-label="取消选择" onClick={ui.clearSelection}><X size={14} /></button></div>}

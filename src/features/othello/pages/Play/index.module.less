@@ -296,13 +296,13 @@
 @media(max-width:767px) {
   .play { padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
   .topbar {
-    height:54px;
+    height:50px;
     gap:8px;
     padding:0 9px;
     > button { width:31px; height:36px; }
     > span:nth-of-type(1),.divider,.room small { display:none; }
     .room { flex:1; }
-    .room strong { max-width:none; color:#725a44; font-size:13px; }
+    .room strong { max-width:none; color:#725a44; font-size:14px; line-height:1.3; }
     .spacer { display:none; }
     > button[aria-label='玩法指南'] { display:none; }
     > button[data-game-action-button] { display:none; }
@@ -318,14 +318,14 @@
   .compactPlayer { min-height:54px; padding:8px 12px; border-radius:7px;
     .avatarWrap>span:first-child { width:32px!important; height:32px!important; }
     .playerInfo strong { font-size:13px; }
-    .playerInfo>span { margin-top:4px; font-size:9px; }
+    .playerInfo>span { margin-top:4px; font-size:10px; line-height:1.3; }
     .playerScore { flex-direction:row-reverse; align-items:center; gap:11px;
       > strong { font-size:27px; }
     }
   }
   .arena { border-radius:7px; box-shadow:none;
     > header { height:34px; margin:0 9px;
-      > span { gap:6px; font-size:9px; small { font-size:8px; } }
+      > span { gap:6px; font-size:10px; small { font-size:9px; } }
       > div { gap:12px; }
       button { padding:7px 0; b { display:none; } svg { width:14px; height:14px; } }
     }
@@ -360,7 +360,7 @@
     backdrop-filter:blur(12px);
     > button { height:44px; }
     > button:first-child { display:grid; place-items:center; border:1px solid #e3d3b7!important; border-radius:6px; background:#f5eee0!important; color:#af9269; }
-    > button[data-game-action-button] { min-width:0; justify-content:space-between; font-size:12px; }
+    > button[data-game-action-button] { min-width:0; justify-content:space-between; font-size:13px; }
   }
   .rules { grid-template-columns:1fr; > p { grid-column:1; } }
   .zoomBoard { width:100%; }

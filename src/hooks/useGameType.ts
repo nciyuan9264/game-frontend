@@ -1,13 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useLocation } from 'react-router-dom';
 
-export type GameType = 'acquire' | 'splendor' | 'davinci' | 'yinsh' | 'othello';
+export type GameType =
+  | 'acquire'
+  | 'splendor'
+  | 'davinci'
+  | 'yinsh'
+  | 'othello'
+  | 'fugitive';
 export enum GameTypeEnum {
   Acquire = 'acquire',
   Splendor = 'splendor',
   Davinci = 'davinci',
   Yinsh = 'yinsh',
   Othello = 'othello',
+  Fugitive = 'fugitive',
 }
 
 const gameTypes: GameType[] = [
@@ -16,6 +23,7 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Davinci,
   GameTypeEnum.Yinsh,
   GameTypeEnum.Othello,
+  GameTypeEnum.Fugitive,
 ];
 
 export const useGameType = () => {

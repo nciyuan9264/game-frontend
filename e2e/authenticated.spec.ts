@@ -22,6 +22,11 @@ const games = [
     lobbyHeading: /进退之间/,
     profileHeading: '你的每一步，都值得回看。',
   },
+  {
+    gameType: 'fugitive',
+    lobbyHeading: /下一步/,
+    profileHeading: '每一场追逐，都有你的痕迹。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {

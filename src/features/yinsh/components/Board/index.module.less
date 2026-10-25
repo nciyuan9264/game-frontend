@@ -56,7 +56,8 @@
 @keyframes invalidPing { 0% { opacity:1; } 65% { opacity:.75; } 100% { opacity:0; } }
 @media (max-width:767px) {
   .scroll { position:absolute; inset:0; }
-  .board { width:calc(100% + 14px); height:100%; max-width:none; max-height:none; margin-left:-7px; }
+  .board { width:100%; height:100%; max-width:none; max-height:none; overflow:hidden; }
+  .coordinates { font-size:12px; }
   .zoomed { display:block;
     .board { width:138%; height:auto; margin:0; }
   }

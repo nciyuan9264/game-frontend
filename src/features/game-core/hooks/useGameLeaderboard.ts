@@ -11,6 +11,7 @@ interface UseGameLeaderboardOptions<TEntry extends LeaderboardEntry> {
   gameType: HistoryGameType;
   pageSize: number;
   sort: LeaderboardSortDim;
+  gameRole?: string;
   isEntry?: (entry: LeaderboardEntry) => entry is TEntry;
 }
 
@@ -22,6 +23,7 @@ export function useGameLeaderboard<TEntry extends LeaderboardEntry = Leaderboard
   gameType,
   pageSize,
   sort,
+  gameRole,
   isEntry = allEntries,
 }: UseGameLeaderboardOptions<TEntry>) {
   const loadPage = useCallback(async ({
@@ -33,12 +35,19 @@ export function useGameLeaderboard<TEntry extends LeaderboardEntry = Leaderboard
     limit: number;
     signal: AbortSignal;
   }) => {
-    const result = await getLeaderboard({ gameType, limit, offset, sort, signal });
+    const result = await getLeaderboard({
+      gameType,
+      limit,
+      offset,
+      sort,
+      gameRole,
+      signal,
+    });
     return (result.entries ?? []).filter(isEntry);
-  }, [gameType, isEntry, sort]);
+  }, [gameRole, gameType, isEntry, sort]);
   const getKey = useCallback((entry: TEntry) => entry.userID, []);
   const collection = usePagedCollection({
-    queryKey: `${gameType}:${sort}`,
+    queryKey: `${gameType}:${sort}:${gameRole ?? 'all'}`,
     pageSize,
     loadPage,
     getKey,
