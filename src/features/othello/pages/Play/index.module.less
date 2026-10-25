@@ -30,6 +30,21 @@
   small { color:#aa9987; font-size:7px; letter-spacing:1.2px; }
   b { margin-top:3px; font:600 16px var(--serif); }
 }
+.resultReturn {
+  display:flex!important;
+  width:auto!important;
+  min-width:72px;
+  height:36px!important;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  padding:0 11px;
+  border:1px solid #d8bac4!important;
+  border-radius:5px;
+  background:#f8eff1!important;
+  color:var(--wine)!important;
+  font-size:10px;
+}
 .live { position:absolute; width:1px; height:1px; overflow:hidden; clip:rect(0,0,0,0); }
 .content { width:min(1380px,100%); margin:auto; padding:22px 30px 34px; }
 .matchHeading {
@@ -128,7 +143,6 @@
     em { width:7px; height:7px; margin-left:7px; border:1px solid #b79e6d; border-radius:50%; }
   }
 }
-.toolActive { color:#92774f!important; }
 .boardStage {
   display:flex;
   position:relative;
@@ -186,7 +200,6 @@
   > i { width:1px; height:30px; background:#e4cfd6; }
   > small { align-self:flex-end; margin:0 0 4px auto; color:#aa8793; font-size:9px; white-space:nowrap; }
 }
-.cancel { display:flex; width:100%; min-height:31px; align-items:center; justify-content:center; gap:5px; color:#ad8795; font-size:9px; }
 .passCard { border-color:#d8c6a1; background:#f5f0e4; color:#8c7047;
   .turnCopy h2 { color:#8c7047; }
   .turnCopy p { color:#a48f6b; }
@@ -258,16 +271,6 @@
   }
   > p { display:flex; grid-column:1/-1; gap:7px; padding:12px; background:#edf1e9; color:#657657; font-size:10px; }
 }
-.settings {
-  > div { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px 0; border-bottom:1px solid #e7ddce;
-    b { display:block; font-size:12px; }
-    small { display:block; margin-top:5px; color:#a18f79; font-size:9px; }
-    button { display:flex; width:39px; height:23px; flex:none; padding:3px; border-radius:20px; background:#d5c9bb!important;
-      i { width:17px; height:17px; border-radius:50%; background:#fff; transition:transform .2s; }
-    }
-    .switchOn { background:var(--wine)!important; i { transform:translateX(16px); } }
-  }
-}
 .menu { display:grid; gap:5px;
   button { display:grid; min-height:60px; align-items:center; grid-template-columns:26px 1fr auto; gap:8px; padding:9px 6px; border-bottom:1px solid #eee5d9!important; text-align:left;
     span { min-width:0; }
@@ -285,8 +288,6 @@
 .zoomBoard { display:flex; justify-content:center; }
 .zoomInstruction { margin:15px 0; color:#a58b6b; font-size:11px; line-height:1.8; text-align:center; }
 .zoomActions { display:flex; justify-content:center; gap:12px; > button:last-child { width:220px; } }
-.reduceMotion * { animation:none!important; transition:none!important; }
-
 @media(max-width:1199px) and (min-width:768px) {
   .layout { grid-template-columns:minmax(0,1fr) 284px; gap:20px; }
   .boardCorner,.boardEdition { display:none; }
@@ -308,6 +309,14 @@
     > button[data-game-action-button] { display:none; }
   }
   .timer { min-width:34px; }
+  .resultReturn {
+    min-width:48px;
+    height:34px!important;
+    gap:4px;
+    padding:0 7px;
+    font-size:9px;
+    svg { width:13px; height:13px; }
+  }
   .content { width:100%; max-width:470px; padding:10px 12px 8px; }
   .matchHeading,.desktopPlayers,.strategyNote { display:none; }
   .layout { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
@@ -358,7 +367,7 @@
   .boardCorner,.boardEdition,.footnote { display:none; }
   .sidebar { display:contents; }
   .actionCard { grid-column:1/-1; order:1; width:100%; min-height:63px; padding:10px 12px; border-color:#e7d2d9; border-radius:6px; background:#faf2f3;
-    > button[data-game-action-button],.actionEyebrow,.movePreview,.cancel { display:none; }
+    > button[data-game-action-button],.actionEyebrow,.movePreview { display:none; }
   }
   .turnCopy { gap:11px; margin:0;
     > span { display:inline-block; width:25px; height:25px; }
@@ -373,14 +382,12 @@
     z-index:50;
     min-height:calc(68px + env(safe-area-inset-bottom));
     align-items:start;
-    grid-template-columns:45px 1fr;
-    gap:10px;
+    grid-template-columns:1fr;
     padding:10px 15px env(safe-area-inset-bottom);
     border-top:1px solid #e5d6bd;
     background:#faf6edf5;
     backdrop-filter:blur(12px);
     > button { height:44px; }
-    > button:first-child { display:grid; place-items:center; border:1px solid #e3d3b7!important; border-radius:6px; background:#f5eee0!important; color:#af9269; }
     > button[data-game-action-button] { min-width:0; justify-content:space-between; font-size:13px; }
   }
   .rules { grid-template-columns:1fr; > p { grid-column:1; } }

@@ -20,7 +20,6 @@ export function Board({
   currentSide,
   legalMoves,
   preview,
-  pendingIndex,
   lastData,
   interactive,
   coordinates,
@@ -33,7 +32,6 @@ export function Board({
   currentSide: Side;
   legalMoves: LegalMove[];
   preview?: LegalMove;
-  pendingIndex?: number;
   lastData?: MoveEntry;
   interactive: boolean;
   coordinates: boolean;
@@ -100,7 +98,6 @@ export function Board({
           const target = preview?.index === index;
           const affected = previewFlips.has(index);
           const last = lastData?.kind === 'move' && lastData.index === index;
-          const selected = pendingIndex === index;
           const label = `${coordinate(index)}，${cell
             ? `${cell === 'black' ? '黑' : '白'}子`
             : move
@@ -117,10 +114,8 @@ export function Board({
               affected ? styles.wouldFlip : '',
               last ? styles.lastMove : '',
               recentlyFlipped.has(index) ? styles.justFlipped : '',
-              selected ? styles.selected : '',
             ].filter(Boolean).join(' ')}
             aria-label={label}
-            aria-pressed={selected}
             data-testid={`${testPrefix}-${coordinate(index)}`}
             tabIndex={interactive && focusIndex === index ? 0 : -1}
             onClick={() => move && interactive && onCell(index)}

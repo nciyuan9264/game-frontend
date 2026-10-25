@@ -2,22 +2,18 @@ import {
   ArrowLeft,
   ArrowRight,
   BookOpen,
-  Check,
   ChevronRight,
   Clock3,
-  Eye,
   Flag,
   History,
   Info,
   Lightbulb,
   Maximize2,
   MoreHorizontal,
-  Settings2,
   ShieldCheck,
   SkipForward,
   Trophy,
   Users,
-  X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -27,7 +23,6 @@ import { Brand, Disc } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import type { OthelloSession } from '../../hooks/useOthelloSession';
 import { useOthelloPlayUI } from '../../hooks/useOthelloPlayUI';
-import { useOthelloPreferences } from '../../hooks/useOthelloPreferences';
 import { coordinate } from '../../model/board';
 import {
   actionCopy,
@@ -127,7 +122,6 @@ export function Play({
   startNextMatchPending?: boolean;
 }) {
   const ui = useOthelloPlayUI(data);
-  const preferences = useOthelloPreferences();
   const ended = data.roomData.gameStatus === 'end';
   const myTurn = data.roomData.currentPlayer === data.playerId;
   const playable = data.roomData.gameStatus === 'playing';
@@ -148,46 +142,35 @@ export function Play({
   };
   const onCell = (index: number) => {
     if (!interactive || !playable) return;
-    if (preferences.confirmMoves) {
-      ui.setPendingIndex(index);
-      ui.setHoveredIndex(undefined);
-    } else {
-      submitPlace(index);
-    }
+    submitPlace(index);
   };
   const mainAction = () => {
     if (!interactive) return;
     if (mustPass) {
       session.submit('game_pass');
-    } else if (ui.pendingIndex != null) {
-      submitPlace(ui.pendingIndex);
     }
   };
   const actionLabel = mustPass
     ? '跳过本回合'
-    : ui.pendingIndex != null
-      ? `确认落子 · ${coordinate(ui.pendingIndex)}`
-      : myTurn
-        ? '选择棋盘上的合法位置'
-        : '等待对手落子';
-  const actionEnabled = interactive && (mustPass || ui.pendingIndex != null);
+    : myTurn
+      ? '选择棋盘上的合法位置'
+      : '等待对手落子';
+  const actionEnabled = interactive && mustPass;
   const actionButton = <ActionButton
     variant="primary"
     disabled={!actionEnabled}
     onClick={mainAction}
-  >{actionLabel}{mustPass ? <SkipForward size={17} />
-      : ui.pendingIndex != null ? <Check size={17} /> : <ArrowRight size={17} />}</ActionButton>;
+  >{actionLabel}{mustPass ? <SkipForward size={17} /> : <ArrowRight size={17} />}</ActionButton>;
 
   const board = (zoom = false) => <Board
     board={data.roomData.board}
     currentSide={data.roomData.currentSide}
     legalMoves={data.roomData.legalMoves}
     preview={interactive ? ui.preview : undefined}
-    pendingIndex={ui.pendingIndex}
     lastData={data.roomData.lastData}
     interactive={interactive && playable}
-    coordinates={preferences.coordinates}
-    hints={preferences.hints}
+    coordinates
+    hints
     onCell={onCell}
     onHover={ui.setHoveredIndex}
     testPrefix={zoom ? 'zoom-cell' : 'cell'}
@@ -197,27 +180,29 @@ export function Play({
     return <Results
       data={data}
       onViewBoard={() => ui.setShowResults(false)}
-      onLeave={onLeave}
       onRestart={onStartNextMatch}
       restarting={startNextMatchPending}
     />;
   }
 
-  return <div className={`${styles.play} ${preferences.reduceMotion ? styles.reduceMotion : ''}`}>
+  return <div className={styles.play}>
     <header className={styles.topbar}>
       <button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={20} /></button>
       <Brand /><span className={styles.divider} />
       <div className={styles.room}><strong>{data.roomID}</strong>
         <small>第 {data.roomData.roundNo} 局 · 经典规则 · 服务端权威</small></div>
       <span className={styles.spacer} />
-      {ended && <ActionButton onClick={() => ui.setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
       <button type="button" aria-label="查看棋谱" onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
       <button type="button" aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>
-      <span className={styles.timer}><small>TIME</small>
-        {data.roomData.turnDeadline && !ended
-          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-          : <b>--</b>}</span>
+      {ended
+        ? <button type="button" className={styles.resultReturn}
+          aria-label="返回终局结算" onClick={() => ui.setShowResults(true)}>
+          <Trophy size={15} /><span>结算</span></button>
+        : <span className={styles.timer}><small>TIME</small>
+          {data.roomData.turnDeadline
+            ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+            : <b>--</b>}</span>}
     </header>
     <div className={styles.live} role="status" aria-live="polite">
       {session.pending ? '等待服务端确认…'
@@ -248,11 +233,6 @@ export function Play({
             <header><span><i />经典棋盘 <small>· {
               ended ? '终局' : `第 ${data.roomData.moveLog.filter(entry => entry.kind === 'move').length + 1} 手`
             }</small></span><div>
-              <button type="button" aria-label={preferences.hints ? '关闭落点提示' : '开启落点提示'}
-                aria-pressed={preferences.hints}
-                className={preferences.hints ? styles.toolActive : ''}
-                onClick={() => preferences.setHints(!preferences.hints)}>
-                <Lightbulb size={15} /><b>落点提示</b></button>
               <button type="button" aria-label="放大棋盘" onClick={() => ui.setPanel('zoom')}>
                 <Maximize2 size={15} /></button>
             </div></header>
@@ -295,8 +275,6 @@ export function Play({
               {ui.preview && <small>{ui.preview.lines.length} 个方向</small>}
             </div>
             {actionButton}
-            {ui.pendingIndex != null && <button type="button" className={styles.cancel}
-              onClick={ui.clearSelection}><X size={14} />取消选择</button>}
           </section>
           <section className={styles.goal}><Trophy size={17} />
             <span className={styles.eyebrow}>THINK BEYOND THIS TURN</span>
@@ -316,11 +294,7 @@ export function Play({
         </aside>
       </div>
     </main>
-    <div className={styles.mobileDock}>
-      <button type="button" aria-label="取消落点选择" disabled={ui.pendingIndex == null}
-        onClick={ui.clearSelection}><X size={20} /></button>
-      {actionButton}
-    </div>
+    {!ended && <div className={styles.mobileDock}>{actionButton}</div>}
 
     {ui.panel === 'activity' && <Dialog title="这一局的每一步" eyebrow="THE GAME JOURNAL"
       wide onClose={() => ui.setPanel(undefined)}><Journal data={data} full /></Dialog>}
@@ -330,24 +304,8 @@ export function Play({
           <span>0{index + 1}</span><div><h3>{section[0]}</h3><p>{section[1]}</p></div></article>)}
         <p><Info size={15} />线上对局不提供撤回或策略推荐；合法落点提示不改变服务端判定。</p>
       </div></Dialog>}
-    {ui.panel === 'settings' && <Dialog title="专注于你的下一步。" eyebrow="PLAYING PREFERENCES"
-      onClose={() => ui.setPanel(undefined)}
-      footer={<ActionButton variant="primary" onClick={() => ui.setPanel(undefined)}>完成</ActionButton>}>
-      <div className={styles.settings}>{[
-        ['显示合法落点', preferences.hints, preferences.setHints],
-        ['显示棋盘坐标', preferences.coordinates, preferences.setCoordinates],
-        ['落子前确认', preferences.confirmMoves, preferences.setConfirmMoves],
-        ['减少动态效果', preferences.reduceMotion, preferences.setReduceMotion],
-      ].map(([label, value, setter]) => <div key={String(label)}><span><b>{String(label)}</b>
-        <small>偏好只影响当前设备的显示与操作方式</small></span>
-        <button type="button" role="switch" aria-label={String(label)} aria-checked={Boolean(value)}
-          className={value ? styles.switchOn : ''}
-          onClick={() => (setter as (next: boolean) => void)(!value)}><i /></button></div>)}</div>
-    </Dialog>}
     {ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE"
       onClose={() => ui.setPanel(undefined)}><div className={styles.menu}>
-        <button type="button" onClick={() => ui.setPanel('settings')}><Settings2 size={20} />
-          <span><b>对局偏好</b><small>坐标、落点提示与落子前确认</small></span><ChevronRight size={16} /></button>
         <button type="button" onClick={() => ui.setPanel('activity')}><History size={20} />
           <span><b>查看棋谱</b><small>回看当前对局的每一步</small></span><ChevronRight size={16} /></button>
         <button type="button" onClick={() => ui.setPanel('rules')}><BookOpen size={20} />

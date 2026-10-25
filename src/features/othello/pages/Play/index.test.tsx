@@ -20,7 +20,11 @@ function opening(): Disc[] {
   return board;
 }
 
-function snapshot(currentPlayer = 'me', status: 'playing' | 'pass' = 'playing'): GameSnapshot {
+function snapshot(
+  currentPlayer = 'me',
+  status: 'playing' | 'pass' | 'end' = 'playing',
+  ownerID = 'me',
+): GameSnapshot {
   return {
     schemaVersion: 2,
     type: 'ROOM_SYNC',
@@ -29,13 +33,20 @@ function snapshot(currentPlayer = 'me', status: 'playing' | 'pass' = 'playing'):
     seq: 11,
     phaseVersion: 11,
     turnNumber: 11,
-    ownerID: 'me',
+    ownerID,
     visibility: 'private',
     playerId: 'me',
     playerData: {
       me: { side: 'black', discCount: 2 },
       ai_2: { side: 'white', discCount: 2 },
     },
+    result: status === 'end' ? {
+      winnerID: 'me',
+      draw: false,
+      reason: '双方均无合法落点',
+      blackCount: 36,
+      whiteCount: 28,
+    } : undefined,
     roomData: {
       board: opening(),
       currentPlayer,
@@ -104,5 +115,40 @@ describe('OTHELLO play', () => {
     render(<Play session={session} data={snapshot('me', 'pass')} onLeave={vi.fn()} />);
     fireEvent.click(screen.getAllByRole('button', { name: /跳过本回合/ })[0]);
     expect(submit).toHaveBeenCalledWith('game_pass');
+  });
+
+  it('returns from the final board to results through the former timer slot', () => {
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit: vi.fn(() => true),
+    } as unknown as OthelloSession;
+    render(<Play session={session} data={snapshot('me', 'end')}
+      onLeave={vi.fn()} onStartNextMatch={vi.fn(async () => true)} />);
+
+    expect(screen.getByRole('button', { name: '回到棋盘' })).toBeTruthy();
+    expect(screen.getByRole('button', { name: /再来一局/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /返回大厅/ })).toBeNull();
+
+    fireEvent.click(screen.getByRole('button', { name: '回到棋盘' }));
+    expect(screen.getByRole('button', { name: '返回终局结算' })).toBeTruthy();
+
+    fireEvent.click(screen.getByRole('button', { name: '返回终局结算' }));
+    expect(screen.getByRole('button', { name: '回到棋盘' })).toBeTruthy();
+  });
+
+  it('keeps the rematch action visible but disabled for non-owners', () => {
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit: vi.fn(() => true),
+    } as unknown as OthelloSession;
+    render(<Play session={session}
+      data={snapshot('me', 'end', 'ai_2')} onLeave={vi.fn()} />);
+
+    const rematch = screen.getByRole('button', {
+      name: '等待房主再来一局',
+    }) as HTMLButtonElement;
+    expect(rematch.disabled).toBe(true);
   });
 });

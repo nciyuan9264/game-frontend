@@ -4,7 +4,6 @@ import type { GameSnapshot } from '../model/session';
 export type OthelloPanel =
   | 'activity'
   | 'rules'
-  | 'settings'
   | 'menu'
   | 'resign'
   | 'zoom';
@@ -12,19 +11,17 @@ export type OthelloPanel =
 export function useOthelloPlayUI(data: GameSnapshot) {
   const [panel, setPanel] = useState<OthelloPanel>();
   const [hoveredIndex, setHoveredIndex] = useState<number>();
-  const [pendingIndex, setPendingIndex] = useState<number>();
   const [showResults, setShowResults] = useState(
     data.roomData.gameStatus === 'end',
   );
   const preview = useMemo(
     () => data.roomData.legalMoves.find(move =>
-      move.index === (pendingIndex ?? hoveredIndex)),
-    [data.roomData.legalMoves, hoveredIndex, pendingIndex],
+      move.index === hoveredIndex),
+    [data.roomData.legalMoves, hoveredIndex],
   );
 
   const clearSelection = useCallback(() => {
     setHoveredIndex(undefined);
-    setPendingIndex(undefined);
   }, []);
 
   useEffect(() => {
@@ -40,8 +37,6 @@ export function useOthelloPlayUI(data: GameSnapshot) {
     setPanel,
     hoveredIndex,
     setHoveredIndex,
-    pendingIndex,
-    setPendingIndex,
     preview,
     clearSelection,
     showResults,

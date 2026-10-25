@@ -1,7 +1,7 @@
-import { useEffect, useMemo, useRef, useState, type CSSProperties, type KeyboardEvent, type PointerEvent } from 'react';
-import type { TouchEvent as ReactTouchEvent } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronDown, ChevronUp, GripHorizontal, Maximize2 } from 'lucide-react';
+import { useReplayPanel } from '@/features/game-core/hooks/useReplayPanel';
 import { snapshotToWsRoomSyncData } from './snapshotAdapter';
 import EconomyChart from './EconomyChart';
 import { AppShell } from '../../components/AppShell';
@@ -31,13 +31,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const [priceTier, setPriceTier] = useState<number>();
   const [scorePending, setScorePending] = useState(false);
   const [scoreError, setScoreError] = useState('');
-  const [panelPosition, setPanelPosition] = useState({ x: 0, y: 0 });
-  const [timelineCollapsed, setTimelineCollapsed] = useState(false);
-  const timelineRef = useRef<HTMLElement>(null);
-  const drag = useRef<{
-    pointerID: number; startX: number; startY: number; originX: number; originY: number; rect: DOMRect;
-    cleanup: () => void;
-  }>();
+  const replayPanel = useReplayPanel();
   const snapshot = replay.currentSnapshot;
   const display = useMemo(
     () => snapshot && replay.viewer
@@ -57,115 +51,6 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const totalTurns = replay.detail?.events.filter(
     item => item.cmdType === 'game_place_tile'
   ).length ?? 0;
-  const clampPosition = (left: number, top: number, rect: Pick<DOMRect, 'width' | 'height'>) => {
-    const leftInset = 8;
-    const bottomInset = 8;
-    return {
-      left: Math.min(Math.max(leftInset, left), Math.max(leftInset, window.innerWidth - rect.width - 8)),
-      top: Math.min(Math.max(8, top), Math.max(8, window.innerHeight - bottomInset - rect.height)),
-    };
-  };
-  const applyDragPosition = (
-    state: NonNullable<typeof drag.current>,
-    clientX: number,
-    clientY: number,
-  ) => {
-    const next = clampPosition(
-      state.rect.left + clientX - state.startX,
-      state.rect.top + clientY - state.startY,
-      state.rect,
-    );
-    setPanelPosition({
-      x: state.originX + next.left - state.rect.left,
-      y: state.originY + next.top - state.rect.top,
-    });
-  };
-  const beginDrag = (event: PointerEvent<HTMLElement>) => {
-    if (event.pointerType === 'touch') return;
-    const rect = timelineRef.current?.getBoundingClientRect();
-    if (!rect) return;
-    event.preventDefault();
-    drag.current?.cleanup();
-    const pointerID = event.pointerId;
-    const move = (moveEvent: globalThis.PointerEvent) => {
-      const state = drag.current;
-      if (!state || state.pointerID !== moveEvent.pointerId) return;
-      moveEvent.preventDefault();
-      applyDragPosition(state, moveEvent.clientX, moveEvent.clientY);
-    };
-    const cleanup = () => {
-      window.removeEventListener('pointermove', move);
-      window.removeEventListener('pointerup', end);
-      window.removeEventListener('pointercancel', end);
-    };
-    const end = (endEvent: globalThis.PointerEvent) => {
-      if (drag.current?.pointerID !== endEvent.pointerId) return;
-      cleanup();
-      drag.current = undefined;
-    };
-    drag.current = {
-      pointerID, startX: event.clientX, startY: event.clientY,
-      originX: panelPosition.x, originY: panelPosition.y, rect, cleanup,
-    };
-    window.addEventListener('pointermove', move, { passive: false });
-    window.addEventListener('pointerup', end);
-    window.addEventListener('pointercancel', end);
-  };
-  const beginTouchDrag = (event: ReactTouchEvent<HTMLElement>) => {
-    const rect = timelineRef.current?.getBoundingClientRect();
-    const touch = event.touches[0];
-    if (!rect || !touch) return;
-    event.preventDefault();
-    drag.current?.cleanup();
-    const identifier = touch.identifier;
-    const move = (moveEvent: globalThis.TouchEvent) => {
-      const current = Array.from(moveEvent.touches).find(item => item.identifier === identifier);
-      const state = drag.current;
-      if (!current || !state || state.pointerID !== identifier) return;
-      moveEvent.preventDefault();
-      applyDragPosition(state, current.clientX, current.clientY);
-    };
-    const cleanup = () => {
-      window.removeEventListener('touchmove', move);
-      window.removeEventListener('touchend', end);
-      window.removeEventListener('touchcancel', end);
-    };
-    const end = (endEvent: globalThis.TouchEvent) => {
-      if (!Array.from(endEvent.changedTouches).some(item => item.identifier === identifier)) return;
-      endEvent.preventDefault();
-      cleanup();
-      drag.current = undefined;
-    };
-    drag.current = {
-      pointerID: identifier, startX: touch.clientX, startY: touch.clientY,
-      originX: panelPosition.x, originY: panelPosition.y, rect, cleanup,
-    };
-    window.addEventListener('touchmove', move, { passive: false });
-    window.addEventListener('touchend', end, { passive: false });
-    window.addEventListener('touchcancel', end, { passive: false });
-  };
-  const moveWithKeyboard = (event: KeyboardEvent<HTMLElement>) => {
-    if (!['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', 'Home'].includes(event.key)) return;
-    event.preventDefault();
-    if (event.key === 'Home') { setPanelPosition({ x: 0, y: 0 }); return; }
-    const rect = timelineRef.current?.getBoundingClientRect();
-    const dx = event.key === 'ArrowLeft' ? -24 : event.key === 'ArrowRight' ? 24 : 0;
-    const dy = event.key === 'ArrowUp' ? -24 : event.key === 'ArrowDown' ? 24 : 0;
-    if (!rect?.width || !rect.height) {
-      setPanelPosition(current => ({ x: current.x + dx, y: current.y + dy }));
-      return;
-    }
-    const next = clampPosition(rect.left + dx, rect.top + dy, rect);
-    setPanelPosition(current => ({ x: current.x + next.left - rect.left, y: current.y + next.top - rect.top }));
-  };
-  useEffect(() => {
-    const resetPosition = () => setPanelPosition({ x: 0, y: 0 });
-    window.addEventListener('resize', resetPosition);
-    return () => {
-      window.removeEventListener('resize', resetPosition);
-      drag.current?.cleanup();
-    };
-  }, []);
   useEffect(() => {
     if (replay.pendingIndex == null) setPreviewIndex(replay.selectedIndex);
   }, [replay.pendingIndex, replay.selectedIndex]);
@@ -201,28 +86,26 @@ function ReplayContent({ gameID }: { gameID: number }) {
         {replay.pendingIndex != null && <small className={styles.frameStatus}>正在加载第 {replay.pendingIndex} 步</small>}</span><div className={styles.boardTools}><button type="button" className={styles.zoomButton} onClick={() => setPanel('zoom')}><Maximize2 size={13} />放大棋盘</button></div></div>
         <Board data={display} mode="replay" /><p className={styles.note}>你的手牌：{display.playerData.tiles.join(' · ') || '无'}。回放不会发送对局操作。</p></section>
       <aside className={styles.portfolioColumn}><Portfolio data={display} /></aside></div>
-      <section ref={timelineRef} className={`${styles.timeline} ${timelineCollapsed ? styles.timelineCollapsed : ''}`}
-        style={{ '--replay-panel-x': `${panelPosition.x}px`, '--replay-panel-y': `${panelPosition.y}px` } as CSSProperties}>
+      <section ref={replayPanel.panelRef}
+        className={`${styles.timeline} ${replayPanel.collapsed ? styles.timelineCollapsed : ''}`}
+        style={replayPanel.positionStyle}>
         <button type="button" className={styles.dragHandle} aria-label="移动回放面板" title="移动回放面板"
-          draggable={false} onDragStart={event => event.preventDefault()}
-          onPointerDown={beginDrag} onTouchStart={beginTouchDrag}
-          onKeyDown={moveWithKeyboard}><GripHorizontal size={18} /></button>
+          {...replayPanel.dragHandleProps}><GripHorizontal size={18} /></button>
         <div className={styles.timelineContent}><header><div role="group" aria-label="回放内容"><ActionButton data-click-sound="tab" variant={tab === 'timeline' ? 'primary' : 'quiet'} onClick={() => setTab('timeline')}>时间轴</ActionButton><ActionButton data-click-sound="tab" variant={tab === 'economy' ? 'primary' : 'quiet'} onClick={() => setTab('economy')}>经济曲线</ActionButton></div>
           <div className={styles.loadMeta}><span className={styles.loadCount}><b>已加载 {replay.loadedCount} / {total}</b><i>{replay.loadedCount}/{total}</i></span>{replay.backgroundLoading && <span className={styles.loadSpinner} aria-label="正在载入回放" />}</div>
           {replay.detail?.game.endedAt && <ActionButton pending={scorePending} onClick={openResults}>最终结算</ActionButton>}</header>
           <div className={styles.loadTrack} role="progressbar" aria-label="回放载入进度" aria-valuemin={0} aria-valuemax={total} aria-valuenow={replay.loadedCount}><i style={{ width: `${total ? replay.loadedCount / total * 100 : 0}%` }} /></div>
           {(replay.progressError || scoreError) && <div className={styles.progressStatus} role="alert">{scoreError || '加载暂停'}{replay.progressError && <ActionButton variant="quiet" onClick={replay.retryProgress}>继续加载</ActionButton>}</div>}
-          <div className={styles.controls}><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(0)}>初始</ActionButton><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(replay.selectedIndex - 1)}>上一步</ActionButton>{timelineCollapsed
+          <div className={styles.controls}><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(0)}>初始</ActionButton><ActionButton disabled={!replay.selectedIndex} onClick={() => selectStep(replay.selectedIndex - 1)}>上一步</ActionButton>{replayPanel.collapsed
             ? <button type="button" className={styles.stepCounter} aria-label="移动折叠回放面板" title="拖动移动回放面板"
-              draggable={false} onDragStart={event => event.preventDefault()}
-              onPointerDown={beginDrag} onTouchStart={beginTouchDrag} onKeyDown={moveWithKeyboard}>{replay.selectedIndex} / {Math.max(0, total - 1)}</button>
+              {...replayPanel.dragHandleProps}>{replay.selectedIndex} / {Math.max(0, total - 1)}</button>
             : <span className={styles.stepCounter}>{replay.selectedIndex} / {Math.max(0, total - 1)}</span>}<ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(replay.selectedIndex + 1)}>下一步</ActionButton><ActionButton disabled={replay.selectedIndex >= total - 1} onClick={() => selectStep(total - 1)}>末步</ActionButton>
             <button type="button" className={styles.collapseToggle}
-              aria-label={timelineCollapsed ? '展开回放面板' : '收起回放面板'}
-              aria-expanded={!timelineCollapsed}
-              title={timelineCollapsed ? '展开回放面板' : '收起回放面板'}
-              onClick={() => setTimelineCollapsed(current => !current)}>
-              {timelineCollapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
+              aria-label={replayPanel.collapsed ? '展开回放面板' : '收起回放面板'}
+              aria-expanded={!replayPanel.collapsed}
+              title={replayPanel.collapsed ? '展开回放面板' : '收起回放面板'}
+              onClick={replayPanel.toggleCollapsed}>
+              {replayPanel.collapsed ? <ChevronUp size={14} /> : <ChevronDown size={14} />}
             </button></div>
           <input className={styles.range} type="range" min={0} max={Math.max(0, total - 1)} value={previewIndex}
             onChange={changeEvent => setPreviewIndex(Number(changeEvent.target.value))}

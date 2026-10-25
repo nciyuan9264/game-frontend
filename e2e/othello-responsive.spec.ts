@@ -75,15 +75,35 @@ function gameSnapshot() {
   };
 }
 
-async function mockSession(page: Page) {
-  await page.addInitScript(() => {
-    window.localStorage.setItem('othello-display-preferences', JSON.stringify({
-      coordinates: true,
-      hints: true,
-      confirmMoves: true,
-      reduceMotion: false,
-    }));
-  });
+function endedSnapshot(ownerID = human.playerID) {
+  const snapshot = gameSnapshot();
+  return {
+    ...snapshot,
+    seq: 13,
+    view: {
+      othello: {
+        ...snapshot.view.othello,
+        ownerID,
+        result: {
+          winnerID: human.playerID,
+          draw: false,
+          reason: '双方均无合法落点',
+          blackCount: 36,
+          whiteCount: 28,
+        },
+        roomData: {
+          ...snapshot.view.othello.roomData,
+          gameStatus: 'end',
+          legalMoves: [],
+          turnDeadline: undefined,
+        },
+      },
+    },
+  };
+}
+
+async function mockSession(page: Page, initialSnapshot = gameSnapshot()) {
+  const commands: string[] = [];
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -125,8 +145,10 @@ async function mockSession(page: Page) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(initialSnapshot));
+    socket.onMessage(message => commands.push(String(message)));
   });
+  return commands;
 }
 
 async function expectNoOverflow(page: Page) {
@@ -159,7 +181,7 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
   page.on('pageerror', error => pageErrors.push(error));
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockSession(page);
+  const commands = await mockSession(page);
   await page.goto(`/game/othello/match?roomID=${roomID}`);
   const board = page.getByRole('group', {
     name: '黑白棋棋盘，8 行 8 列。方向键移动，回车落子。',
@@ -187,7 +209,9 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   const topbarBox = await page.locator('header').first().boundingBox();
   expect(topbarBox?.height).toBe(50);
   await page.getByRole('button', { name: 'D3，可落子，翻转 1 枚' }).click();
-  await expect(page.getByRole('button', { name: /确认落子 · D3/ })).toBeVisible();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"game_place_disc"')
+    && command.includes('"index":19'))).toBe(true);
   const box = await board.boundingBox();
   expect(box?.width).toBeGreaterThan(300);
   expect(box?.height).toBeGreaterThan(300);
@@ -205,4 +229,23 @@ test('Othello desktop keeps board and sidebar visible at 1440x900', async ({ pag
   await expect(page.getByText('最后的多，', { exact: false })).toBeVisible();
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
   await expectNoOverflow(page);
+});
+
+test('Othello mobile final result returns through the timer slot', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, endedSnapshot());
+  await page.goto(`/game/othello/match?roomID=${roomID}`);
+
+  await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
+
+  await page.getByRole('button', { name: '回到棋盘' }).click();
+  await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
+  await expect(page.getByRole('button', {
+    name: /选择棋盘上的合法位置|等待对手落子/,
+  })).toHaveCount(0);
+
+  await page.getByRole('button', { name: '返回终局结算' }).click();
+  await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
 });

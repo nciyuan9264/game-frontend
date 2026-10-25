@@ -1,16 +1,16 @@
 .page { min-width:0; }
 .eyebrow { color:#a0815a; font:9px/1.2 Georgia,serif; letter-spacing:2.2px; }
-.hero { position:relative; display:flex; min-height:306px; align-items:center; overflow:hidden; border:1px solid #e2d7c8; border-radius:6px; background:linear-gradient(110deg,#eee5d7,#f9f4eb 68%,#ece2d2);
+.hero { position:relative; display:flex; height:260px; align-items:center; overflow:hidden; border:1px solid #e2d7c8; border-radius:6px; background:linear-gradient(110deg,#eee5d7,#f9f4eb 68%,#ece2d2);
   > svg { position:absolute; right:-20px; bottom:-7px; width:min(52vw,620px); }
 }
-.heroCopy { position:relative; z-index:2; width:54%; padding:33px 40px;
-  h1 { margin:12px 0 12px; color:#543b40; font-size:38px; line-height:1.45; letter-spacing:1px; }
+.heroCopy { position:relative; z-index:2; width:54%; padding:27px 40px;
+  h1 { margin:9px 0 9px; color:#543b40; font-size:35px; line-height:1.4; letter-spacing:1px; }
   p { color:#796b60; font-size:12px; line-height:1.9; }
-  > button { min-height:42px; margin-top:21px; padding:0 18px; font-size:11px; }
+  > button { min-height:40px; margin-top:16px; padding:0 18px; font-size:11px; }
 }
 .heroCaption { position:absolute; right:23px; bottom:18px; z-index:2; color:#8e7b65; font:8px Georgia,serif; letter-spacing:2px; }
 .facts { display:flex; align-items:center; gap:32px; margin-bottom:27px; padding:18px 2px 22px; border-bottom:1px solid var(--line);
-  > span { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:10px; }
+  > span { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:10px; white-space:nowrap; }
   svg { color:#9d8563; } b { color:#6f5a44; font:600 16px var(--serif); }
   > a { display:flex; align-items:center; gap:6px; margin-left:auto; color:var(--wine); font-size:10px; }
 }
@@ -67,6 +67,18 @@
   span { font-size:8px; letter-spacing:1.4px; } h3 { margin:7px 0 11px; color:#6c564b; font:500 15px var(--serif); }
   b { display:flex; align-items:center; gap:7px; color:var(--wine); font-size:10px; font-weight:500; }
 }
+.joinCard { padding:18px 19px; border:1px solid #e3dacf; border-radius:6px; background:#f7f2e9;
+  h3 { display:flex; align-items:center; gap:8px; color:#6c564b; font-size:13px; font-weight:500;
+    svg { color:#9b7960; }
+  }
+  p { margin:8px 0 12px; color:#998878; font-size:10px; line-height:1.7; }
+  form { display:flex; height:38px; overflow:hidden; border:1px solid #d9cebf; border-radius:5px; background:#fffdf8;
+    &:focus-within { border-color:#b58b96; box-shadow:0 0 0 1px #b58b9633; }
+  }
+  input { width:100%; min-width:0; padding:0 10px; border:0; outline:0; background:transparent; color:#66574d; font-size:11px; }
+  button { display:grid; width:40px; flex:none; place-items:center; border-left:1px solid #ded3c4!important; background:#eee4e1!important; color:var(--wine); }
+}
+.mobileJoin { display:none; }
 .create {
   > p { color:#978571; font-size:13px; }
   > div { display:grid; gap:8px; margin:17px 0; }
@@ -83,14 +95,25 @@
 }
 @media (max-width:1100px) and (min-width:768px) { .layout { grid-template-columns:1fr; } .side { display:none; } .roomGrid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:767px) {
-  .hero { min-height:330px; align-items:flex-start; > svg { right:-150px; bottom:-20px; width:520px; opacity:.55; } }
-  .heroCopy { width:100%; padding:25px 21px; h1 { font-size:31px; } p { font-size:11px; } > button { min-height:44px; } }
+  .hero { height:230px; align-items:flex-start; > svg { right:-112px; bottom:-42px; width:410px; opacity:.5; } }
+  .heroCopy { width:100%; padding:19px 18px; h1 { margin:8px 0; font-size:26px; line-height:1.35; } p { max-width:240px; font-size:10px; line-height:1.7; } > button { min-height:40px; margin-top:13px; } }
   .heroCaption { display:none; }
-  .facts { justify-content:space-between; gap:0; flex-wrap:wrap; padding:15px 0; > span { font-size:9px; } > a { display:none; } }
+  .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; padding:14px 0;
+    > span { justify-content:center; gap:4px; font-size:8px; }
+    svg { width:14px; height:14px; }
+    b { font-size:13px; }
+    > a { display:none; }
+  }
   .layout { display:block; }
   .sectionHeading { h2 { font-size:20px; } > button { min-height:44px; } }
   .toolbar { flex-wrap:wrap; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
   .roomGrid { grid-template-columns:1fr; }
   .roomCard { padding:17px; .roomIdentity h3 { font-size:16px; } > footer button { min-height:44px; min-width:94px; font-size:12px; } }
   .side { display:none; }
+  .mobileJoin { display:block; margin-top:13px;
+    .joinCard { padding:18px; }
+    form { height:44px; }
+    input { font-size:12px; }
+    button { width:46px; }
+  }
 }
