@@ -93,6 +93,70 @@ describe('othello protocol', () => {
     expect(snapshot.roomData.turnTimeoutMs).toBe(60_000);
   });
 
+  it('normalizes nullable transport lists after a forced pass', () => {
+    const message = parseServerMessage(JSON.stringify({
+      schemaVersion: 2,
+      type: 'ROOM_SYNC',
+      roomID: 'othello-room',
+      matchID: 'othello-room-r1',
+      seq: '59',
+      view: {
+        othello: {
+          playerId: '7',
+          ownerID: '7',
+          visibility: 'private',
+          playerData: {
+            '7': { side: 'black', discCount: 24 },
+            ai_2: { side: 'white', discCount: 38 },
+          },
+          roomData: {
+            board: opening(),
+            currentPlayer: 'ai_2',
+            currentSide: 'white',
+            blackPlayerID: '7',
+            whitePlayerID: 'ai_2',
+            roundNo: 1,
+            gameStatus: 'playing',
+            legalMoves: [{ index: 1, flips: [10, 19], lines: [[10, 19]] }],
+            moveLog: [{
+              id: 59,
+              kind: 'pass',
+              playerID: '7',
+              side: 'black',
+              flips: null,
+              automatic: false,
+            }],
+            lastData: {
+              id: 59,
+              kind: 'pass',
+              playerID: '7',
+              side: 'black',
+              flips: null,
+              automatic: false,
+            },
+            players: {
+              '7': player,
+              ai_2: {
+                ...player,
+                userID: undefined,
+                playerID: 'ai_2',
+                displayName: '墨白',
+                seatIndex: 1,
+                ai: true,
+              },
+            },
+            playerOrder: ['7', 'ai_2'],
+          },
+        },
+      },
+    }));
+    expect(message?.type).toBe('ROOM_SYNC');
+    const snapshot = message as GameSnapshot;
+    expect(snapshot.roomData.moveLog[0].flips).toEqual([]);
+    expect(snapshot.roomData.lastData?.flips).toEqual([]);
+    expect(snapshot.roomData.legalMoves[0].lines).toEqual([[10, 19]]);
+  });
+
   it('serializes every public othello command through the generated union', () => {
     expect(createClientCommand('othello', 'match-1', 'cmd-1', 'game_place_disc', {
       index: 19,

@@ -107,14 +107,14 @@ function move(entry: OthelloMoveEntry): MoveEntry {
     playerID: entry.playerID,
     side: side(entry.side),
     index: entry.index,
-    flips: entry.flips.map(Number),
+    flips: (entry.flips ?? []).map(Number),
     automatic: entry.automatic,
   };
 }
 
 function roomData(room: OthelloRoomData): GameSnapshot['roomData'] {
   return {
-    board: room.board.map(value =>
+    board: (room.board ?? []).map(value =>
       value === 'black' || value === 'white' ? value : '') as Disc[],
     currentPlayer: room.currentPlayer,
     currentSide: side(room.currentSide),
@@ -122,12 +122,12 @@ function roomData(room: OthelloRoomData): GameSnapshot['roomData'] {
     whitePlayerID: room.whitePlayerID,
     roundNo: room.roundNo,
     gameStatus: room.gameStatus as GameStatus,
-    legalMoves: room.legalMoves.map(item => ({
+    legalMoves: (room.legalMoves ?? []).map(item => ({
       index: item.index,
-      flips: item.flips.map(Number),
-      lines: item.lines.map(line => line.map(Number)),
+      flips: (item.flips ?? []).map(Number),
+      lines: (item.lines ?? []).map(line => (line ?? []).map(Number)),
     })),
-    moveLog: room.moveLog.map(move),
+    moveLog: (room.moveLog ?? []).map(move),
     lastData: room.lastData ? move(room.lastData) : undefined,
     turnDeadline: room.turnDeadline,
     turnTimeoutMs: room.turnTimeoutMs == null
