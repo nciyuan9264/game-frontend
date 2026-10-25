@@ -81,7 +81,38 @@ function gameSnapshot(moved = false) {
   };
 }
 
-async function mockSession(page: Page, respondToMove = false) {
+function endedSnapshot() {
+  const snapshot = gameSnapshot();
+  return {
+    ...snapshot,
+    seq: 14,
+    view: {
+      yinsh: {
+        ...snapshot.view.yinsh,
+        playerData: {
+          ...snapshot.view.yinsh.playerData,
+          [human.playerID]: { side: 'white', ringsRemoved: 3 },
+        },
+        result: {
+          winnerID: human.playerID,
+          reason: '率先取走第三枚圆环',
+          ringsRemoved: { white: 3, black: 1 },
+        },
+        roomData: {
+          ...snapshot.view.yinsh.roomData,
+          gameStatus: 'end',
+          legalMoves: {},
+        },
+      },
+    },
+  };
+}
+
+async function mockSession(
+  page: Page,
+  respondToMove = false,
+  initialSnapshot = gameSnapshot(),
+) {
   const commands: string[] = [];
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
@@ -118,7 +149,7 @@ async function mockSession(page: Page, respondToMove = false) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(initialSnapshot));
     if (respondToMove) {
       socket.onMessage(message => {
         const value = String(message);
@@ -206,4 +237,23 @@ test('YINSH drag waits for the authoritative snapshot before animating', async (
   await expect(board).toHaveAttribute('data-motion', 'idle');
   await expect(page.getByTestId('point-E7')).toHaveAttribute('data-ring', 'white');
   await expect(page.getByRole('button', { name: '回放上一步' })).toBeEnabled();
+});
+
+test('YINSH settlement action keeps its icon and label inside the button', async ({ page }) => {
+  await page.setViewportSize({ width: 1024, height: 768 });
+  await mockSession(page, false, endedSnapshot());
+  await page.goto(`/game/yinsh/match?roomID=${roomID}`);
+  await page.getByRole('button', { name: '回看棋盘' }).click();
+
+  const button = page.getByRole('button', { name: '查看结算' });
+  const content = button.locator('span').first();
+  await expect(button).toBeVisible();
+  const [buttonBox, contentBox] = await Promise.all([
+    button.boundingBox(),
+    content.boundingBox(),
+  ]);
+  expect(buttonBox?.width).toBeGreaterThan(90);
+  expect(contentBox?.x).toBeGreaterThanOrEqual(buttonBox?.x ?? 0);
+  expect((contentBox?.x ?? 0) + (contentBox?.width ?? 0))
+    .toBeLessThanOrEqual((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0));
 });

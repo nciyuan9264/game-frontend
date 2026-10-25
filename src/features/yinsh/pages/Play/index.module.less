@@ -1,6 +1,6 @@
 .play { min-height:100dvh; background:var(--paper); color:var(--ink); }
 .topbar { position:sticky; top:0; z-index:40; display:flex; height:72px; align-items:center; gap:17px; padding:0 30px; border-bottom:1px solid var(--line); background:#faf7f1f5; backdrop-filter:blur(12px);
-  > button { display:grid; width:40px; height:40px; place-items:center; color:#786b61; }
+  > button:not([data-game-action-button]) { display:grid; width:40px; height:40px; place-items:center; color:#786b61; }
 }
 .divider { width:1px; height:24px; background:var(--line); }
 .room { min-width:0; strong { display:block; overflow:hidden; max-width:220px; color:#67584c; font-size:12px; text-overflow:ellipsis; white-space:nowrap; } small { display:block; margin-top:5px; color:#a0907f; font-size:8px; letter-spacing:.7px; } }
@@ -142,7 +142,7 @@
 }
 @media (max-width:767px) {
   .play { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
-  .topbar { height:56px; gap:9px; padding:0 10px; > button { width:38px; } > span:nth-of-type(1) { transform:scale(.88); transform-origin:left center; } .divider,.room small { display:none; } .room strong { max-width:90px; font-size:10px; } > button[aria-label="玩法指南"] { display:none; } > button[data-game-action-button] { display:none; } }
+  .topbar { height:56px; gap:9px; padding:0 10px; > button:not([data-game-action-button]) { width:38px; } > span:nth-of-type(1) { transform:scale(.88); transform-origin:left center; } .divider,.room small { display:none; } .room strong { max-width:90px; font-size:10px; } > button[aria-label="玩法指南"] { display:none; } > button[data-game-action-button] { display:none; } }
   .timer { min-width:36px; }
   .content { padding:13px 0 4px; }
   .matchHeading,.desktopPlayers,.sidebar { display:none; }
