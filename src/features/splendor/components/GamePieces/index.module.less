@@ -15,9 +15,35 @@
 .tokenBlocked { opacity:.42; }
 .tokenControl:not(:disabled):hover .tokenDisc { background:#eadfc7; transform:translateY(-2px); }
 
+.resourceMatrix { --resource-label-width:48px; --resource-bank-height:70px; --resource-row-height:26px; --resource-disc-size:34px; display:grid; min-width:0; grid-template-columns:var(--resource-label-width) repeat(6,minmax(0,1fr)); column-gap:3px; margin-top:14px; font-variant-numeric:tabular-nums; }
+.resourceLabels,.resourceColumn { display:grid; min-width:0; grid-template-rows:var(--resource-bank-height) repeat(2,var(--resource-row-height)); }
+.resourceLabels {
+  > i { display:flex; align-items:center; color:#887158; font-size:10px; font-style:normal; line-height:16px; white-space:nowrap; }
+  > i:first-child { align-items:flex-end; padding-bottom:2px; }
+  > i:nth-child(2) { border-top:1px solid #e6dac8; color:#6f4d3c; font-weight:500; }
+}
+.resourceColumn { position:relative; justify-items:stretch; text-align:center; }
+.resourceGold::before { position:absolute; top:0; bottom:3px; left:-2px; width:1px; background:#e5d8c4; content:''; pointer-events:none; }
+.resourceBank { min-width:0; }
+.tokenMatrix { width:100%; height:100%; min-height:0; justify-content:flex-start; gap:0; padding:0;
+  .tokenDisc { width:var(--resource-disc-size); height:var(--resource-disc-size); flex-shrink:0; }
+  .tokenDisc svg { width:calc(var(--resource-disc-size) - 11px); height:calc(var(--resource-disc-size) - 11px); }
+  .tokenDisc > b { right:50%; bottom:-34px; min-width:0; width:auto; height:16px; padding:0; border:0; border-radius:0; background:transparent; box-shadow:none; color:#715338; font-size:14px; font-weight:500; line-height:16px; transform:translateX(50%); }
+  .tokenDisc > em { top:-5px; right:-5px; min-width:17px; height:15px; font-size:9px; }
+  > span:last-child { margin-top:3px; color:#80664d; font-size:9px; line-height:12px; }
+}
+.tokenMatrix:not(:disabled):hover .tokenDisc { transform:none; }
+.resourceValue { display:flex; min-width:0; align-items:center; justify-content:center; border-top:1px solid #e6dac8; color:#674b3d; font-size:14px; font-weight:600; line-height:18px; }
+.resourceDiscount { display:flex; min-width:23px; height:19px; align-self:center; align-items:center; justify-content:center; justify-self:center; padding:0 2px; border:1px solid #ded0bb; border-radius:3px; background:#eee5d6; color:#795d43; font-size:12px; font-weight:500; line-height:17px; }
+.resourceZero { color:#a18e78!important; font-weight:400!important; }
+.resourceUnavailable { border-color:transparent; background:transparent; color:#9b896f; font-weight:400; }
+
+.playerResourceSummary { display:none; }
+
 .card { position:relative; display:block; min-width:0; padding:0; overflow:hidden; border:1px solid #cfbfa8; border-radius:5px; background:#fffbf0; box-shadow:0 3px 6px #59402710; text-align:left; transition:transform .16s,border .16s; }
+button.card.card { border:1px solid #cfbfa8; background:#fffbf0; }
 button.card:hover:not(:disabled) { border-color:#a58c70; box-shadow:0 5px 11px #59402720; transform:translateY(-2px); }
-.cardSelected { outline:2px solid var(--wine); outline-offset:2px; }
+.cardSelected,button.card.cardSelected { outline:2px solid var(--wine); outline-offset:2px; }
 .cardImage { position:relative; display:block; height:101px; overflow:hidden; background:#a3916f;
   > span:first-child { position:absolute; inset:0; width:100%; height:100%; }
 }
@@ -32,7 +58,7 @@ button.card:hover:not(:disabled) { border-color:#a58c70; box-shadow:0 5px 11px #
   > span { display:flex; align-items:center; gap:2px; color:#6d6258; font-size:11px; }
   b { font-weight:500; }
 }
-.affordable { border:2px solid #3f7657; box-shadow:0 0 0 2px #dce9d7,0 5px 12px #355d4730;
+.affordable,button.card.affordable { border:2px solid #3f7657; box-shadow:0 0 0 2px #dce9d7,0 5px 12px #355d4730;
   .cardCosts { background:#e5eddf; }
   .cardCosts > span { color:#375541; }
 }
@@ -41,8 +67,9 @@ button.card:hover:not(:disabled) { border-color:#a58c70; box-shadow:0 5px 11px #
 .cardmini .cardCosts { height:27px; gap:4px; padding:0 5px; }
 
 .noble { position:relative; display:flex; min-width:0; gap:9px; overflow:hidden; padding:7px; border:1px solid #dac9b0; border-radius:5px; background:#f8f1e4; color:#705746; text-align:left; }
+button.noble.noble { border:1px solid #dac9b0; background:#f8f1e4; }
 button.noble:hover { border-color:#b99b6b; }
-.nobleEligible { border-color:#a4854a; box-shadow:0 0 0 1px #bfa363; }
+.nobleEligible,button.noble.nobleEligible { border-color:#a4854a; box-shadow:0 0 0 1px #bfa363; }
 .noblePortrait { width:40px; height:63px; overflow:hidden; border-radius:22px 22px 3px 3px; }
 .nobleInfo { min-width:0; flex:1; padding-top:2px; }
 .nobleTop { display:flex; align-items:center; justify-content:space-between; gap:4px; font-size:11px;
@@ -69,9 +96,32 @@ button.noble:hover { border-color:#b99b6b; }
 .reservedCompact { width:35px; }
 .emptyReserve { display:flex; align-items:center; justify-content:center; gap:6px; min-height:45px; color:#ae987a; font-size:10px; }
 
+@media (min-width:768px) {
+  .cardboard .cardImage { height:84px; }
+  .deck { gap:9px; padding-top:8px; padding-bottom:8px; }
+}
+
 @media (max-width:767px) {
   .tokenControl { min-height:54px; gap:4px; }
   .tokenDisc { width:36px; height:36px; }
+  .resourceMatrix { --resource-label-width:44px; --resource-bank-height:58px; --resource-row-height:18px; --resource-disc-size:30px; margin-top:5px; }
+  .tokenMatrix { height:100%; min-height:0; gap:0;
+    .tokenDisc { width:var(--resource-disc-size); height:var(--resource-disc-size); }
+    .tokenDisc > b { bottom:-27px; }
+    > span:last-child { margin-top:2px; line-height:11px; }
+  }
+  .resourceDiscount { min-width:22px; height:16px; font-size:11px; line-height:14px; }
+  .playerResourceSummary { display:flex; min-width:0; grid-column:1/-1; flex-direction:column; gap:2px; }
+  .playerResourceRow { display:grid; min-height:13px; grid-template-columns:20px repeat(6,minmax(0,1fr)); align-items:center; column-gap:2px;
+    > i { color:#85735f; font-size:8px; font-style:normal; line-height:13px; white-space:nowrap; }
+    > span { display:flex; min-width:0; min-height:13px; align-items:center; justify-content:center; gap:1px; color:#675341; font-variant-numeric:tabular-nums; line-height:13px; }
+    > span svg { width:9px; height:9px; }
+    > span b { font-size:10px; font-weight:600; line-height:13px; }
+  }
+  .playerResourceRow:first-child > span { border-radius:3px; background:#ebe4d8; }
+  .playerResourceRow:first-child .playerResourceUnavailable { background:transparent; color:#aa9b86; font-size:10px; }
+  .playerResourceGold { border-radius:8px; background:#efe4cc; color:#836438!important; }
+  .playerResourceZero b { color:#978877; font-weight:400!important; }
   .cardboard .cardImage { height:clamp(40px,calc((100dvh - 676px)/3),60px); }
   .cardboard .cardPoints { left:4px; top:3px; font-size:22px; }
   .cardboard .cardBonus { right:3px; top:3px; width:22px; height:23px; }
@@ -80,10 +130,16 @@ button.noble:hover { border-color:#b99b6b; }
   .cardboard .cardCosts { height:20px; gap:2px; padding:0 3px; }
   .cardboard .cardCosts svg { width:8px; height:10px; }
   .cardboard .canBuy { top:5px; width:14px; height:14px; padding:0; border-radius:50%; i { display:none; } }
-  .nobleCompact { display:grid; height:62px; grid-template-rows:34px 15px; gap:3px; .nobleInfo { display:contents; } .nobleTop { position:absolute; right:5px; top:10px; } }
+  .nobleCompact { display:grid; height:50px; grid-template-rows:26px 13px; gap:3px;
+    .noblePortrait { width:25px; height:27px; }
+    .nobleInfo { display:contents; }
+    .nobleTop { position:absolute; right:5px; top:7px; }
+  }
 }
 
 @media (max-width:389px) {
+  .playerResourceRow { grid-template-columns:19px repeat(6,minmax(0,1fr)); column-gap:1px; }
+  .playerResourceRow > span svg { width:9px; height:9px; }
   .cardboard .cardCosts { justify-content:space-between; gap:1px; padding:0 1px; }
   .cardboard .cardCosts > span { min-width:0; gap:0; font-size:9px; }
   .cardboard .cardCosts svg { width:6px; height:8px; }

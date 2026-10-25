@@ -1,6 +1,6 @@
 import { useEffect, useMemo, useState } from 'react';
 import {
-  ArrowLeft, ArrowRight, BookOpen, Bookmark, Check, Coins, Crown, Eye,
+  ArrowLeft, ArrowRight, BookOpen, Bookmark, Check, ChevronRight, Coins, Crown, Eye,
   History, Info, Layers, ShieldCheck, X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
@@ -9,7 +9,7 @@ import { PlayerAvatar } from '../../components/AppShell';
 import { GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import {
-  DeckBack, DevelopmentCardView, NobleTile, TokenControl,
+  DeckBack, DevelopmentCardView, NobleTile, PlayerResourceSummary, ResourceMatrix,
 } from '../../components/GamePieces';
 import { ActivityDialog } from '../../dialogs/Activity';
 import { CardActionDialog } from '../../dialogs/CardAction';
@@ -157,15 +157,9 @@ export function Play({
       {interactive ? selectedGemCount ? `确认拿取 ${selectedGemCount} 枚` : '请先选择宝石' : '等待当前玩家'}
       <ArrowRight size={16} /></ActionButton>;
 
-  const bank = <div className={styles.bankTokens}>{gemColors.map(color => {
-    const count = data.roomData.gems[color] ?? 0;
-    const selected = color === 'Gold' ? 0 : ui.selectedGems[color] ?? 0;
-    const disabled = color === 'Gold' || !interactive || !count
-      || (!selected && selectionLocked);
-    return <TokenControl key={color} color={color} count={count} selected={selected}
-      disabled={disabled} blocked={!disabled && !selected && selectionLocked}
-      onClick={() => color !== 'Gold' && ui.toggleGem(color)} />;
-  })}</div>;
+  const resources = <ResourceMatrix bank={data.roomData.gems} wallet={me.gem}
+    bonuses={myDiscounts} selected={ui.selectedGems} interactive={interactive}
+    selectionLocked={selectionLocked} onToggle={ui.toggleGem} />;
 
   return <div className={styles.play}>
     <header className={styles.topbar}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={21} /></button>
@@ -182,13 +176,16 @@ export function Play({
     </header>
     <span className={styles.live} role="status" aria-live="polite">{roundDescription}。{phaseDescription}</span>
     <main className={styles.content}>
-      <section className={styles.players} aria-label="玩家概览" data-player-count={playerIDs.length}>
+      <div className={styles.layout}><div className={styles.tableColumn}>
+      <section className={styles.players} aria-label="玩家概览"
+        data-player-count={Math.max(0, playerIDs.length - 1)}>
         {playerIDs.map(id => {
           const player = data.roomData.players[id];
           const state = data.playerData[id];
           const current = id === data.roomData.currentPlayer;
           const bonus = discounts(state);
-          return <button type="button" key={id} className={current ? styles.currentPlayer : ''}
+          return <button type="button" key={id} className={`${current ? styles.currentPlayer : ''}
+            ${id === data.playerId ? styles.selfPlayer : ''}`}
             onClick={() => ui.openCollection(id)} aria-current={current || undefined}>
             <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={34} />
             <div className={styles.playerInfo}><strong>{playerName(id, data.roomData.players)}
@@ -199,12 +196,13 @@ export function Play({
             <div className={styles.publicResources}><span><i>宝石</i><i>折扣</i><i>筹码</i></span>
               {gemColors.map(color => <span key={color}><GemIcon color={color} size={18} />
                 <b>{color === 'Gold' ? '—' : bonus[color]}</b><i>{state?.gem[color] ?? 0}</i></span>)}</div>
+            <PlayerResourceSummary wallet={state?.gem ?? {}} bonuses={bonus} />
             {current && <i className={styles.currentLine} />}
           </button>;
         })}
       </section>
 
-      <div className={styles.layout}><section className={styles.market}>
+      <section className={styles.market}>
         <div className={styles.nobleArea}><header><Crown size={14} /><span>贵族的青睐</span>
           <small>只计算永久折扣 · 自动结算</small></header>
           <div>{nobles.map(noble => <NobleTile key={noble.id} noble={noble}
@@ -220,9 +218,22 @@ export function Play({
           <footer><span>S P L E N D O R</span><span>每次购买，都让下一次更轻松。</span><span>THE GILDED HOUR</span></footer>
         </div>
       </section>
+      </div>
 
-      <aside className={styles.sidebar}><section className={styles.bankPanel}><header><h3>宝石银行</h3><span>选择 · 再确认</span></header>
-        {bank}<p className={styles.bankHint}><Info size={13} />{!interactive ? '当前牌桌只读，请等待你的回合'
+      <aside className={styles.sidebar}><section className={styles.bankPanel}>
+        <button type="button" className={`${styles.bankPlayer} ${myTurn && playable ? styles.bankPlayerCurrent : ''}`}
+          onClick={() => ui.openCollection(data.playerId)} aria-current={myTurn && playable || undefined}>
+          <PlayerAvatar name={playerName(data.playerId, data.roomData.players)}
+            avatar={data.roomData.players[data.playerId]?.avatar} ai={data.roomData.players[data.playerId]?.ai} size={34} />
+          <span className={styles.bankPlayerInfo}><strong>{playerName(data.playerId, data.roomData.players)}<em>你</em></strong>
+            <span><i />{!playable ? '本局已结束' : myTurn ? '你的回合'
+              : `等待 ${playerName(data.roomData.currentPlayer, data.roomData.players)}`}
+              <small>· {me.normalCard.length} 张发展卡</small></span></span>
+          <span className={styles.playerScore}><b>{me.score}</b><small>声望</small></span>
+          <ChevronRight size={14} />
+        </button>
+        <header><h3>宝石银行</h3><span>按同色列对照</span></header>
+        {resources}<p className={styles.bankHint}><Info size={13} />{!interactive ? '当前牌桌只读，请等待你的回合'
           : selectedGemCount ? `已选择 ${selectedGemCount} 枚${tokenTotal(me) + selectedGemCount > 10 ? `，需退还 ${tokenTotal(me) + selectedGemCount - 10} 枚` : ''}`
             : `选择 ${selectionGoal} 种不同颜色，或库存至少四枚时拿同色两枚`}</p>
         <div className={styles.selection}><span>{selectedGemCount ? `已选 ${selectedGemCount} / ${selectionGoal} 枚` : '选择你需要的宝石'}</span>
@@ -243,13 +254,12 @@ export function Play({
 
     <div className={styles.mobileDock}><section><div><h3>宝石银行</h3><small>{selectedGemCount
       ? `已选 ${selectedGemCount} 枚${tokenTotal(me) + selectedGemCount > 10 ? ` · 需退 ${tokenTotal(me) + selectedGemCount - 10} 枚` : ''}`
-      : interactive ? '直接选择宝石，再确认拿取' : '当前牌桌只读'}</small></div>{bank}</section>
+      : interactive ? '直接选择宝石，再确认拿取' : '当前牌桌只读'}</small></div>{resources}</section>
       <div className={styles.mobileWalletHead}><button type="button" onClick={() => ui.openCollection(data.playerId)}>我的资源</button>
         <span>筹码 <b>{tokenTotal(me)} / 10</b></span>
         <button type="button" onClick={() => ui.openCollection(data.playerId)}><Bookmark size={12} />预留 {reserved.length}/3</button></div>
-      <div className={styles.mobileWallet}>{gemColors.map(color => <span key={color}><GemIcon color={color} size={19} />
-        <b>{me.gem[color] ?? 0}</b><small>{color === 'Gold' ? '百搭' : `折扣 ${myDiscounts[color]}`}</small></span>)}</div>
-      <div className={styles.mobileActions}>{selectedGemCount > 0 && <ActionButton onClick={() => ui.setSelectedGems({})}><X size={14} />清空</ActionButton>}
+      <div className={styles.mobileActions}><ActionButton disabled={!selectedGemCount || !interactive}
+        onClick={() => ui.setSelectedGems({})}><X size={14} />清空</ActionButton>
         {actionButton}</div></div>
 
     {ui.panel?.type === 'card' && selectedCard && <CardActionDialog card={selectedCard} player={me}

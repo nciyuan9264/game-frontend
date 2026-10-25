@@ -19,8 +19,8 @@
 .live { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; }
 .content { max-width:1440px; margin:auto; padding:16px 32px 24px; }
 .players { display:grid; grid-auto-columns:minmax(0,1fr); grid-auto-flow:column; gap:12px; margin-bottom:16px;
-  > button { position:relative; display:grid; min-width:0; min-height:0; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:0 10px; overflow:hidden; padding:9px 13px 10px; border:1px solid #e2d8c9; border-radius:6px; background:#faf7f0; text-align:left; }
-  > button:hover { background:#f1eade; }
+  > button { position:relative; display:grid; min-width:0; min-height:0; grid-template-columns:34px minmax(0,1fr) auto; align-items:center; gap:0 10px; overflow:hidden; padding:9px 13px 10px; border:1px solid #e2d8c9!important; border-radius:6px; background:#faf7f0!important; text-align:left; }
+  > button:hover { background:#f1eade!important; }
 }
 .currentPlayer { border-color:#a97b80!important; background:#f5e9e6!important; }
 .playerInfo { min-width:0;
@@ -42,7 +42,8 @@
   > span:not(:first-child)>i { height:18px; color:#674d40; font-size:12px; font-style:normal; font-weight:500; }
 }
 .currentLine { position:absolute; right:13px; bottom:0; left:13px; height:2px; background:#9b6a71; }
-.layout { display:grid; grid-template-columns:minmax(0,1fr) 310px; gap:20px; align-items:start; }
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 344px; gap:20px; align-items:start; }
+.tableColumn { min-width:0; }
 .market { min-width:0; padding:16px 16px 0; border:1px solid #ded1bd; border-radius:7px; background:#ebe4d8; box-shadow:inset 0 0 0 5px #f5eee460; }
 .nobleArea {
   > header { display:flex; height:22px; align-items:center; gap:7px; color:#876e52; font-size:11px; font-weight:500; }
@@ -68,7 +69,23 @@
   > header span { color:#a08b70; font-size:9px; }
   > header button { color:var(--wine); font-size:10px; }
 }
-.bankTokens { display:grid; grid-template-columns:repeat(6,minmax(0,1fr)); gap:2px; margin:14px 0 0; }
+.bankPlayer { display:flex; width:100%; min-height:56px; align-items:center; gap:9px; margin:0 0 17px; padding:8px 9px; border:1px solid #e1d4c2!important; border-radius:5px; background:#f4eee2!important; text-align:left;
+  &:hover { border-color:#aa8180!important; }
+  > svg { flex-shrink:0; color:#ae9171; }
+  .playerScore>b { font-size:28px; }
+}
+.bankPlayerCurrent { border-color:#b58c8d!important; background:#f5e8e4!important;
+  .bankPlayerInfo>span { color:#925c66; }
+  .bankPlayerInfo>span>i { background:#925c66; }
+}
+.bankPlayerInfo { min-width:0; flex:1;
+  > strong { display:flex; align-items:center; gap:7px; overflow:hidden; font-size:13px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  > strong em { padding:2px 4px; border-radius:3px; background:#e9dadc; color:var(--wine); font-size:9px; font-style:normal; font-weight:400; }
+  > span { display:flex; align-items:center; gap:4px; overflow:hidden; margin-top:6px; color:#8c7259; font-size:10px; white-space:nowrap; }
+  > span>i { width:5px; height:5px; flex-shrink:0; border-radius:50%; background:#bba78b; }
+  > span>small { overflow:hidden; color:#967d62; font-size:9px; text-overflow:ellipsis; }
+}
+.bankPanel>header { margin-bottom:0; }
 .bankHint { display:flex; min-height:30px; align-items:flex-start; gap:5px; margin-top:9px; color:#978167; font-size:9px; line-height:1.75; }
 .selection { display:flex; align-items:center; justify-content:space-between; margin-top:6px; padding:6px 0 9px; border-top:1px solid #e7dece; color:#94765e; font-size:10px;
   button { min-height:30px; color:var(--wine); font-size:10px; }
@@ -97,7 +114,7 @@
 @media (min-width:768px) and (max-width:1150px) {
   .topbar { padding-inline:20px; gap:12px; }
   .content { padding-inline:20px; }
-  .layout { grid-template-columns:minmax(0,1fr) 274px; gap:14px; }
+  .layout { grid-template-columns:minmax(0,1fr) 302px; gap:14px; }
   .market { padding-inline:12px; }
   .cardRow { grid-template-columns:38px repeat(4,minmax(0,1fr)); gap:7px; }
   .nobleArea>div { gap:6px; grid-template-columns:repeat(auto-fit,minmax(100px,1fr)); }
@@ -106,10 +123,19 @@
   .publicResources { >span:first-child { font-size:9px; } }
 }
 @media (min-width:768px) and (max-width:900px) {
-  .players[data-player-count='4'] { grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); }
+  .players[data-player-count='3'] { grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-columns:auto; }
+}
+@media (min-width:768px) {
+  .selfPlayer { display:none!important; }
+  .cardRows { gap:10px; }
+  .marketArea>footer { padding-top:11px; padding-bottom:10px; }
+  .bankPanel { padding:14px; }
+  .bankHint { min-height:0; line-height:16px; }
+  .collectionPanel { padding-top:15px; padding-bottom:15px; }
+  .activity { padding-top:12px; padding-bottom:12px; }
 }
 @media (max-width:767px) {
-  .play { --dock-height:240px; }
+  .play { --dock-height:206px; }
   .topbar { height:44px; gap:4px; padding:0 10px; background:#f4f0e8;
     >button { width:44px; height:44px; }
     >button:nth-last-child(3) { display:grid; }
@@ -123,15 +149,15 @@
   .spacer { display:none; }
   .timer { min-width:42px; height:29px; padding:0 6px; }
   .content { max-width:none; padding:8px 12px calc(var(--dock-height) + 12px); }
-  .players { gap:6px; margin-bottom:10px;
-    >button { display:grid; min-height:48px; grid-template-columns:22px minmax(0,1fr); gap:2px 4px; padding:5px; border-radius:5px; }
-    >button>span:first-child { width:22px!important; height:22px!important; grid-row:1/3; align-self:center; font-size:14px; }
+  .players { grid-auto-flow:row; grid-template-columns:repeat(2,minmax(0,1fr)); grid-auto-columns:auto; gap:6px; margin-bottom:6px;
+    >button { display:grid; min-height:60px; grid-template-columns:20px minmax(0,1fr) auto; gap:3px 5px; padding:5px 7px; border-radius:6px; }
+    >button>span:first-child { width:20px!important; height:20px!important; grid-row:1; align-self:center; font-size:13px; }
   }
-  .playerInfo { align-self:end;
-    >strong { display:block; font-size:9.5px; line-height:13px; }
+  .playerInfo { align-self:center;
+    >strong { font-size:11px; line-height:16px; }
     em,>span { display:none; }
   }
-  .playerScore { display:flex; grid-column:2; align-items:baseline; gap:3px; align-self:start; text-align:left;
+  .playerScore { display:flex; grid-column:3; grid-row:1; align-items:baseline; gap:3px; align-self:center; text-align:right;
     >b { font-size:21px; } small { margin:0; font-size:8px; }
   }
   .publicResources { display:none; }
@@ -144,7 +170,7 @@
     >header svg { width:12px; }
     >header small { font-size:8.5px; white-space:nowrap; }
     >div { grid-template-columns:none; grid-auto-columns:minmax(0,1fr); grid-auto-flow:column; gap:5px; margin-top:4px; }
-    >div>button { min-height:64px; }
+    >div>button { min-height:50px; height:50px; grid-template-rows:26px 13px; }
   }
   .marketArea {
     >header { height:28px; margin:3px 0 0; }
@@ -160,25 +186,18 @@
     >span:first-child small { font-size:12px; line-height:14px; }
   }
   .mobileDock { position:fixed; inset:auto 0 0; z-index:50; display:block; padding:6px 14px calc(env(safe-area-inset-bottom)); border-top:1px solid #d7c7b0; background:#fcf8f0; box-shadow:0 -5px 20px #6b4d3110;
-    >section { padding-bottom:6px; border-bottom:1px solid #e4d7c4; }
+    >section { padding-bottom:2px; border-bottom:1px solid #e4d7c4; }
     >section>div:first-child { display:flex; align-items:center; justify-content:space-between; gap:8px; }
     h3 { flex-shrink:0; color:#775348; font-size:12px; font-weight:500; }
     >section>div:first-child small { min-width:0; color:#8b7058; font-size:9px; line-height:12px; text-align:right; }
-    .bankTokens { gap:4px; margin:6px 0 0; }
   }
-  .mobileWalletHead { display:flex; min-height:30px; align-items:center; gap:8px; color:#8b7058; font-size:10px;
-    button { display:flex; min-height:44px; align-items:center; gap:4px; padding:0; color:#775348; font-size:10px; white-space:nowrap; }
+  .mobileWalletHead { display:flex; min-height:26px; align-items:center; gap:8px; color:#8b7058; font-size:10px;
+    button { display:flex; min-height:26px; align-items:center; gap:4px; padding:0; color:#775348; font-size:10px; white-space:nowrap; }
     button:first-child { margin-right:auto; font-size:11px; }
     button:last-child { margin-left:auto; }
     span { white-space:nowrap; } b { color:#76543f; font-weight:500; }
   }
-  .mobileWallet { display:grid; height:34px; grid-template-columns:repeat(6,minmax(0,1fr)); gap:8px;
-    >span { display:grid; grid-template-columns:20px 1fr; align-items:center; justify-items:center; gap:1px 4px; }
-    b { color:#674d3e; font-size:14px; font-weight:500; }
-    small { grid-column:1/-1; color:#937956; font-size:9px; line-height:1.3; white-space:nowrap; }
-    >span:last-child { padding-left:6px; border-left:1px solid #e3d8c6; }
-  }
-  .mobileActions { display:flex; gap:9px; margin-top:8px;
+  .mobileActions { display:flex; gap:9px; margin-top:6px;
     >button { min-height:44px; flex:1; padding:0 12px; font-size:13px; }
     >button:first-child:not(:last-child) { flex:0 0 72px; font-size:12px; }
   }
@@ -186,6 +205,5 @@
 }
 @media (max-width:389px) {
   .content { padding-inline:11px; }
-  .mobileWallet { gap:5px; }
   .playerScore small { display:none; }
 }

@@ -56,6 +56,7 @@ describe('Splendor turn countdown', () => {
 
     const { rerender } = render(<Play session={session} data={snapshot('me')} onLeave={vi.fn()} />);
     expect(screen.getByText('30s')).toBeTruthy();
+    expect(screen.getAllByRole('group', { name: '宝石银行与我的资源对照' })).toHaveLength(2);
 
     rerender(<Play session={session} data={snapshot('guest')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
