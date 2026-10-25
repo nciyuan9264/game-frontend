@@ -70,7 +70,10 @@ const confirmsCommand = (
   next: TestSnapshot,
 ) => next.seq > command.before.seq;
 
-function useTestSession(url = 'ws://test') {
+function useTestSession(
+  url = 'ws://test',
+  onMatchChanged?: (matchID: string) => void,
+) {
   return useAuthoritativeSession<
     TestSnapshot,
     TestMessage,
@@ -95,6 +98,7 @@ function useTestSession(url = 'ws://test') {
       type,
       payload,
     }),
+    onMatchChanged,
   });
 }
 
@@ -159,6 +163,33 @@ describe('useAuthoritativeSession', () => {
     receive({ ...snapshot(4), roomID: 'other' });
     receive({ ...snapshot(4), matchID: 'other-match' });
     expect(hook.result.current.snapshot?.seq).toBe(3);
+  });
+
+  it('reports a new match once and accepts it only after the URL changes', () => {
+    const onMatchChanged = vi.fn();
+    const hook = renderHook(
+      ({ url }) => useTestSession(url, onMatchChanged),
+      { initialProps: { url: 'ws://test?matchID=match' } },
+    );
+    receive(snapshot(3));
+    act(() => {
+      hook.result.current.submit('act');
+    });
+
+    receive({ ...snapshot(0, 'waiting'), matchID: 'match-2' });
+    receive({ ...snapshot(0, 'waiting'), matchID: 'match-2' });
+
+    expect(onMatchChanged).toHaveBeenCalledTimes(1);
+    expect(onMatchChanged).toHaveBeenCalledWith('match-2');
+    expect(hook.result.current.snapshot?.matchID).toBe('match');
+    expect(hook.result.current.pending).toBeDefined();
+
+    hook.rerender({ url: 'ws://test?matchID=match-2' });
+    expect(hook.result.current.snapshot).toBeUndefined();
+    expect(hook.result.current.pending).toBeUndefined();
+
+    receive({ ...snapshot(0, 'waiting'), matchID: 'match-2' });
+    expect(hook.result.current.snapshot?.matchID).toBe('match-2');
   });
 
   it('retries after confirmation timeout and unlocks on a new epoch', () => {

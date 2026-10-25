@@ -29,7 +29,7 @@ function Session({ roomID }: { roomID: string }) {
   const target = useAcquireResource(loadTarget);
   const nextMatch = useStartNextMatch('acquire', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
-  const session = useAcquireSession(roomID, matchID);
+  const session = useAcquireSession(roomID, matchID, nextMatch.adoptMatch);
   const interaction = useAcquireInteraction(session);
   const leave = useAcquireLeave(session.connection.close);
   const { connection, snapshot } = session;

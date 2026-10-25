@@ -36,7 +36,7 @@ function Session({ roomID }: { roomID: string }) {
   const target = useAsyncResource(loadTarget);
   const nextMatch = useStartNextMatch('davinci', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
-  const session = useDavinciSession(roomID, matchID);
+  const session = useDavinciSession(roomID, matchID, nextMatch.adoptMatch);
   const leave = useDavinciLeave(session.connection.close);
   const { connection, snapshot } = session;
   const players = snapshot?.type === 'MATCH_SYNC' ? snapshot.players : snapshot?.roomData.players;

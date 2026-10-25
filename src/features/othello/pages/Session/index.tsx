@@ -43,7 +43,7 @@ function Session({ roomID }: { roomID: string }) {
   const target = useAsyncResource(loadTarget);
   const nextMatch = useStartNextMatch('othello', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
-  const session = useOthelloSession(roomID, matchID);
+  const session = useOthelloSession(roomID, matchID, nextMatch.adoptMatch);
   const leave = useOthelloLeave(session.connection.close);
   const { connection, snapshot } = session;
   const players = snapshot?.type === 'MATCH_SYNC'

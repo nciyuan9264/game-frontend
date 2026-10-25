@@ -55,13 +55,17 @@ describe('Davinci session bootstrap', () => {
     </MemoryRouter>);
 
     const loader = screen.getByRole('status');
-    expect(mocks.useDavinciSession).toHaveBeenCalledWith('room-1', '');
+    expect(mocks.useDavinciSession).toHaveBeenCalledWith(
+      'room-1', '', expect.any(Function),
+    );
 
     await act(async () => {
       resolveProfile({ id: '42', name: 'Alice', email: 'alice@example.com' });
     });
 
-    await waitFor(() => expect(mocks.useDavinciSession).toHaveBeenCalledWith('room-1', 'match-1'));
+    await waitFor(() => expect(mocks.useDavinciSession).toHaveBeenCalledWith(
+      'room-1', 'match-1', expect.any(Function),
+    ));
     expect(screen.getByRole('status')).toBe(loader);
   });
 });

@@ -30,7 +30,11 @@ const createCommand = (
   payload: CommandPayload,
 ) => createClientCommand('davinci', matchID, commandID, type, payload);
 
-export function useDavinciSession(roomID: string, matchID: string) {
+export function useDavinciSession(
+  roomID: string,
+  matchID: string,
+  onMatchChanged?: (matchID: string) => void,
+) {
   return useAuthoritativeSession<
     Snapshot,
     ServerMessage,
@@ -46,6 +50,7 @@ export function useDavinciSession(roomID: string, matchID: string) {
     getWaitingKey,
     readyCommand: 'game_ready',
     createCommand,
+    onMatchChanged,
   });
 }
 

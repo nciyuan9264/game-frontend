@@ -32,6 +32,65 @@ describe('useStartNextMatch', () => {
     expect(hook.result.current.pending).toBe(false);
   });
 
+  it('adopts a match published by the realtime session', () => {
+    const hook = renderHook(() => useStartNextMatch('davinci', 'room-1'));
+
+    act(() => {
+      hook.result.current.adoptMatch('match-2');
+      hook.result.current.adoptMatch('match-2');
+    });
+
+    expect(hook.result.current.matchID).toBe('match-2');
+    expect(hook.result.current.pending).toBe(false);
+    expect(hook.result.current.error).toBe('');
+  });
+
+  it('converges when realtime publishes the REST-created match first', async () => {
+    let resolve!: (value: { matchID: string; roundNo: number }) => void;
+    vi.mocked(startNextGameMatch).mockReturnValue(new Promise(value => {
+      resolve = value;
+    }));
+    const hook = renderHook(() => useStartNextMatch('othello', 'room-1'));
+
+    let request!: Promise<boolean>;
+    act(() => {
+      request = hook.result.current.start();
+    });
+    act(() => {
+      hook.result.current.adoptMatch('match-2');
+    });
+    await act(async () => {
+      resolve({ matchID: 'match-2', roundNo: 2 });
+      await expect(request).resolves.toBe(true);
+    });
+
+    expect(hook.result.current.matchID).toBe('match-2');
+    expect(hook.result.current.pending).toBe(false);
+  });
+
+  it('does not let a superseded REST result replace the adopted match', async () => {
+    let resolve!: (value: { matchID: string; roundNo: number }) => void;
+    vi.mocked(startNextGameMatch).mockReturnValue(new Promise(value => {
+      resolve = value;
+    }));
+    const hook = renderHook(() => useStartNextMatch('yinsh', 'room-1'));
+
+    let request!: Promise<boolean>;
+    act(() => {
+      request = hook.result.current.start();
+    });
+    act(() => {
+      hook.result.current.adoptMatch('match-3');
+    });
+    await act(async () => {
+      resolve({ matchID: 'match-2', roundNo: 2 });
+      await expect(request).resolves.toBe(false);
+    });
+
+    expect(hook.result.current.matchID).toBe('match-3');
+    expect(hook.result.current.pending).toBe(false);
+  });
+
   it('ignores an in-flight result after the room changes', async () => {
     let resolve!: (value: { matchID: string; roundNo: number }) => void;
     vi.mocked(startNextGameMatch).mockReturnValue(new Promise(value => {

@@ -54,7 +54,7 @@ function Session({ roomID }: { roomID: string }) {
   const target = useAsyncResource(loadTarget);
   const nextMatch = useStartNextMatch('fugitive', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
-  const session = useFugitiveSession(roomID, matchID);
+  const session = useFugitiveSession(roomID, matchID, nextMatch.adoptMatch);
   const leave = useFugitiveLeave(session.connection.close);
   const { connection, snapshot } = session;
   const profile = target.data?.profile;

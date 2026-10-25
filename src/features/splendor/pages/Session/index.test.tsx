@@ -55,13 +55,17 @@ describe('Splendor session bootstrap', () => {
     </MemoryRouter>);
 
     const loader = screen.getByRole('status');
-    expect(mocks.useSplendorSession).toHaveBeenCalledWith('room-1', '');
+    expect(mocks.useSplendorSession).toHaveBeenCalledWith(
+      'room-1', '', expect.any(Function),
+    );
 
     await act(async () => {
       resolveProfile({ id: '42', name: 'Alice', email: 'alice@example.com' });
     });
 
-    await waitFor(() => expect(mocks.useSplendorSession).toHaveBeenCalledWith('room-1', 'match-1'));
+    await waitFor(() => expect(mocks.useSplendorSession).toHaveBeenCalledWith(
+      'room-1', 'match-1', expect.any(Function),
+    ));
     expect(screen.getByRole('status')).toBe(loader);
   });
 });

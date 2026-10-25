@@ -36,7 +36,11 @@ const createCommand = (
   payload,
 );
 
-export function useFugitiveSession(roomID: string, matchID: string) {
+export function useFugitiveSession(
+  roomID: string,
+  matchID: string,
+  onMatchChanged?: (matchID: string) => void,
+) {
   return useAuthoritativeSession<
     Snapshot,
     ServerMessage,
@@ -52,6 +56,7 @@ export function useFugitiveSession(roomID: string, matchID: string) {
     getWaitingKey,
     readyCommand: 'game_ready',
     createCommand,
+    onMatchChanged,
   });
 }
 

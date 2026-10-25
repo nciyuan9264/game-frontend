@@ -10,6 +10,7 @@ import { startNextGameMatch } from '../api/room';
 export function useStartNextMatch(gameType: GameType, roomID: string) {
   const sequence = useRef(0);
   const pendingRef = useRef(false);
+  const matchIDRef = useRef('');
   const [matchID, setMatchID] = useState('');
   const [pending, setPending] = useState(false);
   const [error, setError] = useState('');
@@ -17,14 +18,26 @@ export function useStartNextMatch(gameType: GameType, roomID: string) {
   useEffect(() => {
     sequence.current++;
     pendingRef.current = false;
+    matchIDRef.current = '';
     setMatchID('');
     setPending(false);
     setError('');
     return () => {
       sequence.current++;
       pendingRef.current = false;
+      matchIDRef.current = '';
     };
   }, [gameType, roomID]);
+
+  const adoptMatch = useCallback((nextMatchID: string) => {
+    if (!nextMatchID || matchIDRef.current === nextMatchID) return;
+    sequence.current++;
+    pendingRef.current = false;
+    matchIDRef.current = nextMatchID;
+    setMatchID(nextMatchID);
+    setPending(false);
+    setError('');
+  }, []);
 
   const start = useCallback(async () => {
     if (!roomID || pendingRef.current) return false;
@@ -34,7 +47,10 @@ export function useStartNextMatch(gameType: GameType, roomID: string) {
     setError('');
     try {
       const result = await startNextGameMatch(gameType, roomID);
-      if (requestID !== sequence.current) return false;
+      if (requestID !== sequence.current) {
+        return matchIDRef.current === result.matchID;
+      }
+      matchIDRef.current = result.matchID;
       setMatchID(result.matchID);
       return true;
     } catch (reason) {
@@ -50,5 +66,5 @@ export function useStartNextMatch(gameType: GameType, roomID: string) {
     }
   }, [gameType, roomID]);
 
-  return { matchID, pending, error, start };
+  return { matchID, pending, error, start, adoptMatch };
 }

@@ -46,6 +46,7 @@ interface UseAuthoritativeSessionOptions<
   clearFeedbackOnCommandResult?: boolean;
   confirmationOrder?: 'epoch-first' | 'snapshot-first';
   onAcceptedSnapshot?: (context: AcceptedSnapshotContext<TSnapshot>) => void;
+  onMatchChanged?: (matchID: string) => void;
   confirmationTimeoutMs?: number;
 }
 
@@ -78,6 +79,7 @@ export function useAuthoritativeSession<
   clearFeedbackOnCommandResult = true,
   confirmationOrder = 'epoch-first',
   onAcceptedSnapshot,
+  onMatchChanged,
   confirmationTimeoutMs = 12000,
 }: UseAuthoritativeSessionOptions<
   TSnapshot,
@@ -97,6 +99,7 @@ export function useAuthoritativeSession<
   >();
   const [feedback, setFeedback] = useState('');
   const readyKeyRef = useRef('');
+  const matchChangeRef = useRef('');
 
   const clearPending = useCallback(() => {
     pendingRef.current = undefined;
@@ -131,13 +134,14 @@ export function useAuthoritativeSession<
 
     const next = message as unknown as TSnapshot;
     const previous = latestRef.current;
-    if (
-      previous
-      && (
-        next.matchID !== previous.matchID
-        || next.seq < previous.seq
-      )
-    ) {
+    if (previous && next.matchID !== previous.matchID) {
+      if (matchChangeRef.current !== next.matchID) {
+        matchChangeRef.current = next.matchID;
+        onMatchChanged?.(next.matchID);
+      }
+      return;
+    }
+    if (previous && next.seq < previous.seq) {
       return;
     }
 
@@ -175,6 +179,7 @@ export function useAuthoritativeSession<
     confirmationOrder,
     confirmsCommand,
     onAcceptedSnapshot,
+    onMatchChanged,
     roomID,
   ]);
 
@@ -182,6 +187,7 @@ export function useAuthoritativeSession<
     latestRef.current = undefined;
     latestEpochRef.current = undefined;
     readyKeyRef.current = '';
+    matchChangeRef.current = '';
     clearPending();
     setSnapshot(undefined);
     setFeedback('');

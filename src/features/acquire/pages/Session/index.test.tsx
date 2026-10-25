@@ -71,13 +71,17 @@ describe('Acquire session authentication preflight', () => {
 
     const loader = screen.getByRole('status');
     expect(mocks.getProfile).toHaveBeenCalledTimes(1);
-    expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1', '');
+    expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-1', '', expect.any(Function),
+    );
 
     await act(async () => {
       resolveProfile({ id: '42', name: 'Alice', email: 'alice@example.com' });
     });
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1', 'match-1'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-1', 'match-1', expect.any(Function),
+    ));
     expect(screen.getByRole('status')).toBe(loader);
   });
 
@@ -89,12 +93,16 @@ describe('Acquire session authentication preflight', () => {
     </MemoryRouter>);
 
     expect(await screen.findByText('对局信息确认失败')).toBeTruthy();
-    expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2', '');
+    expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-2', '', expect.any(Function),
+    );
 
     mocks.getProfile.mockResolvedValue({ id: '42', name: 'Alice', email: 'alice@example.com' });
     fireEvent.click(screen.getByRole('button', { name: '重新验证' }));
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2', 'match-1'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-2', 'match-1', expect.any(Function),
+    ));
   });
 
   it('resets the keyed bootstrap when the room id changes', async () => {
@@ -111,11 +119,17 @@ describe('Acquire session authentication preflight', () => {
       <Harness />
     </MemoryRouter>);
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1', 'room-1-match'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-1', 'room-1-match', expect.any(Function),
+    ));
     fireEvent.click(screen.getByRole('button', { name: '切换房间' }));
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2', ''));
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-2', 'room-2-match'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-2', '', expect.any(Function),
+    ));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-2', 'room-2-match', expect.any(Function),
+    ));
     expect(mocks.getProfile).toHaveBeenCalledTimes(2);
   });
 
@@ -125,7 +139,9 @@ describe('Acquire session authentication preflight', () => {
       <AcquireSessionPage />
     </MemoryRouter>);
 
-    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith('room-1', 'match-1'));
+    await waitFor(() => expect(mocks.useAcquireSession).toHaveBeenCalledWith(
+      'room-1', 'match-1', expect.any(Function),
+    ));
     expect(screen.getByRole('status')).toBeTruthy();
 
     mocks.useAcquireSession.mockReturnValue({

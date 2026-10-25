@@ -29,7 +29,11 @@ const createCommand = (
   payload: unknown,
 ) => createClientCommand('othello', matchID, commandID, type, payload);
 
-export function useOthelloSession(roomID: string, matchID: string) {
+export function useOthelloSession(
+  roomID: string,
+  matchID: string,
+  onMatchChanged?: (matchID: string) => void,
+) {
   return useAuthoritativeSession<
     Snapshot,
     ServerMessage,
@@ -45,6 +49,7 @@ export function useOthelloSession(roomID: string, matchID: string) {
     getWaitingKey,
     readyCommand: 'game_ready',
     createCommand,
+    onMatchChanged,
   });
 }
 

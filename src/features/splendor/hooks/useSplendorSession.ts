@@ -29,7 +29,11 @@ const createCommand = (
   payload: unknown,
 ) => createClientCommand('splendor', matchID, commandID, type, payload);
 
-export function useSplendorSession(roomID: string, matchID: string) {
+export function useSplendorSession(
+  roomID: string,
+  matchID: string,
+  onMatchChanged?: (matchID: string) => void,
+) {
   return useAuthoritativeSession<
     Snapshot,
     ServerMessage,
@@ -45,6 +49,7 @@ export function useSplendorSession(roomID: string, matchID: string) {
     getWaitingKey,
     readyCommand: 'game_ready',
     createCommand,
+    onMatchChanged,
   });
 }
 

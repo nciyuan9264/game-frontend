@@ -33,7 +33,11 @@ const createCommand = (
   payload: CommandPayload,
 ) => createClientCommand('acquire', matchID, commandID, type, payload);
 
-export function useAcquireSession(roomID: string, matchID: string) {
+export function useAcquireSession(
+  roomID: string,
+  matchID: string,
+  onMatchChanged?: (matchID: string) => void,
+) {
   const [activity, setActivity] = useState<string[]>([]);
   const onAcceptedSnapshot = useCallback(({
     previous,
@@ -82,6 +86,7 @@ export function useAcquireSession(roomID: string, matchID: string) {
     createCommand,
     confirmationOrder: 'snapshot-first',
     onAcceptedSnapshot,
+    onMatchChanged,
   });
   return { ...session, activity };
 }
