@@ -216,7 +216,7 @@
   .motionStatus { margin-top:9px; }
   .cancel,.goal,.journalCard { display:none; }
   .mobileDock { position:fixed; inset:auto 0 0; z-index:50; display:grid; min-height:calc(68px + env(safe-area-inset-bottom)); align-items:start; grid-template-columns:48px 1fr; gap:8px; padding:10px 12px env(safe-area-inset-bottom); border-top:1px solid #d9cebf; background:#faf7f1f5; backdrop-filter:blur(12px);
-    > button { display:grid; height:44px; place-items:center; border:1px solid #ddd1c3!important; border-radius:5px; background:#fffdf8!important; }
+    > button:not([data-game-action-button]) { display:grid; height:44px; place-items:center; border:1px solid #ddd1c3!important; border-radius:5px; background:#fffdf8!important; }
     > button[data-game-action-button] { min-height:44px; }
   }
   .rules { grid-template-columns:1fr; > p { grid-column:1; } }

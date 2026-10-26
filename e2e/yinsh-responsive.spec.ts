@@ -179,6 +179,10 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
     getComputedStyle(element).colorScheme)).toBe('light only');
   await expect(page.getByRole('heading', { name: '选择你的下一步' })).toBeVisible();
   await expect(page.getByText(/^公共池/).first()).toBeVisible();
+  const dockAction = page.getByTestId('yinsh-mobile-dock')
+    .getByRole('button', { name: '按坐标选择圆环' });
+  await expect(dockAction).toHaveCSS('background-color', 'rgb(121, 68, 83)');
+  await expect(dockAction).toHaveCSS('color', 'rgb(255, 250, 243)');
   const initialBoardBox = await board.boundingBox();
   expect(initialBoardBox?.x).toBeGreaterThanOrEqual(10);
   expect(initialBoardBox?.width).toBeGreaterThan(340);
