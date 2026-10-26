@@ -27,8 +27,6 @@ import {
   Target,
   TriangleAlert,
 } from 'lucide-react';
-import { HomeIndicator } from '../../components/mobile-shell/home-indicator';
-import { StatusBar } from '../../components/mobile-shell/status-bar';
 import {
   Brand,
   CardBack,
@@ -303,8 +301,7 @@ export function Play({
   return <div className={`game-app ${isRunner ? 'runner-game' : 'marshal-game'}`}
     data-testid="fugitive-play">
     <div className="game-underlay" aria-hidden={!!panel}>
-      <div className="topbar"><div className="mobile-system">
-        <StatusBar floating={false} color="white" /></div>
+      <div className="topbar">
         <header className="game-header">
           <button className="icon-button" type="button" aria-label="离开对局"
             onClick={onLeave}><ArrowLeft size={20} /></button>
@@ -510,7 +507,7 @@ export function Play({
               && <button className="button secondary" type="button"
                 disabled={!active} onClick={() => setPanel('pass')}>潜伏</button>}
               {primaryAction}</>}
-        </div><div className="home-wrap"><HomeIndicator floating={false} /></div>
+        </div>
       </div>
     </div>
 

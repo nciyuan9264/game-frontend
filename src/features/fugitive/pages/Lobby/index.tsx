@@ -1,18 +1,23 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import { QRCode } from 'antd';
 import {
   ArrowRight,
   ArrowUpRight,
   BookOpen,
   Check,
   Clock3,
+  Copy,
   Footprints,
   Globe2,
   Hash,
+  KeyRound,
   Layers,
   LockKeyhole,
   Plus,
+  QrCode,
   Search,
+  Share2,
   Shield,
   ShieldCheck,
   Trophy,
@@ -40,6 +45,7 @@ import {
 } from '../../components/Visual';
 import { useFugitiveLobby } from '../../hooks/useFugitiveLobby';
 import {
+  FUGITIVE_PUBLIC_URL,
   roomEntry,
   roomOwnerName,
 } from '../../model/adapters';
@@ -123,7 +129,8 @@ export default function Lobby() {
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('fugitive');
   const action = useLatestAsyncAction();
-  const [panel, setPanel] = useState<'create' | 'join'>();
+  const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
+  const [shareCopied, setShareCopied] = useState(false);
   const [draft, setDraft] = useState<RoomDraft>(defaultDraft);
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<FugitiveRoom>();
@@ -161,10 +168,19 @@ export default function Lobby() {
         lookupFugitiveRoom(code.trim(), signal)));
     } catch { /* Shared action exposes the error. */ }
   };
+  const copyShareURL = async () => {
+    try {
+      await navigator.clipboard.writeText(FUGITIVE_PUBLIC_URL);
+      setShareCopied(true);
+    } catch {
+      setShareCopied(false);
+    }
+  };
   const close = () => {
     if (action.pending) return;
     setPanel(undefined);
     setFoundRoom(undefined);
+    setShareCopied(false);
     action.reset();
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
@@ -184,9 +200,13 @@ export default function Lobby() {
               <button className="button primary" type="button" onClick={openCreate}>
                 <Plus size={17} />创建房间<ArrowRight size={17} />
               </button>
-              <Link className="button hero-secondary" to="/game/fugitive/guide">
-                了解玩法<ArrowUpRight size={16} />
-              </Link>
+              <button className="button hero-secondary" type="button"
+                onClick={() => {
+                  setShareCopied(false);
+                  setPanel('share');
+                }}>
+                <Share2 size={16} />分享游戏
+              </button>
             </div>
           </div>
           <div className="hero-label"><span>THE MIDNIGHT RUN</span>
@@ -196,7 +216,6 @@ export default function Lobby() {
           <span><Users size={16} /><b>2</b> 位玩家</span>
           <span><Clock3 size={16} /><b>10–20</b> 分钟</span>
           <span><Layers size={16} /><b>43</b> 张地点牌</span>
-          <Link to="/game/fugitive/guide">第一次来？读懂规则 <ArrowRight size={15} /></Link>
         </div>
         {ownRoom && <section className="own-room-return">
           <ProfileMonogram profile={profile.data} className="own-room-mark" />
@@ -262,7 +281,7 @@ export default function Lobby() {
           <Link className="learning-card" to="/game/fugitive/guide"><div>
             <Eyebrow>BEFORE YOUR FIRST MOVE</Eyebrow><h3>先读懂，再看穿。</h3>
             <p>3 分钟，学会你的第一场追逐。</p>
-            <b>了解玩法<ArrowUpRight size={14} /></b>
+            <b>查看指南<ArrowUpRight size={14} /></b>
           </div><BookOpen size={40} strokeWidth={1.2} /></Link>
           <div className="quick-role-actions">
             <button type="button" onClick={openCreate}><Footprints size={18} />
@@ -322,29 +341,65 @@ export default function Lobby() {
       {action.error && <p className="field-error" role="alert">{action.error}</p>}
     </Modal>}
 
-    {panel === 'join' && <Modal title="他已经在等你了？"
-      kicker="FOLLOW THE ROOM CODE" onClose={close}
-      footer={<button className="button primary full" type="button"
-        disabled={action.pending || !code.trim()}
-        onClick={() => foundRoom ? enter(foundRoom) : void find()}>
-        {foundRoom ? roomEntry(foundRoom, { userID }).label : '查找房间'}<ArrowRight size={17} />
-      </button>}>
-      <p className="muted">输入完整房间号，找到留下的位置。</p>
-      <label className="form-label" htmlFor="fugitive-join-code">房间号</label>
-      <input className="input code-input" id="fugitive-join-code"
-        autoComplete="off" enterKeyHint="go" placeholder="输入完整房间号"
-        value={code} onChange={event => {
-          setCode(event.target.value);
-          setFoundRoom(undefined);
-          action.reset();
-        }} onKeyDown={event => {
-          if (event.key === 'Enter' && code.trim()) void find();
-        }} />
+    {panel === 'join' && <Modal title="通过房间号加入"
+      kicker="FIND YOUR FRIENDS' TABLE" onClose={close}
+      footer={<><button className="button secondary" type="button"
+        disabled={action.pending} onClick={close}>取消</button>
+        <button className="button primary" type={foundRoom ? 'button' : 'submit'}
+          form={foundRoom ? undefined : 'fugitive-join-room'}
+          disabled={action.pending || !code.trim()
+            || !!foundRoom && !roomEntry(foundRoom, { userID }).allowed}
+          onClick={() => {
+            if (foundRoom) enter(foundRoom);
+          }}>
+          {foundRoom ? roomEntry(foundRoom, { userID }).label : '加入房间'}
+          <ArrowRight size={16} />
+        </button></>}>
+      <form id="fugitive-join-room" className="join-form"
+        onSubmit={event => {
+          event.preventDefault();
+          void find();
+        }}>
+        <div className="modal-emblem"><KeyRound size={29} /></div>
+        <label className="form-label" htmlFor="fugitive-join-code">房间号
+          <input className="input code-input" id="fugitive-join-code"
+            autoComplete="off" autoCapitalize="off" spellCheck={false}
+            placeholder="例如 0302_075034" disabled={action.pending}
+            value={code} onChange={event => {
+              setCode(event.target.value);
+              setFoundRoom(undefined);
+              action.reset();
+            }} />
+        </label>
+      </form>
       {action.error && <p className="field-error" role="alert">{action.error}</p>}
+      <div className="join-hint"><ShieldCheck size={16} />
+        <span>输入朋友分享的完整房间号。</span></div>
       {foundRoom && <div className="invitation"><h3>{foundRoom.displayName || '午夜追缉'}</h3>
         <p>{roomOwnerName(foundRoom)} · {foundRoom.roomPlayer.length}/2 已入座</p>
         <p>{foundRoom.roomPlayer.map(player => playerDisplayName(player)).join(' / ')}</p>
       </div>}
+    </Modal>}
+
+    {panel === 'share' && <Modal title="分享 Fugitive"
+      kicker="INVITE SOMEONE TO THE CHASE" className="share-dialog"
+      onClose={close}
+      footer={<><button className="button secondary" type="button"
+        onClick={close}>关闭</button>
+        <button className="button primary" type="button"
+          onClick={() => void copyShareURL()}>
+          {shareCopied ? <Check size={16} /> : <Copy size={16} />}
+          {shareCopied ? '链接已复制' : '复制游戏链接'}
+        </button></>}>
+      <div className="share-content">
+        <div className="share-qr"><QRCode type="svg"
+          value={FUGITIVE_PUBLIC_URL} size={184} bordered={false}
+          color="#172c22" bgColor="#eee8d8" errorLevel="M" /></div>
+        <div className="share-address"><span>游戏地址</span>
+          <strong>{FUGITIVE_PUBLIC_URL}</strong></div>
+        <p className="share-hint"><QrCode size={16} />
+          朋友可以扫码进入大厅，也可以使用复制的链接直接打开。</p>
+      </div>
     </Modal>}
   </AppShell>;
 }

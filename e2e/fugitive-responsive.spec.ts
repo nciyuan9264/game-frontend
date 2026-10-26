@@ -169,10 +169,78 @@ async function mockSession(page: Page) {
   });
 }
 
+async function mockLobby(page: Page) {
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        user_id: human.userID,
+        display_name: human.displayName,
+        avatar: '',
+      },
+    },
+  }));
+  await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { rooms: [] },
+    },
+  }));
+  await page.route('**/pam-api/platform/history/stats?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        totalGames: 0,
+        wins: 0,
+        winRate: 0,
+        avgScore: 0,
+        gamesByRole: {},
+        winsByRole: {},
+      },
+    },
+  }));
+}
+
 async function expectNoDocumentOverflow(page: Page) {
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
+
+test('Fugitive mobile lobby uses product chrome and shared entry flows', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockLobby(page);
+  await page.goto('/game/fugitive');
+
+  const createButton = page.getByRole('button', { name: /创建房间/ });
+  const shareButton = page.getByRole('button', { name: /分享游戏/ });
+  await expect(createButton).toBeVisible();
+  await expect(shareButton).toBeVisible();
+  await expect(page.locator('.mobile-system')).toHaveCount(0);
+  await expect(page.locator('.home-wrap')).toHaveCount(0);
+  await expect(page.getByText('了解玩法', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('第一次来？读懂规则')).toHaveCount(0);
+  await expect(createButton).toHaveCSS('justify-content', 'center');
+  await expect(createButton).toHaveCSS('align-items', 'center');
+  await expect(shareButton).toHaveCSS('justify-content', 'center');
+  await expect(shareButton).toHaveCSS('align-items', 'center');
+
+  await shareButton.click();
+  await expect(page.getByRole('dialog', { name: '分享 Fugitive' })).toBeVisible();
+  await expect(page.locator('.share-qr svg')).toHaveCount(1);
+  await expect(page.getByRole('button', { name: /复制游戏链接/ })).toBeVisible();
+  await page.getByRole('button', { name: '关闭弹窗' }).click();
+
+  await page.getByRole('button', { name: /房间号加入/ }).click();
+  await expect(page.getByRole('dialog', { name: '通过房间号加入' })).toBeVisible();
+  await expect(page.getByRole('textbox', { name: '房间号' }))
+    .toHaveAttribute('placeholder', '例如 0302_075034');
+  await expect(page.getByRole('button', { name: '取消' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /加入房间/ })).toBeDisabled();
+  await expectNoDocumentOverflow(page);
+});
 
 test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
@@ -183,6 +251,8 @@ test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
 
   await expect(page.getByTestId('fugitive-route')).toBeVisible();
   await expect(page.getByTestId('fugitive-mobile-dock')).toBeVisible();
+  await expect(page.locator('.mobile-system')).toHaveCount(0);
+  await expect(page.locator('.home-wrap')).toHaveCount(0);
   await expect(page.getByText('选择新的藏身点，或原地潜伏')).toBeVisible();
   await page.getByTestId('fugitive-mobile-dock')
     .getByRole('button', { name: /选择藏身点/ }).click();

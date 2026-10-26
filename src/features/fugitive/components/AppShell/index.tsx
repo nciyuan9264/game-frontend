@@ -14,8 +14,6 @@ import {
 import type { AuthProfile } from '@/features/game-core/api/auth';
 import { useFugitivePreferences } from '../../hooks/useFugitivePreferences';
 import { Brand, Modal } from '../Visual';
-import { HomeIndicator } from '../mobile-shell/home-indicator';
-import { StatusBar } from '../mobile-shell/status-bar';
 import styles from '../../styles.module.less';
 
 const navigation = [
@@ -110,7 +108,6 @@ export function AppShell({
           </div>
         </aside>}
         <div className="topbar">
-          <div className="mobile-system"><StatusBar floating={false} color="white" /></div>
           <header className="app-header">
             {room && <button className="icon-button" type="button" aria-label="返回大厅"
               onClick={() => navigate('/game/fugitive')}><ArrowLeft size={20} /></button>}
@@ -140,7 +137,7 @@ export function AppShell({
               <item.icon size={21} /><span>{item.short}</span>
             </button>;
           })}
-        </nav><div className="home-wrap"><HomeIndicator floating={false} /></div></div></>}
+        </nav></div></>}
       </div>
       {preferencesOpen && <Modal title="让行动更顺手。" kicker="DISPLAY PREFERENCES"
         onClose={() => setPreferencesOpen(false)}

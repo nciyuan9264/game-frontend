@@ -13,7 +13,6 @@ import {
 } from 'lucide-react';
 import { DECK_SOURCE_PAGE } from '../model/deck';
 import type { Card, Role } from '../model/types';
-import { HomeIndicator } from './mobile-shell/home-indicator';
 
 export const ART = {
   hero: 'https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/ff3c115f3fd61a4ca2ec4c415d748e87d6930984e6d2ed4878157b5d387b70c3.webp',
@@ -124,7 +123,6 @@ export function Modal({
           onClick={onClose}><X size={21} /></button></header>
       <div className="modal-body">{children}</div>
       {footer && <footer className="modal-foot">{footer}</footer>}
-      <div className="modal-home home-wrap"><HomeIndicator floating={false} /></div>
     </div>
   </div>;
 }

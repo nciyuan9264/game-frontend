@@ -4,8 +4,6 @@ import {
   Check,
   Eye,
 } from 'lucide-react';
-import { HomeIndicator } from '../../components/mobile-shell/home-indicator';
-import { StatusBar } from '../../components/mobile-shell/status-bar';
 import {
   Eyebrow,
   Portrait,
@@ -66,8 +64,7 @@ export function Results({
     item.revealed && item.card?.number !== 0).length;
 
   return <div className="game-app result-app">
-    <div className="topbar"><div className="mobile-system">
-      <StatusBar floating={false} color="white" /></div>
+    <div className="topbar">
       <header className="game-header result-topbar">
         <button className="icon-button" type="button" aria-label="返回大厅"
           onClick={onExit}><ArrowLeft size={20} /></button>
@@ -117,7 +114,6 @@ export function Results({
         disabled={rematchPending} onClick={onRematch}>
         {rematchPending ? '正在准备…' : '再来一局'}<ArrowRight size={16} /></button>
     </div><small>续局保留房间设置，房主可重新选择双方身份。</small>
-      <div className="home-wrap"><HomeIndicator floating={false} /></div>
     </footer>
   </div>;
 }
