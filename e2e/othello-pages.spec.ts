@@ -63,6 +63,13 @@ async function mockPublicData(page: Page) {
       data: { totalGames: 12, wins: 7, winRate: 7 / 12, avgScore: 34 },
     },
   }));
+  await page.route('**/pam-api/platform/history/games?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { games: [] },
+    },
+  }));
   await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
     json: {
       status_code: 0,
@@ -99,6 +106,16 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   const lobbyHero = page.getByTestId('othello-lobby-hero');
   await expect(lobbyHero).toBeVisible();
   expect((await lobbyHero.boundingBox())?.height).toBeLessThanOrEqual(240);
+  await page.evaluate(() => document.fonts.ready);
+  const createButton = lobbyHero.getByRole('button', { name: /新开一局/ });
+  const shareButton = lobbyHero.getByRole('button', { name: /分享游戏/ });
+  const [createBox, shareBox] = await Promise.all([
+    createButton.boundingBox(),
+    shareButton.boundingBox(),
+  ]);
+  expect(createBox).toMatchObject({ width: 129, height: 39 });
+  expect(shareBox).toMatchObject({ width: 99, height: 39 });
+  expect(createBox?.y).toBe(shareBox?.y);
   await expect(page.locator('[data-testid="othello-join-card"]:visible')).toBeVisible();
   const facts = page.getByTestId('othello-lobby-facts').locator(':scope > span');
   await expect(facts).toHaveCount(3);
@@ -107,6 +124,9 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   expect(new Set(factRows).size).toBe(1);
   const joinCard = page.locator('[data-testid="othello-join-card"]:visible');
   await joinCard.getByRole('textbox', { name: '查找房间号' }).fill('friend_room');
+  const lobbyHeading = page.getByRole('heading', { name: '挑一局，慢慢想。' });
+  await expect(lobbyHeading).toHaveCSS('font-size', '16px');
+  await expect(lobbyHeading).toHaveCSS('line-height', '25.6px');
   await joinCard.getByRole('button', { name: '查找房间' }).click();
   await expect(page.getByRole('heading', {
     name: '对面已经留好了位置？',
@@ -117,13 +137,27 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   await page.goto('/game/othello/rankings');
   const rankHero = page.getByTestId('othello-rank-hero');
   await expect(rankHero).toBeVisible();
-  expect((await rankHero.boundingBox())?.height).toBeLessThanOrEqual(180);
+  expect((await rankHero.boundingBox())?.height).toBe(139);
+  const rankPanel = page.getByRole('tablist', { name: '排行榜模式' }).locator('..');
+  expect((await rankPanel.boundingBox())?.height).toBeGreaterThanOrEqual(337);
   await expectNoOverflow(page);
 
   await page.goto('/game/othello/guide');
   const guideVisual = page.getByTestId('othello-guide-visual');
   await expect(guideVisual).toBeVisible();
-  expect((await guideVisual.boundingBox())?.height).toBeLessThanOrEqual(220);
+  expect((await guideVisual.boundingBox())?.height).toBe(266);
+  await expectNoOverflow(page);
+
+  await page.goto('/game/othello/me');
+  const playerID = page.getByText('PLAYER ID · 110');
+  await expect(playerID).toBeVisible();
+  const identity = playerID.locator('xpath=ancestor::aside[1]');
+  const history = page.getByRole('heading', { name: '过去的棋局' })
+    .locator('xpath=ancestor::section[1]');
+  const about = page.getByTestId('othello-about-entry');
+  expect((await identity.boundingBox())?.height).toBeCloseTo(324.58, 1);
+  expect((await history.boundingBox())?.height).toBe(142);
+  expect((await about.boundingBox())?.height).toBe(55);
   await expectNoOverflow(page);
 
   await page.setViewportSize({ width: 320, height: 568 });

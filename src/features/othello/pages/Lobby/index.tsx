@@ -137,7 +137,7 @@ export default function Lobby() {
         <p>简单的两种颜色，不简单的下一步。<br />在六十四格里，留一段安静思考的时间。</p>
         <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
           onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
-          <Plus size={17} />新开一局<ArrowRight size={17} />
+          <Plus size={17} />新开一局<ArrowRight size={16} />
         </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
           <Share2 size={16} />分享游戏</ActionButton></div></div>
         <OthelloStillLife /><span className={styles.heroCaption}>OTHELLO / THE QUIET COLLECTION</span></section>

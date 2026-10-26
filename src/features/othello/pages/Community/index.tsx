@@ -49,7 +49,7 @@ export function Rankings() {
   return <AppShell title="棋手排行" profile={profile.data}><div className={styles.page}>
     <header className={styles.title}><Eyebrow>THE QUIET MASTERS</Eyebrow>
       <h1>每一次翻转，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
-    <section className={styles.rankHero} data-testid="othello-rank-hero"><BrandMark size={58} /><div><h2>OTHELLO 棋手榜</h2>
+    <section className={styles.rankHero} data-testid="othello-rank-hero"><BrandMark size={58} /><div><small>OTHELLO LEADERBOARD</small><h2>OTHELLO 棋手榜</h2>
       <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div></section>
     <section className={styles.panel}><div className={styles.tabs} role="tablist" aria-label="排行榜模式"><button type="button"
       role="tab" aria-selected={mode === 'winRate'} className={mode === 'winRate' ? styles.active : ''} onClick={() => setMode('winRate')}>胜率榜</button>
