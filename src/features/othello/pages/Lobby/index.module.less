@@ -104,12 +104,30 @@
 }
 @media (max-width:1100px) and (min-width:768px) { .layout { grid-template-columns:1fr; } .side { display:none; } .roomGrid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:767px) {
-  .hero { height:230px; align-items:flex-start; > svg { right:-112px; bottom:-42px; width:410px; opacity:.5; } }
-  .heroCopy { width:100%; padding:19px 18px; h1 { margin:8px 0; font-size:26px; line-height:1.35; } p { max-width:240px; font-size:10px; line-height:1.7; } }
-  .heroActions { gap:7px; margin-top:13px; > button { min-width:0; flex:1; min-height:40px; padding:0 10px; } }
+  .hero {
+    height:clamp(300px,52vw,380px);
+    align-items:flex-start;
+    border-radius:9px;
+    background:linear-gradient(110deg,#f3ebe0 0%,#f8f2e9 42%,#eadfcd 100%);
+  }
+  .hero::after {
+    position:absolute;
+    inset:0;
+    z-index:1;
+    background:linear-gradient(90deg,#f6efe5f5 0%,#f6efe5dc 43%,#f6efe520 100%);
+    content:'';
+    pointer-events:none;
+  }
+  .heroCopy {
+    width:100%;
+    padding:30px 21px;
+    h1 { margin:13px 0 12px; font-size:34px; line-height:1.36; letter-spacing:.04em; }
+    p { max-width:265px; font-size:12px; line-height:1.85; }
+  }
+  .heroActions { gap:8px; margin-top:28px; > button { min-width:0; flex:1; min-height:48px; padding:0 13px; gap:8px; font-size:12px; } }
   .heroCaption { display:none; }
   .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; margin-bottom:18px; padding:14px 0;
-    > span { justify-content:center; gap:4px; font-size:8px; }
+    > span { justify-content:center; gap:5px; font-size:10px; }
     svg { width:14px; height:14px; }
     b { font-size:13px; }
     > a { display:none; }
@@ -119,6 +137,10 @@
   .toolbar { flex-wrap:wrap; margin-top:12px; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
   .roomGrid { grid-template-columns:1fr; }
   .roomCard { padding:17px; .roomIdentity h3 { font-size:16px; } > footer button { min-height:44px; min-width:94px; font-size:12px; } }
+  .empty { min-height:340px; padding:28px 19px;
+    h3 { font-size:19px; }
+    p { font-size:11px; }
+  }
   .side { display:none; }
   .mobileJoin { display:block; margin-top:13px;
     .joinCard { padding:18px; }
