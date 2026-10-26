@@ -134,20 +134,24 @@ export function My() {
   };
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
 
-  return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={styles.page}>
+  return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.heading}><div><small>YOUR CIPHER RECORD</small><h1>身份、判断与每一场对决。</h1></div><UserRoundIcon /></header>
     {loading ? <DavinciLoading title="正在整理你的破译档案。" description="同步身份、战绩与历史对局" /> : <div className={styles.profileLayout}>
-      <section className={styles.profileSummary}>
-        {profile.data && <><PlayerAvatar name={profile.data.name} avatar={profile.data.avatar} size={70} />
-          <div><small>PLAYER ID · {profile.data.id}</small><h2>{profile.data.name}</h2><span><Mail size={13} />{profile.data.email || '邮箱未绑定'}</span></div></>}
+      <section className={styles.profileDisplay} data-testid="davinci-profile-card">
+        {profile.data && <><div className={styles.profileIdentity} data-testid="davinci-profile-identity">
+          <PlayerAvatar name={profile.data.name} avatar={profile.data.avatar} size={72} />
+          <div><small className={styles.profileEyebrow}>THE CODE BREAKER</small><h2>{profile.data.name}</h2>
+            <span>PLAYER ID · {profile.data.id}</span></div>
+        </div>
+        <div className={styles.profileEmail}><Mail size={14} />{profile.data.email || '邮箱未绑定'}</div></>}
         <div className={styles.profileStats}><span><b>{stats.data?.totalGames ?? '—'}</b><small>对局</small></span>
           <span><b>{stats.data?.wins ?? '—'}</b><small>胜场</small></span>
           <span><b>{stats.data ? `${(stats.data.winRate * 100).toFixed(0)}%` : '—'}</b><small>胜率</small></span></div>
-        <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
+        <div className={styles.profileManage}><a className={styles.profileEdit} href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
           <ActionButton variant="quiet" pending={logoutAction.pending} onClick={() => void handleLogout()}><LogOut size={14} />退出登录</ActionButton></div>
         {logoutAction.error && <Feedback error>{logoutAction.error}</Feedback>}
       </section>
-      <section className={styles.history}><h2>最近对局</h2>
+      <section className={styles.profileHistory} data-testid="davinci-profile-history"><h2>最近对局</h2>
         {games.map(game => {
           const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id));
           const opponent = game.players?.find(player => player.id !== me?.id);
@@ -160,8 +164,9 @@ export function My() {
         {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link to="/game/davinci">去大厅开始第一局</Link></Feedback>}
       </section>
     </div>}
-    <button className={styles.about} data-testid="davinci-about-entry" type="button"
-      onClick={() => setAboutOpen(true)}><Info size={17} /><span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
+    <button className={styles.aboutEntry} data-testid="davinci-about-entry" type="button"
+      onClick={() => setAboutOpen(true)}><span className={styles.aboutEntryIcon}><Info size={17} /></span>
+      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
     {aboutOpen && <ResponsiveDialog title="关于 DaVinci Code Online" eyebrow="ABOUT & CONTACT" themeClassName={rootStyles.root}
       onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
       <ProjectContact gameName="DaVinci Code" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}

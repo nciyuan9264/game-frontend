@@ -291,3 +291,53 @@ for (const item of communityCases) {
     await expectNoOverflow(page);
   });
 }
+
+test('davinci mobile profile keeps the Acquire card geometry on narrow screens', async ({ page }) => {
+  await mockCommunityData(page, 'davinci');
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 356, height: 783 },
+  ]) {
+    await page.setViewportSize(viewport);
+    await page.goto('/game/davinci/me', { waitUntil: 'domcontentloaded' });
+
+    const card = page.getByTestId('davinci-profile-card');
+    const identity = page.getByTestId('davinci-profile-identity');
+    const history = page.getByTestId('davinci-profile-history');
+    const about = page.getByTestId('davinci-about-entry');
+    const avatar = identity.locator(':scope > span').first();
+    const playerName = identity.getByRole('heading', { name: '移动端玩家' });
+    await expect(card).toBeVisible();
+    await expect(history).toBeVisible();
+    await expect(about).toBeVisible();
+
+    const [
+      cardBox,
+      historyBox,
+      aboutBox,
+      avatarBox,
+      playerNameBox,
+    ] = await Promise.all([
+      card.boundingBox(),
+      history.boundingBox(),
+      about.boundingBox(),
+      avatar.boundingBox(),
+      playerName.boundingBox(),
+    ]);
+    expect(cardBox).not.toBeNull();
+    expect(historyBox).not.toBeNull();
+    expect(aboutBox).not.toBeNull();
+    expect(avatarBox).not.toBeNull();
+    expect(playerNameBox).not.toBeNull();
+    expect(Math.abs((cardBox?.x ?? 0) - (historyBox?.x ?? 0))).toBeLessThanOrEqual(1);
+    expect(Math.abs((cardBox?.width ?? 0) - (historyBox?.width ?? 0))).toBeLessThanOrEqual(1);
+    expect(Math.abs((cardBox?.x ?? 0) - (aboutBox?.x ?? 0))).toBeLessThanOrEqual(1);
+    expect(Math.abs((cardBox?.width ?? 0) - (aboutBox?.width ?? 0))).toBeLessThanOrEqual(1);
+    expect((avatarBox?.x ?? 0) + (avatarBox?.width ?? 0)).toBeLessThan(playerNameBox?.x ?? 0);
+    expect(Math.abs(
+      (avatarBox?.y ?? 0) + (avatarBox?.height ?? 0) / 2
+      - ((playerNameBox?.y ?? 0) + (playerNameBox?.height ?? 0) / 2),
+    )).toBeLessThanOrEqual(20);
+    await expectNoOverflow(page);
+  }
+});
