@@ -4,6 +4,7 @@ import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowRight,
   Brain,
+  BrickWall,
   Coins,
   CircleDot,
   Cpu,
@@ -120,6 +121,25 @@ const gameConfigs = [
       { icon: <Move size={20} />, title: '行动力争夺', desc: '压缩落点，掌握回合主动' },
       { icon: <Brain size={20} />, title: '启发式 AI', desc: '角落、边线与终局综合判断' },
       { icon: <Trophy size={20} />, title: '实际子数', desc: '双方无子可下时，多者获胜' },
+    ],
+  },
+  {
+    key: 'quoridor',
+    tabTitle: '步步为营',
+    tabSubtitle: 'QUORIDOR',
+    tabStatus: '路径策略',
+    badge: '九乘九格 · 经典双人对决',
+    title: 'QUORIDOR',
+    subtitle: '步步为营',
+    description: '移动棋子，落下围墙，在改写对手路线的同时守住自己的通路。越过相逢，绕开阻挡，率先抵达棋盘彼岸。',
+    route: '/game/quoridor',
+    cta: '进入步步为营大厅',
+    footer: 'The Art of Finding a Way',
+    features: [
+      { icon: <Footprints size={20} />, title: '移动与跳跃', desc: '直行、越过与受阻后的斜绕' },
+      { icon: <BrickWall size={20} />, title: '十道围墙', desc: '设障但不能封死任何通路' },
+      { icon: <Cpu size={20} />, title: '权威 AI', desc: '真人与人机使用同一套规则' },
+      { icon: <Flag size={20} />, title: '先到对边', desc: '抵达目标行即刻赢得对局' },
     ],
   },
   {
@@ -453,6 +473,43 @@ const OthelloVisual = () => {
   </>;
 };
 
+const QuoridorVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.quoridorMockup}`}
+    >
+      <div className={styles.quoridorUI}>
+        <div className={styles.quoridorHeader}>
+          <span>YOUR NEXT STEP</span><b>SOUTH · 10 WALLS</b>
+        </div>
+        <div className={styles.quoridorBoard}>
+          {Array.from({ length: 81 }, (_, index) =>
+            <i key={index}>
+              {index === 4 && <span className={styles.northPawn} />}
+              {index === 76 && <span className={styles.southPawn} />}
+            </i>)}
+          <span className={`${styles.homeWall} ${styles.wallOne}`} />
+          <span className={`${styles.homeWall} ${styles.wallTwo}`} />
+          <span className={`${styles.homeWall} ${styles.wallThree}`} />
+        </div>
+        <div className={styles.quoridorFooter}>
+          <span>9 × 9 CLASSIC</span><span>EVERY WALL · A NEW WAY</span>
+        </div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingQuoridorPawn} ${styles.southPawn}`} />
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={styles.floatingQuoridorWall} />
+  </>
+);
+
 
 const WarChestVisual = () => (
   <>
@@ -528,6 +585,7 @@ export default function Home() {
     splendor: styles.themeSplendor,
     yinsh: styles.themeYinsh,
     othello: styles.themeOthello,
+    quoridor: styles.themeQuoridor,
     warchest: styles.themeWarChest,
     fugitive: styles.themeFugitive,
   } as const;
@@ -537,6 +595,7 @@ export default function Home() {
     splendor: styles.gameTabSplendor,
     yinsh: styles.gameTabYinsh,
     othello: styles.gameTabOthello,
+    quoridor: styles.gameTabQuoridor,
     warchest: styles.gameTabWarChest,
     fugitive: styles.gameTabFugitive,
   } as const;
@@ -639,6 +698,8 @@ export default function Home() {
                         ? <YinshVisual />
                         : activeGame.key === 'othello'
                           ? <OthelloVisual />
+                          : activeGame.key === 'quoridor'
+                            ? <QuoridorVisual />
                           : activeGame.key === 'warchest'
                             ? <WarChestVisual />
                             : <FugitiveVisual />}

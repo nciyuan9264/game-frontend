@@ -41,6 +41,7 @@ export interface LobbyRoomLike {
   progressCurrent?: number;
   progressTotal?: number;
   maxControlledLocations?: number;
+  turnCount?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -126,6 +127,7 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     highestRevealed: room.metrics.fugitive?.highestRevealed,
     hiddenHideoutCount: room.metrics.fugitive?.hiddenHideoutCount,
     maxControlledLocations: room.metrics.warchest?.maxControlledLocations,
+    turnCount: room.metrics.quoridor?.turnCount,
     progressCurrent: room.metrics.fugitive?.progressCurrent
       ?? room.metrics.warchest?.progressCurrent
       ?? room.metrics.othello?.progressCurrent,

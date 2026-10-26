@@ -1,0 +1,20 @@
+.dialog {
+  width:min(520px,calc(100% - 48px));
+  border-radius:8px;
+  > header { padding:25px 28px 20px; }
+  > header h2 { font-size:24px; }
+  > header > button { width:36px; height:36px; }
+  > div { padding:22px 28px; }
+  > footer { padding:18px 28px 23px; }
+}
+@media (max-width:767px) {
+  .dialog {
+    width:100%;
+    max-height:calc(100dvh - 60px);
+    border-radius:14px 14px 0 0;
+    > header { padding:14px 20px 16px; }
+    > header h2 { font-size:22px; }
+    > div { padding:18px 20px; }
+    > footer { padding:15px 20px max(20px,env(safe-area-inset-bottom)); }
+  }
+}
