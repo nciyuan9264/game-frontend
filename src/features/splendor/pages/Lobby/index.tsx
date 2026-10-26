@@ -8,7 +8,7 @@ import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -21,7 +21,7 @@ import { Artwork, Eyebrow, GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { SplendorLoading } from '../../components/LoadingState';
 import { useSplendorLobby } from '../../hooks/useSplendorLobby';
-import { SPLENDOR_PUBLIC_URL, roomEntry, roomOwnerName } from '../../model/adapters';
+import { SPLENDOR_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import type { LobbyFilter, SplendorRoom, Visibility } from '../../model/types';
 import styles from './index.module.less';
 
@@ -39,20 +39,22 @@ function RoomCard({ room, userID, onEnter, artIndex }: {
   artIndex: number;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = roomOwnerName(room);
-  const players = room.roomPlayer;
+  const owner = roomOwnerProfile(room);
+  const players = owner.player
+    ? [owner.player, ...room.roomPlayer.filter(player => player !== owner.player)]
+    : room.roomPlayer;
   return <article className={styles.roomCard}>
     <div className={styles.roomTop}><span className={room.status === 'match' ? styles.waiting : styles.playing}>
       <i />{room.status === 'match' ? '等待加入' : '对局中'}</span>
       <b>#{room.roomID}</b>{room.visibility === 'private' && <LockKeyhole size={13} />}</div>
-    <div className={styles.roomTitle}><div><h3>{owner} 的商会</h3><p>经典对局 · {room.visibility === 'private' ? '私密' : '公开'}</p></div>
+    <div className={styles.roomTitle}><div><h3>{owner.name} 的商会</h3><p>经典对局 · {room.visibility === 'private' ? '私密' : '公开'}</p></div>
       <Artwork index={artIndex} /></div>
     <div className={styles.people}>{players.slice(0, 3).map(player =>
       <PlayerAvatar key={player.playerID} name={playerDisplayName(player)}
         avatar={player.avatar} ai={player.ai} size={31} />)}
       {players.length < room.maxPlayers && <span>+</span>}
       <strong>{players.length} <small>/ {room.maxPlayers} 人</small></strong></div>
-    <div className={styles.roomBottom}><span>{room.status === 'match' ? `${owner} 正在等待` : `最高声望 ${room.maxScore ?? 0}`}</span>
+    <div className={styles.roomBottom}><span>{room.status === 'match' ? `${owner.name} 正在等待` : `最高声望 ${room.maxScore ?? 0}`}</span>
       <ActionButton variant={entry.allowed ? 'secondary' : 'quiet'} disabled={!entry.allowed} onClick={() => onEnter(room)}>
         {entry.label}{entry.allowed && <ArrowRight size={15} />}
       </ActionButton></div>

@@ -39,6 +39,7 @@ const room: RoomInfo = {
     userID: 'user-1',
     playerID: 'player-1',
     displayName: 'Alice',
+    avatar: 'https://cdn.example.com/alice.png',
     seatIndex: 0,
     online: true,
     ai: false,
@@ -79,6 +80,7 @@ describe('game room API', () => {
       roomID: 'room-1',
       ownerID: 'player-1',
       ownerName: 'Alice',
+      ownerAvatar: 'https://cdn.example.com/alice.png',
       maxScore: 0,
     });
   });

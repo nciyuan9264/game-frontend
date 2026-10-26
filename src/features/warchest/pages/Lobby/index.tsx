@@ -23,9 +23,10 @@ import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { createWarChestRoom, lookupWarChestRoom } from '../../api/room';
-import { WARCHEST_PUBLIC_URL, roomEntry, roomOwnerName } from '../../adapters';
+import { WARCHEST_PUBLIC_URL, roomEntry } from '../../adapters';
 import { useWarChestLobby } from '../../hooks/useWarChestLobby';
 import type { LobbyFilter, Visibility, WarChestRoom } from '../../types';
 import { HERO, Crest, Eyebrow, Modal, UnitGlyph } from '../../visuals';
@@ -54,7 +55,7 @@ function RoomCard({
   onEnter: (room: WarChestRoom) => void;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = roomOwnerName(room);
+  const owner = roomOwnerProfile(room);
   const playing = room.status !== 'match';
   const progress = Math.max(0, Math.min(6, room.maxControlledLocations ?? 0));
   const glyphs: UnitId[] = ['pike', 'light', 'crossbow'];
@@ -68,14 +69,19 @@ function RoomCard({
     <p>{playing ? `领先方已控制 ${progress} 处` : '完整基础版'}<span>·</span>
       {room.turnTimeoutSeconds ?? 90} 秒行动</p>
     <div className="room-card-bottom"><div className="room-seats">
-      {room.roomPlayer.map((player, index) => <Crest key={player.playerID}
-        side={index ? 1 : 0} size={30} />)}
+      {owner.player && <span className="room-owner-avatar" aria-hidden="true">
+        {owner.avatar
+          ? <img src={owner.avatar} alt="" referrerPolicy="no-referrer" />
+          : Array.from(owner.name.trim() || '将').slice(0, 1).join('')}
+      </span>}
+      {room.roomPlayer.filter(player => player !== owner.player).map(player =>
+        <Crest key={player.playerID} side={1} size={30} />)}
       {room.roomPlayer.length < 2 && <span className="empty-seat-mini">+</span>}
       <span>{room.roomPlayer.length}<small> / 2</small></span></div>
       <button className={entry.allowed ? 'room-join' : 'room-view'}
         type="button" disabled={!entry.allowed} onClick={() => onEnter(room)}>
         {entry.label}{entry.allowed && <ArrowRight size={15} />}</button></div>
-    <div className="room-host">{owner} 的房间</div>
+    <div className="room-host">{owner.name} 的房间</div>
     {playing && <div className="room-card-progress"><i style={{ width: `${progress / 6 * 100}%` }} /></div>}
   </article>;
 }

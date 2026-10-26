@@ -8,7 +8,7 @@ import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -19,7 +19,7 @@ import { Brand, Disc, OthelloStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { OthelloLoading } from '../../components/LoadingState';
 import { useOthelloLobby } from '../../hooks/useOthelloLobby';
-import { OTHELLO_PUBLIC_URL, roomEntry, roomOwnerName } from '../../model/adapters';
+import { OTHELLO_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import type { LobbyFilter, Visibility, OthelloRoom } from '../../model/types';
 import styles from './index.module.less';
 
@@ -40,19 +40,22 @@ function RoomCard({
   onEnter: (room: OthelloRoom) => void;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = roomOwnerName(room);
+  const owner = roomOwnerProfile(room);
+  const players = owner.player
+    ? [owner.player, ...room.roomPlayer.filter(player => player !== owner.player)]
+    : room.roomPlayer;
   return <article className={styles.roomCard}>
     <header><span className={room.status === 'match' ? styles.waiting : styles.playing}>
       <i />{room.status === 'match' ? '等待落座' : '对局中'}
     </span><b>#{room.roomID}</b>{room.visibility === 'private' && <LockKeyhole size={13} />}</header>
     <div className={styles.roomIdentity}><span><Disc side="black" /><Disc side="white" /></span>
-      <div><h3>{owner} 的棋室</h3><p>经典 8 × 8 · {room.visibility === 'private' ? '私密' : '公开'}</p></div></div>
-    <div className={styles.players}>{room.roomPlayer.map(player =>
+      <div><h3>{owner.name} 的棋室</h3><p>经典 8 × 8 · {room.visibility === 'private' ? '私密' : '公开'}</p></div></div>
+    <div className={styles.players}>{players.map(player =>
       <PlayerAvatar key={player.playerID} name={playerDisplayName(player)}
         avatar={player.avatar} ai={player.ai} size={32} />)}
       {room.roomPlayer.length < 2 && <span>+</span>}
       <strong>{room.roomPlayer.length}<small> / 2</small></strong></div>
-    <footer><span>{room.status === 'match' ? `${owner} 正在等你` : `盘面已有 ${room.occupiedCount ?? 4} 子`}</span>
+    <footer><span>{room.status === 'match' ? `${owner.name} 正在等你` : `盘面已有 ${room.occupiedCount ?? 4} 子`}</span>
       <ActionButton variant={entry.allowed ? 'secondary' : 'quiet'} disabled={!entry.allowed}
         onClick={() => onEnter(room)}>{entry.label}{entry.allowed && <ArrowRight size={15} />}</ActionButton></footer>
   </article>;

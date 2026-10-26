@@ -27,7 +27,7 @@ import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   createFugitiveRoom,
@@ -47,7 +47,6 @@ import { useFugitiveLobby } from '../../hooks/useFugitiveLobby';
 import {
   FUGITIVE_PUBLIC_URL,
   roomEntry,
-  roomOwnerName,
 } from '../../model/adapters';
 import type {
   FugitiveRoom,
@@ -86,7 +85,7 @@ function RoomCard({
   onEnter: (room: FugitiveRoom) => void;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = roomOwnerName(room);
+  const owner = roomOwnerProfile(room);
   const playing = room.status !== 'match';
   const ownerRole = roomRole(room);
   const scene = Array.from(room.roomID).reduce((total, value) =>
@@ -108,11 +107,12 @@ function RoomCard({
     </div><Scene index={scene} className="room-card-art" /></div>
     <div className="room-card-bottom">
       <div className="room-members">
-        <Portrait role={ownerRole} className="avatar" />
+        <ProfileMonogram profile={{ name: owner.name, avatar: owner.avatar }}
+          className="avatar owner-avatar" />
         {room.roomPlayer.length > 1
           ? <Portrait role={ownerRole === 'fugitive' ? 'marshal' : 'fugitive'} className="avatar" />
           : <span className="vacant-avatar"><Plus size={12} /></span>}
-        <span><b>{room.roomPlayer.length} / 2</b><small>{owner} 的房间</small></span>
+        <span><b>{room.roomPlayer.length} / 2</b><small>{owner.name} 的房间</small></span>
       </div>
       <button className={`button ${entry.allowed ? 'room-join' : 'secondary'}`}
         type="button" disabled={!entry.allowed}
@@ -368,7 +368,7 @@ export default function Lobby() {
       <div className="join-hint"><ShieldCheck size={16} />
         <span>输入朋友分享的完整房间号。</span></div>
       {foundRoom && <div className="invitation"><h3>{foundRoom.displayName || '午夜追缉'}</h3>
-        <p>{roomOwnerName(foundRoom)} · {foundRoom.roomPlayer.length}/2 已入座</p>
+        <p>{roomOwnerProfile(foundRoom).name} · {foundRoom.roomPlayer.length}/2 已入座</p>
         <p>{foundRoom.roomPlayer.map(player => playerDisplayName(player)).join(' / ')}</p>
       </div>}
     </Modal>}

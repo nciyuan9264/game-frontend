@@ -59,10 +59,17 @@ export function playerDisplayName(
     || (player?.ai ? 'AI' : playerID ? `玩家 ${playerID}` : '玩家');
 }
 
-export function roomOwnerName(room: LobbyRoomLike) {
+export function roomOwnerProfile(room: LobbyRoomLike) {
   const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
-  return room.ownerName
-    || playerDisplayName(owner, room.ownerID);
+  return {
+    player: owner,
+    name: room.ownerName || playerDisplayName(owner, room.ownerID),
+    avatar: room.ownerAvatar || owner?.avatar,
+  };
+}
+
+export function roomOwnerName(room: LobbyRoomLike) {
+  return roomOwnerProfile(room).name;
 }
 
 export function roomEntry(room: LobbyRoomLike, identity: RoomEntryIdentity) {
@@ -101,6 +108,7 @@ export function filterLobbyRooms<TRoom extends LobbyRoomLike>(
 }
 
 export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
+  const owner = room.players.find(player => player.playerID === room.ownerPlayerID);
   return {
     roomID: room.roomID,
     gameType: room.gameType as GameType,
@@ -117,8 +125,8 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
       ...player,
       name: player.displayName,
     })),
-    ownerName: room.players.find(player => player.playerID === room.ownerPlayerID)?.displayName,
-    ownerAvatar: room.players.find(player => player.playerID === room.ownerPlayerID)?.avatar,
+    ownerName: owner?.displayName,
+    ownerAvatar: owner?.avatar,
     emptyTileCount: room.metrics.acquire?.emptyTileCount,
     boardCardCount: room.metrics.davinci?.boardCardCount,
     maxScore: room.metrics.splendor?.maxScore,

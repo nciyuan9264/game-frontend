@@ -11,6 +11,7 @@ describe('Acquire room card', () => {
       roomID: 'private-room',
       ownerID: '42',
       ownerName: 'Alice',
+      ownerAvatar: 'https://cdn.example.com/alice.png',
       maxPlayers: 6,
       visibility: 'private',
       status: 'match',
@@ -21,6 +22,9 @@ describe('Acquire room card', () => {
 
     expect(screen.getByText('仅你可见')).toBeTruthy();
     expect(screen.getByRole('button', { name: '返回房间 private-room' })).toBeTruthy();
+    expect(document.querySelector('img')?.getAttribute('src')).toBe(
+      'https://cdn.example.com/alice.png',
+    );
     const progress = screen.getByRole('progressbar', { name: '对局进度' });
     expect(progress.getAttribute('aria-valuenow')).toBe('0');
     expect(progress.getAttribute('aria-valuemax')).toBe('108');

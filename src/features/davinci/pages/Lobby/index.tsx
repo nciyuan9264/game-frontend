@@ -7,7 +7,7 @@ import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -18,7 +18,7 @@ import { createDavinciRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { DavinciLoading } from '../../components/LoadingState';
 import { useDavinciLobby } from '../../hooks/useDavinciLobby';
-import { DAVINCI_PUBLIC_URL, roomEntry, roomOwnerName } from '../../model/adapters';
+import { DAVINCI_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import type { DavinciRoom, LobbyFilter } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
@@ -43,12 +43,12 @@ function RoomCard({ room, userID, onEnter }: {
   onEnter: (room: DavinciRoom) => void;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
+  const owner = roomOwnerProfile(room);
   const progress = Math.max(0, Math.min(100, ((26 - (room.boardCardCount ?? 26)) / 26) * 100));
   return <article className={styles.roomCard}>
     <header><span><i className={room.status === 'match' ? styles.waiting : styles.playing} />{room.status === 'match' ? '等待加入' : '对局中'}</span><b>{room.roomID}</b></header>
-    <div className={styles.owner}><PlayerAvatar name={roomOwnerName(room)} avatar={room.ownerAvatar || owner?.avatar} size={38} />
-      <div><small>房主</small><strong>{roomOwnerName(room)}</strong></div></div>
+    <div className={styles.owner}><PlayerAvatar name={owner.name} avatar={owner.avatar} size={38} />
+      <div><small>房主</small><strong>{owner.name}</strong></div></div>
     <div className={styles.seats} aria-label={`${room.roomPlayer.length} / ${room.maxPlayers} 个席位`}>
       {Array.from({ length: room.maxPlayers }, (_, index) => {
         const player = room.roomPlayer.find(item => item.seatIndex === index) ?? room.roomPlayer[index];

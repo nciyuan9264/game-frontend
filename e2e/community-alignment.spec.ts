@@ -121,7 +121,11 @@ function metric(gameType: GameType, index: number) {
   };
 }
 
-async function mockCommunityData(page: Page, gameType: GameType) {
+async function mockCommunityData(
+  page: Page,
+  gameType: GameType,
+  rooms: Array<Record<string, unknown>> = [],
+) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -135,7 +139,7 @@ async function mockCommunityData(page: Page, gameType: GameType) {
     },
   }));
   await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
-    json: { status_code: 0, message: 'ok', data: { rooms: [] } },
+    json: { status_code: 0, message: 'ok', data: { rooms } },
   }));
   await page.route('**/pam-api/platform/history/stats?**', route => route.fulfill({
     json: {
@@ -170,6 +174,71 @@ async function mockCommunityData(page: Page, gameType: GameType) {
       },
     },
   }));
+}
+
+const ownerAvatarURL = '/test-owner-avatar.png';
+const avatarPNG = Buffer.from(
+  'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFElEQVR4nGP4z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==',
+  'base64',
+);
+
+function ownerIdentityRoom(gameType: GameType) {
+  const roomID = `${gameType}_owner_identity`;
+  return {
+    roomID,
+    gameType,
+    status: 'match',
+    visibility: 'public',
+    ownerUserID: '220',
+    ownerPlayerID: 'owner-220',
+    maxPlayers: gameType === 'acquire' ? 6
+      : gameType === 'davinci' || gameType === 'splendor' ? 4 : 2,
+    playerCount: 2,
+    currentMatchID: `${roomID}-r1`,
+    currentMatchStatus: 'preparing',
+    nextRoundNo: 1,
+    createdAt: '2026-10-26T00:00:00Z',
+    updatedAt: '2026-10-26T00:00:00Z',
+    displayName: gameType === 'fugitive' ? '午夜追缉'
+      : gameType === 'warchest' ? '雾谷前哨' : undefined,
+    turnTimeoutSeconds: gameType === 'warchest' ? 90 : 60,
+    players: [{
+      userID: '330',
+      playerID: 'guest-330',
+      displayName: '先返回的玩家',
+      avatar: '',
+      seatIndex: 1,
+      online: true,
+      ai: false,
+      ready: true,
+      gameRole: gameType === 'fugitive' ? 'marshal' : undefined,
+    }, {
+      userID: '220',
+      playerID: 'owner-220',
+      displayName: '真实房主',
+      avatar: ownerAvatarURL,
+      seatIndex: 0,
+      online: true,
+      ai: false,
+      ready: true,
+      gameRole: gameType === 'fugitive' ? 'fugitive' : undefined,
+    }],
+    metrics: {
+      acquire: { emptyTileCount: 108, progressCurrent: 0, progressTotal: 108 },
+      davinci: { boardCardCount: 26, progressCurrent: 0, progressTotal: 26 },
+      splendor: { maxScore: 0, progressCurrent: 0, progressTotal: 15 },
+      yinsh: { ringsRemoved: 0, progressCurrent: 0, progressTotal: 3 },
+      othello: { occupiedCount: 4, progressCurrent: 0, progressTotal: 60 },
+      fugitive: {
+        highestRevealed: 0,
+        hiddenHideoutCount: 0,
+        progressCurrent: 0,
+        progressTotal: 42,
+      },
+      warchest: { maxControlledLocations: 0, progressCurrent: 0, progressTotal: 6 },
+      quoridor: { turnCount: 0 },
+    },
+  };
 }
 
 async function expectNoOverflow(page: Page) {
@@ -231,6 +300,38 @@ for (const item of lobbyCases) {
     }
     await expect(page.locator('input[placeholder="输入完整房间号"]:visible')).toBeVisible();
     await expectNoOverflow(page);
+  });
+}
+
+for (const item of lobbyCases) {
+  test(`${item.gameType} lobby card binds the real owner name and avatar`, async ({ page }) => {
+    const room = ownerIdentityRoom(item.gameType);
+    await page.route('**/test-owner-avatar.png', route => route.fulfill({
+      body: avatarPNG,
+      contentType: 'image/png',
+    }));
+    await mockCommunityData(page, item.gameType, [room]);
+
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 1440, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
+
+      const card = page.locator('article').filter({ hasText: room.roomID }).first();
+      const ownerAvatar = card.locator(`img[src="${ownerAvatarURL}"]`).first();
+      await expect(card.getByText('真实房主', { exact: false }).first()).toBeVisible();
+      await expect(ownerAvatar).toBeVisible();
+      await expect.poll(() => ownerAvatar.evaluate(image =>
+        image instanceof HTMLImageElement
+        && image.complete
+        && image.naturalWidth > 0)).toBe(true);
+      const avatarBox = await ownerAvatar.boundingBox();
+      expect(avatarBox?.width).toBeGreaterThanOrEqual(20);
+      expect(avatarBox?.height).toBeGreaterThanOrEqual(20);
+      await expectNoOverflow(page);
+    }
   });
 }
 

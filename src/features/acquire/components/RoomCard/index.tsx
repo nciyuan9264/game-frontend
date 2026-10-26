@@ -1,7 +1,8 @@
 import { ArrowRight, Building2, Lock, Users } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { roomOwnerProfile } from '@/features/game-core/model/room';
 import type { AcquireRoom } from '../../model/types';
-import { roomEntry, roomOwnerName } from '../../model/adapters';
+import { roomEntry } from '../../model/adapters';
 import { PlayerAvatar } from '../AppShell';
 import styles from './index.module.less';
 
@@ -22,8 +23,7 @@ export function RoomCard({ room, userID, onEnter }: {
   onEnter: (room: AcquireRoom) => void;
 }) {
   const entry = roomEntry(room, { userID });
-  const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
-  const name = roomOwnerName(room);
+  const owner = roomOwnerProfile(room);
   const bots = room.roomPlayer.filter(player => player.ai).length;
   const progress = roomProgress(room);
   return <article className={styles.card} aria-label={`房间 ${room.roomID}`}>
@@ -32,7 +32,7 @@ export function RoomCard({ room, userID, onEnter }: {
       <span className={`${styles.status} ${room.status !== 'match' ? styles.playing : ''}`}>{room.status === 'match' ? '等待入座' : room.status === 'end' ? '已结束' : '对局中'}</span>
     </div>
     <div className={styles.meta}>
-      <div className={styles.host}><PlayerAvatar name={name} avatar={room.ownerAvatar || owner?.avatar} size={24} /><span>房主</span><strong title={name}>{name}</strong></div>
+      <div className={styles.host}><PlayerAvatar name={owner.name} avatar={owner.avatar} size={24} /><span>房主</span><strong title={owner.name}>{owner.name}</strong></div>
       <span className={`${styles.mode} ${room.visibility === 'private' ? styles.private : ''}`}>
         {room.visibility === 'private' ? <><Lock size={13} />仅你可见</> : <><Building2 size={13} />经典对局</>}
       </span>

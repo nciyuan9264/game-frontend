@@ -5,6 +5,7 @@ import {
   playerDisplayName,
   roomEntry,
   roomOwnerName,
+  roomOwnerProfile,
   sortLobbyRooms,
   type LobbyRoomLike,
 } from './room';
@@ -28,6 +29,15 @@ describe('shared lobby room model', () => {
   it('resolves owner names and entry states', () => {
     expect(playerDisplayName(room.roomPlayer[0])).toBe('Alice-Cooper-7');
     expect(roomOwnerName(room)).toBe('Alice-Cooper-7');
+    expect(roomOwnerProfile({
+      ...room,
+      ownerName: 'Current Alice',
+      ownerAvatar: 'https://cdn.example.com/alice.png',
+    })).toMatchObject({
+      player: room.roomPlayer[0],
+      name: 'Current Alice',
+      avatar: 'https://cdn.example.com/alice.png',
+    });
     expect(roomEntry(room, { userID: '7' })).toEqual({ allowed: true, label: '返回房间' });
     expect(roomEntry({ ...room, status: 'playing' }, { userID: '8' })).toEqual({ allowed: false, label: '已开局' });
     expect(roomEntry({ ...room, roomPlayer: [...room.roomPlayer, {

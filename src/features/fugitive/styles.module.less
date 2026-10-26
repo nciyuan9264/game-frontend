@@ -1459,6 +1459,8 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
 .room-card-bottom{display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:44px}
 .room-members{display:flex;align-items:center;min-width:0}
 .room-members .avatar,.member-monogram,.vacant-avatar{width:27px;height:27px;border:1px solid #5a7150;flex-shrink:0}
+.profile-monogram{display:grid;place-items:center;border-radius:50%;overflow:hidden}
+.profile-monogram>img,.room-members .owner-avatar>img{position:static;width:100%;height:100%;object-fit:cover}
 .member-monogram{font-size:16px}
 .vacant-avatar{border:1px dashed #5a7150;border-radius:50%;display:grid;place-items:center;color:#9bb58b;background:#1d2c20}
 .room-members>.avatar+.avatar,.room-members>.vacant-avatar,.room-members>.member-monogram+.avatar{margin-left:-8px}

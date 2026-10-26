@@ -140,6 +140,7 @@ export interface GetUserReq {
 export interface PublicUserProfile {
   user_id: string;
   display_name: string;
+  avatar?: string;
 }
 
 export interface BatchGetPublicProfilesReq {

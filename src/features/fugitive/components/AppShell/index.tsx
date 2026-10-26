@@ -59,11 +59,15 @@ export function ProfileMonogram({
   profile,
   className = '',
 }: {
-  profile?: Pick<AuthProfile, 'name'>;
+  profile?: Pick<AuthProfile, 'name'> & { avatar?: AuthProfile['avatar'] };
   className?: string;
 }) {
   const value = Array.from(profile?.name.trim() || '追').slice(0, 1).join('');
-  return <span className={className} aria-hidden="true">{value}</span>;
+  return <span className={`${className} profile-monogram`} aria-hidden="true">
+    {profile?.avatar
+      ? <img src={profile.avatar} alt="" referrerPolicy="no-referrer" />
+      : value}
+  </span>;
 }
 
 export function AppShell({
