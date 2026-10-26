@@ -194,7 +194,8 @@ export function Play({
       <span className={styles.spacer} />
       <button type="button" aria-label="查看棋谱" onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-      <button type="button" aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>
+      {!ended && <button type="button" aria-label="打开对局菜单"
+        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
       {ended
         ? <button type="button" className={styles.resultReturn}
           aria-label="返回终局结算" onClick={() => ui.setShowResults(true)}>
@@ -304,7 +305,7 @@ export function Play({
           <span>0{index + 1}</span><div><h3>{section[0]}</h3><p>{section[1]}</p></div></article>)}
         <p><Info size={15} />线上对局不提供撤回或策略推荐；合法落点提示不改变服务端判定。</p>
       </div></Dialog>}
-    {ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE"
+    {!ended && ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE"
       onClose={() => ui.setPanel(undefined)}><div className={styles.menu}>
         <button type="button" onClick={() => ui.setPanel('activity')}><History size={20} />
           <span><b>查看棋谱</b><small>回看当前对局的每一步</small></span><ChevronRight size={16} /></button>

@@ -244,7 +244,8 @@ export function Play({
       <span className={styles.spacer} />
       <button type="button" aria-label="查看棋谱" onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-      <button type="button" aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>
+      {!ended && <button type="button" aria-label="打开对局菜单"
+        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
       {ended
         ? <button type="button" className={styles.resultReturn}
           aria-label="返回终局结算" onClick={() => ui.setShowResults(true)}>
@@ -395,7 +396,7 @@ export function Play({
                 : `${data.roomData.legalMoves[pointID]?.length ?? 0} 个落点`}</small>
         </button>)}</div>
     </Dialog>}
-    {ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
+    {!ended && ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
       <div className={styles.menu}><button type="button" onClick={() => ui.setPanel('activity')}><History size={18} /><span><b>完整棋谱</b><small>查看本局所有权威动作</small></span><ArrowRight size={15} /></button>
         <button type="button" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /><span><b>玩法指南</b><small>移动、翻色、取环与特例</small></span><ArrowRight size={15} /></button>
         <button type="button" className={styles.danger} disabled={ended} onClick={() => ui.setPanel('resign')}><Flag size={18} /><span><b>结束并认输</b><small>对手将立即获胜</small></span><ArrowRight size={15} /></button></div>

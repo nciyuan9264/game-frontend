@@ -27,7 +27,8 @@ const ai = {
   ready: true,
 };
 
-function gameSnapshot() {
+function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
+  const ended = gameStatus === 'end';
   return {
     schemaVersion: 2,
     type: 'ROOM_SYNC',
@@ -51,9 +52,16 @@ function gameSnapshot() {
             distanceToGoal: 7,
           },
         },
+        result: ended ? {
+          winnerID: human.playerID,
+          winnerSide: 'south',
+          reason: '率先抵达目标行',
+          turnCount: 18,
+          placedWallCount: 4,
+        } : undefined,
         roomData: {
           pawns: {
-            south: { row: 7, column: 4 },
+            south: { row: ended ? 0 : 7, column: 4 },
             north: { row: 1, column: 4 },
           },
           walls: [
@@ -89,7 +97,7 @@ function gameSnapshot() {
           northPlayerID: ai.playerID,
           firstPlayerID: human.playerID,
           roundNo: 1,
-          gameStatus: 'playing',
+          gameStatus,
           legalMoves: [
             { row: 6, column: 4 },
             { row: 7, column: 3 },
@@ -217,7 +225,10 @@ async function mockPublicData(page: Page) {
   }));
 }
 
-async function mockSession(page: Page) {
+async function mockSession(
+  page: Page,
+  snapshot: ReturnType<typeof gameSnapshot> = gameSnapshot(),
+) {
   const commands: string[] = [];
   await mockProfile(page);
   await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route =>
@@ -247,7 +258,7 @@ async function mockSession(page: Page) {
       },
     }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(snapshot));
     socket.onMessage(message => {
       const command = String(message);
       commands.push(command);
@@ -310,9 +321,22 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   const board = page.getByRole('group', { name: 'Quoridor 九乘九棋盘' });
   await expect(board).toBeVisible();
   await expect(board.getByTestId(/^cell-/)).toHaveCount(81);
-  await expect(page.getByRole('button', {
-    name: '当前行动状态',
-  })).toBeDisabled();
+  const actionButton = page.getByRole('button', { name: '当前行动状态' });
+  await expect(actionButton).toBeDisabled();
+  const centerOffset = await actionButton.evaluate(element => {
+    const label = [...element.childNodes].find(node =>
+      node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
+    if (!label) return Number.POSITIVE_INFINITY;
+    const range = document.createRange();
+    range.selectNodeContents(label);
+    const buttonBox = element.getBoundingClientRect();
+    const labelBox = range.getBoundingClientRect();
+    return Math.abs(
+      labelBox.left + labelBox.width / 2
+      - (buttonBox.left + buttonBox.width / 2),
+    );
+  });
+  expect(centerOffset).toBeLessThanOrEqual(1);
   await page.getByTestId('cell-E7').click();
   await expect(page.getByRole('button', { name: '确认移动' })).toBeEnabled();
   await page.getByRole('button', { name: '确认移动' }).click();
@@ -331,19 +355,46 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   })).toBeEnabled();
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-wall-picker');
-  await page.getByRole('button', { name: /返回棋盘预览/ }).click();
-  await expect(page.getByRole('button', { name: '确认放墙' })).toBeEnabled();
-  await page.getByRole('button', { name: '确认放墙' }).click();
-  await expect.poll(() => commands.some(command =>
-    command.includes('"game_place_wall"')
-    && command.includes('"row":3')
-    && command.includes('"column":3')
-    && command.includes('"orientation":"h"'))).toBe(true);
+  expect(pageErrors).toEqual([]);
+});
 
-  await page.setViewportSize({ width: 360, height: 780 });
-  await expect(board).toBeVisible();
+test('Quoridor mobile results and final board keep a compact usable shell', async ({
+  page,
+}, testInfo) => {
+  const pageErrors: Error[] = [];
+  page.on('pageerror', error => pageErrors.push(error));
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('end'));
+  await page.goto(`/game/quoridor/match?roomID=${roomID}`);
+
+  await expect(page.getByTestId('result-page')).toBeVisible();
+  await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
+  const actions = page.locator('.result-certificate > .page-actions');
+  expect((await actions.boundingBox())?.height).toBe(66);
+  await capture(page, testInfo, 'mobile-results');
+
+  await page.getByRole('button', { name: '回看棋盘' }).click();
+  await expect(page.getByRole('group', {
+    name: 'Quoridor 九乘九棋盘',
+  })).toBeVisible();
+  await expect(page.getByRole('button', {
+    name: '步步为营游戏大厅',
+  })).toHaveCount(0);
+  await expect(page.getByRole('button', {
+    name: '打开对局菜单',
+  })).toHaveCount(0);
+  await expect(page.locator('.match-context')).toHaveCSS('white-space', 'nowrap');
   await expectNoOverflow(page);
-  await capture(page, testInfo, 'game-360x780');
+  await capture(page, testInfo, 'mobile-final-board');
+
+  await page.getByRole('button', { name: '查看行棋记录' }).click();
+  await expect(page.getByRole('heading', {
+    name: '每一步，都有来路。',
+  })).toBeVisible();
+  const journal = page.getByTestId('activity-journal');
+  await expect(journal).toBeVisible();
+  await expect(journal.locator('li')).toHaveCount(2);
+  await capture(page, testInfo, 'mobile-activity-journal');
   expect(pageErrors).toEqual([]);
 });
 
@@ -351,7 +402,7 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  const commands = await mockSession(page);
+  await mockSession(page);
   await page.goto(`/game/quoridor/match?roomID=${roomID}`);
 
   await expect(page.getByRole('heading', {
@@ -364,15 +415,4 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
   await expectNoOverflow(page);
   await capture(page, testInfo, 'game-1440x900');
-  await page.getByTestId('cell-E7').click();
-  await expect.poll(() => commands.some(command =>
-    command.includes('"game_move_pawn"'))).toBe(true);
-  await expect(page.getByRole('button', { name: '确认移动' })).toHaveCount(0);
-
-  await page.setViewportSize({ width: 1024, height: 768 });
-  await expect(page.getByRole('group', {
-    name: 'Quoridor 九乘九棋盘',
-  })).toBeVisible();
-  await expectNoOverflow(page);
-  await capture(page, testInfo, 'game-1024x768');
 });

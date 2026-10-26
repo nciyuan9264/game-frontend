@@ -233,12 +233,11 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(page.getByRole('button', { name: /复制游戏链接/ })).toBeVisible();
   await page.getByRole('button', { name: '关闭弹窗' }).click();
 
-  await page.getByRole('button', { name: /房间号加入/ }).click();
-  await expect(page.getByRole('dialog', { name: '通过房间号加入' })).toBeVisible();
-  await expect(page.getByRole('textbox', { name: '房间号' }))
+  const mobileJoin = page.getByTestId('fugitive-lobby-mobile-join');
+  await expect(mobileJoin).toBeVisible();
+  await expect(mobileJoin.getByRole('textbox', { name: '查找房间号' }))
     .toHaveAttribute('placeholder', '输入完整房间号');
-  await expect(page.getByRole('button', { name: '取消' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /加入房间/ })).toBeDisabled();
+  await expect(mobileJoin.getByRole('button', { name: '查找房间' })).toBeDisabled();
   await expectNoDocumentOverflow(page);
 });
 

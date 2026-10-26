@@ -166,7 +166,37 @@
   .phone-replay-dialog { height: calc(100dvh - 76px); }
   .phone-replay-dialog .dialog-body { min-height: 0; flex: 1; }
   .q-app .phone-replay-dialog .dialog-footer { padding-top: 7px; }
-  .q-app.playing-page .toast { top: 124px; bottom: auto; }
+  :scope.q-app .page-actions {
+    height: calc(66px + env(safe-area-inset-bottom));
+    min-height: calc(66px + env(safe-area-inset-bottom));
+    padding: 10px 17px calc(11px + env(safe-area-inset-bottom));
+  }
+  :scope.q-app.playing-page .app-header { width: 100%; min-width: 0; overflow: hidden; }
+  :scope.q-app.playing-page .app-header > .header-context {
+    display: flex;
+    min-width: 0;
+    align-items: center;
+    gap: 5px;
+    margin: 0;
+    white-space: nowrap;
+  }
+  :scope.q-app.playing-page .app-header > .match-context { flex: 1 1 auto; }
+  :scope.q-app.playing-page .app-header > .turn-context { flex: 0 1 auto; }
+  :scope.q-app.playing-page .app-header > .header-context > strong,
+  :scope.q-app.playing-page .app-header > .header-context > small {
+    display: block;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  :scope.q-app .phone-activity-dialog .activity-journal-card {
+    display: block;
+    max-height: calc(100dvh - 190px);
+    overflow-y: auto;
+  }
+  :scope.q-app.playing-page .toast { top: 124px; bottom: auto; }
 }
 @media (max-width: 370px) {
   .q-app .app-header { gap: 4px; }

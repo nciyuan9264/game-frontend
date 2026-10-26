@@ -128,6 +128,37 @@ function gameSnapshot() {
   };
 }
 
+function endedSnapshot() {
+  const snapshot = gameSnapshot();
+  return {
+    ...snapshot,
+    seq: 13,
+    view: {
+      warchest: {
+        ...snapshot.view.warchest,
+        result: {
+          winnerID: human.playerID,
+          winnerSide: 'oak',
+          reason: 'control',
+          actionCount: 18,
+        },
+        roomData: {
+          ...snapshot.view.warchest.roomData,
+          gameStatus: 'end',
+          legalActions: [],
+          controls: [
+            ...snapshot.view.warchest.roomData.controls,
+            { cell: '-2,0', side: 'oak' },
+            { cell: '3,-2', side: 'oak' },
+            { cell: '2,0', side: 'oak' },
+          ],
+          turnDeadline: undefined,
+        },
+      },
+    },
+  };
+}
+
 async function mockProfile(page: Page) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
@@ -198,7 +229,7 @@ async function mockPublicData(page: Page) {
   }));
 }
 
-async function mockSession(page: Page) {
+async function mockSession(page: Page, initialSnapshot = gameSnapshot()) {
   const commands: string[] = [];
   await mockProfile(page);
   await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
@@ -229,7 +260,7 @@ async function mockSession(page: Page) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(initialSnapshot));
     socket.onMessage(message => commands.push(String(message)));
   });
   return commands;
@@ -374,6 +405,33 @@ test('War Chest mobile battle submits only the service action ID', async ({ page
     value.includes('"game_play_action"')
     && value.includes('"actionID":"action-move"'))).toBe(true);
   await expectNoOverflow(page);
+});
+
+test('War Chest final board keeps history and results without the live menu', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, endedSnapshot());
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  await expect(page.getByRole('dialog', {
+    name: '六面旗帜，见证你的远见。',
+  })).toBeVisible();
+  await page.getByRole('button', { name: '回到棋盘' }).click();
+
+  await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
+  await page.getByRole('button', { name: '打开战报' }).click();
+  await expect(page.getByRole('dialog', { name: '战场纪事' })).toBeVisible();
+  await page.getByRole('button', { name: '关闭弹窗' }).click();
+  await expectNoOverflow(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await expect(page.getByRole('button', { name: '打开战报' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
+  await expectNoOverflow(page);
+
+  await page.getByRole('button', { name: '打开终局结算' }).click();
+  await expect(page.getByRole('dialog', {
+    name: '六面旗帜，见证你的远见。',
+  })).toBeVisible();
 });
 
 test('War Chest desktop keeps board, factions, and intelligence visible', async ({ page }) => {

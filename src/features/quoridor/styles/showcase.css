@@ -53,3 +53,7 @@
 @media(max-width:760px){.wall-turn .board-stage>.q-board{width:calc(100% - 38px)}.action-panel{display:grid;grid-template-columns:minmax(0,1fr) auto}.action-tabs,.mobile-instruction{grid-column:1/-1}.wall-tools{grid-column:1;grid-row:3;padding:8px 4px 0;gap:8px;justify-content:flex-start}.wall-tools>span{font-size:9px;gap:3px}.wall-tools>span>svg{display:none}.wall-tools>button{min-height:30px;font-size:10px;padding:5px 8px;gap:5px}.wall-nudge{grid-column:2;grid-row:3;gap:5px;padding:8px 3px 0 0}.wall-nudge>span{display:none}.wall-nudge>button{width:30px;height:30px}.wall-turn .mobile-instruction{padding-top:7px;font-size:9px;line-height:1.9}.wall-turn .board-stage{padding-top:6px;padding-bottom:6px}}
 @media(max-width:760px){html{scroll-padding-top:124px;scroll-padding-bottom:108px}.final-links>.desktop-record-link{display:none}.final-links{justify-content:flex-end}.final-position{padding-bottom:26px;margin-bottom:130px}.dialog-body{scroll-padding-block:14px}.page-actions,.mobile-game-dock,.bottom-navigation{isolation:isolate}}
 }
+@media(max-width:760px){
+  .quoridor-root .mobile-game-dock .button{position:relative}
+  .quoridor-root .mobile-game-dock .button>svg:last-child{position:absolute;right:17px;margin-left:0}
+}

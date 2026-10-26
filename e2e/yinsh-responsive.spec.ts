@@ -273,6 +273,7 @@ test('YINSH final result returns through the timer slot', async ({ page }) => {
   const content = button.locator('span').first();
   await expect(button).toBeVisible();
   await expect(page.getByTestId('yinsh-mobile-dock')).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   const [buttonBox, contentBox] = await Promise.all([
     button.boundingBox(),
     content.boundingBox(),
@@ -281,6 +282,14 @@ test('YINSH final result returns through the timer slot', async ({ page }) => {
   expect(contentBox?.x).toBeGreaterThanOrEqual(buttonBox?.x ?? 0);
   expect((contentBox?.x ?? 0) + (contentBox?.width ?? 0))
     .toBeLessThanOrEqual((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0));
+  await page.getByRole('button', { name: '查看棋谱' }).click();
+  await expect(page.getByRole('dialog', { name: '这一局的每一步' })).toBeVisible();
+  await page.getByRole('button', { name: '关闭面板' }).click();
+  await expectNoOverflow(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toBeVisible();
+  await expect(button).toBeVisible();
+  await expectNoOverflow(page);
 
   await button.click();
   await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();

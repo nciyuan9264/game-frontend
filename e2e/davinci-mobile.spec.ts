@@ -257,6 +257,9 @@ test('DaVinci final board can reopen the results panel on mobile', async ({ page
   await page.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await expectNoHorizontalOverflow(page);
+  await page.setViewportSize({ width: 356, height: 783 });
+  await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
+  await expectNoHorizontalOverflow(page);
 
   await page.getByRole('button', { name: '打开终局结算' }).click();
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();

@@ -19,6 +19,7 @@ import {
   playerName,
   type GameSnapshot,
 } from '../../model/session';
+import { useQuoridorViewport } from '../../hooks/useQuoridorViewport';
 import type { Side } from '../../model/types';
 
 export function Results({
@@ -34,6 +35,7 @@ export function Results({
   restarting?: boolean;
   readOnly?: boolean;
 }) {
+  const { isMobile } = useQuoridorViewport();
   const winnerID = data.result?.winnerID ?? '';
   const winnerSide = data.result?.winnerSide
     ?? data.playerData[winnerID]?.side
@@ -86,7 +88,7 @@ export function Results({
               等待房主再来一局</ActionButton>)}
         </div></div>
       </section>
-      <aside className="final-position">
+      {!isMobile && <aside className="final-position">
         <span className="eyebrow"><i />THE LAST POSITION</span>
         <div className="final-board-title"><h2>这一局最后的模样</h2>
           <span>只读快照</span></div>
@@ -102,7 +104,7 @@ export function Results({
         <ActionButton onClick={onViewBoard}><History size={16} />
           查看终局棋盘<ArrowRight size={16} /></ActionButton>
         <small>终局位置、围墙库存与结果均来自同一份权威快照。</small>
-      </aside>
+      </aside>}
     </div>
   </main>;
 }

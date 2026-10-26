@@ -286,10 +286,7 @@ export function Play({
       <header className="app-header">
         <button type="button" className="icon-button back-button"
           aria-label="返回大厅" onClick={onLeave}><ArrowLeft size={20} /></button>
-        <button type="button" className="brand-button"
-          aria-label="步步为营游戏大厅" onClick={onLeave}><Brand /></button>
-        <span className="header-divider" />
-        <div className="header-context"><strong>{data.roomID}</strong>
+        <div className="header-context match-context"><strong>{data.roomID}</strong>
           <small>Quoridor · 第 {data.roomData.roundNo} 局 · 60 秒回合</small></div>
         <span className="header-space" />
         <span className="local-tag"><i />服务端权威</span>
@@ -299,13 +296,14 @@ export function Play({
         <button type="button" className="header-help" aria-label="玩法指南"
           onClick={() => ui.setPanel('rules')}><BookOpen size={19} />
           <span>玩法指南</span></button>
-        <button type="button" className="icon-button" aria-label="打开对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>
+        {!ended && <button type="button" className="icon-button"
+          aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}>
+          <MoreHorizontal size={23} /></button>}
         {ended
           ? <button type="button" className="header-help"
             onClick={() => ui.setShowResults(true)}>
             <Trophy size={17} /><span>结算</span></button>
-          : <span className="header-context">
+          : <span className="header-context turn-context">
             <strong>{data.roomData.turnDeadline
               ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
               : '--'}</strong><small>本回合剩余</small></span>}
@@ -528,8 +526,10 @@ export function Play({
     </main>
 
     {ui.panel === 'activity' && <Dialog title="每一步，都有来路。"
-      eyebrow="THE GAME JOURNAL" wide onClose={() => ui.setPanel(undefined)}>
-      <div className="journal-card"><Journal data={data} full /></div>
+      eyebrow="THE GAME JOURNAL" wide className="phone-activity-dialog"
+      onClose={() => ui.setPanel(undefined)}>
+      <div className="journal-card activity-journal-card"
+        data-testid="activity-journal"><Journal data={data} full /></div>
     </Dialog>}
     {ui.panel === 'rules' && <Dialog title="规则很短，路可以很长。"
       eyebrow="THE QUORIDOR HANDBOOK" wide onClose={() => ui.setPanel(undefined)}>
@@ -540,7 +540,7 @@ export function Play({
           客户端只展示服务端确认的合法落点、墙位与参考通路。</p>
       </div>
     </Dialog>}
-    {ui.panel === 'menu' && <Dialog title="落步之外。"
+    {!ended && ui.panel === 'menu' && <Dialog title="落步之外。"
       eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
       <div className="menu">
         <button type="button" onClick={() => ui.setPanel('activity')}>
@@ -551,14 +551,14 @@ export function Play({
           <BookOpen size={21} /><span><b>玩法指南</b>
             <small>目标、围墙、跳跃与胜负</small></span>
           <ChevronRight size={16} /></button>
-        {!ended && <button type="button" className="danger"
+        <button type="button" className="danger"
           onClick={() => ui.setPanel('resign')}>
           <Flag size={21} /><span><b>结束并认输</b>
             <small>需要再次确认，本局立即结束</small></span>
-          <ChevronRight size={16} /></button>}
+          <ChevronRight size={16} /></button>
       </div>
     </Dialog>}
-    {ui.panel === 'resign' && <Dialog title="这一程，要在这里停下吗？"
+    {!ended && ui.panel === 'resign' && <Dialog title="这一程，要在这里停下吗？"
       eyebrow="END THIS JOURNEY" onClose={() => ui.setPanel(undefined)}
       footer={<><ActionButton onClick={() => ui.setPanel(undefined)}>
         继续思考</ActionButton>

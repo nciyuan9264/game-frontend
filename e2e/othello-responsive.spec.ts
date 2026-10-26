@@ -242,9 +242,18 @@ test('Othello mobile final result returns through the timer slot', async ({ page
 
   await page.getByRole('button', { name: '回到棋盘' }).click();
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('button', {
     name: /选择棋盘上的合法位置|等待对手落子/,
   })).toHaveCount(0);
+  await page.getByRole('button', { name: '查看棋谱' }).click();
+  await expect(page.getByRole('dialog', { name: '这一局的每一步' })).toBeVisible();
+  await page.getByRole('button', { name: '关闭面板' }).click();
+  await expectNoOverflow(page);
+  await page.setViewportSize({ width: 360, height: 800 });
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
+  await expectNoOverflow(page);
 
   await page.getByRole('button', { name: '返回终局结算' }).click();
   await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();

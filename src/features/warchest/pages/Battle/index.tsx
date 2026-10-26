@@ -247,8 +247,11 @@ export function Battle({
         <div className="header-space" /><span className="local-label"><i />服务端权威 · 90 秒</span>
         <button className="icon-button" type="button" aria-label="查看对局规则"
           onClick={() => setPanel('rules')}><BookOpen size={19} /></button>
-        <button className="icon-button" type="button" aria-label="打开对局菜单"
-          onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>
+        {end
+          ? <button className="icon-button" type="button" aria-label="打开终局结算"
+            onClick={() => setPanel('result')}><Trophy size={19} /></button>
+          : <button className="icon-button" type="button" aria-label="打开对局菜单"
+            onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>}
         {!end && <span className="battle-timer"><Clock3 size={13} />
           {game.turnDeadline ? <TurnCountdown bare secondsOnly deadline={game.turnDeadline} /> : '--'}</span>}
       </header>
