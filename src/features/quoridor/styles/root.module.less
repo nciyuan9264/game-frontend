@@ -1,0 +1,78 @@
+.root {
+  --paper: #f5f1e9;
+  --surface: #fffdf8;
+  --ink: #332f2d;
+  --muted: #81766e;
+  --line: #e1d8cb;
+  --wine: #794453;
+  --wine-dark: #552b37;
+  --sage: #71845e;
+  --gold: #aa855c;
+  --serif: 'Cormorant Garamond', 'Noto Serif SC', Georgia, serif;
+
+  --game-bg: var(--paper);
+  --game-panel: var(--surface);
+  --game-raised: #eee6da;
+  --game-line: var(--line);
+  --game-accent: var(--wine);
+  --game-primary: var(--wine);
+  --game-primary-gradient: none;
+  --game-primary-border: var(--wine);
+  --game-primary-hover-border: var(--wine-dark);
+  --game-primary-text: #fffaf3;
+  --game-text: var(--ink);
+  --game-muted: var(--muted);
+  --game-placeholder: #a4998e;
+  --game-success: var(--sage);
+  --game-danger: #a34f51;
+  --game-danger-text: #984147;
+  --game-danger-bg: #f8e8e5;
+  --game-danger-border: #d9a7a3;
+  --game-danger-hover-bg: #f2d9d5;
+  --game-danger-hover-border: #c7857f;
+  --game-button-bg: var(--surface);
+  --game-button-border: #d9cfc2;
+  --game-button-text: #654a46;
+  --game-button-hover-bg: #eee6dc;
+  --game-button-hover-border: #c3ad9a;
+  --game-panel-gradient: linear-gradient(145deg, #fffdf8, #f4ede3);
+  --game-feedback-bg: #fffaf1;
+  --game-feedback-border: #e3d7c4;
+  --game-eyebrow: var(--gold);
+  --game-dialog-bg: #faf6ee;
+  --game-dialog-footer-bg: #f9f4eb;
+  --game-dialog-border: #ede4d8;
+  --game-dialog-line: #e7dccd;
+  --game-dialog-close-bg: transparent;
+  --game-dialog-close-border: transparent;
+  --game-dialog-close-text: #a8947e;
+  --game-dialog-backdrop: #2e24245c;
+  --game-dialog-handle: #d4c5b2;
+  --game-dialog-shadow: 0 24px 90px #2b171e40;
+  --game-scroll-track: #f6f0e7;
+  --game-scroll-thumb: #cbbba9;
+  --game-scroll-thumb-hover: #ab9278;
+  --game-feedback-particle-1: var(--wine);
+  --game-feedback-particle-2: var(--sage);
+  --game-feedback-particle-3: var(--gold);
+
+  min-height: 100%;
+  color: var(--ink);
+  color-scheme: only light;
+  background: var(--paper);
+  font-family: Inter, 'Noto Sans SC', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Microsoft YaHei', sans-serif;
+  letter-spacing: 0;
+
+  button, input, select, textarea { letter-spacing: 0; }
+  button:not([data-game-action-button]) { border: 0; background: none; color: inherit; }
+  h1, h2 { font-family: var(--serif); font-weight: 500; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .root *, .root *::before, .root *::after {
+    animation-duration: .001ms !important;
+    animation-iteration-count: 1 !important;
+    scroll-behavior: auto !important;
+    transition-duration: .001ms !important;
+  }
+}

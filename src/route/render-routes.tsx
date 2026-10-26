@@ -7,6 +7,7 @@ import { DavinciLoading } from '@/features/davinci/components/LoadingState';
 import { SplendorLoading } from '@/features/splendor/components/LoadingState';
 import { YinshLoading } from '@/features/yinsh/components/LoadingState';
 import { OthelloLoading } from '@/features/othello/components/LoadingState';
+import { QuoridorLoading } from '@/features/quoridor/components/LoadingState';
 import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
 
@@ -27,6 +28,8 @@ export const RenderRoutes = () => {
                             ? <YinshLoading fullScreen />
                             : route.path.startsWith('/game/othello')
                                 ? <OthelloLoading fullScreen />
+                                : route.path.startsWith('/game/quoridor')
+                                    ? <QuoridorLoading fullScreen />
                                 : route.path.startsWith('/game/fugitive')
                                     ? <FugitiveLoading fullScreen />
                                     : route.path.startsWith('/game/warchest')

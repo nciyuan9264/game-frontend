@@ -28,6 +28,11 @@ import {
   listWarChestRooms,
   lookupWarChestRoom,
 } from '@/features/warchest/api/room';
+import {
+  createQuoridorRoom,
+  listQuoridorRooms,
+  lookupQuoridorRoom,
+} from '@/features/quoridor/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -170,6 +175,30 @@ describe('game room API wrappers', () => {
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'warchest',
       'room-5',
+      options,
+    );
+  });
+
+  it('injects Quoridor fixed seats and authoritative timeout', () => {
+    const signal = new AbortController().signal;
+    createQuoridorRoom('private', signal);
+    listQuoridorRooms(signal);
+    lookupQuoridorRoom('room-6', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'quoridor',
+      {
+        visibility: 'private',
+        maxPlayers: 2,
+        turnTimeoutSeconds: 60,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('quoridor', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'quoridor',
+      'room-6',
       options,
     );
   });

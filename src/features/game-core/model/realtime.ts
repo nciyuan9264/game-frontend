@@ -338,6 +338,28 @@ function gamePayload(
         return { warchest: { resign: {} } };
     }
   }
+  if (gameType === 'quoridor') {
+    switch (commandType) {
+      case 'game_move_pawn':
+        return {
+          quoridor: {
+            movePawn: objectPayload as {
+              to: { row: number; column: number };
+            },
+          },
+        };
+      case 'game_place_wall':
+        return {
+          quoridor: {
+            placeWall: objectPayload as {
+              wall: { row: number; column: number; orientation: string };
+            },
+          },
+        };
+      case 'game_resign':
+        return { quoridor: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

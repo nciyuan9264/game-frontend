@@ -1,0 +1,79 @@
+@scope (.quoridor-root) {
+:scope{font-family:Inter,"Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+/* PC v1.1. The independently published Mobile project is intentionally unchanged. */
+.header-storage{display:flex;align-items:center;gap:7px;position:relative;min-height:34px;padding:0 10px;border:1px solid #ded1be;border-radius:5px;font-size:11px;color:#846d51;white-space:nowrap;background:#f6f0e4}
+.header-storage.has-save{border-color:#cbd4b6;background:#eef1e5;color:#75815e}
+.header-storage>i{width:5px;height:5px;border-radius:50%;background:#84936b}
+.desktop-shortcut-bar{height:32px;color:#978369;gap:13px}
+.desktop-shortcut-bar>div{display:flex;align-items:center;gap:17px}
+.desktop-shortcut-bar>div>span{display:flex;align-items:center;gap:6px;font-size:10px}
+.desktop-shortcut-bar kbd,.shortcut-grid kbd{font:10px/1.2 ui-monospace,SFMono-Regular,Consolas,monospace;border:1px solid #d7c7af;border-bottom-width:2px;border-radius:4px;color:#8d7558;background:#fcf8ef;padding:3px 5px;min-width:20px;text-align:center}
+.desktop-shortcut-bar>button{display:flex;align-items:center;gap:9px;margin-left:auto;font-size:10px;color:#886575;white-space:nowrap}
+.keyboard-intro{display:flex;align-items:center;gap:14px;margin:0 0 17px;padding:17px 19px;border:1px solid #d7dbc5;border-radius:7px;background:#ebeee1;color:#7d8865}
+.keyboard-intro p{font-size:13px;font-weight:500}
+.keyboard-intro small{display:block;margin-top:7px;font-size:11px;line-height:1.7;color:#929a7c;font-weight:400}
+.shortcut-grid{display:grid;grid-template-columns:1fr 1fr;gap:0 24px}
+.shortcut-grid>div{display:flex;align-items:center;gap:14px;min-height:68px;border-bottom:1px solid #e6d8c0;padding:12px 0}
+.shortcut-grid kbd{min-width:73px;padding:7px 8px;flex-shrink:0;font-size:11px}
+.shortcut-grid b{display:block;color:#856b50;font-size:12px;font-weight:500}
+.shortcut-grid small{display:block;color:#a28b6d;font-size:10px;line-height:1.8;margin-top:5px}
+.desktop-replay .history-board{padding:15px}
+.desktop-replay .history-board .q-board{width:340px}
+.replay-caption{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;font-size:10px;color:#9b8464}
+.replay-caption>span:first-child{display:flex;align-items:center;gap:6px;color:#81916c}
+.replay-transport{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:15px;border-radius:6px}
+.replay-transport .icon-button{width:31px;height:34px}
+.replay-play{display:flex;align-items:center;justify-content:center;width:40px;height:40px;border-radius:50%;background:var(--wine);color:#fff4e1;box-shadow:0 3px 9px #77495620}
+.replay-play:disabled{background:#b4a195}
+.replay-progress{display:flex;align-items:center;justify-content:space-between;margin-top:14px;color:#866b51;font-size:12px}
+.replay-progress small{font-size:10px;color:#af9878;margin-left:5px}
+.replay-progress label{display:flex;align-items:center;gap:7px;color:#a38a69;font-size:10px}
+.replay-progress select{border:1px solid #deceb4;border-radius:4px;background:#faf3e7;color:#8b7253;font-family:inherit;font-size:10px;padding:5px 8px}
+.desktop-replay .history-slider{margin-top:9px}
+.replay-step{display:flex;align-items:center;gap:13px;margin-top:11px;padding:13px 16px;border:1px solid #dfcbd2;background:#f3e9ed;border-radius:6px;color:#946f7c;min-height:63px}
+.replay-step>.pawn{width:19px;height:28px}
+.replay-step>div{flex:1;min-width:0}
+.replay-step b{display:block;font-size:11px;font-weight:500;color:#855b6b}
+.replay-step span{display:block;font-size:10px;margin-top:6px;line-height:1.7}
+.desktop-replay .history-note{font-size:10px;color:#a78e6c;margin-top:11px}
+.replay-detail{min-height:0;display:flex;flex-direction:column;max-height:620px}
+.replay-score{display:flex;align-items:center;gap:15px;min-height:71px;padding:13px 16px;margin-bottom:13px;border:1px solid #d9d5bc;border-radius:6px;background:#eeeddf}
+.replay-score>div{flex:1;display:flex;align-items:center;gap:10px}
+.replay-score .pawn{width:18px;height:26px}
+.replay-score>div>span{font:500 22px/1 var(--serif);color:#8c704e}
+.replay-score small{display:block;font:9px/1.5 sans-serif;color:#a59473;margin-top:6px}
+.replay-score>i{height:35px;width:1px;background:#d8ccb3}
+.replay-detail .history-records{flex:1;max-height:none;min-height:120px}
+.replay-detail .history-list{flex:1;min-height:0;scrollbar-width:thin;scrollbar-color:#d4c6af transparent}
+.replay-outcome{font-size:10px;line-height:1.9;color:#a78e6d;margin-top:12px}
+.checkpoint-intro{display:flex;align-items:center;gap:14px;padding:0 0 20px;color:#8c795d}
+.checkpoint-intro>p{font:500 21px/1.4 var(--serif);flex:1}
+.checkpoint-intro small{display:block;font:10px/1.8 sans-serif;color:#a28c6d;margin-top:7px}
+.checkpoint-empty{border:1px dashed #d9c9af;border-radius:7px;background:#f4efe2;text-align:center;padding:28px 20px;color:#a08b69}
+.checkpoint-empty h3{font-size:24px;margin:13px 0 11px;color:#8e7151}
+.checkpoint-empty p{font-size:11px;line-height:1.9;color:#a58d6b}
+.checkpoint-saved{display:grid;grid-template-columns:minmax(0,.95fr) minmax(0,1fr);gap:25px;align-items:center;border:1px solid #d4d5bb;background:#eeedde;border-radius:8px;padding:23px 28px}
+.checkpoint-board{display:flex;align-items:center;justify-content:center;padding:4px 0}
+.checkpoint-panel .checkpoint-board .q-board.mini{width:228px;box-shadow:3px 5px 0 #b4987177,0 10px 20px #72674615}
+.checkpoint-copy>span{display:flex;align-items:center;gap:6px;color:#7f9169;font-size:10px}
+.checkpoint-copy h3{font-size:26px;line-height:1.6;color:#806346;margin:9px 0 4px}
+.checkpoint-copy p{font-size:11px;color:#a28a66;line-height:1.8}
+.checkpoint-copy>small{display:flex;align-items:center;gap:6px;color:#a18d6c;font-size:10px;margin:13px 0 17px}
+.checkpoint-copy>.button{min-height:37px;font-size:11px;min-width:177px}
+.checkpoint-positions{display:flex;align-items:center;gap:17px;margin-top:15px}
+.checkpoint-positions>span{display:flex;align-items:center;gap:6px;font-size:10px;color:#987859;white-space:nowrap}
+.checkpoint-positions .pawn{width:12px;height:19px}
+.checkpoint-current{display:flex;align-items:center;justify-content:space-between;gap:20px;border:1px solid #e1d2b9;border-radius:7px;background:#fffaf0;margin-top:18px;padding:18px 20px}
+.checkpoint-current>div>span{display:block;font-size:7px;letter-spacing:1.5px;color:#b29975;margin-bottom:5px}
+.checkpoint-current h3{font-size:21px;color:#8c6b4b;line-height:1.5}
+.checkpoint-current p{font-size:10px;color:#a58c6b;margin-top:6px;line-height:1.8}
+.checkpoint-current .button{min-height:39px;font-size:11px}
+.checkpoint-maintenance{display:flex;align-items:center;justify-content:space-between;gap:16px;margin-top:13px;font-size:10px;color:#aa9373}
+.checkpoint-maintenance>button{display:flex;align-items:center;gap:6px;color:#a36d68;padding:5px 0}
+.checkpoint-panel>.notice{margin-top:18px;font-size:10px;line-height:1.9;padding:14px 16px}
+.checkpoint-error{display:flex;align-items:flex-start;gap:10px;padding:15px 16px;border:1px solid #d9b3a4;border-radius:6px;background:#f4e5dd;color:#a56352;font-size:12px;line-height:1.8;margin-bottom:18px}
+.checkpoint-error svg{margin-top:2px}
+@media(min-width:761px){.playing-page .game-main{padding-top:18px}.playing-page .desktop-shortcut-bar{height:32px}.playing-page .strategy-card{padding:11px 16px 10px}.playing-page .strategy-card h3{font-size:20px;line-height:1.28;margin:6px 0 8px}.playing-page .strategy-card>div:first-child>svg{width:14px;height:14px}.playing-page .strategy-card>button{padding-top:8px}.desktop-replay .history-records b{font-size:12px}.desktop-replay .history-list>button{min-height:38px}.desktop-replay .history-list>button.active{box-shadow:inset 2px 0 var(--wine)}}
+@media(min-width:761px) and (max-width:1100px){.desktop-shortcut-bar>div{gap:10px}.desktop-shortcut-bar>div>span{font-size:9px}.desktop-shortcut-bar>div>span:nth-last-child(-n+2){display:none}.header-storage{padding:0 7px;font-size:10px}.app-header .local-tag{display:none}}
+@media(max-width:760px){.header-storage{display:none}.desktop-shortcut-bar{display:none}.shortcut-grid{grid-template-columns:1fr}.checkpoint-saved{grid-template-columns:1fr;padding:19px}.checkpoint-current{align-items:flex-start;flex-direction:column}.checkpoint-intro .quiet-badge{display:none}.replay-detail{max-height:360px}.desktop-replay .history-board .q-board{width:276px}.keyboard-intro{align-items:flex-start}.keyboard-intro small{font-size:10px}.checkpoint-maintenance{align-items:flex-start}.checkpoint-copy>.button{width:100%}}
+}

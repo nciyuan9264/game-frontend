@@ -1,0 +1,250 @@
+.page {
+  --replay-panel-height:240px;
+  min-height:100dvh;
+  padding:22px 28px calc(var(--replay-panel-height) + 34px);
+  background:var(--paper);
+}
+.heading {
+  display:flex;
+  height:58px;
+  align-items:center;
+  gap:13px;
+  margin-bottom:16px;
+  > a { display:grid; width:40px; height:40px; place-items:center; border:1px solid var(--line); border-radius:6px; color:#74675d; }
+  small { color:#9c8264; font-size:8px; letter-spacing:1.6px; }
+  h1 { margin-top:4px; color:#60454b; font:500 21px var(--serif); }
+  > span { margin-left:auto; padding:5px 8px; border-radius:4px; background:#e7eee4; color:#617356; font-size:9px; }
+}
+.boardArea {
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 240px;
+  gap:15px;
+  > section { overflow:hidden; border:1px solid #d9cebf; border-radius:7px; background:#eee5d7; }
+  > section>header {
+    display:flex;
+    min-height:55px;
+    align-items:center;
+    justify-content:space-between;
+    gap:12px;
+    padding:8px 18px;
+    border-bottom:1px solid #d9cebf;
+    > div:first-child { min-width:0; }
+    > div:last-child { display:flex; flex:none; align-items:center; gap:12px; color:#8f7d6a; font-size:9px; }
+    small { color:#a1815d; font-size:7px; letter-spacing:1.5px; }
+    h2 { margin-top:4px; overflow:hidden; color:#654b4c; font-size:13px; text-overflow:ellipsis; white-space:nowrap; }
+  }
+  > aside {
+    padding:20px 17px;
+    border:1px solid #e1d7ca;
+    border-radius:7px;
+    background:#fffdf8;
+    color:#8b6a56;
+    h3 { margin:10px 0; color:#62474b; font:500 19px var(--serif); }
+    > p { min-height:48px; color:#8e7f71; font-size:10px; line-height:1.7; }
+    dl { margin:18px 0;
+      div { display:flex; justify-content:space-between; gap:8px; padding:9px 0; border-bottom:1px solid #eee6dc; font-size:9px; }
+      dt { color:#9a8a79; }
+      dd { display:flex; align-items:center; gap:5px; margin:0; color:#654f47; }
+      dd>span { width:14px; height:14px; }
+    }
+  }
+}
+.frameStatus { display:block; margin-top:4px; color:#8d5868!important; letter-spacing:0!important; }
+.zoomButton {
+  display:flex;
+  align-items:center;
+  gap:4px;
+  padding:5px 0;
+  color:#8c6b57!important;
+  font-size:9px;
+  white-space:nowrap;
+}
+.boardFrame {
+  display:grid;
+  min-height:560px;
+  place-items:center;
+  padding:10px 28px;
+  background:radial-gradient(circle,#faf4e9,#e7ddce);
+}
+.timeline {
+  position:fixed;
+  left:50%;
+  bottom:12px;
+  z-index:45;
+  width:clamp(520px,50vw,720px);
+  height:var(--replay-panel-height);
+  min-height:176px;
+  max-height:min(520px,calc(100dvh - 92px));
+  overflow:hidden;
+  border:1px solid #cdbfaf;
+  border-radius:8px;
+  background:#fffdf8f2;
+  box-shadow:0 16px 50px #4d372a36,0 0 0 1px #fff9ef;
+  translate:calc(-50% + var(--replay-panel-x,0px)) var(--replay-panel-y,0px);
+  backdrop-filter:blur(12px);
+}
+.dragHandle {
+  display:grid;
+  width:100%;
+  height:24px;
+  place-items:center;
+  padding:0;
+  border-bottom:1px solid #e5d9ca!important;
+  border-radius:0;
+  color:#9d8a78;
+  cursor:move;
+  touch-action:none;
+  user-select:none;
+  &:focus-visible { outline:2px solid var(--wine); outline-offset:-3px; }
+  &:active { background:#f4e9e8!important; color:var(--wine); cursor:grabbing; }
+  > svg { pointer-events:none; }
+}
+.timelineContent {
+  display:flex;
+  height:calc(100% - 24px);
+  min-height:0;
+  padding:10px 18px 14px;
+  flex-direction:column;
+  > header {
+    display:flex;
+    min-height:33px;
+    align-items:center;
+    gap:10px;
+    flex:none;
+    > strong { color:#654b4c; font-size:11px; font-weight:500; }
+    > button { min-height:31px; padding:0 10px; font-size:9px; }
+  }
+}
+.loadMeta {
+  display:flex;
+  align-items:center;
+  gap:6px;
+  margin-left:auto;
+  color:#918274;
+  font-size:9px;
+  white-space:nowrap;
+  > i { width:10px; height:10px; border:1px solid #9b8c7c; border-right-color:var(--wine); border-radius:50%; animation:spin .75s linear infinite; }
+}
+.loadTrack {
+  width:100%;
+  height:2px;
+  flex:none;
+  margin-top:6px;
+  overflow:hidden;
+  border-radius:1px;
+  background:#e4d9cc;
+  > i { display:block; height:100%; background:var(--wine); transition:width .2s; }
+}
+.progressStatus {
+  display:flex;
+  min-height:24px;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  color:#9e5c5e;
+  font-size:9px;
+  button { min-height:22px; padding:0 7px; font-size:8px; }
+}
+.controls {
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:6px;
+  margin:8px 0 4px;
+  button { min-height:30px; padding:0 8px; font-size:9px; }
+}
+.stepCounter {
+  min-width:57px;
+  padding:0;
+  border:0;
+  background:transparent;
+  color:var(--wine);
+  font-size:10px;
+  text-align:center;
+}
+button.stepCounter { cursor:move; touch-action:none; user-select:none; }
+.collapseToggle { display:none; width:30px; min-width:30px; padding:0!important; place-items:center; color:#8c6b57!important; }
+.range { display:block; width:100%; margin:7px 0; flex:none; accent-color:var(--wine); }
+.timelineViewport { min-height:0; flex:1; overflow:auto; overscroll-behavior:contain; }
+.events {
+  display:flex;
+  gap:6px;
+  overflow-x:auto;
+  padding-bottom:4px;
+  button {
+    display:grid;
+    min-width:54px;
+    min-height:43px;
+    flex:none;
+    place-items:center;
+    padding:5px;
+    border:1px solid #e4d9cc!important;
+    border-radius:4px;
+    background:#fffaf3!important;
+    color:#71545b;
+    font:600 12px var(--serif);
+  }
+  button[aria-pressed=true] { border-color:var(--wine)!important; background:#f4e8ea!important; }
+  small { margin-top:2px; color:#9b8b7d; font:7px sans-serif; white-space:nowrap; }
+  .unloaded { border-style:dashed!important; opacity:.48; }
+  .loading { border-style:dashed!important; border-color:#9c7a5f!important; color:#9c7a5f; }
+  .failed { border-color:#b85e65!important; background:#f8e9e7!important; color:#a25055; }
+}
+.zoomBoard { display:flex; justify-content:center; }
+@keyframes spin { to { transform:rotate(360deg); } }
+
+@media (max-width:767px) {
+  .page {
+    --replay-panel-height:190px;
+    min-height:100dvh;
+    padding:9px 0 calc(var(--replay-panel-height) + 20px);
+  }
+  .heading { height:48px; gap:8px; margin:0 0 8px; padding:0 12px;
+    > a { width:31px; height:34px; }
+    small { font-size:6px; letter-spacing:1px; }
+    h1 { max-width:225px; overflow:hidden; font-size:17px; text-overflow:ellipsis; white-space:nowrap; }
+    > span { padding:4px 6px; font-size:8px; }
+  }
+  .boardArea {
+    display:block;
+    > section { border-right:0; border-left:0; border-radius:0; }
+    > section>header { min-height:45px; padding:7px 11px;
+      > div:last-child>span { display:none; }
+    }
+    > aside { display:none; }
+  }
+  .boardFrame { min-height:0; padding:0 4px 4px; }
+  .timeline {
+    bottom:calc(8px + env(safe-area-inset-bottom));
+    width:calc(100vw - 28px);
+    min-height:190px;
+    max-height:calc(100dvh - 28px);
+  }
+  .timelineCollapsed { height:56px; min-height:56px; max-height:56px; }
+  .dragHandle { height:20px; svg { width:16px; height:16px; } }
+  .timelineContent { height:calc(100% - 20px); padding:6px 9px 8px;
+    > header { min-height:30px; gap:6px;
+      > strong { font-size:9px; }
+      > button { min-height:29px; padding:0 7px; font-size:8px; }
+    }
+  }
+  .loadMeta { gap:4px; font-size:8px; > i { width:8px; height:8px; } }
+  .loadTrack { margin-top:3px; }
+  .progressStatus { min-height:19px; font-size:8px; button { min-height:19px; } }
+  .controls { gap:3px; margin:4px 0 1px;
+    button { min-height:29px; padding:0 4px; flex:1; font-size:8px; }
+    .stepCounter { min-width:38px; flex:0 0 38px; font-size:8px; }
+  }
+  .collapseToggle { display:grid!important; flex:0 0 29px!important; }
+  .range { margin:4px 0; }
+  .timelineViewport { overflow-x:auto; overflow-y:hidden; }
+  .events { gap:4px; height:44px; padding-bottom:0; overflow-y:hidden;
+    button { min-width:50px; min-height:40px; height:40px; padding:3px 4px; font-size:10px; }
+    small { font-size:7px; }
+  }
+  .timelineCollapsed {
+    .dragHandle,.timelineContent>header,.loadTrack,.progressStatus,.range,.timelineViewport { display:none; }
+    .timelineContent { height:100%; padding:7px 9px; }
+    .controls { height:100%; margin:0; }
+  }
+}

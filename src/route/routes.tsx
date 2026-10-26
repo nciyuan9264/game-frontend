@@ -28,6 +28,12 @@ import {
   My as OthelloMy,
   Rankings as OthelloRankings,
 } from "@/features/othello/pages/Community";
+import QuoridorLobby from "@/features/quoridor/pages/Lobby";
+import {
+  Guide as QuoridorGuide,
+  My as QuoridorMy,
+  Rankings as QuoridorRankings,
+} from "@/features/quoridor/pages/Community";
 import FugitiveLobby from "@/features/fugitive/pages/Lobby";
 import FugitiveGuide from "@/features/fugitive/pages/Guide";
 import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
@@ -52,6 +58,8 @@ const YinshSession = lazy(() => import("@/features/yinsh/pages/Session"));
 const YinshReplay = lazy(() => import("@/features/yinsh/pages/Replay"));
 const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
+const QuoridorSession = lazy(() => import("@/features/quoridor/pages/Session"));
+const QuoridorReplay = lazy(() => import("@/features/quoridor/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
@@ -117,6 +125,15 @@ export const routes: AppRoute[] = [
   { path: "/game/othello/me", element: <OthelloMy /> },
   { path: "/game/othello/match", element: <OthelloSession /> },
   { path: "/game/othello/replay/:gameId", element: <OthelloReplay /> },
+  {
+    path: "/game/quoridor",
+    element: <QuoridorLobby />
+  },
+  { path: "/game/quoridor/rankings", element: <QuoridorRankings /> },
+  { path: "/game/quoridor/guide", element: <QuoridorGuide /> },
+  { path: "/game/quoridor/me", element: <QuoridorMy /> },
+  { path: "/game/quoridor/match", element: <QuoridorSession /> },
+  { path: "/game/quoridor/replay/:gameId", element: <QuoridorReplay /> },
   {
     path: "/game/fugitive",
     element: <FugitiveLobby />
