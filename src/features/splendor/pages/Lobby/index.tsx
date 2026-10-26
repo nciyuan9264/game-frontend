@@ -27,7 +27,7 @@ import styles from './index.module.less';
 
 const loadStats = () => getMyStats('splendor');
 const roomFilters: Array<{ value: LobbyFilter; label: string }> = [
-  { value: 'all', label: '全部' },
+  { value: 'all', label: '全部房间' },
   { value: 'joinable', label: '可加入' },
   { value: 'playing', label: '对局中' },
 ];
@@ -61,6 +61,26 @@ function RoomCard({ room, userID, onEnter, artIndex }: {
   </article>;
 }
 
+function JoinCard({
+  code,
+  setCode,
+  onJoin,
+}: {
+  code: string;
+  setCode: (value: string) => void;
+  onJoin: () => void;
+}) {
+  return <section className={styles.joinCard}><h3><KeyRound size={18} />朋友已经开好房间？</h3>
+    <p>输入完整房间号，找到朋友的商会。</p>
+    <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
+      <input aria-label="查找房间号" placeholder="输入完整房间号" value={code}
+        onChange={event => setCode(event.target.value)} autoCapitalize="off"
+        autoCorrect="off" spellCheck={false} />
+      <button disabled={!code.trim()} aria-label="查找房间" type="submit"><ArrowRight size={19} /></button>
+    </form>
+  </section>;
+}
+
 export default function Lobby() {
   const navigate = useNavigate();
   const lobby = useSplendorLobby();
@@ -90,6 +110,7 @@ export default function Lobby() {
   const find = async () => {
     if (!code.trim()) return;
     setFoundRoom(undefined);
+    setPanel('join');
     try {
       setFoundRoom(await action.run(signal => lookupSplendorRoom(code.trim(), signal)));
     } catch { /* Error state is owned by the shared action hook. */ }
@@ -105,7 +126,7 @@ export default function Lobby() {
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <SplendorLoading description="正在同步商会与在线收藏家" /> : <div className={styles.page}>
-      <section className={styles.hero}>
+      <section className={styles.hero} data-testid="splendor-lobby-hero">
         <img src={hero} alt="暮色下的文艺复兴商港与宝石收藏" />
         <div className={styles.heroShade} />
         <div className={styles.heroCopy}><Eyebrow>THE ART OF PROSPERITY</Eyebrow>
@@ -119,14 +140,14 @@ export default function Lobby() {
         <div className={styles.heroStamp}><GemIcon color="Red" size={23} /><span>THE GILDED HOUR<small>暮色宝石商会</small></span></div>
       </section>
 
-      <div className={styles.gameFacts}><span><Users size={17} /><b>4</b> 位收藏家</span>
+      <div className={styles.gameFacts} data-testid="splendor-lobby-facts"><span><Users size={17} /><b>4</b> 位收藏家</span>
         <span><Clock3 size={17} /><b>60</b> 秒回合时限</span>
         <span><Crown size={18} /><b>15</b> 点声望开启终局</span>
         <Link to="/game/splendor/guide">初次来访？了解玩法 <ArrowRight size={15} /></Link></div>
 
-      <div className={styles.layout}><section className={styles.rooms}>
+      <div className={styles.layout}><section className={styles.rooms} data-testid="splendor-lobby-browser">
         <div className={styles.sectionHeading}><div><Eyebrow>TAKE YOUR SEAT</Eyebrow><h2>好的一局，从入座开始。</h2></div>
-          <button type="button" onClick={() => { setCode(''); action.reset(); setPanel('join'); }}>房间号加入 <ArrowRight size={16} /></button></div>
+          <span className={styles.visibleRooms}>可见房间</span></div>
         <div className={styles.toolbar}><GameTabs items={roomFilters} value={lobby.filter}
           onChange={lobby.setFilter} ariaLabel="房间筛选" className={styles.tabs} activeClassName={styles.active}
           renderItem={item => <>{item.label}{item.value === 'all' && <span>{lobby.rooms.length}</span>}</>} />
@@ -141,15 +162,19 @@ export default function Lobby() {
           <ActionButton onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清空筛选</ActionButton></div>}
       </section>
 
-      <aside className={styles.side}><section className={styles.collector}>
+      <aside className={styles.side} data-testid="splendor-lobby-aside"><section className={styles.collector}>
         <div className={styles.collectorHeading}><PlayerAvatar name={profile.data?.name ?? '玩家'} avatar={profile.data?.avatar} size={44} />
           <div><span>欢迎回来，收藏家</span><h3>{profile.data?.name || '玩家'} <Sparkles size={15} /></h3></div></div>
         <div className={styles.stats}><div><b>{stats.data?.totalGames ?? '—'}</b><span>完成对局</span></div>
           <div><b>{stats.data?.wins ?? '—'}</b><span>获胜场次</span></div>
           <div><b>{stats.data ? `${Math.round(stats.data.winRate * 100)}%` : '—'}</b><span>胜率</span></div></div>
         <Link to="/game/splendor/me">我的收藏家档案 <ArrowRight size={16} /></Link></section>
+        <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
         <Link className={styles.learning} to="/game/splendor/guide"><div><span>THE FIRST GEM</span><h3>先积累，再闪耀。</h3>
           <p>读懂你的第一局。</p><b>开始了解 <ArrowRight size={15} /></b></div><BookOpen size={51} /></Link></aside>
+      </div>
+      <div className={styles.mobileJoin} data-testid="splendor-lobby-mobile-join">
+        <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
       </div>
     </div>}
 

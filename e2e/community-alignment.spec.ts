@@ -22,9 +22,15 @@ const lobbyCases: Array<{
   { gameType: 'yinsh', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'YINSH 手机导航' },
   { gameType: 'othello', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'OTHELLO 手机导航' },
   { gameType: 'quoridor', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一条路，慢慢走。', mobileNavigation: 'QUORIDOR 手机导航' },
-  { gameType: 'fugitive', searchPlaceholder: '搜索房间名称 / 房间号 / 房主', heading: '找一个对手，开一场追逐。', mobileNavigation: 'Fugitive 手机导航' },
-  { gameType: 'warchest', searchPlaceholder: '搜索房间名称 / 房间号 / 房主', heading: '为下一场交锋，入席。', mobileNavigation: '战争之匣手机导航' },
+  { gameType: 'fugitive', searchPlaceholder: '搜索房间号 / 房主', heading: '找一个对手，开一场追逐。', mobileNavigation: 'Fugitive 手机导航' },
+  { gameType: 'warchest', searchPlaceholder: '搜索房间号 / 房主', heading: '为下一场交锋，入席。', mobileNavigation: '战争之匣手机导航' },
 ];
+
+const acquireAlignedLobbyCases = [
+  { gameType: 'splendor', heading: '好的一局，从入座开始。' },
+  { gameType: 'warchest', heading: '为下一场交锋，入席。' },
+  { gameType: 'fugitive', heading: '找一个对手，开一场追逐。' },
+] as const;
 
 const communityCases: Array<{
   gameType: GameType;
@@ -302,6 +308,65 @@ for (const item of lobbyCases) {
     await expectNoOverflow(page);
   });
 }
+
+for (const item of acquireAlignedLobbyCases) {
+  test(`${item.gameType} lobby matches the Acquire mobile and desktop structure`, async ({ page }) => {
+    await mockCommunityData(page, item.gameType);
+    const hero = page.getByTestId(`${item.gameType}-lobby-hero`);
+    const facts = page.getByTestId(`${item.gameType}-lobby-facts`);
+    const browser = page.getByTestId(`${item.gameType}-lobby-browser`);
+    const aside = page.getByTestId(`${item.gameType}-lobby-aside`);
+    const mobileJoin = page.getByTestId(`${item.gameType}-lobby-mobile-join`);
+
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
+    const search = page.getByPlaceholder('搜索房间号 / 房主');
+    const heading = page.getByRole('heading', { name: item.heading });
+    const [heroBox, factsBox, browserBox, joinBox, searchBox, headingBox] = await Promise.all([
+      hero.boundingBox(),
+      facts.boundingBox(),
+      browser.boundingBox(),
+      mobileJoin.boundingBox(),
+      search.locator('..').boundingBox(),
+      heading.boundingBox(),
+    ]);
+    expect(heroBox).toMatchObject({ x: 14, y: 72, width: 362, height: 227 });
+    expect(factsBox).toMatchObject({ x: 14, y: 299, width: 362, height: 63 });
+    expect(browserBox).toMatchObject({ x: 14, y: 381, width: 362 });
+    expect(searchBox).toMatchObject({ x: 14, width: 362, height: 39 });
+    expect(headingBox).toMatchObject({ y: 395, height: 25.59375 });
+    expect(joinBox).toMatchObject({ x: 14, width: 362 });
+    expect(joinBox?.y).toBeGreaterThanOrEqual(
+      (browserBox?.y ?? 0) + (browserBox?.height ?? 0) + 12,
+    );
+    await expect(aside).toBeHidden();
+    await expectNoOverflow(page);
+
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
+    const [desktopHeroBox, desktopBrowserBox, desktopAsideBox] = await Promise.all([
+      hero.boundingBox(),
+      browser.boundingBox(),
+      aside.boundingBox(),
+    ]);
+    expect(desktopHeroBox?.height).toBe(252);
+    expect(desktopBrowserBox?.x).toBeLessThan(desktopAsideBox?.x ?? 0);
+    expect(desktopAsideBox?.width).toBe(302);
+    await expect(mobileJoin).toBeHidden();
+    await expectNoOverflow(page);
+  });
+}
+
+test('fugitive lobby removes content outside the Acquire hierarchy', async ({ page }) => {
+  await mockCommunityData(page, 'fugitive');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.goto('/game/fugitive', { waitUntil: 'domcontentloaded' });
+
+  await expect(page.getByText('做逃亡者', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('做追捕者', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('完整牌库', { exact: true })).toHaveCount(0);
+  await expect(page.getByText('城市风云榜', { exact: true })).toHaveCount(0);
+});
 
 for (const item of lobbyCases) {
   test(`${item.gameType} lobby card binds the real owner name and avatar`, async ({ page }) => {

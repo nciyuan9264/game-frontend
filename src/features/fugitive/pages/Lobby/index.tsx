@@ -1,24 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
-  ArrowUpRight,
   BookOpen,
   Check,
   Clock3,
   Copy,
-  Footprints,
   Globe2,
-  Hash,
   KeyRound,
   Layers,
   LockKeyhole,
   Plus,
   Search,
   Share2,
-  Shield,
   ShieldCheck,
-  Trophy,
   Users,
   X,
 } from 'lucide-react';
@@ -123,6 +118,26 @@ function RoomCard({
   </article>;
 }
 
+function JoinCard({
+  code,
+  setCode,
+  onJoin,
+}: {
+  code: string;
+  setCode: (value: string) => void;
+  onJoin: () => void;
+}) {
+  return <section className="lobby-join-card"><h3><KeyRound size={18} />朋友已经开好房间？</h3>
+    <p>输入完整房间号，找到朋友的追逐。</p>
+    <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
+      <input aria-label="查找房间号" placeholder="输入完整房间号" value={code}
+        onChange={event => setCode(event.target.value)} autoCapitalize="off"
+        autoCorrect="off" spellCheck={false} />
+      <button disabled={!code.trim()} aria-label="查找房间" type="submit"><ArrowRight size={19} /></button>
+    </form>
+  </section>;
+}
+
 export default function Lobby() {
   const navigate = useNavigate();
   const lobby = useFugitiveLobby();
@@ -135,9 +150,6 @@ export default function Lobby() {
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<FugitiveRoom>();
   const userID = profile.data?.id ?? '';
-  const ownRoom = useMemo(() => lobby.rooms.find(room =>
-    room.roomPlayer.some(player =>
-      player.userID === userID || player.playerID === userID)), [lobby.rooms, userID]);
 
   const enter = (room: FugitiveRoom) => {
     if (roomEntry(room, { userID }).allowed) {
@@ -163,6 +175,7 @@ export default function Lobby() {
   const find = async () => {
     if (!code.trim()) return;
     setFoundRoom(undefined);
+    setPanel('join');
     try {
       setFoundRoom(await action.run(signal =>
         lookupFugitiveRoom(code.trim(), signal)));
@@ -182,7 +195,7 @@ export default function Lobby() {
     {initialLoading
       ? <FugitiveLoading description="正在同步追逃房间与在线玩家" />
       : <main className="page-content lobby-page framework-lobby">
-        <section className="lobby-hero">
+        <section className="lobby-hero" data-testid="fugitive-lobby-hero">
           <img className="hero-art" src={ART.hero}
             alt="午夜城市与高架铁路，追逃主题插画" />
           <div className="hero-copy"><Eyebrow>A TWO-PLAYER GAME OF CAT & MOUSE</Eyebrow>
@@ -204,29 +217,19 @@ export default function Lobby() {
           <div className="hero-label"><span>THE MIDNIGHT RUN</span>
             <span>一 场 没 有 回 头 路 的 追 逐</span></div>
         </section>
-        <div className="game-facts">
+        <div className="game-facts" data-testid="fugitive-lobby-facts">
           <span><Users size={16} /><b>2</b> 位玩家</span>
           <span><Clock3 size={16} /><b>10–20</b> 分钟</span>
           <span><Layers size={16} /><b>43</b> 张地点牌</span>
         </div>
-        {ownRoom && <section className="own-room-return">
-          <ProfileMonogram profile={profile.data} className="own-room-mark" />
-          <div><b>{ownRoom.displayName || '午夜追缉'}</b>
-            <small>{ownRoom.visibility === 'private' ? '私密房间' : '你的公开房间'}
-              {' · '}{ownRoom.roomPlayer.length}/2 已入座</small></div>
-          <button className="button secondary" type="button" onClick={() => enter(ownRoom)}>
-            返回房间<ArrowRight size={14} /></button>
-        </section>}
-        <div className="lobby-lower"><section className="room-panel">
+        <div className="lobby-lower"><section className="room-panel" data-testid="fugitive-lobby-browser">
           <div className="section-heading"><div><Eyebrow>TAKE YOUR SIDE</Eyebrow>
             <h2>找一个对手，开一场追逐。</h2></div>
-            <button className="text-button" type="button"
-              onClick={() => { setCode(''); action.reset(); setPanel('join'); }}>
-              <Hash size={14} />房间号加入</button>
+            <span className="visible-rooms">可见房间</span>
           </div>
           <div className="room-toolbar"><div className="tabs">
             {([
-              { id: 'all', text: '全部' },
+              { id: 'all', text: '全部房间' },
               { id: 'joinable', text: '可加入' },
               { id: 'playing', text: '对局中' },
             ] as Array<{ id: LobbyFilter; text: string }>).map(item =>
@@ -237,7 +240,7 @@ export default function Lobby() {
                 {item.id === 'all' && <span>{lobby.rooms.length}</span>}</button>)}
           </div>
           <label className="search-field"><Search size={16} />
-            <input aria-label="搜索房间" placeholder="搜索房间名称 / 房间号 / 房主"
+            <input aria-label="搜索房间" placeholder="搜索房间号 / 房主"
               value={lobby.query} onChange={event => lobby.setQuery(event.target.value)} />
             {lobby.query && <button type="button" aria-label="清空搜索"
               onClick={() => lobby.setQuery('')}><X size={16} /></button>}
@@ -255,7 +258,7 @@ export default function Lobby() {
             </div>}
           </div>
         </section>
-        <aside className="lobby-aside">
+        <aside className="lobby-aside" data-testid="fugitive-lobby-aside">
           <section className="lobby-profile">
             <div className="lobby-profile-head">
               <ProfileMonogram profile={profile.data} className="profile-monogram-small" />
@@ -270,23 +273,15 @@ export default function Lobby() {
             <Link className="text-button full" to="/game/fugitive/me">
               我的追逃档案<ArrowRight size={15} /></Link>
           </section>
+          <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
           <Link className="learning-card" to="/game/fugitive/guide"><div>
             <Eyebrow>BEFORE YOUR FIRST MOVE</Eyebrow><h3>先读懂，再看穿。</h3>
             <p>3 分钟，学会你的第一场追逐。</p>
-            <b>查看指南<ArrowUpRight size={14} /></b>
+            <b>查看指南<ArrowRight size={14} /></b>
           </div><BookOpen size={40} strokeWidth={1.2} /></Link>
-          <div className="quick-role-actions">
-            <button type="button" onClick={openCreate}><Footprints size={18} />
-              <span>做逃亡者<small>手牌规划与冲刺</small></span><ArrowUpRight size={14} /></button>
-            <button type="button" onClick={openCreate}><Shield size={18} />
-              <span>做追捕者<small>线索排除与搜查</small></span><ArrowUpRight size={14} /></button>
-          </div>
         </aside></div>
-        <div className="lobby-bottom-links">
-          <Link to="/game/fugitive/cards"><Layers size={16} />
-            <span><b>完整牌库</b> · 查询 43 张地点牌</span><ArrowUpRight size={14} /></Link>
-          <Link to="/game/fugitive/rankings"><Trophy size={16} />
-            <span>城市风云榜 · 真实线上战绩</span><ArrowUpRight size={14} /></Link>
+        <div className="mobile-lobby-join" data-testid="fugitive-lobby-mobile-join">
+          <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
         </div>
       </main>}
 

@@ -86,7 +86,6 @@
 .warchest-notice.is-error { border-color: #e3cfc5; background: #f8eee8; color: #9b604f; }
 .warchest-root .room-card-progress { height: 3px; background: #edf0e5; margin: 0 -15px; }
 .warchest-root .room-card-progress i { display: block; height: 100%; background: #7f9a6c; }
-.warchest-root .online-note { color: #687e55; }
 .warchest-root .room-owner-avatar {
   display: grid;
   place-items: center;
@@ -109,6 +108,84 @@
   margin-left: -8px;
   border: 2px solid #fff;
 }
+.warchest-root .lobby-page .hero { height: 252px; border-radius: 12px; }
+.warchest-root .lobby-page .hero-copy { width: 690px; max-width: 100%; padding: 25px 34px; }
+.warchest-root .lobby-page .hero h1 { font-size: 34px; line-height: 1.43; letter-spacing: 2px; }
+.warchest-root .lobby-page .game-facts { height: 71px; margin-bottom: 24px; }
+.warchest-root .lobby-columns {
+  grid-template-columns: minmax(0, 1fr) 302px;
+  gap: 25px;
+  margin-top: 0;
+}
+.warchest-root .room-cards { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+.warchest-root .visible-rooms {
+  flex-shrink: 0;
+  padding: 4px 9px;
+  border: 1px solid #cad3bd;
+  border-radius: 4px;
+  color: #829174;
+  font-size: 10px;
+}
+.warchest-root .room-empty { min-height: 360px; }
+.warchest-root .lobby-aside {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+  padding-top: 0;
+}
+.warchest-root .commander-card > a {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  width: 100%;
+  padding: 12px 0;
+  border-top: 1px solid #dce1d0;
+  color: #708364;
+  font-size: 10px;
+}
+.warchest-root .learning-card { margin-top: 0; }
+.warchest-root .lobby-join-card {
+  padding: 18px 19px;
+  border: 1px solid #dce3d2;
+  border-radius: 8px;
+  background: #f4f7ed;
+}
+.warchest-root .lobby-join-card h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: #56684d;
+  font-size: 13px;
+}
+.warchest-root .lobby-join-card h3 > svg { color: #8a7953; }
+.warchest-root .lobby-join-card p { margin: 8px 0 12px; color: #8b977f; font-size: 10px; }
+.warchest-root .lobby-join-card form {
+  display: flex;
+  height: 36px;
+  overflow: hidden;
+  border: 1px solid #d4dcc8;
+  border-radius: 5px;
+  background: #fbfcf6;
+}
+.warchest-root .lobby-join-card input {
+  width: 100%;
+  min-width: 0;
+  padding: 0 10px;
+  border: 0;
+  outline: 0;
+  background: transparent;
+  color: #52634a;
+  font-size: 10px;
+}
+.warchest-root .lobby-join-card form button {
+  display: grid;
+  width: 38px;
+  flex-shrink: 0;
+  place-items: center;
+  background: #e5ebdc;
+  color: #5b774d;
+}
+.warchest-root .mobile-lobby-join { display: none; }
 .warchest-root .rank-row {
   display: grid;
   grid-template-columns: 70px minmax(150px, 1fr) 120px 100px 100px;
@@ -191,32 +268,6 @@
   color: #7b8d69;
   font-size: 12px;
 }
-.warchest-root .own-room-return {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  margin-top: 18px;
-  padding: 12px 14px;
-  border: 1px solid #dce3d2;
-  border-radius: 7px;
-  background: #f7f9f0;
-}
-.warchest-root .own-room-return > div { flex: 1; }
-.warchest-root .own-room-return b,
-.warchest-root .own-room-return small { display: block; }
-.warchest-root .own-room-return small { margin-top: 4px; color: #93a085; font-size: 9px; }
-.warchest-root .quick-role-actions { margin-top: 14px; }
-.warchest-root .quick-role-actions a {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  padding: 13px;
-  border: 1px solid #dce2d1;
-  border-radius: 7px;
-  background: #f9faf4;
-}
-.warchest-root .quick-role-actions a span { flex: 1; font-size: 11px; }
-.warchest-root .quick-role-actions a small { display: block; margin-top: 4px; color: #9ca88f; font-size: 8px; }
 .warchest-root .warchest-setup { margin-top: 24px; padding-top: 20px; border-top: 1px solid #e1e6d6; }
 .warchest-root .warchest-draft { margin: 15px 0; }
 .warchest-root .draft-status { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 11px; background: #edf2e3; border-radius: 6px; }
@@ -236,6 +287,44 @@
 .warchest-root .lineup-cards > div > small { padding-top: 8px; }
 .warchest-root .warchest-seat-remove { position: absolute; right: 9px; top: 9px; }
 @media (max-width: 760px) {
+  .warchest-root .lobby-page .hero { height: 227px; border-radius: 9px; }
+  .warchest-root .lobby-page .hero-copy { width: 100%; padding: 21px 20px; }
+  .warchest-root .lobby-page .hero h1 {
+    margin: 11px 0 9px;
+    font-size: 27px;
+    line-height: 1.42;
+    letter-spacing: .02em;
+  }
+  .warchest-root .lobby-page .game-facts { height: 63px; margin-bottom: 19px; }
+  .warchest-root .lobby-columns { gap: 0; margin-top: 0; }
+  .warchest-root .section-heading { margin-bottom: 13px; }
+  .warchest-root .section-heading h2 { margin-top: 5px; font-size: 16px; line-height: 1.6; }
+  .warchest-root .visible-rooms { padding: 4px 7px; font-size: 8px; }
+  .warchest-root .room-toolbar { gap: 12px; margin: 0 0 14px; }
+  .warchest-root .room-toolbar .tabs {
+    width: 100%;
+    gap: 23px;
+  }
+  .warchest-root .room-toolbar .tabs > button {
+    min-height: 35px;
+    padding: 8px 0;
+    border-radius: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    font-size: 12px;
+  }
+  .warchest-root .room-toolbar .tabs > button.active {
+    border-bottom-color: #6d885d;
+    background: transparent;
+  }
+  .warchest-root .room-toolbar .search-field { width: 100%; height: 39px; }
+  .warchest-root .room-empty { min-height: 340px; padding: 28px 19px; }
+  .warchest-root .lobby-aside { display: none; }
+  .warchest-root .mobile-lobby-join { display: block; margin-top: 13px; }
+  .warchest-root .mobile-lobby-join .lobby-join-card { padding: 18px; }
+  .warchest-root .mobile-lobby-join .lobby-join-card form { height: 40px; }
+  .warchest-root .mobile-lobby-join .lobby-join-card input { font-size: 12px; }
+  .warchest-root .mobile-lobby-join .lobby-join-card form button { width: 42px; }
   .warchest-replay-back { top: 52px; left: 8px; }
   .warchest-root .replay-dock { bottom: 8px; }
   .warchest-root .battle-timer { min-width: 44px; font-size: 10px; }

@@ -1,20 +1,19 @@
-import { useMemo, useState } from 'react';
+import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
-  ArrowUpRight,
+  BookOpen,
   Check,
   Clock3,
   Copy,
   Flag,
   Globe2,
+  KeyRound,
   LockKeyhole,
   Plus,
   Search,
   Share2,
   ShieldCheck,
-  Swords,
-  Trophy,
   Users,
   X,
 } from 'lucide-react';
@@ -86,6 +85,26 @@ function RoomCard({
   </article>;
 }
 
+function JoinCard({
+  code,
+  setCode,
+  onJoin,
+}: {
+  code: string;
+  setCode: (value: string) => void;
+  onJoin: () => void;
+}) {
+  return <section className="lobby-join-card"><h3><KeyRound size={18} />朋友已经开好房间？</h3>
+    <p>输入完整房间号，找到朋友的战场。</p>
+    <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
+      <input aria-label="查找房间号" placeholder="输入完整房间号" value={code}
+        onChange={event => setCode(event.target.value)} autoCapitalize="off"
+        autoCorrect="off" spellCheck={false} />
+      <button disabled={!code.trim()} aria-label="查找房间" type="submit"><ArrowRight size={19} /></button>
+    </form>
+  </section>;
+}
+
 export default function Lobby() {
   const navigate = useNavigate();
   const lobby = useWarChestLobby();
@@ -98,9 +117,6 @@ export default function Lobby() {
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<WarChestRoom>();
   const userID = profile.data?.id ?? '';
-  const ownRoom = useMemo(() => lobby.rooms.find(room =>
-    room.roomPlayer.some(player =>
-      player.userID === userID || player.playerID === userID)), [lobby.rooms, userID]);
 
   const enter = (room: WarChestRoom) => {
     if (roomEntry(room, { userID }).allowed) {
@@ -121,6 +137,7 @@ export default function Lobby() {
   const find = async () => {
     if (!code.trim()) return;
     setFoundRoom(undefined);
+    setPanel('join');
     try {
       setFoundRoom(await action.run(signal =>
         lookupWarChestRoom(code.trim(), signal)));
@@ -138,8 +155,7 @@ export default function Lobby() {
 
   return <Shell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <Loading text="正在同步战场与在线指挥官。" />
-      : <main className="page lobby-page"><div className="welcome-row">
-        <p>欢迎归来，{profile.data?.name || '指挥官'}。</p><span>沉着落子，自有回响。</span></div>
+      : <main className="page lobby-page">
       <section className="hero" data-testid="warchest-lobby-hero">
         <img className="hero-image" src={HERO} alt="墨绿色山地与城堡前的骑兵，前景为金属兵种币" />
         <div className="hero-shade" /><div className="hero-copy">
@@ -157,26 +173,17 @@ export default function Lobby() {
       <div className="game-facts" data-testid="warchest-lobby-facts">
         <span><Users size={18} /><b>2</b><small>位指挥官</small></span>
         <span><Clock3 size={18} /><b>90</b><small>秒行动</small></span>
-        <span><Flag size={18} /><b>6</b><small>据点即胜</small></span>
-        <button type="button" onClick={() => navigate('/game/warchest/guide')}>第一次出征？
-          <b>了解玩法</b><ArrowUpRight size={15} /></button></div>
-      {ownRoom && <section className="own-room-return"><Crest size={40} /><div>
-        <b>{ownRoom.displayName || '战争之匣'}</b><small>{ownRoom.visibility === 'private' ? '私密房间' : '你的公开房间'}
-          {' · '}{ownRoom.roomPlayer.length}/2 已入座</small></div>
-        <button className="button secondary" type="button" onClick={() => enter(ownRoom)}>
-          返回房间<ArrowRight size={14} /></button></section>}
-      <div className="lobby-columns"><section className="rooms-section">
+        <span><Flag size={18} /><b>6</b><small>据点即胜</small></span></div>
+      <div className="lobby-columns"><section className="rooms-section" data-testid="warchest-lobby-browser">
         <div className="section-heading"><div><Eyebrow>CHOOSE YOUR BATTLEFIELD</Eyebrow>
           <h2>为下一场交锋，入席。</h2></div>
-          <button className="text-button" type="button"
-            onClick={() => { setCode(''); setFoundRoom(undefined); action.reset(); setPanel('join'); }}>
-            房间号加入 <ArrowRight size={15} /></button></div>
+          <span className="visible-rooms">可见房间</span></div>
         <div className="room-toolbar"><div className="tabs">{filters.map(item =>
           <button type="button" key={item.value} className={lobby.filter === item.value ? 'active' : ''}
             onClick={() => lobby.setFilter(item.value)}>{item.label}
             {item.value === 'all' && <span>{lobby.rooms.length}</span>}</button>)}</div>
           <label className="search-field"><Search size={15} /><input aria-label="搜索房间"
-            placeholder="搜索房间名称 / 房间号 / 房主" value={lobby.query}
+            placeholder="搜索房间号 / 房主" value={lobby.query}
             onChange={event => lobby.setQuery(event.target.value)} />
             {lobby.query && <button type="button" aria-label="清空房间搜索"
               onClick={() => lobby.setQuery('')}><X size={13} /></button>}</label></div>
@@ -188,21 +195,22 @@ export default function Lobby() {
             <Search size={30} /><h3>还没有找到这片战场</h3><p>换个关键词，或升起自己的战旗。</p>
             <button className="button secondary" type="button"
               onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清空筛选</button></div>}</div>
-        <p className="demo-note online-note"><ShieldCheck size={13} />房间、编成、抽币和所有行动均由服务端验证</p>
-      </section><aside className="lobby-aside"><section className="commander-card">
+      </section><aside className="lobby-aside" data-testid="warchest-lobby-aside"><section className="commander-card">
         <div className="commander-top"><Crest size={44} /><div><small>你的指挥官手册</small>
           <h3>{profile.data?.name || '指挥官'}</h3></div></div>
         <div className="commander-stats"><div><b>{stats.data?.totalGames ?? '—'}</b><span>完成对局</span></div>
           <div><b>{stats.data?.wins ?? '—'}</b><span>胜局</span></div>
           <div><b>{stats.data ? `${Math.round(stats.data.winRate * 100)}%` : '—'}</b><span>胜率</span></div></div>
         <Link to="/game/warchest/me">查看我的战绩 <ArrowRight size={16} /></Link></section>
-        <Link className="learning-card" to="/game/warchest/army"><div>
-          <Eyebrow>KNOW YOUR LEGION</Eyebrow><h3>十六兵种，各有所长。</h3>
-          <p>认识能力，再决定编成。</p><span>翻开兵种图鉴 <ArrowRight size={15} /></span></div>
-          <Swords size={51} strokeWidth={0.9} /></Link>
-        <div className="quick-role-actions"><Link to="/game/warchest/rankings"><Trophy size={18} />
-          <span>指挥官排行<small>真实线上胜率</small></span><ArrowUpRight size={14} /></Link></div>
-      </aside></div></main>}
+        <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
+        <Link className="learning-card" to="/game/warchest/guide"><div>
+          <Eyebrow>THE FIRST MOVE</Eyebrow><h3>先懂调遣，再定胜局。</h3>
+          <p>读懂你的第一场交锋。</p><span>查看玩法 <ArrowRight size={15} /></span></div>
+          <BookOpen size={51} strokeWidth={0.9} /></Link>
+      </aside></div>
+      <div className="mobile-lobby-join" data-testid="warchest-lobby-mobile-join">
+        <JoinCard code={code} setCode={setCode} onJoin={() => void find()} />
+      </div></main>}
 
     {panel === 'create' && <Modal title="为下一场交锋，升起战旗。" eyebrow="CREATE A ROOM"
       onClose={close} footer={<><button className="button secondary" type="button"
