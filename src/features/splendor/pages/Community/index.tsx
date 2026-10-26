@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Bookmark, Crown, Gem, Layers, LogOut,
-  Settings2, ShieldCheck, Trophy,
+  ArrowLeft, ArrowRight, Bookmark, ChevronRight, Crown, Gem, Info, Layers,
+  LogOut, Mail, Pencil, Settings2, ShieldCheck, Trophy,
 } from 'lucide-react';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -74,23 +75,13 @@ export function Rankings() {
     sort,
   });
   const myIndex = entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
-  const podium = [entries[1], entries[0], entries[2]].filter(Boolean);
 
   return <AppShell title="收藏家榜" profile={profile.data}><div className={`${styles.page} ${styles.rankPage}`}>
     <header className={styles.pageTitle}><Eyebrow>THE DISTINGUISHED COLLECTORS</Eyebrow>
       <h1>让每一次远见，都留下声望。</h1><p>在宝石的世界里，稳定的眼光值得被看见。</p></header>
     <section className={styles.rankHero}><div><Crown size={36} /><h2>收藏家荣誉榜</h2>
       <p>累积收藏的不是宝石，而是每一步的智慧。</p>
-      <span>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</span></div>
-      {!!podium.length && <div className={styles.podium}>{podium.map((entry, index) =>
-        <div key={entry.userID} className={index === 1 ? styles.first : ''}>
-          <span>{index === 1 ? <Crown size={22} /> : index === 0 ? '02' : '03'}</span>
-          <PlayerAvatar name={entry.displayName} size={index === 1 ? 78 : 64} />
-          <strong>{entry.displayName}</strong>
-          <b>{mode === 'games' ? entry.totalGames : 'avgRank' in entry ? entry.avgRank.toFixed(2) : '—'}
-            <small>{mode === 'games' ? '完成对局' : '平均名次'}</small></b>
-        </div>)}</div>}
-    </section>
+      <span>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</span></div></section>
     <section className={styles.rankPanel}><GameTabs className={styles.rankTabs}
       ariaLabel="排行榜模式" value={mode} onChange={setMode} activeClassName={styles.active}
       items={[{ value: 'score', label: '战绩榜' }, { value: 'games', label: '场次榜' }]}
@@ -172,13 +163,13 @@ export function My() {
     retry,
   } = useGameHistory({ gameType: 'splendor', pageSize: 20 });
   const logoutAction = useGameLogout();
-  const [panel, setPanel] = useState<'preferences' | 'logout'>();
+  const [panel, setPanel] = useState<'preferences' | 'logout' | 'about'>();
   const doLogout = async () => {
     await logoutAction.run();
   };
   const firstLoading = profile.loading && !profile.data || stats.loading && !stats.data || loading && !games.length;
 
-  return <AppShell title="我的收藏" profile={profile.data}><div className={`${styles.page} ${styles.profilePage}`}>
+  return <AppShell title="我的收藏" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.pageTitle}><Eyebrow>YOUR COLLECTOR'S JOURNEY</Eyebrow>
       <h1>你的眼光，值得珍藏。</h1><p>每一局都是新的旅程，每一步都有自己的印记。</p></header>
     {firstLoading ? <SplendorLoading title="正在整理你的收藏档案。" description="同步身份、战绩与对局记录" />
@@ -186,12 +177,16 @@ export function My() {
         <Gem className={styles.identityDecoration} size={160} strokeWidth={.5} />
         <PlayerAvatar name={profile.data?.name ?? '玩家'} avatar={profile.data?.avatar} size={88} />
         <span>THE GEM COLLECTOR</span><h2>{profile.data?.name || '玩家'}</h2>
-        <p>{profile.data?.email || '商会会员'}</p><em><Crown size={14} />收藏家档案</em>
+        <p className={styles.profileID}>PLAYER ID · {profile.data?.id ?? '—'}</p>
+        <div className={styles.profileEmail}><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>
+        <em><Crown size={14} />收藏家档案</em>
         <div className={styles.identityStats}><div><b>{stats.data?.totalGames ?? 0}</b><span>完成对局</span></div>
           <div><b>{stats.data?.wins ?? 0}</b><span>胜利</span></div>
           <div><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><span>平均声望</span></div></div>
-        <ActionButton onClick={() => setPanel('preferences')}><Settings2 size={17} />显示偏好</ActionButton>
-        <ActionButton variant="quiet" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</ActionButton>
+        <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile">
+          <Pencil size={14} />编辑资料</a>
+          <ActionButton variant="quiet" onClick={() => setPanel('preferences')}><Settings2 size={15} />显示偏好</ActionButton>
+          <ActionButton variant="quiet" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</ActionButton></div>
       </section>
       <section className={styles.history}><div className={styles.highlights}>
         <div><Trophy size={19} /><span>完成对局</span><b>{stats.data?.totalGames ?? 0}</b></div>
@@ -212,6 +207,16 @@ export function My() {
           {hasMore && <ActionButton className={styles.more} pending={loading} onClick={loadMore}>加载更多</ActionButton>}
         </div>
       </section></div>}
+    <button className={styles.aboutEntry} data-testid="splendor-about-entry" type="button"
+      onClick={() => setPanel('about')}><span><Info size={17} /></span>
+      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
+      <ChevronRight size={17} /></button>
+    {panel === 'about' && <Dialog title="关于 Splendor Online" eyebrow="ABOUT & CONTACT"
+      onClose={() => setPanel(undefined)}
+      footer={<ActionButton onClick={() => setPanel(undefined)}>知道了</ActionButton>}>
+      <ProjectContact gameName="Splendor" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
+    </Dialog>}
     {panel === 'preferences' && <Dialog title="让收藏，更顺手。" eyebrow="MAKE YOURSELF AT HOME"
       onClose={() => setPanel(undefined)} footer={<ActionButton variant="primary" onClick={() => setPanel(undefined)}>完成</ActionButton>}>
       <div className={styles.preferences}><div><span><b>更清晰的文字</b><small>提高辅助文字的对比度</small></span>

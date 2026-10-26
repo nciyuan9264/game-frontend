@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
 import { Link, NavLink } from 'react-router-dom';
+import layoutStyles from './index.module.less';
 
 export interface GameShellNavigationItem {
   path: string;
@@ -56,6 +57,7 @@ export interface GameAppShellProps {
   inMatch?: boolean;
   hideRail?: boolean;
   hideHeader?: boolean;
+  compactMobileFooter?: boolean;
   tools?: ReactNode;
   renderMark: () => ReactNode;
   renderBrand: () => ReactNode;
@@ -90,6 +92,7 @@ export function GameAppShell({
   inMatch = false,
   hideRail = false,
   hideHeader = false,
+  compactMobileFooter = false,
   tools,
   renderMark,
   renderBrand,
@@ -112,6 +115,7 @@ export function GameAppShell({
     inMatch ? classes.inMatch : '',
     hideRail ? classes.hideRail : '',
     hideHeader ? classes.hideHeader : '',
+    compactMobileFooter ? layoutStyles.compactMobileShell : '',
   ].filter(Boolean).join(' ');
   const showRail = !hideRail && (!inMatch || showRailInMatch);
   const fallbackProfile = profile ?? { name: '玩家' };
@@ -148,7 +152,10 @@ export function GameAppShell({
           })}</Link>}
       </div>
     </aside>}
-    <div className={classes.main}>
+    <div className={[
+      classes.main,
+      compactMobileFooter ? layoutStyles.compactMobileShell : '',
+    ].filter(Boolean).join(' ')}>
       {!hideHeader && <header className={classes.header}>
         {inMatch
           ? <span className={classes.brand}>{renderBrand()}</span>
@@ -175,7 +182,10 @@ export function GameAppShell({
             })}<span className={classes.profileName}>{renderProfileLabel(profile)}</span>{profileAccessory}</Link>)}
         </div>
       </header>}
-      <main className={classes.content}>{children}</main>
+      <main className={[
+        classes.content,
+        compactMobileFooter ? layoutStyles.compactMobileFooter : '',
+      ].filter(Boolean).join(' ')}>{children}</main>
     </div>
     {!inMatch && <nav className={classes.mobileNav} aria-label={labels.mobileNavigation}>
       {navigation.map(item => <NavLink

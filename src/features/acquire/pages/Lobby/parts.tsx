@@ -70,7 +70,7 @@ export function RoomBrowser({ lobby, userID, onEnter }: Pick<LobbyViewProps, 'lo
 export function JoinCard({ code, setCode, onJoin }: Pick<LobbyViewProps, 'code' | 'setCode' | 'onJoin'>) {
   return <Panel className={styles.join}><h3><KeyRound size={18} />朋友已经开好房间？</h3><p>输入完整房间号，找到朋友的桌。</p>
     <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
-      <input aria-label="查找房间号" placeholder="例如 0302_075034" value={code} onChange={event => setCode(event.target.value)} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+      <input aria-label="查找房间号" placeholder="输入完整房间号" value={code} onChange={event => setCode(event.target.value)} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
       <button disabled={!code.trim()} aria-label="查找房间" type="submit"><ArrowRight size={19} /></button>
     </form>
   </Panel>;

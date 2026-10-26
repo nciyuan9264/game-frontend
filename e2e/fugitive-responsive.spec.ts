@@ -236,7 +236,7 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await page.getByRole('button', { name: /房间号加入/ }).click();
   await expect(page.getByRole('dialog', { name: '通过房间号加入' })).toBeVisible();
   await expect(page.getByRole('textbox', { name: '房间号' }))
-    .toHaveAttribute('placeholder', '例如 0302_075034');
+    .toHaveAttribute('placeholder', '输入完整房间号');
   await expect(page.getByRole('button', { name: '取消' })).toBeVisible();
   await expect(page.getByRole('button', { name: /加入房间/ })).toBeDisabled();
   await expectNoDocumentOverflow(page);

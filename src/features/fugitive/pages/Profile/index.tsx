@@ -5,11 +5,15 @@ import {
   Check,
   ChevronRight,
   Footprints,
+  Info,
   LogOut,
+  Mail,
+  Pencil,
   Route,
   Settings2,
   Shield,
 } from 'lucide-react';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -40,7 +44,7 @@ export default function Profile() {
   const history = useGameHistory({ gameType: 'fugitive', pageSize: 20 });
   const preferences = useFugitivePreferences();
   const logout = useGameLogout();
-  const [panel, setPanel] = useState<'preferences' | 'logout' | 'record'>();
+  const [panel, setPanel] = useState<'preferences' | 'logout' | 'record' | 'about'>();
   const [record, setRecord] = useState<Game>();
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
@@ -54,7 +58,7 @@ export default function Profile() {
     setPanel('record');
   };
 
-  return <AppShell title="我的档案" profile={profile.data}>
+  return <AppShell title="我的档案" profile={profile.data} compactMobileFooter>
     {loading
       ? <FugitiveLoading title="正在整理你的追逃档案。"
         description="同步身份、角色战绩与历史对局" />
@@ -67,14 +71,19 @@ export default function Profile() {
             <ProfileMonogram profile={profile.data} className="profile-monogram" />
             <Eyebrow>ONLINE FIELD AGENT</Eyebrow>
             <h2>{profile.data?.name || '城市追踪者'}</h2>
-            <p>{profile.data?.email || '在线玩家'}</p>
+            <p className="profile-id">PLAYER ID · {profile.data?.id ?? '—'}</p>
+            <div className="profile-email"><Mail size={14} />
+              {profile.data?.email || '邮箱未绑定'}</div>
             <div className="profile-stats"><span><b>{total}</b>完成对局</span>
-              <span><b>{wins}</b>获胜</span></div>
-            <button className="button secondary" type="button"
-              onClick={() => setPanel('preferences')}>
-              <Settings2 size={16} />显示偏好</button>
-            <button className="text-button" type="button"
-              onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</button>
+              <span><b>{wins}</b>获胜</span>
+              <span><b>{total ? Math.round((stats.data?.winRate ?? 0) * 100) : 0}%</b>胜率</span></div>
+            <div className="profile-actions"><a href="https://auth.gamebus.online/profile">
+              <Pencil size={14} />编辑资料</a>
+              <button className="text-button" type="button"
+                onClick={() => setPanel('preferences')}>
+                <Settings2 size={15} />显示偏好</button>
+              <button className="text-button" type="button"
+                onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</button></div>
           </section>
           <section className="profile-history">
             <div className="profile-role-stats">
@@ -118,7 +127,20 @@ export default function Profile() {
               {history.loading ? '载入中…' : '加载更多对局'}</button>}
           </section>
         </div>
+        <button className="profile-about" data-testid="fugitive-about-entry"
+          type="button" onClick={() => setPanel('about')}><span><Info size={17} /></span>
+          <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
+          <ChevronRight size={17} /></button>
       </main>}
+
+    {panel === 'about' && <Modal title="关于 Fugitive Online"
+      kicker="ABOUT & CONTACT" onClose={() => setPanel(undefined)}
+      footer={<button className="button secondary full" type="button"
+        onClick={() => setPanel(undefined)}>知道了</button>}>
+      <ProjectContact gameName="Fugitive"
+        avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }} className="contact-monogram" />}
+        classes={{ intro: 'project-contact-intro', links: 'project-contact-links', legal: 'project-contact-legal' }} />
+    </Modal>}
 
     {panel === 'preferences' && <Modal title="让行动更顺手。"
       kicker="DISPLAY PREFERENCES" onClose={() => setPanel(undefined)}

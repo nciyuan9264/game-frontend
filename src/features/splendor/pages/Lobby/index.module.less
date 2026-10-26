@@ -6,8 +6,8 @@
 .heroCopy { position:relative; z-index:1; width:560px; padding:28px 38px;
   h1 { margin:11px 0 10px; color:#593d41; font-size:35px; line-height:1.48; letter-spacing:1.4px; }
   p { color:#7b6b59; font-size:11px; line-height:1.9; }
-  > button { min-height:40px; margin-top:19px; padding:0 17px; font-size:11px; }
 }
+.heroActions { display:flex; gap:9px; margin-top:19px; > button { min-height:40px; padding:0 16px; font-size:11px; } }
 .heroStamp { position:absolute; right:25px; bottom:20px; display:flex; align-items:center; gap:9px; padding:8px 10px; border:1px solid #fff0c135; border-radius:2px; background:#382b1e30; color:#ffedc8; text-shadow:0 1px 8px #281700;
   > span { font:500 12px var(--serif); letter-spacing:1.6px; }
   small { display:block; margin-top:3px; color:#f4dfbb; font:8px/1.8 sans-serif; letter-spacing:3px; }
@@ -103,13 +103,23 @@
   input { height:54px; padding:0 13px; border:1px solid #dcd3c7; border-radius:5px; outline:0; background:#fffcf7; color:var(--ink); font-size:18px; letter-spacing:2px; }
   input:focus { border-color:var(--wine); }
 }
+.shareContent { display:grid; justify-items:center; gap:14px; }
+.shareQr { padding:11px; border-radius:7px; background:#fffaf1; line-height:0; }
+.shareAddress { width:100%; padding:11px 12px; border:1px solid #ded3c4; border-radius:5px; background:#fffaf1;
+  span { display:block; margin-bottom:5px; color:#9d8f80; font-size:9px; }
+  strong { display:block; overflow-wrap:anywhere; color:#66574d; font:11px/1.5 monospace; }
+}
+.shareHint { display:flex; align-items:flex-start; gap:8px; width:100%; color:#8e744b; font-size:10px; line-height:1.8;
+  svg { flex:none; margin-top:1px; color:var(--wine); }
+}
 
 @media (min-width:1550px) { .hero { height:321px; } .heroCopy { padding:37px 42px; h1 { font-size:39px; } } .roomTitle>span { display:block; } .layout { grid-template-columns:minmax(0,1fr) 295px; } }
 @media (max-width:1180px) and (min-width:768px) { .layout { grid-template-columns:minmax(0,1fr) 223px; gap:20px; } .roomGrid { gap:8px; } .roomCard { padding:13px 11px; } .roomTitle h3 { font-size:12px; } }
 @media (max-width:767px) {
   .hero { height:285px; border-radius:6px; > img { object-position:64% 50%; opacity:.87; } }
   .heroShade { background:linear-gradient(90deg,#eee5d5f5 0%,#eee5d5dd 30%,#eee5d56e 100%); }
-  .heroCopy { width:100%; padding:24px 21px; h1 { margin-top:11px; font-size:29px; line-height:1.55; letter-spacing:.5px; } p { max-width:275px; font-size:11px; } > button { min-height:44px; margin-top:18px; font-size:12px; } }
+  .heroCopy { width:100%; padding:24px 21px; h1 { margin-top:11px; font-size:29px; line-height:1.55; letter-spacing:.5px; } p { max-width:275px; font-size:11px; } }
+  .heroActions { gap:7px; margin-top:18px; > button { min-width:0; flex:1; min-height:44px; padding:0 10px; font-size:11px; } }
   .heroStamp { display:none; }
   .gameFacts { justify-content:space-between; gap:0; row-gap:15px; flex-wrap:wrap; margin-bottom:22px; padding:15px 0;
     > span { gap:3px; font-size:9px; } b { font-size:16px; } > a { display:none; }

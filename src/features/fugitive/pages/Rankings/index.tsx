@@ -71,23 +71,6 @@ export default function Rankings() {
         <span>按胜率、总场次和用户编号稳定排序；AI 不进入排行榜。</span>
         <span>{entries.length} 位玩家</span></div>
 
-      {!!entries.length && <section className="podium" aria-label="排行榜前三名">
-        {entries.slice(0, 3).map((entry, index) =>
-          <button type="button" key={entry.userID}
-            className={`podium-card podium-${index + 1}`}
-            onClick={() => setSelected(entry)}>
-            <span className="podium-number">0{index + 1}</span>
-            <RankAvatar name={entry.displayName} index={index} />
-            <div className="podium-name"><span>{index === 0
-              ? '夜色领跑者' : index === 1 ? '紧随其后' : '蓄势待发'}</span>
-              <h3>{entry.displayName}</h3>
-              <small>{Math.round(entry.winRate * 100)}% 胜率 · {entry.totalGames} 场</small>
-            </div>
-            <div className="podium-score"><Trophy size={index === 0 ? 21 : 16} />
-              <b>{Math.round(entry.winRate * 100)}%</b><small>真实胜率</small></div>
-          </button>)}
-      </section>}
-
       {self && <div className="mobile-rank-summary">
         <RankAvatar name={self.displayName} index={myIndex} /><div>
           <b>我的位置 <strong>#{String(myIndex + 1).padStart(2, '0')}</strong></b>

@@ -42,9 +42,9 @@ export function PlayerAvatar({ name, avatar, ai, size = 36 }: { name: string; av
   return <GameAvatar className={styles.avatar} name={name} avatar={avatar} ai={ai} size={size}
     renderFallback={() => <AvatarArt variant={variant} bot={ai} />} />;
 }
-export function AppShell({ children, title, profile, inMatch = false, hideRail = false, hideHeader = false, tools }: {
+export function AppShell({ children, title, profile, inMatch = false, hideRail = false, hideHeader = false, compactMobileFooter = false, tools }: {
   children: ReactNode; title: string; profile?: ShellProfile;
-  inMatch?: boolean; hideRail?: boolean; hideHeader?: boolean; tools?: ReactNode;
+  inMatch?: boolean; hideRail?: boolean; hideHeader?: boolean; compactMobileFooter?: boolean; tools?: ReactNode;
 }) {
   return <GameAppShell
     rootClassName={rootStyles.root}
@@ -78,6 +78,7 @@ export function AppShell({ children, title, profile, inMatch = false, hideRail =
     inMatch={inMatch}
     hideRail={hideRail}
     hideHeader={hideHeader}
+    compactMobileFooter={compactMobileFooter}
     tools={tools}
     renderMark={() => <AcquireMark />}
     renderBrand={() => <Brand />}

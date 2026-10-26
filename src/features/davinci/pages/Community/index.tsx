@@ -1,14 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, BookOpen, Check, Clock, Code2, Copy, ExternalLink, Fingerprint,
-  Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users,
+  ArrowRight, BookOpen, Clock, Fingerprint,
+  Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -127,22 +128,13 @@ export function My() {
   } = useGameHistory({ gameType: 'davinci', pageSize: 20 });
   const logoutAction = useGameLogout();
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
   const handleLogout = async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
     await logoutAction.run();
   };
-  const copyQQ = async () => {
-    try {
-      await navigator.clipboard.writeText('1522457543');
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
-  };
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
 
-  return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page}>
+  return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={styles.page}>
     <header className={styles.heading}><div><small>YOUR CIPHER RECORD</small><h1>身份、判断与每一场对决。</h1></div><UserRoundIcon /></header>
     {loading ? <DavinciLoading title="正在整理你的破译档案。" description="同步身份、战绩与历史对局" /> : <div className={styles.profileLayout}>
       <section className={styles.profileSummary}>
@@ -168,11 +160,12 @@ export function My() {
         {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link to="/game/davinci">去大厅开始第一局</Link></Feedback>}
       </section>
     </div>}
-    <button className={styles.about} type="button" onClick={() => { setCopied(false); setAboutOpen(true); }}><Info size={17} /><span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
+    <button className={styles.about} data-testid="davinci-about-entry" type="button"
+      onClick={() => setAboutOpen(true)}><Info size={17} /><span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
     {aboutOpen && <ResponsiveDialog title="关于 DaVinci Code Online" eyebrow="ABOUT & CONTACT" themeClassName={rootStyles.root}
       onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
-      <div className={styles.aboutLinks}><button type="button" onClick={() => void copyQQ()}><MessageCircle size={19} /><span><b>{copied ? 'QQ 已复制' : 'QQ 联系作者'}</b><small>1522457543</small></span>{copied ? <Check size={15} /> : <Copy size={15} />}</button>
-        <a href="https://github.com/nciyuan9264/game-frontend" target="_blank" rel="noreferrer"><Code2 size={19} /><span><b>查看项目源码</b><small>nciyuan9264/game-frontend</small></span><ExternalLink size={15} /></a></div>
+      <ProjectContact gameName="DaVinci Code" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
     </ResponsiveDialog>}
   </div></AppShell>;
 }

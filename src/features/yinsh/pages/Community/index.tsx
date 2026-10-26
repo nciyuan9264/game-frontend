@@ -1,9 +1,10 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Flag, History, LogOut, RotateCw,
-  ShieldCheck, Trophy,
+  ArrowLeft, ArrowRight, ChevronRight, Flag, History, Info, LogOut, Mail,
+  Pencil, RotateCw, ShieldCheck, Trophy,
 } from 'lucide-react';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -49,10 +50,7 @@ export function Rankings() {
     <header className={styles.title}><Eyebrow>THE QUIET MASTERS</Eyebrow>
       <h1>每一次取环，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
     <section className={styles.rankHero} data-testid="yinsh-rank-hero"><BrandMark size={58} /><div><h2>YINSH 棋手榜</h2>
-      <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div>
-      <div>{leaderboard.entries.slice(0, 3).map((entry, index) => <span key={entry.userID}>
-        <b>0{index + 1}</b><PlayerAvatar name={entry.displayName} size={index === 0 ? 58 : 48} />
-        <strong>{entry.displayName}</strong><small>{Math.round(entry.winRate * 100)}%</small></span>)}</div></section>
+      <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div></section>
     <section className={styles.panel}><div className={styles.tabs}
       role="tablist" aria-label="排行榜模式"><button type="button"
       role="tab" aria-selected={mode === 'winRate'}
@@ -105,22 +103,27 @@ export function My() {
   const history = useGameHistory({ gameType: 'yinsh', pageSize: 20 });
   const logout = useGameLogout();
   const [logoutOpen, setLogoutOpen] = useState(false);
+  const [aboutOpen, setAboutOpen] = useState(false);
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
-  return <AppShell title="我的棋谱" profile={profile.data}><div className={styles.page}>
+  return <AppShell title="我的棋谱" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.title}><Eyebrow>YOUR QUIET JOURNEY</Eyebrow>
       <h1>你的每一步，都值得回看。</h1><p>真实战绩、棋局结果与逐步回放。</p></header>
     {loading ? <YinshLoading title="正在整理你的棋谱。" description="同步身份、战绩与历史" />
       : <div className={styles.profileLayout}><aside className={styles.identity}>
-        <PlayerAvatar name={profile.data?.name ?? '棋手'} avatar={profile.data?.avatar} size={86} />
-        <Eyebrow>THE YINSH PLAYER</Eyebrow><h2>{profile.data?.name || '棋手'}</h2>
-        <p>{profile.data?.email || '在线棋手'}</p>
-        <div><b>{stats.data?.totalGames ?? 0}<small>对局</small></b>
+        <div className={styles.identityHeader}><PlayerAvatar name={profile.data?.name ?? '棋手'}
+          avatar={profile.data?.avatar} size={72} /><div><Eyebrow>THE YINSH PLAYER</Eyebrow>
+            <h2>{profile.data?.name || '棋手'}</h2>
+            <span>PLAYER ID · {profile.data?.id ?? '—'}</span></div></div>
+        <div className={styles.profileEmail}><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>
+        <div className={styles.profileStats}><b>{stats.data?.totalGames ?? 0}<small>对局</small></b>
           <b>{stats.data?.wins ?? 0}<small>胜场</small></b>
           <b>{Math.round((stats.data?.winRate ?? 0) * 100)}%<small>胜率</small></b></div>
-        <ActionButton variant="quiet" onClick={() => setLogoutOpen(true)}>
-          <LogOut size={14} />退出登录</ActionButton></aside>
+        <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile">
+          <Pencil size={14} />编辑资料</a>
+          <ActionButton variant="quiet" onClick={() => setLogoutOpen(true)}>
+            <LogOut size={14} />退出登录</ActionButton></div></aside>
         <section className={styles.history}><header><History size={17} /><h2>过去的棋局</h2></header>
           {history.games.map(game => {
             const me = game.players?.find(player => String(player.userID) === String(profile.data?.id));
@@ -133,11 +136,22 @@ export function My() {
           {history.error && <Feedback error>{history.error}<ActionButton onClick={history.retry}>重试</ActionButton></Feedback>}
           {!history.loading && !history.games.length && <Feedback>还没有对局记录。<Link to="/game/yinsh">去大厅开始第一局</Link></Feedback>}
           {history.hasMore && <ActionButton pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}</section></div>}
+    <button className={styles.aboutEntry} data-testid="yinsh-about-entry" type="button"
+      onClick={() => setAboutOpen(true)}><span><Info size={17} /></span>
+      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
+      <ChevronRight size={17} /></button>
+    {aboutOpen && <Dialog title="关于 YINSH Online" eyebrow="ABOUT & CONTACT"
+      onClose={() => setAboutOpen(false)}
+      footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
+      <ProjectContact gameName="YINSH" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
+    </Dialog>}
     {logoutOpen && <Dialog title="离开当前账号？" eyebrow="SIGN OUT"
       onClose={() => setLogoutOpen(false)}
       footer={<><ActionButton onClick={() => setLogoutOpen(false)}>取消</ActionButton>
         <ActionButton variant="danger" pending={logout.pending} onClick={() => void logout.run()}>退出登录</ActionButton></>}>
       <p className={styles.dialogText}>退出不会删除棋谱与战绩，下次登录后仍可查看。</p>
+      {logout.error && <Feedback error>{logout.error}</Feedback>}
     </Dialog>}
   </div></AppShell>;
 }

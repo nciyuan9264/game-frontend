@@ -1,0 +1,25 @@
+@media (max-width: 767px) {
+  .compactMobileShell {
+    padding-bottom: 0 !important;
+  }
+
+  .compactMobileFooter {
+    display: flex;
+    min-height: calc(
+      100dvh
+      - var(--game-mobile-header-height, 57px)
+    );
+    flex-direction: column;
+    padding-bottom: calc(
+      var(--game-mobile-nav-height, 66px)
+      + env(safe-area-inset-bottom)
+    ) !important;
+
+    > * {
+      display: flex;
+      min-height: 0;
+      flex: 1;
+      flex-direction: column;
+    }
+  }
+}

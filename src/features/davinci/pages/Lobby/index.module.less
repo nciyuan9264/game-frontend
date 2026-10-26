@@ -92,9 +92,14 @@
 .empty { min-height: 180px; display: grid; place-items: center; align-content: center; text-align: center; color: #7f8881;
   h3 { margin-top: 10px; color: #d6d8d2; font-size: 14px; } p { margin-top: 5px; font-size: 11px; }
 }
-.share { display: grid; justify-items: center; gap: 16px; text-align: center;
-  p { color: var(--game-muted); max-width: 380px; }
-  strong { width: 100%; padding: 11px; overflow: hidden; text-overflow: ellipsis; border: 1px solid #404742; border-radius: 5px; color: #cfc8b7; background: #171a18; font: 11px/1.4 monospace; }
+.share { display: grid; justify-items: center; gap: 16px; text-align: center; }
+.shareQr { padding: 10px; border-radius: 7px; background: #eee8d8; line-height: 0; }
+.shareAddress { width: 100%; padding: 11px; overflow: hidden; border: 1px solid #404742; border-radius: 5px; background: #171a18; text-align: left;
+  span { display: block; margin-bottom: 5px; color: #858e87; font-size: 9px; }
+  strong { display: block; overflow: hidden; color: #cfc8b7; font: 11px/1.4 monospace; text-overflow: ellipsis; }
+}
+.shareHint { display: flex; align-items: flex-start; gap: 8px; width: 100%; color: var(--game-muted); font-size: 10px; line-height: 1.8; text-align: left;
+  svg { flex: none; margin-top: 1px; color: var(--game-accent); }
 }
 .mobileJoin { display: none; }
 

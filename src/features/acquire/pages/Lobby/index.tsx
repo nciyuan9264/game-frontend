@@ -1,9 +1,10 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QRCode } from 'antd';
-import { ArrowRight, Check, Copy, Globe, KeyRound, Lock, QrCode, ShieldCheck } from 'lucide-react';
+import { ArrowRight, Check, Copy, Globe, KeyRound, Lock, ShieldCheck } from 'lucide-react';
+import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
+import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { createAcquireRoom, lookupRoom } from '../../api/room';
 import { AppShell } from '../../components/AppShell';
@@ -31,7 +32,7 @@ export default function Lobby() {
   const stats = useAcquireResource(loadStats);
   const { isMobile } = useAcquireViewport();
   const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
-  const [shareCopied, setShareCopied] = useState(false);
+  const shareClipboard = useClipboardCopy();
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<AcquireRoom>();
@@ -57,23 +58,15 @@ export default function Lobby() {
       setFoundRoom(await action.run(signal => lookupRoom(code.trim(), signal)));
     } catch { /* Error state is owned by the shared action hook. */ }
   };
-  const copyShareURL = async () => {
-    try {
-      await navigator.clipboard.writeText(ACQUIRE_PUBLIC_URL);
-      setShareCopied(true);
-    } catch {
-      setShareCopied(false);
-    }
-  };
   const close = () => {
     if (pending) return;
     setPanel(undefined);
-    setShareCopied(false);
+    shareClipboard.reset();
     action.reset();
   };
   const props = {
     lobby, profile: profile.data, stats: stats.data, statsError: stats.error, userID, code, setCode,
-    onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { setShareCopied(false); setPanel('share'); },
+    onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { shareClipboard.reset(); setPanel('share'); },
     onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
@@ -104,22 +97,19 @@ export default function Lobby() {
         onClick={() => { if (foundRoom) onEnter(foundRoom); }}>{foundRoom ? roomEntry(foundRoom, identity).label : '加入房间'}<ArrowRight size={16} /></ActionButton></>}>
       <form id="acquire-join-room" className={styles.joinForm} onSubmit={event => { event.preventDefault(); void find(); }}>
         <div className={styles.modalEmblem}><KeyRound size={29} /></div>
-        <label>房间号<input aria-label="房间号" placeholder="例如 0302_075034" value={code} disabled={pending} onChange={event => { setCode(event.target.value); setFoundRoom(undefined); }} autoCapitalize="off" spellCheck={false} /></label>
+        <label>房间号<input aria-label="房间号" placeholder="输入完整房间号" value={code} disabled={pending} onChange={event => { setCode(event.target.value); setFoundRoom(undefined); }} autoCapitalize="off" spellCheck={false} /></label>
       </form>
       {error && <Feedback error>{error}</Feedback>}
       <div className={styles.joinHint}><ShieldCheck size={16} /><span>输入朋友分享的完整房间号。</span></div>
       {foundRoom && <RoomCard room={foundRoom} userID={userID} onEnter={onEnter} />}
     </ResponsiveDialog>}
     {panel === 'share' && <ResponsiveDialog title="分享 Acquire" eyebrow="INVITE SOMEONE TO THE TABLE" className={styles.shareDialog} onClose={close}
-      footer={<><ActionButton onClick={close}>关闭</ActionButton><ActionButton variant="primary" onClick={() => void copyShareURL()}>
-        {shareCopied ? <Check size={16} /> : <Copy size={16} />}{shareCopied ? '链接已复制' : '复制游戏链接'}
+      footer={<><ActionButton onClick={close}>关闭</ActionButton><ActionButton variant="primary" onClick={() => void shareClipboard.copy(ACQUIRE_PUBLIC_URL)}>
+        {shareClipboard.copiedValue === ACQUIRE_PUBLIC_URL ? <Check size={16} /> : <Copy size={16} />}
+        {shareClipboard.copiedValue === ACQUIRE_PUBLIC_URL ? '链接已复制' : '复制游戏链接'}
       </ActionButton></>}>
-      <div className={styles.shareContent}>
-        <div className={styles.shareQRCode}><QRCode type="svg" value={ACQUIRE_PUBLIC_URL} size={184} bordered={false}
-          color="#172c35" bgColor="#f0e7cf" errorLevel="M" /></div>
-        <div className={styles.shareAddress}><span>游戏地址</span><strong>{ACQUIRE_PUBLIC_URL}</strong></div>
-        <p className={styles.shareHint}><QrCode size={16} />朋友可以扫码进入大厅，也可以使用复制的链接直接打开。</p>
-      </div>
+      <GameShareContent url={ACQUIRE_PUBLIC_URL} color="#172c35" background="#f0e7cf"
+        classes={{ root: styles.shareContent, qr: styles.shareQRCode, address: styles.shareAddress, hint: styles.shareHint }} />
     </ResponsiveDialog>}
     {priceTier != null && <StockPrices initialTier={priceTier} onClose={() => setPriceTier(undefined)} />}
   </AppShell>;

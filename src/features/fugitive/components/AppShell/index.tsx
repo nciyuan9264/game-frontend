@@ -71,11 +71,13 @@ export function AppShell({
   title,
   profile,
   room = false,
+  compactMobileFooter = false,
 }: {
   children: ReactNode;
   title: string;
   profile?: AuthProfile;
   room?: boolean;
+  compactMobileFooter?: boolean;
 }) {
   const navigate = useNavigate();
   const location = useLocation();
@@ -84,7 +86,8 @@ export function AppShell({
 
   return <FugitiveRoot className={preferences.className}>
     <div className={`app ${room ? 'waiting-app' : ''}`}>
-      <div className="app-underlay" aria-hidden={preferencesOpen}>
+      <div className={`app-underlay ${compactMobileFooter ? 'compact-mobile-footer' : ''}`}
+        aria-hidden={preferencesOpen}>
         {!room && <aside className="side-nav">
           <NavLink className="rail-logo" to="/game/fugitive" aria-label="Fugitive 大厅">
             <Route size={27} />

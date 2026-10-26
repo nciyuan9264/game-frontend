@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, BookOpen, Check, Clock3, Crown, Globe2, KeyRound, LockKeyhole,
-  Plus, Search, ShieldCheck, Sparkles, Users, X,
+  Plus, Search, Share2, ShieldCheck, Sparkles, Users, X, Copy,
 } from 'lucide-react';
+import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
+import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
@@ -19,7 +21,7 @@ import { Artwork, Eyebrow, GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { SplendorLoading } from '../../components/LoadingState';
 import { useSplendorLobby } from '../../hooks/useSplendorLobby';
-import { roomEntry, roomOwnerName } from '../../model/adapters';
+import { SPLENDOR_PUBLIC_URL, roomEntry, roomOwnerName } from '../../model/adapters';
 import type { LobbyFilter, SplendorRoom, Visibility } from '../../model/types';
 import styles from './index.module.less';
 
@@ -62,7 +64,8 @@ export default function Lobby() {
   const lobby = useSplendorLobby();
   const profile = useAsyncResource(getProfile);
   const stats = useAsyncResource(loadStats);
-  const [panel, setPanel] = useState<'create' | 'join'>();
+  const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
+  const shareClipboard = useClipboardCopy();
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<SplendorRoom>();
@@ -93,6 +96,7 @@ export default function Lobby() {
     if (pending) return;
     setPanel(undefined);
     setFoundRoom(undefined);
+    shareClipboard.reset();
     action.reset();
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
@@ -105,10 +109,11 @@ export default function Lobby() {
         <div className={styles.heroCopy}><Eyebrow>THE ART OF PROSPERITY</Eyebrow>
           <h1>从一颗宝石，<br />到一座商业帝国。</h1>
           <p>收集宝石，拓展商路，赢得贵族的青睐。<br />你的下一次远见，将在这里闪耀。</p>
-          <ActionButton variant="primary" disabled={!profile.data}
+          <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
             onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
             <Plus size={18} />创建房间<ArrowRight size={18} />
-          </ActionButton></div>
+          </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
+            <Share2 size={16} />分享游戏</ActionButton></div></div>
         <div className={styles.heroStamp}><GemIcon color="Red" size={23} /><span>THE GILDED HOUR<small>暮色宝石商会</small></span></div>
       </section>
 
@@ -123,7 +128,7 @@ export default function Lobby() {
         <div className={styles.toolbar}><GameTabs items={roomFilters} value={lobby.filter}
           onChange={lobby.setFilter} ariaLabel="房间筛选" className={styles.tabs} activeClassName={styles.active}
           renderItem={item => <>{item.label}{item.value === 'all' && <span>{lobby.rooms.length}</span>}</>} />
-          <label><Search size={16} /><input aria-label="搜索房间" placeholder="房间号或房主" value={lobby.query}
+          <label><Search size={16} /><input aria-label="搜索房间" placeholder="搜索房间号 / 房主" value={lobby.query}
             onChange={event => lobby.setQuery(event.target.value)} />
             {lobby.query && <button type="button" aria-label="清空搜索" onClick={() => lobby.setQuery('')}><X size={14} /></button>}</label></div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
@@ -172,6 +177,15 @@ export default function Lobby() {
           placeholder="输入完整房间号" autoCapitalize="off" autoCorrect="off" spellCheck={false} /></label></form>
       {error && <Feedback error>{error}</Feedback>}
       {foundRoom && <RoomCard room={foundRoom} userID={userID} onEnter={enter} artIndex={4} />}
+    </Dialog>}
+    {panel === 'share' && <Dialog title="分享 Splendor" eyebrow="INVITE SOMEONE TO THE SALON" onClose={close}
+      footer={<><ActionButton onClick={close}>关闭</ActionButton>
+        <ActionButton variant="primary" onClick={() => void shareClipboard.copy(SPLENDOR_PUBLIC_URL)}>
+          {shareClipboard.copiedValue === SPLENDOR_PUBLIC_URL ? <Check size={16} /> : <Copy size={16} />}
+          {shareClipboard.copiedValue === SPLENDOR_PUBLIC_URL ? '链接已复制' : '复制游戏链接'}
+        </ActionButton></>}>
+      <GameShareContent url={SPLENDOR_PUBLIC_URL} color="#583b3e" background="#fffaf1"
+        classes={{ root: styles.shareContent, qr: styles.shareQr, address: styles.shareAddress, hint: styles.shareHint }} />
     </Dialog>}
   </AppShell>;
 }

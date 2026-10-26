@@ -53,6 +53,7 @@ export function AppShell({
   profile,
   inMatch = false,
   hideHeader = false,
+  compactMobileFooter = false,
   tools,
 }: {
   children: ReactNode;
@@ -60,6 +61,7 @@ export function AppShell({
   profile?: ShellProfile;
   inMatch?: boolean;
   hideHeader?: boolean;
+  compactMobileFooter?: boolean;
   tools?: ReactNode;
 }) {
   const rootClassName = [
@@ -94,6 +96,7 @@ export function AppShell({
     profile={profile}
     inMatch={inMatch}
     hideHeader={hideHeader}
+    compactMobileFooter={compactMobileFooter}
     tools={tools}
     renderMark={() => <YinshMark />}
     renderBrand={() => <Brand />}

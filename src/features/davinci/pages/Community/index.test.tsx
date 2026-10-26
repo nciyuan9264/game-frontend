@@ -1,11 +1,13 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Guide, Rankings } from '.';
+import { Guide, My, Rankings } from '.';
 
 const api = vi.hoisted(() => ({
   getProfile: vi.fn(),
   getLeaderboard: vi.fn(),
+  getMyStats: vi.fn(),
+  listMyGames: vi.fn(),
 }));
 
 vi.mock('@/features/game-core/api/auth', () => ({
@@ -14,8 +16,8 @@ vi.mock('@/features/game-core/api/auth', () => ({
 }));
 vi.mock('@/features/game-core/api/history', () => ({
   getLeaderboard: api.getLeaderboard,
-  getMyStats: vi.fn(),
-  listMyGames: vi.fn(),
+  getMyStats: api.getMyStats,
+  listMyGames: api.listMyGames,
 }));
 
 beforeEach(() => {
@@ -23,6 +25,16 @@ beforeEach(() => {
   api.getLeaderboard.mockResolvedValue({
     gameType: 'davinci',
     entries: [{ userID: 1, playerID: '1', displayName: 'Alice-1', totalGames: 2, wins: 1, winRate: .5 }],
+  });
+  api.getMyStats.mockResolvedValue({ totalGames: 2, wins: 1, winRate: .5, avgScore: 1 });
+  api.listMyGames.mockResolvedValue({ games: [] });
+  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+    configurable: true,
+    value() { this.setAttribute('open', ''); },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+    configurable: true,
+    value() { this.removeAttribute('open'); },
   });
 });
 afterEach(() => {
@@ -52,5 +64,13 @@ describe('DaVinci community', () => {
 
     expect(tab.getAttribute('aria-selected')).toBe('true');
     expect(screen.getByText('每一次抽牌，都会增加新的线索。')).toBeTruthy();
+  });
+
+  it('opens the aligned project contact from the profile footer', async () => {
+    render(<MemoryRouter><My /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /关于与联系/ }));
+
+    expect(screen.getByRole('dialog', { name: '关于 DaVinci Code Online' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /查看项目源码/ })).toBeTruthy();
   });
 });

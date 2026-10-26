@@ -6,8 +6,8 @@
 .heroCopy { position:relative; z-index:2; width:54%; padding:27px 40px;
   h1 { margin:9px 0; color:#543b40; font-size:35px; line-height:1.4; letter-spacing:1px; }
   p { color:#796b60; font-size:12px; line-height:1.9; }
-  > button { min-height:40px; margin-top:16px; padding:0 18px; font-size:11px; }
 }
+.heroActions { display:flex; gap:9px; margin-top:16px; > button { min-height:40px; padding:0 16px; font-size:11px; } }
 .heroCaption { position:absolute; right:23px; bottom:18px; z-index:2; color:#8e7b65; font:8px Georgia,serif; letter-spacing:2px; }
 .facts { display:flex; align-items:center; gap:32px; margin-bottom:27px; padding:18px 2px 22px; border-bottom:1px solid var(--line);
   > span { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:10px; white-space:nowrap; }
@@ -93,6 +93,15 @@
   p { color:#978571; font-size:12px; } label { display:grid; gap:7px; width:100%; color:#8d735c; font-size:11px; }
   input { height:54px; padding:0 13px; border:1px solid #dcd3c7; border-radius:5px; outline:0; background:#fffcf7; color:var(--ink); font-size:17px; }
 }
+.shareContent { display:grid; justify-items:center; gap:14px; }
+.shareQr { padding:11px; border-radius:7px; background:#fffaf3; line-height:0; }
+.shareAddress { width:100%; padding:11px 12px; border:1px solid #ded3c4; border-radius:5px; background:#fffaf3;
+  span { display:block; margin-bottom:5px; color:#9d8f80; font-size:9px; }
+  strong { display:block; overflow-wrap:anywhere; color:#66574d; font:11px/1.5 monospace; }
+}
+.shareHint { display:flex; align-items:flex-start; gap:8px; width:100%; color:#8e744b; font-size:10px; line-height:1.8;
+  svg { flex:none; margin-top:1px; color:var(--wine); }
+}
 @media (max-width:1100px) and (min-width:768px) {
   .layout { grid-template-columns:1fr; }
   .side { display:none; }
@@ -104,10 +113,10 @@
   .heroCopy { width:100%; padding:19px 18px;
     h1 { margin:8px 0; font-size:26px; line-height:1.35; }
     p { max-width:240px; font-size:10px; line-height:1.7; }
-    > button { min-height:40px; margin-top:13px; }
   }
+  .heroActions { gap:7px; margin-top:13px; > button { min-width:0; flex:1; min-height:40px; padding:0 10px; } }
   .heroCaption { display:none; }
-  .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; padding:14px 0;
+  .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; margin-bottom:18px; padding:14px 0;
     > span { justify-content:center; gap:4px; font-size:8px; }
     svg { width:14px; height:14px; }
     b { font-size:13px; }
@@ -115,7 +124,7 @@
   }
   .layout { display:block; }
   .sectionHeading { h2 { font-size:20px; } > button { min-height:44px; } }
-  .toolbar { flex-wrap:wrap; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
+  .toolbar { flex-wrap:wrap; margin-top:12px; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
   .roomGrid { grid-template-columns:1fr; }
   .roomCard { padding:17px; .roomIdentity h3 { font-size:16px; } > footer button { min-height:44px; min-width:94px; font-size:12px; } }
   .side { display:none; }

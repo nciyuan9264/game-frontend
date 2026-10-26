@@ -2,10 +2,12 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, BookOpen, Check, Clock3, Globe2, Grid3X3, KeyRound,
-  LockKeyhole, Plus, Search, ShieldCheck, Users, X,
+  LockKeyhole, Plus, Search, Share2, ShieldCheck, Users, X, Copy,
 } from 'lucide-react';
+import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
+import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
@@ -17,7 +19,7 @@ import { Brand, Disc, OthelloStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { OthelloLoading } from '../../components/LoadingState';
 import { useOthelloLobby } from '../../hooks/useOthelloLobby';
-import { roomEntry, roomOwnerName } from '../../model/adapters';
+import { OTHELLO_PUBLIC_URL, roomEntry, roomOwnerName } from '../../model/adapters';
 import type { LobbyFilter, Visibility, OthelloRoom } from '../../model/types';
 import styles from './index.module.less';
 
@@ -90,7 +92,8 @@ export default function Lobby() {
   const profile = useAsyncResource(getProfile);
   const stats = useAsyncResource(loadStats);
   const action = useLatestAsyncAction();
-  const [panel, setPanel] = useState<'create' | 'join'>();
+  const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
+  const shareClipboard = useClipboardCopy();
   const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<OthelloRoom>();
@@ -120,6 +123,7 @@ export default function Lobby() {
     if (action.pending) return;
     setPanel(undefined);
     setFoundRoom(undefined);
+    shareClipboard.reset();
     action.reset();
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
@@ -131,10 +135,11 @@ export default function Lobby() {
         <span className={styles.eyebrow}>THE QUIET COLLECTION / 02</span>
         <h1>黑白之间，<br />总有转机。</h1>
         <p>简单的两种颜色，不简单的下一步。<br />在六十四格里，留一段安静思考的时间。</p>
-        <ActionButton variant="primary" disabled={!profile.data}
+        <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
           onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
           <Plus size={17} />新开一局<ArrowRight size={17} />
-        </ActionButton></div>
+        </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
+          <Share2 size={16} />分享游戏</ActionButton></div></div>
         <OthelloStillLife /><span className={styles.heroCaption}>OTHELLO / THE QUIET COLLECTION</span></section>
       <div className={styles.facts} data-testid="othello-lobby-facts"><span><Users size={17} /><b>2</b> 位棋手</span>
         <span><Grid3X3 size={17} /><b>8 × 8</b> 经典棋盘</span>
@@ -147,7 +152,7 @@ export default function Lobby() {
         <div className={styles.toolbar}><div>{roomFilters.map(item => <button type="button" key={item.value}
           className={lobby.filter === item.value ? styles.active : ''}
           onClick={() => lobby.setFilter(item.value)}>{item.label}{item.value === 'all' && <span>{lobby.rooms.length}</span>}</button>)}</div>
-          <label><Search size={15} /><input aria-label="搜索房间" placeholder="房间号或房主"
+          <label><Search size={15} /><input aria-label="搜索房间" placeholder="搜索房间号 / 房主"
             value={lobby.query} onChange={event => lobby.setQuery(event.target.value)} />
             {lobby.query && <button type="button" aria-label="清空搜索" onClick={() => lobby.setQuery('')}><X size={14} /></button>}</label></div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
@@ -201,6 +206,15 @@ export default function Lobby() {
           placeholder="输入完整房间号" autoCapitalize="off" autoCorrect="off" spellCheck={false} /></label></form>
       {action.error && <Feedback error>{action.error}</Feedback>}
       {foundRoom && <RoomCard room={foundRoom} userID={userID} onEnter={enter} />}
+    </Dialog>}
+    {panel === 'share' && <Dialog title="分享 Othello" eyebrow="INVITE SOMEONE TO THE BOARD" onClose={close}
+      footer={<><ActionButton onClick={close}>关闭</ActionButton>
+        <ActionButton variant="primary" onClick={() => void shareClipboard.copy(OTHELLO_PUBLIC_URL)}>
+          {shareClipboard.copiedValue === OTHELLO_PUBLIC_URL ? <Check size={16} /> : <Copy size={16} />}
+          {shareClipboard.copiedValue === OTHELLO_PUBLIC_URL ? '链接已复制' : '复制游戏链接'}
+        </ActionButton></>}>
+      <GameShareContent url={OTHELLO_PUBLIC_URL} color="#60454b" background="#fffaf3"
+        classes={{ root: styles.shareContent, qr: styles.shareQr, address: styles.shareAddress, hint: styles.shareHint }} />
     </Dialog>}
   </AppShell>;
 }

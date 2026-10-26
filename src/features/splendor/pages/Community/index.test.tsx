@@ -1,11 +1,13 @@
 import { cleanup, fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
-import { Guide, Rankings } from '.';
+import { Guide, My, Rankings } from '.';
 
 const api = vi.hoisted(() => ({
   getProfile: vi.fn(),
   getLeaderboard: vi.fn(),
+  getMyStats: vi.fn(),
+  listMyGames: vi.fn(),
 }));
 
 vi.mock('@/features/game-core/api/auth', () => ({
@@ -14,8 +16,8 @@ vi.mock('@/features/game-core/api/auth', () => ({
 }));
 vi.mock('@/features/game-core/api/history', () => ({
   getLeaderboard: api.getLeaderboard,
-  getMyStats: vi.fn(),
-  listMyGames: vi.fn(),
+  getMyStats: api.getMyStats,
+  listMyGames: api.listMyGames,
 }));
 
 beforeEach(() => {
@@ -28,6 +30,16 @@ beforeEach(() => {
   api.getLeaderboard.mockResolvedValue({
     gameType: 'splendor',
     entries: [{ userID: 1, playerID: '1', displayName: 'Alice-1', totalGames: 2, avgRank: 1.5 }],
+  });
+  api.getMyStats.mockResolvedValue({ totalGames: 2, wins: 1, winRate: .5, avgScore: 12 });
+  api.listMyGames.mockResolvedValue({ games: [] });
+  Object.defineProperty(HTMLDialogElement.prototype, 'showModal', {
+    configurable: true,
+    value() { this.setAttribute('open', ''); },
+  });
+  Object.defineProperty(HTMLDialogElement.prototype, 'close', {
+    configurable: true,
+    value() { this.removeAttribute('open'); },
   });
 });
 afterEach(() => {
@@ -59,5 +71,13 @@ describe('Splendor community', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /上一步/ }));
     expect(screen.getByRole('tab', { name: '01 拿取宝石' }).getAttribute('aria-selected')).toBe('true');
+  });
+
+  it('opens the aligned project contact from the profile footer', async () => {
+    render(<MemoryRouter><My /></MemoryRouter>);
+    fireEvent.click(await screen.findByRole('button', { name: /关于与联系/ }));
+
+    expect(screen.getByRole('dialog', { name: '关于 Splendor Online' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: /查看项目源码/ })).toBeTruthy();
   });
 });

@@ -58,6 +58,7 @@ export function AppShell({
   profile,
   inMatch = false,
   hideHeader = false,
+  compactMobileFooter = false,
   tools,
 }: {
   children: ReactNode;
@@ -65,6 +66,7 @@ export function AppShell({
   profile?: ShellProfile;
   inMatch?: boolean;
   hideHeader?: boolean;
+  compactMobileFooter?: boolean;
   tools?: ReactNode;
 }) {
   const [preferencesOpen, setPreferencesOpen] = useState(false);
@@ -105,6 +107,7 @@ export function AppShell({
     profile={profile}
     inMatch={inMatch}
     hideHeader={hideHeader}
+    compactMobileFooter={compactMobileFooter}
     tools={tools}
     renderMark={() => <SplendorMark />}
     renderBrand={() => <Brand />}

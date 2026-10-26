@@ -1,6 +1,5 @@
 import { useMemo, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { QRCode } from 'antd';
 import {
   ArrowRight,
   ArrowUpRight,
@@ -15,7 +14,6 @@ import {
   Layers,
   LockKeyhole,
   Plus,
-  QrCode,
   Search,
   Share2,
   Shield,
@@ -24,7 +22,9 @@ import {
   Users,
   X,
 } from 'lucide-react';
+import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
+import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { playerDisplayName } from '@/features/game-core/model/room';
@@ -130,7 +130,7 @@ export default function Lobby() {
   const stats = useGameStats('fugitive');
   const action = useLatestAsyncAction();
   const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
-  const [shareCopied, setShareCopied] = useState(false);
+  const shareClipboard = useClipboardCopy();
   const [draft, setDraft] = useState<RoomDraft>(defaultDraft);
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<FugitiveRoom>();
@@ -168,19 +168,11 @@ export default function Lobby() {
         lookupFugitiveRoom(code.trim(), signal)));
     } catch { /* Shared action exposes the error. */ }
   };
-  const copyShareURL = async () => {
-    try {
-      await navigator.clipboard.writeText(FUGITIVE_PUBLIC_URL);
-      setShareCopied(true);
-    } catch {
-      setShareCopied(false);
-    }
-  };
   const close = () => {
     if (action.pending) return;
     setPanel(undefined);
     setFoundRoom(undefined);
-    setShareCopied(false);
+    shareClipboard.reset();
     action.reset();
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
@@ -202,7 +194,7 @@ export default function Lobby() {
               </button>
               <button className="button hero-secondary" type="button"
                 onClick={() => {
-                  setShareCopied(false);
+                  shareClipboard.reset();
                   setPanel('share');
                 }}>
                 <Share2 size={16} />分享游戏
@@ -245,7 +237,7 @@ export default function Lobby() {
                 {item.id === 'all' && <span>{lobby.rooms.length}</span>}</button>)}
           </div>
           <label className="search-field"><Search size={16} />
-            <input aria-label="搜索房间" placeholder="房间名称、房间号或房主"
+            <input aria-label="搜索房间" placeholder="搜索房间名称 / 房间号 / 房主"
               value={lobby.query} onChange={event => lobby.setQuery(event.target.value)} />
             {lobby.query && <button type="button" aria-label="清空搜索"
               onClick={() => lobby.setQuery('')}><X size={16} /></button>}
@@ -364,7 +356,7 @@ export default function Lobby() {
         <label className="form-label" htmlFor="fugitive-join-code">房间号
           <input className="input code-input" id="fugitive-join-code"
             autoComplete="off" autoCapitalize="off" spellCheck={false}
-            placeholder="例如 0302_075034" disabled={action.pending}
+            placeholder="输入完整房间号" disabled={action.pending}
             value={code} onChange={event => {
               setCode(event.target.value);
               setFoundRoom(undefined);
@@ -387,19 +379,12 @@ export default function Lobby() {
       footer={<><button className="button secondary" type="button"
         onClick={close}>关闭</button>
         <button className="button primary" type="button"
-          onClick={() => void copyShareURL()}>
-          {shareCopied ? <Check size={16} /> : <Copy size={16} />}
-          {shareCopied ? '链接已复制' : '复制游戏链接'}
+          onClick={() => void shareClipboard.copy(FUGITIVE_PUBLIC_URL)}>
+          {shareClipboard.copiedValue === FUGITIVE_PUBLIC_URL ? <Check size={16} /> : <Copy size={16} />}
+          {shareClipboard.copiedValue === FUGITIVE_PUBLIC_URL ? '链接已复制' : '复制游戏链接'}
         </button></>}>
-      <div className="share-content">
-        <div className="share-qr"><QRCode type="svg"
-          value={FUGITIVE_PUBLIC_URL} size={184} bordered={false}
-          color="#172c22" bgColor="#eee8d8" errorLevel="M" /></div>
-        <div className="share-address"><span>游戏地址</span>
-          <strong>{FUGITIVE_PUBLIC_URL}</strong></div>
-        <p className="share-hint"><QrCode size={16} />
-          朋友可以扫码进入大厅，也可以使用复制的链接直接打开。</p>
-      </div>
+      <GameShareContent url={FUGITIVE_PUBLIC_URL} color="#172c22" background="#eee8d8"
+        classes={{ root: 'share-content', qr: 'share-qr', address: 'share-address', hint: 'share-hint' }} />
     </Modal>}
   </AppShell>;
 }

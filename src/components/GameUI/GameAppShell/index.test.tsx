@@ -71,4 +71,17 @@ describe('GameAppShell', () => {
     expect(screen.queryByRole('navigation', { name: '测试手机导航' })).toBeNull();
     expect(screen.getByText('GAME')).toBeTruthy();
   });
+
+  it('adds explicit compact mobile footer classes to the shell and content area', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <GameAppShell {...baseProps} compactMobileFooter title="个人资料">
+          <span>PROFILE</span>
+        </GameAppShell>
+      </MemoryRouter>
+    );
+    expect(container.firstElementChild?.className.split(' ')).toHaveLength(3);
+    expect(container.querySelector('div.main')?.className.split(' ')).toHaveLength(2);
+    expect(container.querySelector('main')?.className.split(' ')).toHaveLength(2);
+  });
 });

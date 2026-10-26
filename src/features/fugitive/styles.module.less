@@ -287,12 +287,38 @@ select{cursor:pointer;padding-right:24px}
 .profile-monogram{font:44px Georgia,serif;width:87px;height:87px;display:grid;place-items:center;margin:8px auto 22px;background:#324c28;border:1px solid #6d8951;border-radius:50%;position:relative;color:#d5ddb3}
 .profile-card h2{font-size:26px;margin:12px 0 5px}
 .profile-card p{font-size:10px;color:#95b279}
-.profile-stats{display:flex;justify-content:center;gap:60px;margin:23px 0;font-size:10px;color:#9dbb7f}
+.profile-email{display:flex;align-items:center;justify-content:center;gap:8px;min-height:38px;margin-top:16px;padding:0 10px;border:1px solid #45603d;border-radius:6px;background:#172b18;color:#abc09d;font-size:10px;overflow-wrap:anywhere}
+.profile-stats{display:flex;justify-content:center;gap:0;margin:20px 0 15px;font-size:10px;color:#9dbb7f}
 .profile-stats span{display:flex;align-items:center;flex-direction:column;gap:6px}
+.profile-stats>span{flex:1}
+.profile-stats>span+span{border-left:1px solid #45603d}
 .profile-stats b{font:27px var(--mono);color:#d0dfa8}
+.profile-actions{display:flex;align-items:center;justify-content:center;flex-wrap:wrap;gap:4px 13px;border-top:1px solid #45603d;padding-top:12px}
+.profile-actions>a,.profile-actions>button{display:inline-flex;align-items:center;gap:6px;min-height:34px;color:#b9caaa;font-size:10px}
 .profile-history{border:1px solid #324c28;border-radius:8px;padding:22px;background:#172b18}
 .profile-history h2{font-size:19px}
 .profile-empty{min-height:340px}
+.profile-about{display:flex;width:100%;min-height:56px;align-items:center;gap:11px;margin-top:18px;padding:9px 3px;border-top:1px solid #324c28;text-align:left;color:#a9bca4}
+.profile-about>span:first-child{display:grid;width:30px;height:30px;flex:none;place-items:center;border:1px solid #45603d;border-radius:50%;color:#dfad78}
+.profile-about>span:nth-child(2){min-width:0}
+.profile-about>svg{margin-left:auto;color:#748a76}
+.profile-about b,.profile-about small{display:block}
+.profile-about b{color:#d4ddcf;font-size:11px}
+.profile-about small{margin-top:3px;color:#7f9480;font-size:8px}
+.project-contact-intro{display:flex;align-items:center;gap:14px;padding-bottom:20px;border-bottom:1px solid #354a3b}
+.project-contact-intro>div{min-width:0}
+.contact-monogram{display:grid;width:54px;height:54px;flex:none;place-items:center;border:1px solid #5c704e;border-radius:50%;background:#2c402c;color:#d4debe;font:27px Georgia,serif}
+.project-contact-intro small{color:#95aa88;font-size:7px;letter-spacing:1.4px}
+.project-contact-intro h3{margin:6px 0 5px;color:#e0e7d9;font-size:18px}
+.project-contact-intro p{color:#9eb09a;font-size:10px;line-height:1.8}
+.project-contact-links{margin-top:7px}
+.project-contact-links a,.project-contact-links button{display:flex;width:100%;min-height:61px;align-items:center;gap:12px;padding:9px 2px;border-bottom:1px solid #354a3b;text-align:left;color:#adc0a7}
+.project-contact-links a>span,.project-contact-links button>span{min-width:0;flex:1}
+.project-contact-links a>svg:last-child,.project-contact-links button>svg:last-child{margin-left:auto}
+.project-contact-links b,.project-contact-links small{display:block}
+.project-contact-links b{color:#d8e0d4;font-size:11px}
+.project-contact-links small{margin-top:4px;color:#819580;font-size:9px;overflow-wrap:anywhere}
+.project-contact-legal{margin-top:17px;color:#819580;font-size:8px;line-height:1.9}
 .record-row{display:flex;align-items:center;border-top:1px solid #324c28;padding:15px 0;gap:14px}
 .record-row>div{flex:1}
 .record-row b{font-size:12px;font-weight:500}
@@ -638,23 +664,6 @@ to{opacity:1;transform:translateY(0)}
 .leaderboard-page .page-heading{margin-bottom:17px}
 .ranking-notice{display:flex;align-items:center;gap:9px;font-size:10px;color:#8ea376;margin-bottom:15px}
 .ranking-notice>span:last-child{margin-left:auto;font:9px var(--mono);color:#6d885b}
-.podium{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:18px}
-.podium-card{position:relative;overflow:hidden;border:1px solid #415b30;border-radius:8px;background:#20351f;min-height:104px;padding:17px 19px;gap:13px;justify-content:flex-start;text-align:left}
-.podium-card:hover{background:#294325;border-color:#7a9155}
-.podium-1{border-color:#8b7841;background:linear-gradient(110deg,#54462a55,#1f361f 80%);box-shadow:0 1px 0 #ddbb7850 inset}
-.podium-2{border-color:#607149}
-.podium-3{border-color:#725d3e}
-.podium-number{position:absolute;right:104px;bottom:-5px;font:82px var(--mono);letter-spacing:-8px;color:#bcd29806;pointer-events:none}
-.podium-card>.rank-avatar{width:47px;height:47px;font-size:23px;border-radius:50%;position:relative}
-.podium-name{flex:1;position:relative;min-width:0}
-.podium-name>span{font-size:9px;color:#a79769}
-.podium-name>h3{font-size:17px;margin:3px 0 3px;letter-spacing:.02em;color:#dee1bb}
-.podium-name>small{font-size:9px;color:#8ba570}
-.podium-score{display:flex;flex-direction:column;align-items:flex-end;gap:4px;position:relative}
-.podium-score>svg{color:#ae9a5b;position:absolute;right:0;top:-6px;opacity:.7}
-.podium-score>b{font:23px var(--mono);font-weight:550;color:#d0d8a5;margin-top:16px;letter-spacing:-1px}
-.podium-1 .podium-score>b{color:#ead399}
-.podium-score>small{font-size:8px;color:#7e925a}
 .ranking-layout{display:grid;grid-template-columns:minmax(0,1fr) 268px;gap:18px;align-items:start}
 .ranking-table-panel{overflow:hidden;background:#18271f;border-color:#354c3b}
 .ranking-tabs{display:flex;align-items:center;justify-content:space-between;padding:0 17px;border-bottom:1px solid #3b5b2c;height:48px;gap:12px}
@@ -847,10 +856,6 @@ to{opacity:1;transform:translateY(0)}
 .role-option-copy>b{font-size:26px}
 .game-facts>button{font-size:9px}
 .ranking-layout{grid-template-columns:minmax(0,1fr) 236px;gap:14px}
-.podium-card{padding:13px;gap:10px}
-.podium-card>.rank-avatar{width:38px;height:38px;font-size:18px}
-.podium-name>h3{font-size:14px}
-.podium-score>b{font-size:20px}
 .ranking-table th:first-child,.ranking-table td:first-child{padding-left:12px;width:45px}
 .rank-player-button small{max-width:133px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .win-rate>i{display:none}
@@ -861,7 +866,6 @@ to{opacity:1;transform:translateY(0)}
 .catalog-toolbar .search-field{display:none}
 .lobby-bottom-links button{font-size:9px}
 .season-badge{font-size:8px;margin-left:10px}
-.podium-name>small{font-size:8px}
 }
 
 /* Phone composition: compact artwork, readable content, fixed primary actions. */
@@ -890,6 +894,7 @@ input,select{font-size:14px}
 .page-heading h1{font-size:24px;line-height:1.4}
 .page-heading p{font-size:12px;line-height:1.7;margin-top:8px}
 .page-heading .eyebrow{font-size:8px;letter-spacing:1.1px;margin-bottom:9px}
+.leaderboard-page>.page-heading,.guide-page>.page-heading,.profile-page>.page-heading{display:none}
 .split-heading{align-items:flex-start;gap:10px}
 .split-heading>.button{font-size:11px;padding:0 10px;min-height:40px;margin-top:9px;gap:5px;flex-shrink:0}
 .split-heading>.button>svg{width:14px}
@@ -910,6 +915,14 @@ input,select{font-size:14px}
 .mobile-nav-wrap>nav button{flex:1;min-height:48px;min-width:0;flex-direction:column;gap:3px;font-size:11px;color:#91a58f}
 .mobile-nav-wrap>nav button.active{color:#efb680}
 .mobile-nav-wrap>nav button.active svg{fill:#b5834716}
+.compact-mobile-footer .app-footer{display:none}
+.compact-mobile-footer .profile-page{
+display:flex;
+min-height:calc(100dvh - 50px);
+flex-direction:column;
+padding-bottom:calc(56px + env(safe-area-inset-bottom))
+}
+.compact-mobile-footer .profile-about{margin-top:auto}
 
 /* Lobby: hero 340 → 220px; all three sample rooms stay near the entry. */
 .lobby-heading{min-height:32px;margin-bottom:12px}
@@ -1080,10 +1093,11 @@ input,select{font-size:14px}
 .profile-card>.eyebrow{display:none}
 .profile-card h2{grid-column:2;font-size:21px;margin:0;position:relative}
 .profile-card>p{grid-column:2;font-size:10px;margin:0;position:relative}
+.profile-email{grid-column:1 / -1;justify-content:flex-start;margin-top:10px}
 .profile-stats{grid-column:1 / -1;gap:0;margin:13px 0 10px;justify-content:space-around;width:100%;padding-top:11px;border-top:1px solid var(--line);position:relative}
 .profile-stats>span{gap:4px;font-size:11px}
 .profile-stats b{font-size:24px}
-.profile-card>.button{grid-column:1 / -1;min-height:42px}
+.profile-actions{grid-column:1 / -1}
 .profile-history{padding:16px 13px}
 .profile-history .pill{font-size:9px}
 .profile-history h2{font-size:17px}
@@ -1092,6 +1106,7 @@ input,select{font-size:14px}
 .record-row b{font-size:12px}
 .record-row p{font-size:10px}
 .record-row .avatar{height:29px;width:29px}
+.profile-about{margin-top:13px}
 
 /* Bottom sheets: artwork has a ceiling; safe-area and actions do not scroll away. */
 .modal-backdrop{padding:0;align-items:flex-end;backdrop-filter:blur(4px)}
@@ -1283,7 +1298,7 @@ input,select{font-size:14px}
 .notebook-modal .guess-summary>button{min-height:36px}
 .notebook-modal .risk-copy{font-size:11px!important}
 
-/* Ranking: compact podium, visible self-location, readable touch rows. */
+/* Ranking: visible self-location and readable touch rows. */
 .leaderboard-page .split-heading h1{font-size:25px}
 .leaderboard-page .split-heading{position:relative;display:block;padding-right:0}
 .leaderboard-page .split-heading>div>p{padding-right:0;max-width:100%;font-size:12px}
@@ -1292,18 +1307,6 @@ input,select{font-size:14px}
 .ranking-notice{align-items:flex-start;font-size:10px;line-height:1.75;margin-bottom:12px;gap:7px}
 .ranking-notice>span:last-child{display:none}
 .ranking-notice .demo-badge{font-size:9px;margin-top:2px}
-.podium{gap:8px;margin-bottom:12px}
-.podium-card{padding:12px 6px;min-height:124px;flex-direction:column;align-items:center;text-align:center;gap:5px}
-.podium-card>.rank-avatar{height:28px;width:28px;font-size:15px}
-.podium-name{flex:0}
-.podium-name>span{display:none}
-.podium-name>h3{font-size:13px;margin:0}
-.podium-name>small{display:none}
-.podium-score{align-items:center;gap:2px}
-.podium-score>b{font-size:20px;margin-top:0}
-.podium-score>svg{display:none}
-.podium-score>small{font-size:9px}
-.podium-number{font-size:51px;right:3px;bottom:-4px;opacity:.09}
 .mobile-rank-summary{display:flex;align-items:center;gap:9px;padding:10px 11px;border:1px solid #3e523d;background:#202e21;border-radius:8px;margin-bottom:12px}
 .mobile-rank-summary>.rank-avatar{height:32px;width:32px;font-size:18px}
 .mobile-rank-summary>div{flex:1;min-width:0}

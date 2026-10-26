@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { QRCode } from 'antd';
 import {
   ArrowRight, Check, Copy, Eye, Hash, KeyRound, ListOrdered, Plus, RefreshCw, Search, Share2, ShieldCheck, UserRound,
 } from 'lucide-react';
+import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
+import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
@@ -71,7 +72,7 @@ export default function Lobby() {
   const profile = useAsyncResource(getProfile);
   const stats = useAsyncResource(loadStats);
   const [shareOpen, setShareOpen] = useState(false);
-  const [copied, setCopied] = useState(false);
+  const shareClipboard = useClipboardCopy();
   const [code, setCode] = useState('');
   const [heroReady, setHeroReady] = useState(false);
   const createAction = useLatestAsyncAction();
@@ -89,14 +90,6 @@ export default function Lobby() {
       const room = await createAction.run(createDavinciRoom);
       navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
     } catch { /* Error state is owned by the shared action hook. */ }
-  };
-  const copyShare = async () => {
-    try {
-      await navigator.clipboard.writeText(DAVINCI_PUBLIC_URL);
-      setCopied(true);
-    } catch {
-      setCopied(false);
-    }
   };
   const joinByCode = () => {
     const roomID = code.trim();
@@ -122,7 +115,7 @@ export default function Lobby() {
           <p>隐藏你的序列，观察每一次试探，在对手破解之前揭开他的密码。</p>
           <div><ActionButton variant="primary" pending={pending} disabled={!profile.data} onClick={() => void create()}>
             <Plus size={17} />创建房间<ArrowRight size={16} /></ActionButton>
-            <ActionButton onClick={() => { setCopied(false); setShareOpen(true); }}><Share2 size={16} />分享游戏</ActionButton></div>
+            <ActionButton onClick={() => { shareClipboard.reset(); setShareOpen(true); }}><Share2 size={16} />分享游戏</ActionButton></div>
         </div>
         <span className={styles.heroCaption}>OBSERVE · DEDUCE · REVEAL</span>
       </section>
@@ -139,7 +132,7 @@ export default function Lobby() {
         <div className={styles.controls}>
           <GameTabs items={roomFilters} value={lobby.filter} onChange={lobby.setFilter}
             ariaLabel="房间筛选" className={styles.tabs} activeClassName={styles.active} />
-          <label><Search size={15} /><input aria-label="搜索房间" placeholder="搜索房间号或房主" value={lobby.query}
+          <label><Search size={15} /><input aria-label="搜索房间" placeholder="搜索房间号 / 房主" value={lobby.query}
             onChange={event => lobby.setQuery(event.target.value)} /></label>
         </div>
         {lobby.error && <Feedback error>{lobby.error}<ActionButton onClick={lobby.refresh}>重试</ActionButton></Feedback>}
@@ -156,7 +149,7 @@ export default function Lobby() {
       </aside></div>
       <section className={styles.mobileJoin}><h3><KeyRound size={18} />朋友已经开好房间？</h3><p>输入完整房间号，找到朋友的桌。</p>
         <form onSubmit={event => { event.preventDefault(); joinByCode(); }}>
-          <input aria-label="查找房间号" placeholder="例如 1019_153709" value={code}
+          <input aria-label="查找房间号" placeholder="输入完整房间号" value={code}
             onChange={event => setCode(event.target.value)} autoCapitalize="off" autoCorrect="off" spellCheck={false} />
           <button disabled={!code.trim()} aria-label="查找房间" type="submit"><ArrowRight size={19} /></button>
         </form>
@@ -165,9 +158,12 @@ export default function Lobby() {
     {shareOpen && <ResponsiveDialog title="邀请朋友破解密码" eyebrow="SHARE THE CIPHER TABLE"
       themeClassName={rootStyles.root} onClose={() => setShareOpen(false)}
       footer={<><ActionButton onClick={() => setShareOpen(false)}>关闭</ActionButton>
-        <ActionButton variant="primary" onClick={() => void copyShare()}>{copied ? <Check size={16} /> : <Copy size={16} />}{copied ? '链接已复制' : '复制游戏链接'}</ActionButton></>}>
-      <div className={styles.share}><QRCode type="svg" value={DAVINCI_PUBLIC_URL} size={176} bordered={false} color="#20231f" bgColor="#eee8d8" />
-        <p>扫码进入达芬奇密码大厅，创建房间后再分享房间邀请链接。</p><strong>{DAVINCI_PUBLIC_URL}</strong></div>
+        <ActionButton variant="primary" onClick={() => void shareClipboard.copy(DAVINCI_PUBLIC_URL)}>
+          {shareClipboard.copiedValue === DAVINCI_PUBLIC_URL ? <Check size={16} /> : <Copy size={16} />}
+          {shareClipboard.copiedValue === DAVINCI_PUBLIC_URL ? '链接已复制' : '复制游戏链接'}
+        </ActionButton></>}>
+      <GameShareContent url={DAVINCI_PUBLIC_URL} color="#20231f" background="#eee8d8" size={176}
+        classes={{ root: styles.share, qr: styles.shareQr, address: styles.shareAddress, hint: styles.shareHint }} />
     </ResponsiveDialog>}
   </AppShell>;
 }

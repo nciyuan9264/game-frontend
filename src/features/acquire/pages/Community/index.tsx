@@ -1,7 +1,8 @@
 import { useCallback, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, Check, ChevronRight, Clock, Code2, Copy, ExternalLink, Info, LogOut, Mail, MessageCircle, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
+import { ArrowRight, Building2, ChevronRight, Clock, Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
 import { GameTabs } from '@/components/GameUI/GameTabs';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -136,23 +137,14 @@ export function My() {
   } = useGameHistory({ gameType: 'acquire', pageSize: HISTORY_PAGE_SIZE });
   const logoutAction = useGameLogout();
   const [aboutOpen, setAboutOpen] = useState(false);
-  const [qqCopied, setQQCopied] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const handleLogout = useCallback(async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
     await logoutAction.run();
   }, [logoutAction]);
-  const copyQQ = useCallback(async () => {
-    try {
-      await navigator.clipboard.writeText('1522457543');
-      setQQCopied(true);
-    } catch {
-      setQQCopied(false);
-    }
-  }, []);
   useInfiniteLoad(sentinelRef, games.length > 0 && hasMore && !historyLoading && !historyError, loadNextHistoryPage);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
-  return <AppShell title="玩家档案" profile={profile.data}><div className={styles.page + ' ' + styles.profilePage}>
+  return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={styles.page + ' ' + styles.profilePage}>
     <header className={styles.communityHeading}><div><small>YOUR PLAYER IDENTITY</small><h1>让这张筹码，代表你。</h1></div></header>
     {loading ? <AcquireLoading title="正在整理你的城市档案。" description="正在同步身份、战绩与对局记录" status="正在读取玩家资料" />
       : <div className={styles.profileLayout}><section className={styles.profileDisplay}>
@@ -170,26 +162,16 @@ export function My() {
       {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link className={styles.link} to="/game/acquire">去大厅开一桌</Link></Feedback>}
       {!!games.length && <InfiniteFooter loading={historyLoading} error={historyError} hasMore={hasMore} retry={retryHistory} anchorRef={sentinelRef} />}
     </section></div>}
-    <button type="button" className={styles.aboutEntry} onClick={() => { setQQCopied(false); setAboutOpen(true); }}>
+    <button type="button" className={styles.aboutEntry} data-testid="acquire-about-entry"
+      onClick={() => setAboutOpen(true)}>
       <span className={styles.aboutEntryIcon}><Info size={17} /></span>
       <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
       <ChevronRight size={17} />
     </button>
     {aboutOpen && <ResponsiveDialog title="关于 Acquire Online" eyebrow="ABOUT & CONTACT" className={styles.aboutDialog}
       onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
-      <div className={styles.aboutIntro}>
-        <PlayerAvatar name="nciyuan9264" size={58} />
-        <div><small>DESIGNED & BUILT BY</small><h3>nciyuan9264</h3><p>独立设计、开发并维护这个在线 Acquire 游戏。</p></div>
-      </div>
-      <div className={styles.aboutLinks}>
-        <button type="button" onClick={() => void copyQQ()}>
-          <MessageCircle size={19} /><span><b>{qqCopied ? 'QQ 已复制' : 'QQ 联系作者'}</b><small>1522457543</small></span>{qqCopied ? <Check size={15} /> : <Copy size={15} />}
-        </button>
-        <a href="https://github.com/nciyuan9264/game-frontend" target="_blank" rel="noreferrer">
-          <Code2 size={19} /><span><b>查看项目源码</b><small>nciyuan9264/game-frontend</small></span><ExternalLink size={15} />
-        </a>
-      </div>
-      <p className={styles.aboutLegal}>本项目是非官方在线实现。游戏名称、规则及相关商标归其各自权利人所有。</p>
+      <ProjectContact gameName="Acquire" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
     </ResponsiveDialog>}
   </div></AppShell>;
 }
