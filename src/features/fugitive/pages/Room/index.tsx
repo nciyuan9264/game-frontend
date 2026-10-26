@@ -100,9 +100,9 @@ export function Room({
       <p>房间号 <b>{data.roomID}</b><span>·</span>
         {data.visibility === 'private' ? '私密房间' : '公开房间'}</p>
       <div className="waiting-header-actions">
-        <button className="button secondary" type="button" onClick={openSettings}>
-          <Settings2 size={17} />{owner ? '房间设置' : '房间信息'}
-        </button>
+        {owner && <button className="button secondary" type="button" onClick={openSettings}>
+          <Settings2 size={17} />房间设置
+        </button>}
         <button className="button primary" type="button"
           onClick={() => { setCopyMessage(''); setPanel('invite'); }}>
           <Share2 size={17} />邀请好友</button>
@@ -198,9 +198,9 @@ export function Room({
       <button className="text-button full" type="button" onClick={onLeave}>离开房间</button>
     </footer>
 
-    {panel === 'settings' && <Modal title={owner ? '房间设置' : '房间信息'}
+    {owner && panel === 'settings' && <Modal title="房间设置"
       kicker="MAKE THE NEXT CHASE YOURS" onClose={close}
-      footer={owner ? <><button className="button secondary" type="button"
+      footer={<><button className="button secondary" type="button"
         onClick={close}>取消</button><button className="button primary" type="button"
         disabled={!enabled || !name.trim()}
         onClick={() => {
@@ -213,15 +213,14 @@ export function Room({
             setConfiguredTimeout(turnTimeoutSeconds);
             close();
           }
-        }}>保存设置<Check size={15} /></button></>
-        : <button className="button primary full" type="button" onClick={close}>知道了</button>}>
+        }}>保存设置<Check size={15} /></button></>}>
       <label className="form-label" htmlFor="room-settings-name">房间名称</label>
       <input className="input" id="room-settings-name" maxLength={18}
-        value={name} disabled={!owner}
+        value={name}
         onChange={event => setName(event.target.value)} />
       <label className="form-label">谁可以加入？</label>
       <div className="privacy-options">{(['public', 'private'] as const).map(value =>
-        <button type="button" key={value} disabled={!owner}
+        <button type="button" key={value}
           className={visibility === value ? 'selected' : ''}
           aria-pressed={visibility === value} onClick={() => setVisibility(value)}>
           {value === 'public' ? <Globe2 size={22} /> : <LockKeyhole size={22} />}
@@ -231,7 +230,7 @@ export function Room({
         </button>)}</div>
       <label className="form-label" htmlFor="room-settings-time">每回合思考时间</label>
       <select className="input" id="room-settings-time" value={turnTimeoutSeconds}
-        disabled={!owner} onChange={event => setTurnTimeoutSeconds(Number(event.target.value))}>
+        onChange={event => setTurnTimeoutSeconds(Number(event.target.value))}>
         <option value={60}>60 秒</option><option value={90}>90 秒</option>
         <option value={0}>不限时</option>
       </select>

@@ -39,7 +39,7 @@ export function Room({ session, data, onLeave }: {
   return <div className={styles.page}>
     <header className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开房间" onClick={onLeave}><ArrowLeft size={18} /></button>
       <span><small>JEWEL SALON · 房间号</small><h1>{data.roomID}<em>准备中</em></h1></span></div>
-      <div><ActionButton onClick={() => { setVisibility(data.visibility); setPanel('settings'); }}><Settings2 size={15} />{owner ? '房间设置' : '房间信息'}</ActionButton>
+      <div>{owner && <ActionButton onClick={() => { setVisibility(data.visibility); setPanel('settings'); }}><Settings2 size={15} />房间设置</ActionButton>}
         <ActionButton variant="primary" onClick={() => { setCopyMessage(''); setPanel('invite'); }}><UserPlus size={15} />邀请好友</ActionButton></div></header>
     <div className={styles.roomLayout}><section className={styles.tablePanel}>
       <header className={styles.tableTitle}><span><Users size={16} />经典对局<i />{players.length} / {data.maxPlayers} 人</span>
@@ -90,9 +90,9 @@ export function Room({ session, data, onLeave }: {
         <label>ROOM NUMBER<input aria-label="分享房间号" value={data.roomID} readOnly onClick={event => event.currentTarget.select()} /></label>
         <small><ShieldCheck size={14} />{copyMessage || '邀请链接不包含身份信息，玩家身份由服务端验证。'}</small></div>
     </Dialog>}
-    {panel === 'settings' && <Dialog title={owner ? '房间设置' : '房间信息'} eyebrow="SALON VISIBILITY" onClose={close}
-      footer={owner ? <><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="primary" disabled={!enabled} onClick={() => { if (session.submit('room_update_settings', { visibility })) close(); }}>保存设置</ActionButton></> : <ActionButton variant="primary" onClick={close}>知道了</ActionButton>}>
-      <div className={styles.settings}><p>{owner ? '选择这间展厅如何被其他玩家找到。' : '仅房主可以修改公开范围。'}</p><div>{(['public', 'private'] as const).map(value => <button key={value} type="button" disabled={!owner || !enabled} aria-pressed={visibility === value} onClick={() => setVisibility(value)}>
+    {owner && panel === 'settings' && <Dialog title="房间设置" eyebrow="SALON VISIBILITY" onClose={close}
+      footer={<><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="primary" disabled={!enabled} onClick={() => { if (session.submit('room_update_settings', { visibility })) close(); }}>保存设置</ActionButton></>}>
+      <div className={styles.settings}><p>选择这间展厅如何被其他玩家找到。</p><div>{(['public', 'private'] as const).map(value => <button key={value} type="button" disabled={!enabled} aria-pressed={visibility === value} onClick={() => setVisibility(value)}>
         {value === 'public' ? <Globe size={21} /> : <Lock size={21} />}<b>{value === 'public' ? '公开房间' : '私密房间'}</b><small>{value === 'public' ? '显示在大厅' : '通过完整房间号加入'}</small>{visibility === value && <Check size={14} />}</button>)}</div>
         <span><Info size={14} />开局后不能修改房间设置。</span></div>
     </Dialog>}

@@ -98,12 +98,12 @@ export function Room({
         </div>
       </div>
       <div>
-        <ActionButton onClick={() => {
+        {owner && <ActionButton onClick={() => {
           setVisibility(data.visibility);
           setPanel('settings');
         }}>
-          <Settings2 size={15} />{owner ? '房间设置' : '房间信息'}
-        </ActionButton>
+          <Settings2 size={15} />房间设置
+        </ActionButton>}
         <ActionButton variant="primary" onClick={roomProps.onInvite}>
           <UserPlus size={15} />邀请好友
         </ActionButton>
@@ -165,38 +165,32 @@ export function Room({
       </div>
     </ResponsiveDialog>}
 
-    {panel === 'settings' && <ResponsiveDialog
-      title={owner ? '房间设置' : '房间信息'}
+    {owner && panel === 'settings' && <ResponsiveDialog
+      title="房间设置"
       eyebrow="ROOM VISIBILITY"
       themeClassName={rootStyles.root}
       onClose={close}
-      footer={owner
-        ? <>
-          <ActionButton onClick={close}>取消</ActionButton>
-          <ActionButton
-            variant="primary"
-            disabled={!enabled}
-            onClick={() => {
-              if (session.submit('room_update_settings', { visibility })) {
-                close();
-              }
-            }}
-          >
-            保存设置<ArrowRight size={15} />
-          </ActionButton>
-        </>
-        : <ActionButton variant="primary" onClick={close}>
-          知道了
-        </ActionButton>}
+      footer={<>
+        <ActionButton onClick={close}>取消</ActionButton>
+        <ActionButton
+          variant="primary"
+          disabled={!enabled}
+          onClick={() => {
+            if (session.submit('room_update_settings', { visibility })) {
+              close();
+            }
+          }}
+        >
+          保存设置<ArrowRight size={15} />
+        </ActionButton>
+      </>}
     >
-      <p className={styles.dialogText}>
-        {owner ? '选择这张密码桌如何被其他玩家找到。' : '仅房主可以修改公开范围。'}
-      </p>
+      <p className={styles.dialogText}>选择这张密码桌如何被其他玩家找到。</p>
       <div className={styles.settings}>
         {(['public', 'private'] as const).map(value => <button
           type="button"
           key={value}
-          disabled={!owner || !enabled}
+          disabled={!enabled}
           aria-pressed={visibility === value}
           onClick={() => setVisibility(value)}
         >

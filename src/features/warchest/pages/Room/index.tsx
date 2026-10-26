@@ -187,9 +187,9 @@ export function Room({
       <small className="room-start-note">{players.length < 2 ? '邀请好友或添加一位公平 AI。'
         : !setup.complete ? '完成官方轮抽后才能准备开局。'
           : allReady ? '双方已准备，可以开始交锋。' : '等待另一位指挥官准备。'}</small>
-      <button className="text-button full" type="button" onClick={() => {
+      {owner && <button className="text-button full" type="button" onClick={() => {
         setName(displayName); setVisibility(data.visibility); setPanel('settings');
-      }}><Settings2 size={14} />{owner ? '房间设置' : '房间信息'}</button>
+      }}><Settings2 size={14} />房间设置</button>}
     </aside></div>
 
     {panel === 'invite' && <Modal title="一场好局，等你入席。" eyebrow="AN INVITATION"
@@ -203,18 +203,18 @@ export function Room({
         <small>房间号</small></div><p className="muted">{copyMessage || '邀请链接不包含玩家身份或隐藏信息。'}</p>
     </Modal>}
 
-    {panel === 'settings' && <Modal title={owner ? '房间设置' : '房间信息'} eyebrow="ROOM SETTINGS"
-      onClose={close} footer={owner ? <><button className="button secondary" type="button" onClick={close}>取消</button>
+    {owner && panel === 'settings' && <Modal title="房间设置" eyebrow="ROOM SETTINGS"
+      onClose={close} footer={<><button className="button secondary" type="button" onClick={close}>取消</button>
         <button className="button primary" type="button" disabled={!enabled || !name.trim()} onClick={() => {
           if (session.submit('room_update_settings', {
             visibility, displayName: name.trim(), turnTimeoutSeconds: 90,
           })) { setDisplayName(name.trim()); close(); }
-        }}>保存设置 <Check size={15} /></button></> : <button className="button primary full" type="button" onClick={close}>知道了</button>}>
+        }}>保存设置 <Check size={15} /></button></>}>
       <label className="field-label" htmlFor="warchest-settings-name">房间名称</label>
       <input id="warchest-settings-name" className="input full" maxLength={18} value={name}
-        disabled={!owner} onChange={event => setName(event.target.value)} />
+        onChange={event => setName(event.target.value)} />
       <div className="field-label">谁可以加入？</div><div className="privacy-options">
-        {(['public', 'private'] as const).map(value => <button key={value} type="button" disabled={!owner}
+        {(['public', 'private'] as const).map(value => <button key={value} type="button"
           className={visibility === value ? 'selected' : ''} onClick={() => setVisibility(value)}>
           {value === 'public' ? <Globe2 size={22} /> : <LockKeyhole size={22} />}
           <span><b>{value === 'public' ? '公开房间' : '私密房间'}</b>

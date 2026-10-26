@@ -90,9 +90,9 @@ export function Room({
         <div><small>A TABLE FOR TWO · 房间号</small>
           <h1>{data.roomID}<span>准备中</span></h1></div>
       </div>
-      <div><ActionButton onClick={roomProps.onSettings}>
-        <Info size={15} />{owner ? '棋室设置' : '棋室信息'}
-      </ActionButton>
+      <div>{owner && <ActionButton onClick={roomProps.onSettings}>
+        <Info size={15} />棋室设置
+      </ActionButton>}
         <ActionButton variant="primary" onClick={roomProps.onInvite}>
           <UserPlus size={15} />邀请对手</ActionButton></div>
     </header>
@@ -121,21 +121,19 @@ export function Room({
       <div className={styles.dialogHint}><ShieldCheck size={15} />
         <span>{copyMessage || '邀请链接不包含身份信息。'}</span></div>
     </Dialog>}
-    {panel === 'settings' && <Dialog
-      title={owner ? '棋室设置' : '棋室信息'} eyebrow="ROOM VISIBILITY"
+    {owner && panel === 'settings' && <Dialog
+      title="棋室设置" eyebrow="ROOM VISIBILITY"
       onClose={close}
-      footer={owner
-        ? <><ActionButton onClick={close}>取消</ActionButton>
+      footer={<><ActionButton onClick={close}>取消</ActionButton>
           <ActionButton variant="primary" disabled={!enabled}
             onClick={() => {
               if (session.submit('room_update_settings', { visibility })) {
                 close();
               }
-            }}>保存设置</ActionButton></>
-        : <ActionButton variant="primary" onClick={close}>知道了</ActionButton>}>
+            }}>保存设置</ActionButton></>}>
       <div className={styles.settings}>{(['public', 'private'] as const)
         .map(value => <button type="button" key={value}
-          disabled={!owner || !enabled} aria-pressed={visibility === value}
+          disabled={!enabled} aria-pressed={visibility === value}
           onClick={() => setVisibility(value)}>
           {value === 'public' ? <Globe size={21} /> : <Lock size={21} />}
           <span><b>{value === 'public' ? '公开棋室' : '私密棋室'}</b>

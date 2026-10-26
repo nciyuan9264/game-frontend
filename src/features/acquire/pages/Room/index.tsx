@@ -42,7 +42,7 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
   const hint = (children: ReactNode) => <div className={styles.dialogHint}><ShieldCheck size={16} /><span>{children}</span></div>;
   return <>
     <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}<span>准备中</span></h1></div></div>
-      <div><ActionButton onClick={props.onSettings}><Settings2 size={16} />{owner ? '房间设置' : '房间信息'}</ActionButton>
+      <div>{owner && <ActionButton onClick={props.onSettings}><Settings2 size={16} />房间设置</ActionButton>}
         <ActionButton variant="primary" onClick={props.onInvite}><UserPlus size={16} />邀请好友</ActionButton></div></div>
     {isMobile ? <RoomMobile {...props} /> : <RoomDesktop {...props} />}
     {panel === 'invite' && <ResponsiveDialog title="给朋友，留一个好位置。" eyebrow="BETTER AROUND ONE TABLE" onClose={close}
@@ -55,15 +55,14 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
       {hint(copyMessage || (data.visibility === 'private' ? '私密房间仅房主可在大厅看到，请将房间号或邀请链接分享给朋友。'
         : '朋友可以打开邀请链接，也可以在大厅通过房间号加入。'))}
     </ResponsiveDialog>}
-    {panel === 'settings' && <ResponsiveDialog title={owner ? '房间设置' : '房间信息'} eyebrow="ROOM VISIBILITY" onClose={close}
-      footer={owner ? <><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="primary" type="submit" form="acquire-room-settings" disabled={!enabled}>保存设置<ArrowRight size={16} /></ActionButton></>
-        : <ActionButton variant="primary" onClick={close}>知道了</ActionButton>}>
+    {owner && panel === 'settings' && <ResponsiveDialog title="房间设置" eyebrow="ROOM VISIBILITY" onClose={close}
+      footer={<><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="primary" type="submit" form="acquire-room-settings" disabled={!enabled}>保存设置<ArrowRight size={16} /></ActionButton></>}>
       <form id="acquire-room-settings" className={styles.roomForm} onSubmit={event => { event.preventDefault(); if (session.submit('room_update_settings', { visibility })) close(); }}>
-        <p className={styles.dialogDescription}>{owner ? '选择这张桌如何被其他玩家找到。' : '仅房主可以修改公开范围。'}</p>
+        <p className={styles.dialogDescription}>选择这张桌如何被其他玩家找到。</p>
         <div className={styles.roomCodeSummary}><span>房间号</span><b>{data.roomID}</b></div>
         <div className={styles.dialogField} id="room-visibility-label">房间公开范围</div>
         <div className={styles.accessChoices} role="group" aria-labelledby="room-visibility-label">{(['public', 'private'] as const).map(value =>
-          <button type="button" key={value} aria-pressed={value === visibility} disabled={!owner || !enabled} className={value === visibility ? styles.selectedChoice : ''} onClick={() => setVisibility(value)}>
+          <button type="button" key={value} aria-pressed={value === visibility} disabled={!enabled} className={value === visibility ? styles.selectedChoice : ''} onClick={() => setVisibility(value)}>
             {value === 'public' ? <Globe size={23} /> : <Lock size={23} />}<strong>{value === 'public' ? '公开房间' : '私密房间'}</strong>
             <small>{value === 'public' ? '显示在大厅，其他玩家可加入' : '仅房主可在大厅看到，其他玩家通过房间号加入'}</small>{value === visibility && <Check size={14} />}
           </button>)}</div>
