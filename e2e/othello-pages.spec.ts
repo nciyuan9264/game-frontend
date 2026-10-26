@@ -98,6 +98,26 @@ async function expectNoOverflow(page: Page) {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+async function expectMobileTabGeometry(page: Page) {
+  const banner = page.getByRole('banner');
+  const content = page.getByRole('main');
+  const pageRoot = content.locator(':scope > div').first();
+  const [bannerBox, pageBox, padding] = await Promise.all([
+    banner.boundingBox(),
+    pageRoot.boundingBox(),
+    content.evaluate(element => {
+      const style = getComputedStyle(element);
+      return {
+        left: style.paddingLeft,
+        right: style.paddingRight,
+      };
+    }),
+  ]);
+  expect(bannerBox).toMatchObject({ width: 390, height: 57 });
+  expect(pageBox).toMatchObject({ x: 14, y: 72, width: 362 });
+  expect(padding).toEqual({ left: '14px', right: '14px' });
+}
+
 test('Othello public pages stay compact on mobile', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockPublicData(page);
@@ -105,6 +125,7 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   await page.goto('/game/othello');
   const lobbyHero = page.getByTestId('othello-lobby-hero');
   await expect(lobbyHero).toBeVisible();
+  await expectMobileTabGeometry(page);
   expect((await lobbyHero.boundingBox())?.height).toBeLessThanOrEqual(240);
   await page.evaluate(() => document.fonts.ready);
   const createButton = lobbyHero.getByRole('button', { name: /新开一局/ });
@@ -137,6 +158,7 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   await page.goto('/game/othello/rankings');
   const rankHero = page.getByTestId('othello-rank-hero');
   await expect(rankHero).toBeVisible();
+  await expectMobileTabGeometry(page);
   expect((await rankHero.boundingBox())?.height).toBe(139);
   const rankPanel = page.getByRole('tablist', { name: '排行榜模式' }).locator('..');
   expect((await rankPanel.boundingBox())?.height).toBeGreaterThanOrEqual(337);
@@ -145,12 +167,14 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   await page.goto('/game/othello/guide');
   const guideVisual = page.getByTestId('othello-guide-visual');
   await expect(guideVisual).toBeVisible();
+  await expectMobileTabGeometry(page);
   expect((await guideVisual.boundingBox())?.height).toBe(266);
   await expectNoOverflow(page);
 
   await page.goto('/game/othello/me');
   const playerID = page.getByText('PLAYER ID · 110');
   await expect(playerID).toBeVisible();
+  await expectMobileTabGeometry(page);
   const identity = playerID.locator('xpath=ancestor::aside[1]');
   const history = page.getByRole('heading', { name: '过去的棋局' })
     .locator('xpath=ancestor::section[1]');
