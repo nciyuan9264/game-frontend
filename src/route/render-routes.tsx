@@ -3,10 +3,12 @@ import { routes, AppRoute } from './routes.tsx';
 import { Suspense } from 'react';
 import { LoadingBlock } from '@/components/LoadingBlock/index.tsx';
 import { AcquireLoading } from '@/features/acquire/components/LoadingState';
+import { AcquireSessionLoading } from '@/features/acquire/pages/Session/Loading';
 import { DavinciLoading } from '@/features/davinci/components/LoadingState';
 import { SplendorLoading } from '@/features/splendor/components/LoadingState';
 import { YinshLoading } from '@/features/yinsh/components/LoadingState';
 import { OthelloLoading } from '@/features/othello/components/LoadingState';
+import { OthelloSessionLoading } from '@/features/othello/pages/Session/Loading';
 import { QuoridorLoading } from '@/features/quoridor/components/LoadingState';
 import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
@@ -18,7 +20,9 @@ import { Loading as WarChestLoading } from '@/features/warchest/components/Shell
 export const RenderRoutes = () => {
     const renderRoutes = (routes: AppRoute[]) => {
         return routes.map(route => {
-            const fallback = route.path.startsWith('/game/acquire')
+            const fallback = route.path === '/game/acquire/match'
+                ? <AcquireSessionLoading />
+                : route.path.startsWith('/game/acquire')
                 ? <AcquireLoading fullScreen title="正在进入午夜董事会。" description="正在准备城市与牌桌资源" />
                 : route.path.startsWith('/game/davinci')
                     ? <DavinciLoading fullScreen />
@@ -26,6 +30,8 @@ export const RenderRoutes = () => {
                         ? <SplendorLoading fullScreen />
                         : route.path.startsWith('/game/yinsh')
                             ? <YinshLoading fullScreen />
+                            : route.path === '/game/othello/match'
+                                ? <OthelloSessionLoading />
                             : route.path.startsWith('/game/othello')
                                 ? <OthelloLoading fullScreen />
                                 : route.path.startsWith('/game/quoridor')

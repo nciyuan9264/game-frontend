@@ -52,9 +52,9 @@ function Session({ roomID }: { roomID: string }) {
     || !!roomID && !!matchID && !snapshot
       && (connection.status === 'connecting' || connection.status === 'reconnecting');
 
-  if (initialLoading) return <Shell title="连接战场" profile={profile}>
-    <Loading text={target.data ? '正在建立可靠会话。' : '正在确认身份与当前对局。'} />
-  </Shell>;
+  if (initialLoading) return <div className="warchest-root">
+    <Loading text="正在进入战争之匣。" />
+  </div>;
   if (!target.data) return <Shell title="对局验证失败" profile={profile}>
     <ExitState title="无法确认当前对局"
       message={target.error || '暂时无法确认登录状态与当前房间，请重试。'}

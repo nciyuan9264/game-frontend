@@ -58,9 +58,7 @@ function Session({ roomID }: { roomID: string }) {
     || !!roomID && !!matchID && !snapshot
       && (connection.status === 'connecting' || connection.status === 'reconnecting');
 
-  if (initialLoading) return <AppShell inMatch title="连接棋室">
-    <YinshLoading description={target.data ? '正在建立可靠会话' : '正在确认身份与当前对局'} />
-  </AppShell>;
+  if (initialLoading) return <YinshLoading fullScreen />;
   if (!target.data) return <AppShell inMatch title="对局验证失败"><div className={styles.authError}>
     <Feedback error>对局信息确认失败<span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
       <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton></Feedback>

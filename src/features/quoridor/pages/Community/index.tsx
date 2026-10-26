@@ -49,7 +49,7 @@ export function Rankings() {
   return <AppShell title="棋手排行" profile={profile.data}><div className={styles.page}>
     <header className={styles.title}><Eyebrow>THE QUIET MASTERS</Eyebrow>
       <h1>每一条路，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
-    <section className={styles.rankHero} data-testid="quoridor-rank-hero"><BrandMark size={58} /><div><h2>QUORIDOR 棋手榜</h2>
+    <section className={styles.rankHero} data-testid="quoridor-rank-hero"><BrandMark size={58} /><div><small>QUORIDOR LEADERBOARD</small><h2>QUORIDOR 棋手榜</h2>
       <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div></section>
     <section className={styles.panel}><div className={styles.tabs} role="tablist" aria-label="排行榜模式"><button type="button"
       role="tab" aria-selected={mode === 'winRate'} className={mode === 'winRate' ? styles.active : ''} onClick={() => setMode('winRate')}>胜率榜</button>
@@ -70,7 +70,7 @@ export function Guide() {
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const current = guide.current;
-  return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.title}><Eyebrow>THE QUORIDOR HANDBOOK</Eyebrow>
       <h1>规则很短，路可以很长。</h1><p>四章读懂目标、围墙、跳跃与胜负。</p></header>
     <div className={styles.guideLayout}><section className={styles.guideVisual}
@@ -85,7 +85,7 @@ export function Guide() {
       {guide.index === 3 && <div className={styles.victoryLine}>
         <Pawn side="south" /><Route size={31} /><Trophy size={34} /></div>}
       <footer>QUORIDOR / CLASSIC <span>{guide.index + 1} / 4</span></footer></section>
-      <section className={styles.guideCopy}><nav>{guideSteps.map((step, index) => <button type="button" key={step.name}
+      <section className={styles.guideCopy} data-testid="quoridor-guide-copy"><nav>{guideSteps.map((step, index) => <button type="button" key={step.name}
         className={guide.index === index ? styles.active : ''} onClick={() => guide.select(index)}>
         <span>0{index + 1}</span>{step.name}</button>)}</nav>
         <Eyebrow>{current.name}</Eyebrow><h2>{current.title}</h2><p>{current.copy}</p>

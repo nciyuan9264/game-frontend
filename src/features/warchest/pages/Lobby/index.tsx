@@ -141,7 +141,7 @@ export default function Lobby() {
           <p>从一枚指令，到一场胜局。<br />让每一次调遣，都成为你的远见。</p>
           <div className="hero-actions"><button className="button gold" type="button"
             onClick={() => { setDraft(defaultDraft); action.reset(); setPanel('create'); }}>
-            <Plus size={18} />创建房间<ArrowRight size={17} /></button>
+            <Plus size={17} />创建房间<ArrowRight size={16} /></button>
             <button className="button hero-secondary" type="button"
               onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
               <Share2 size={15} />分享游戏</button></div></div>

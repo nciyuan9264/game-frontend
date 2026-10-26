@@ -137,7 +137,7 @@ export default function Lobby() {
         <p>一枚棋子，十道围墙。<br />为对手设一道弯，也为自己留一条路。</p>
         <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
           onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
-          <Plus size={17} />新开一局<ArrowRight size={17} />
+          <Plus size={17} />新开一局<ArrowRight size={16} />
         </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
           <Share2 size={16} />分享游戏</ActionButton></div></div>
         <QuoridorStillLife /><span className={styles.heroCaption}>QUORIDOR / THE QUIET COLLECTION</span></section>

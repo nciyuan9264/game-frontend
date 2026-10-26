@@ -51,7 +51,7 @@ export function roomSeatOrder(data: MatchSnapshot) {
     ...data.playerOrder.filter(id => data.players[id]),
     ...Object.keys(data.players).filter(id => !data.playerOrder.includes(id)),
   ];
-  const seats = Array<string | undefined>(2);
+  const seats = Array<string | undefined>(2).fill(undefined);
   const unassigned: string[] = [];
   order.forEach(id => {
     const seatIndex = data.players[id].seatIndex;
@@ -84,7 +84,7 @@ export function Seats(props: RoomProps) {
       ? <article className={`${styles.seat} ${id === data.playerID ? styles.self : ''}`}
         data-testid="quoridor-room-seat" key={id}>
         <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
-        <Disc side={side} />
+        <Disc side={side} className={styles.sideMarker} />
         <PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={54} />
         <strong>{playerName(id, data.players)}

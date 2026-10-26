@@ -111,7 +111,7 @@ export default function Lobby() {
           <p>收集宝石，拓展商路，赢得贵族的青睐。<br />你的下一次远见，将在这里闪耀。</p>
           <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
             onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
-            <Plus size={18} />创建房间<ArrowRight size={18} />
+            <Plus size={17} />创建房间<ArrowRight size={16} />
           </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
             <Share2 size={16} />分享游戏</ActionButton></div></div>
         <div className={styles.heroStamp}><GemIcon color="Red" size={23} /><span>THE GILDED HOUR<small>暮色宝石商会</small></span></div>

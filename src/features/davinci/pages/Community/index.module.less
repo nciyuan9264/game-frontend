@@ -92,12 +92,14 @@
 
 @media (max-width: 767px) {
   .heading { display: none; }
+  .guidePage { padding-bottom: 0; }
   .rankSummary { align-items: flex-start; > span { min-width: 70px; } p { display: none; } h2 { font-size: 20px; } }
   .rankList {
     > header, > div { min-width: 0; grid-template-columns: 36px minmax(112px,1fr) 42px 46px 42px; column-gap: 4px; }
     > div > span:nth-child(2) { gap: 7px; }
   }
-  .guideLayout, .profileLayout { grid-template-columns: 1fr; gap: 20px; }
+  .guideLayout { grid-template-columns: 1fr; gap: 8px; }
+  .profileLayout { grid-template-columns: 1fr; gap: 20px; }
   .tileDemo { min-height: 260px; padding: 24px 15px; border-right: 0; border-bottom: 1px solid #3b423d; }
   .blackTile, .whiteTile { font-size: 27px; }
   .guidePanel { padding: 0; }

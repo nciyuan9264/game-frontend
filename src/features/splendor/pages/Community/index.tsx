@@ -109,7 +109,7 @@ export function Guide() {
   const guide = useGuideSteps(guideSteps);
   const step = guide.index;
   const current = guide.current;
-  return <AppShell title="玩法指南" profile={profile.data}><div className={`${styles.page} ${styles.guidePage}`}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.pageTitle}><Eyebrow>YOUR FIRST GEM</Eyebrow>
       <h1>简单的规则，长远的眼光。</h1><p>每回合做一件事，让每张卡都成为下一次机会。</p></header>
     <div className={styles.guideLayout}><section className={styles.guideVisual}>

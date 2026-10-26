@@ -63,11 +63,7 @@ function Session({ roomID }: { roomID: string }) {
       && (connection.status === 'connecting' || connection.status === 'reconnecting');
 
   if (initialLoading) {
-    return <AppShell room title="连接追逃房间" profile={profile}>
-      <FugitiveLoading description={target.data
-        ? '正在建立可靠会话'
-        : '正在确认身份与当前对局'} />
-    </AppShell>;
+    return <FugitiveLoading fullScreen />;
   }
   if (!target.data) {
     return <AppShell room title="对局验证失败" profile={profile}>

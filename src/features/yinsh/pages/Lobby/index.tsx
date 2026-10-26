@@ -137,7 +137,7 @@ export default function Lobby() {
         <p>在黑白翻转间，找到你的下一步。<br />一场只属于两个人的安静较量。</p>
         <div className={styles.heroActions}><ActionButton variant="primary" disabled={!profile.data}
           onClick={() => { setVisibility('public'); action.reset(); setPanel('create'); }}>
-          <Plus size={17} />新开一局<ArrowRight size={17} />
+          <Plus size={17} />新开一局<ArrowRight size={16} />
         </ActionButton><ActionButton onClick={() => { shareClipboard.reset(); setPanel('share'); }}>
           <Share2 size={16} />分享游戏</ActionButton></div></div>
         <RingStillLife /><span className={styles.heroCaption}>YINSH / THE QUIET COLLECTION</span></section>

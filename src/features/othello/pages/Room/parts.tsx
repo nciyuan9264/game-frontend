@@ -84,7 +84,7 @@ export function Seats(props: RoomProps) {
       ? <article className={`${styles.seat} ${id === data.playerID ? styles.self : ''}`}
         data-testid="othello-room-seat" key={id}>
         <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
-        <Disc side={side} />
+        <Disc side={side} className={styles.sideDisc} />
         <PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={54} />
         <strong>{playerName(id, data.players)}

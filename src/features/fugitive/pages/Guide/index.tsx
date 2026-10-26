@@ -34,7 +34,7 @@ export default function Guide() {
   const profile = useAsyncResource(getProfile);
   const [step, setStep] = useState(0);
 
-  return <AppShell title="玩法指南" profile={profile.data}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
     <main className="page-content guide-page">
       <div className="page-heading"><Eyebrow>THE ART OF DISAPPEARING</Eyebrow>
         <h1>读懂规则，藏好下一步。</h1><p>一副号码牌，两套完全不同的思路。</p>

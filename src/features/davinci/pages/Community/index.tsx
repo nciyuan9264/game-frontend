@@ -95,7 +95,7 @@ export function Guide() {
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const step = guide.current;
-  return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.heading}><div><small>LEARN THE CIPHER</small><h1>四步，读懂一场密码对决。</h1></div><BookOpen size={30} /></header>
     <div className={styles.guideLayout}><aside className={styles.tileDemo}>
       <div><span className={styles.blackTile}>3</span><span className={styles.whiteTile}>3</span><span className={styles.blackTile}>7</span><span className={styles.whiteTile}>—</span></div>

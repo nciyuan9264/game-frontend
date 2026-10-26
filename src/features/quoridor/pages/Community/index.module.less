@@ -79,20 +79,56 @@
 .aboutLegal { margin-top:17px; color:#9b8d80; font-size:8px; line-height:1.9; }
 @media (max-width:767px) {
   .title { display:none; }
-  .rankHero { min-height:0; grid-template-columns:auto 1fr; gap:12px; padding:16px;
-    > span:first-child { --mark-size:44px!important; }
-    h2 { font-size:21px; }
-    > div:nth-child(2) p { margin-top:5px; font-size:9px; }
+  .guidePage { padding-bottom:0; }
+  .rankHero { position:relative; display:block; height:139px; min-height:0; overflow:hidden; margin-bottom:18px; padding:23px 18px; border-radius:9px;
+    > span:first-child { position:absolute; top:19px; right:14px; opacity:.35; --mark-size:47px!important; }
+    > div>small { color:#a1815d; font-size:6px; letter-spacing:.14em; }
+    h2 { margin-top:10px; font-size:24px; }
+    > div:nth-child(2) p { max-width:255px; margin-top:9px; font-size:10px; line-height:1.9; }
   }
-  .rankRow { grid-template-columns:42px 1fr 64px 54px; padding:0 10px; > span:nth-last-child(2) { display:none; } }
+  .panel { min-height:337px; margin-top:0; padding:14px 10px 10px; border-radius:8px; }
+  .tabs { gap:23px; padding:0; border-bottom:0; button { min-height:38px; padding:9px 0; } }
+  .rankRow { min-height:63px; grid-template-columns:26px minmax(0,1fr) 48px 48px; gap:7px; padding:0 5px; font-size:12px;
+    > span:nth-last-child(2) { display:none; }
+    > span:nth-child(2) { gap:7px; }
+    > span:nth-child(2)>span:first-child { width:29px!important; height:29px!important; }
+    > b:first-child { font-size:17px; }
+  }
+  .rankHead { min-height:31px; font-size:8px; }
   .rankHead>span:nth-last-child(2) { display:none; }
-  .guideLayout { grid-template-columns:1fr; }
-  .guideVisual { min-height:210px; }
-  .guideCopy { padding:16px; nav { grid-template-columns:1fr; gap:5px; margin-bottom:20px; button { min-height:38px; } } }
-  .profileLayout { grid-template-columns:1fr; }
+  .guideLayout { display:flex; grid-template-columns:none; flex-direction:column; gap:8px; margin-top:0; }
+  .guideVisual { min-height:266px; border-radius:9px; }
+  .guideCopy { display:flex; min-height:0; padding:23px 19px; flex-direction:column; border-radius:9px;
+    nav { display:flex; grid-template-columns:none; gap:22px; margin-bottom:26px; padding-bottom:7px; overflow-x:auto; border-bottom:1px solid #e2d8cc; scrollbar-width:none;
+      &::-webkit-scrollbar { display:none; }
+      button { position:relative; min-height:0; flex-shrink:0; padding:9px 0; border:0!important; border-radius:0; background:transparent!important; font-size:11px; }
+      button::after { position:absolute; right:0; bottom:-8px; left:0; height:2px; background:transparent; content:''; }
+      .active { border-color:transparent!important; background:transparent!important; color:var(--wine); }
+      .active::after { background:var(--wine); }
+    }
+    h2 { margin:12px 0 15px; font-size:22px; line-height:1.6; }
+    > p { font-size:12px; line-height:1.9; }
+    > div { margin-top:23px; padding:13px; }
+    > footer { margin-top:auto; padding-top:25px; > button { min-height:41px; padding:0 12px; font-size:11px; } }
+  }
+  .profileLayout { grid-template-columns:1fr; gap:19px; margin-top:0; }
   .profilePage { padding-bottom:0; }
-  .identity { padding:22px 18px 18px; }
-  .identityHeader>span:first-child { width:60px!important; height:60px!important; }
+  .identity { padding:24px 19px 20px; border-radius:10px; }
+  .identityHeader { gap:14px;
+    > span:first-child { width:60px!important; height:60px!important; }
+    .eyebrow { display:block; font-size:7px; line-height:1.5; }
+    h2 { margin:7px 0; font-size:26px; line-height:1.15; }
+    > div>span:last-child { font-size:9px; }
+  }
+  .profileEmail { min-height:39px; margin-top:28px; padding:0 12px; font-size:11px; }
+  .profileStats { margin-top:19px; padding:20px 0 2px; border-bottom:0;
+    > b { font-size:22px; line-height:1.1; } small { margin-top:8px; font-size:9px; line-height:1.5; }
+  }
+  .profileActions { justify-content:flex-end; gap:18px; margin-top:14px; padding-top:11px; border-top:1px solid #d7cab8;
+    a,button { min-height:24px!important; }
+  }
+  .history { min-height:142px; max-height:min(460px,55dvh); overflow-y:auto; border-radius:9px; }
+  .aboutEntry { min-height:55px; }
   .profilePage .aboutEntry { margin-top:auto; }
   .history>article { grid-template-columns:32px 1fr 45px 38px; padding:10px; }
 }

@@ -330,6 +330,18 @@ test('Othello room uses the aligned two-seat mobile layout', async ({ page }) =>
   }));
   expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThanOrEqual(1);
   expect(Math.abs(boxes[0].width - boxes[1].width)).toBeLessThanOrEqual(1);
+  const seatMarkers = seats.first().locator(':scope > span[aria-hidden="true"]');
+  await expect(seatMarkers).toHaveCount(2);
+  const [discBox, avatarBox] = await Promise.all([
+    seatMarkers.nth(0).boundingBox(),
+    seatMarkers.nth(1).boundingBox(),
+  ]);
+  expect(
+    (discBox?.x ?? 0) + (discBox?.width ?? 0) <= (avatarBox?.x ?? 0)
+      || (avatarBox?.x ?? 0) + (avatarBox?.width ?? 0) <= (discBox?.x ?? 0)
+      || (discBox?.y ?? 0) + (discBox?.height ?? 0) <= (avatarBox?.y ?? 0)
+      || (avatarBox?.y ?? 0) + (avatarBox?.height ?? 0) <= (discBox?.y ?? 0)
+  ).toBe(true);
   await expect(page.getByRole('button', { name: '在席位 2 添加人机' })).toBeVisible();
   await expect(page.getByTestId('othello-room-facts')).toBeVisible();
   await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible();
@@ -338,6 +350,47 @@ test('Othello room uses the aligned two-seat mobile layout', async ({ page }) =>
   await page.setViewportSize({ width: 320, height: 568 });
   await expect(seats).toHaveCount(2);
   await expectNoOverflow(page);
+});
+
+test('Othello refresh keeps one stable session loading view', async ({ page }) => {
+  await page.addInitScript(() => {
+    const state = {
+      labels: [] as string[],
+      maxVisible: 0,
+    };
+    Object.defineProperty(window, '__othelloLoadingState', {
+      configurable: true,
+      value: state,
+    });
+    const collect = () => {
+      const statuses = Array.from(document.querySelectorAll<HTMLElement>(
+        '[role="status"]'
+      ));
+      state.maxVisible = Math.max(state.maxVisible, statuses.length);
+      statuses.forEach(status => {
+        const label = status.getAttribute('aria-label') || '';
+        if (label && !state.labels.includes(label)) state.labels.push(label);
+      });
+    };
+    new MutationObserver(collect).observe(document, {
+      childList: true,
+      subtree: true,
+    });
+  });
+  await mockRoom(page);
+  await page.goto(`/game/othello/match?roomID=${roomID}`);
+  await expect(page.getByTestId('othello-room-seat')).toHaveCount(2);
+
+  const loadingState = await page.evaluate(() =>
+    (window as Window & {
+      __othelloLoadingState: {
+        labels: string[];
+        maxVisible: number;
+      };
+    }).__othelloLoadingState
+  );
+  expect(loadingState.labels).toEqual(['正在同步身份、席位与最新对局状态']);
+  expect(loadingState.maxVisible).toBe(1);
 });
 
 test('Othello room keeps table and facts side by side on desktop', async ({ page }) => {

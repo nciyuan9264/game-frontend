@@ -104,21 +104,36 @@
 }
 @media (max-width:1100px) and (min-width:768px) { .layout { grid-template-columns:1fr; } .side { display:none; } .roomGrid { grid-template-columns:repeat(2,1fr); } }
 @media (max-width:767px) {
-  .hero { height:230px; align-items:flex-start; > svg { right:-112px; bottom:-42px; width:410px; opacity:.5; } }
-  .heroCopy { width:100%; padding:19px 18px; h1 { margin:8px 0; font-size:26px; line-height:1.35; } p { max-width:240px; font-size:10px; line-height:1.7; } }
-  .heroActions { gap:7px; margin-top:13px; > button { min-width:0; flex:1; min-height:40px; padding:0 10px; } }
+  .hero { height:227px; align-items:flex-start; border-radius:9px; }
+  .heroCopy { height:100%; width:100%; padding:21px 20px;
+    > .eyebrow { display:flex; align-items:center; gap:8px; font-family:inherit; font-size:6px; font-weight:500; line-height:1.5; letter-spacing:.14em;
+      &::before { width:21px; height:1px; flex:none; background:currentColor; content:''; opacity:.75; }
+    }
+    h1 { margin:11px 0 8px; font-size:27px; line-height:1.42; letter-spacing:.02em; }
+    p { max-width:225px; font-size:10px; line-height:1.8; }
+  }
+  .heroActions { gap:8px; margin-top:17px;
+    > button { min-height:39px; padding:0 14px; gap:7px; font-size:11px; }
+    > button:first-child { min-width:129px; font-size:12px; font-weight:600; }
+    > button:last-child { min-width:99px; }
+  }
   .heroCaption { display:none; }
   .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; margin-bottom:18px; padding:14px 0;
-    > span { justify-content:center; gap:4px; font-size:8px; }
+    > span { justify-content:center; gap:5px; font-size:10px; }
     svg { width:14px; height:14px; }
     b { font-size:13px; }
     > a { display:none; }
   }
   .layout { display:block; }
-  .sectionHeading { h2 { font-size:20px; } > button { min-height:44px; } }
+  .sectionHeading { align-items:center; gap:8px; margin-bottom:13px;
+    h2 { max-width:230px; margin-top:5px; font-size:16px; line-height:1.6; }
+    .eyebrow { font-size:6px; letter-spacing:.12em; }
+    > button { min-height:44px; }
+  }
   .toolbar { flex-wrap:wrap; margin-top:12px; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
   .roomGrid { grid-template-columns:1fr; }
   .roomCard { padding:17px; .roomIdentity h3 { font-size:16px; } > footer button { min-height:44px; min-width:94px; font-size:12px; } }
+  .empty { min-height:340px; padding:28px 19px; h3 { font-size:19px; } p { font-size:11px; } }
   .side { display:none; }
   .mobileJoin { display:block; margin-top:13px;
     .joinCard { padding:18px; }

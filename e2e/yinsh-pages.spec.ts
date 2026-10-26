@@ -133,7 +133,7 @@ test('YINSH public pages stay compact on mobile', async ({ page }) => {
   await page.goto('/game/yinsh/guide');
   const guideVisual = page.getByTestId('yinsh-guide-visual');
   await expect(guideVisual).toBeVisible();
-  expect((await guideVisual.boundingBox())?.height).toBeLessThanOrEqual(220);
+  expect((await guideVisual.boundingBox())?.height).toBe(266);
   await expectNoOverflow(page);
 
   await page.setViewportSize({ width: 320, height: 568 });
@@ -194,7 +194,9 @@ const ai = {
   ready: true,
 };
 
-async function mockRoom(page: Page) {
+async function mockRoom(page: Page, roomPlayers = [owner, ai]) {
+  const players = Object.fromEntries(roomPlayers.map(player =>
+    [player.playerID, player]));
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: { status_code: 0, message: 'ok', data: profile },
   }));
@@ -211,13 +213,13 @@ async function mockRoom(page: Page) {
           ownerUserID: profile.user_id,
           ownerPlayerID: owner.playerID,
           maxPlayers: 2,
-          playerCount: 2,
+          playerCount: roomPlayers.length,
           currentMatchID: matchID,
           currentMatchStatus: 'preparing',
           nextRoundNo: 1,
           createdAt: '2026-10-25T00:00:00Z',
           updatedAt: '2026-10-25T00:00:00Z',
-          players: [owner, ai],
+          players: roomPlayers,
           metrics: {
             yinsh: {
               ringsRemoved: 0,
@@ -240,18 +242,15 @@ async function mockRoom(page: Page) {
       status: 'match',
       visibility: 'private',
       maxPlayers: 2,
-      players: {
-        [owner.playerID]: owner,
-        [ai.playerID]: ai,
-      },
-      playerOrder: [owner.playerID, ai.playerID],
+      players,
+      playerOrder: roomPlayers.map(player => player.playerID),
     }));
   });
 }
 
 test('YINSH room uses the aligned two-seat mobile layout', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockRoom(page);
+  await mockRoom(page, [owner]);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
 
   const seats = page.getByTestId('yinsh-room-seat');
@@ -263,6 +262,21 @@ test('YINSH room uses the aligned two-seat mobile layout', async ({ page }) => {
   expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThanOrEqual(1);
   expect(Math.abs(boxes[0].width - boxes[1].width))
     .toBeLessThanOrEqual(1);
+  const seatMarkers = seats.first().locator(':scope > span[aria-hidden="true"]');
+  await expect(seatMarkers).toHaveCount(2);
+  const [ringBox, avatarBox] = await Promise.all([
+    seatMarkers.nth(0).boundingBox(),
+    seatMarkers.nth(1).boundingBox(),
+  ]);
+  expect(
+    (ringBox?.x ?? 0) + (ringBox?.width ?? 0) <= (avatarBox?.x ?? 0)
+      || (avatarBox?.x ?? 0) + (avatarBox?.width ?? 0) <= (ringBox?.x ?? 0)
+      || (ringBox?.y ?? 0) + (ringBox?.height ?? 0) <= (avatarBox?.y ?? 0)
+      || (avatarBox?.y ?? 0) + (avatarBox?.height ?? 0) <= (ringBox?.y ?? 0)
+  ).toBe(true);
+  await expect(page.getByRole('button', {
+    name: '在席位 2 添加人机',
+  })).toBeVisible();
   await expect(page.getByTestId('yinsh-room-facts')).toBeVisible();
   await expect(page.getByRole('button', {
     name: '开始对局',

@@ -188,7 +188,7 @@ export function Guide() {
     }
     guide.next();
   };
-  return <AppShell title="玩法指南" profile={profile.data}><div className={`${styles.page} ${styles.guidePage}`}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <div className={styles.guide}>
       <header className={styles.guideHeading}><small>LEARN THE FIRST MOVE</small><h1>先懂一招，再赢一局。</h1></header>
       <div className={styles.guideLayout}><aside><img src={tableArt} alt="Acquire 桌面材质示意" />

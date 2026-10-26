@@ -127,7 +127,7 @@ export function Guide() {
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const current = guide.current;
-  return <Shell title="玩法指南" profile={profile.data}><main className="page guide-page">
+  return <Shell title="玩法指南" profile={profile.data} compactMobileFooter><main className="page guide-page">
     <div className="page-title"><div><Eyebrow>YOUR FIRST CAMPAIGN</Eyebrow>
       <h1>懂得规则，才懂得破局。</h1><p>四步开始第一场交锋；战场只展示服务端确认的合法行动。</p></div>
       <BookOpen size={41} strokeWidth={1} /></div>

@@ -190,7 +190,7 @@ export default function Lobby() {
             <p>一个制造谜题，一个追寻答案。<br />在这座不眠的城市，谁能走在前面？</p>
             <div className="hero-actions">
               <button className="button primary" type="button" onClick={openCreate}>
-                <Plus size={17} />创建房间<ArrowRight size={17} />
+                <Plus size={17} />创建房间<ArrowRight size={16} />
               </button>
               <button className="button hero-secondary" type="button"
                 onClick={() => {

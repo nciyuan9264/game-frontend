@@ -41,6 +41,19 @@ describe('YINSH room presentation', () => {
     expect(roomSeatOrder(data)).toEqual(['owner', 'ai_2']);
   });
 
+  it('keeps the unoccupied second seat explicit', () => {
+    const data = snapshot({
+      owner: {
+        playerID: 'owner',
+        online: true,
+        ready: true,
+        ai: false,
+        seatIndex: 0,
+      },
+    });
+    expect(roomSeatOrder(data)).toStrictEqual(['owner', undefined]);
+  });
+
   it('requires both occupied seats to be ready and accepts ready AI', () => {
     const waiting = snapshot({
       owner: {
