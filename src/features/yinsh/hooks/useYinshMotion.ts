@@ -4,6 +4,7 @@ import {
   useLayoutEffect,
   useRef,
   useState,
+  useSyncExternalStore,
 } from 'react';
 import {
   buildYinshMotion,
@@ -12,11 +13,28 @@ import {
 } from '../model/motion';
 import type { GameSnapshot } from '../model/session';
 
-export function useYinshMotion(
-  data: GameSnapshot,
-  reduced: boolean,
-  quick: boolean,
-) {
+const reducedMotionQuery = '(prefers-reduced-motion: reduce)';
+
+function subscribeReducedMotion(onChange: () => void) {
+  if (typeof window === 'undefined' || !window.matchMedia) {
+    return () => undefined;
+  }
+  const media = window.matchMedia(reducedMotionQuery);
+  media.addEventListener('change', onChange);
+  return () => media.removeEventListener('change', onChange);
+}
+
+function prefersReducedMotion() {
+  return typeof window !== 'undefined'
+    && window.matchMedia?.(reducedMotionQuery).matches === true;
+}
+
+export function useYinshMotion(data: GameSnapshot) {
+  const reduced = useSyncExternalStore(
+    subscribeReducedMotion,
+    prefersReducedMotion,
+    () => false,
+  );
   const previousRef = useRef(data);
   const currentRef = useRef<YinshMotion>();
   const timerRef = useRef<ReturnType<typeof setTimeout>>();
@@ -68,7 +86,7 @@ export function useYinshMotion(
       return;
     }
 
-    const next = buildYinshMotion(previous, data, quick);
+    const next = buildYinshMotion(previous, data, false);
     if (next) start(next);
     else {
       clearMotionTimer();
@@ -76,7 +94,7 @@ export function useYinshMotion(
       setMotion(undefined);
       setLastMotion(undefined);
     }
-  }, [clearMotionTimer, data, quick, reduced, start]);
+  }, [clearMotionTimer, data, reduced, start]);
 
   useEffect(() => {
     if (reduced) finish();
@@ -107,7 +125,7 @@ export function useYinshMotion(
     const next = buildYinshMotion(
       lastMotion.before,
       lastMotion.after,
-      quick,
+      false,
       true,
     );
     if (!next) return false;
@@ -117,10 +135,11 @@ export function useYinshMotion(
     }
     start(next);
     return true;
-  }, [lastMotion, quick, reduced, start]);
+  }, [lastMotion, reduced, start]);
 
   return {
     motion,
+    reduced,
     busy: !!motion,
     receipt,
     canReplay: !!lastMotion

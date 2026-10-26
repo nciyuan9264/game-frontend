@@ -81,7 +81,7 @@ function gameSnapshot(moved = false) {
   };
 }
 
-function endedSnapshot() {
+function endedSnapshot(ownerID = human.playerID) {
   const snapshot = gameSnapshot();
   return {
     ...snapshot,
@@ -89,6 +89,7 @@ function endedSnapshot() {
     view: {
       yinsh: {
         ...snapshot.view.yinsh,
+        ownerID,
         playerData: {
           ...snapshot.view.yinsh.playerData,
           [human.playerID]: { side: 'white', ringsRemoved: 3 },
@@ -150,15 +151,13 @@ async function mockSession(
   }));
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(initialSnapshot));
-    if (respondToMove) {
-      socket.onMessage(message => {
-        const value = String(message);
-        commands.push(value);
-        if (value.includes('"game_move_ring"')) {
-          socket.send(JSON.stringify(gameSnapshot(true)));
-        }
-      });
-    }
+    socket.onMessage(message => {
+      const value = String(message);
+      commands.push(value);
+      if (respondToMove && value.includes('"game_move_ring"')) {
+        socket.send(JSON.stringify(gameSnapshot(true)));
+      }
+    });
   });
   return commands;
 }
@@ -172,7 +171,7 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
   page.on('pageerror', error => pageErrors.push(error));
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockSession(page);
+  const commands = await mockSession(page);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
   const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
   await expect(board).toBeVisible();
@@ -195,8 +194,12 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   await expect(page.getByRole('button', { name: '按坐标选择落点' })).toBeVisible();
   await page.getByRole('button', { name: '按坐标选择落点' }).click();
   await expect(page.getByRole('heading', { name: '精确选择落点' })).toBeVisible();
-  await expect(page.getByRole('button', { name: '预选落点 E7' })).toBeVisible();
-  await page.getByRole('button', { name: '关闭面板' }).click();
+  await page.getByRole('button', { name: '预选落点 E7' }).click();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"game_move_ring"')
+    && command.includes('"from":"E4"')
+    && command.includes('"to":"E7"'))).toBe(true);
+  await expect(page.getByRole('button', { name: /确认落子/ })).toHaveCount(0);
   const normalWidth = (await page.getByTestId('yinsh-board').boundingBox())?.width ?? 0;
   await page.getByRole('button', { name: '放大棋盘' }).click();
   await expect(page.getByRole('button', { name: '缩小棋盘' })).toBeVisible();
@@ -227,6 +230,10 @@ test('YINSH desktop keeps board and sidebar visible at 1440x900', async ({ page 
   });
   expect(scroll?.overflowY).toBe('auto');
   expect(scroll?.scrollHeight).toBeGreaterThan(scroll?.clientHeight ?? 0);
+
+  await page.setViewportSize({ width: 768, height: 1024 });
+  await expect(page.getByTestId('yinsh-board')).toBeVisible();
+  await expectNoOverflow(page);
 });
 
 test('YINSH drag waits for the authoritative snapshot before animating', async ({ page }) => {
@@ -248,21 +255,42 @@ test('YINSH drag waits for the authoritative snapshot before animating', async (
   await expect(page.getByRole('button', { name: '回放上一步' })).toBeEnabled();
 });
 
-test('YINSH settlement action keeps its icon and label inside the button', async ({ page }) => {
-  await page.setViewportSize({ width: 1024, height: 768 });
+test('YINSH final result returns through the timer slot', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, false, endedSnapshot());
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
-  await page.getByRole('button', { name: '回看棋盘' }).click();
 
-  const button = page.getByRole('button', { name: '查看结算' });
+  await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
+  await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
+
+  await page.getByRole('button', { name: '回到棋盘' }).click();
+  const button = page.getByRole('button', { name: '返回终局结算' });
   const content = button.locator('span').first();
   await expect(button).toBeVisible();
+  await expect(page.getByTestId('yinsh-mobile-dock')).toHaveCount(0);
   const [buttonBox, contentBox] = await Promise.all([
     button.boundingBox(),
     content.boundingBox(),
   ]);
-  expect(buttonBox?.width).toBeGreaterThan(90);
+  expect(buttonBox?.width).toBeGreaterThanOrEqual(48);
   expect(contentBox?.x).toBeGreaterThanOrEqual(buttonBox?.x ?? 0);
   expect((contentBox?.x ?? 0) + (contentBox?.width ?? 0))
     .toBeLessThanOrEqual((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0));
+
+  await button.click();
+  await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
+  await expectNoOverflow(page);
+});
+
+test('YINSH non-owner waits for the room owner to rematch', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, false, endedSnapshot(ai.playerID));
+  await page.goto(`/game/yinsh/match?roomID=${roomID}`);
+
+  const rematch = page.getByRole('button', {
+    name: '等待房主再来一局',
+  });
+  await expect(rematch).toBeVisible();
+  await expect(rematch).toBeDisabled();
 });

@@ -2,7 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Flag, History, LogOut, RotateCw,
-  Settings2, ShieldCheck, Trophy,
+  ShieldCheck, Trophy,
 } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
@@ -21,7 +21,6 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { BrandMark, MarkerToken, RingIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { YinshLoading } from '../../components/LoadingState';
-import { useYinshPreferences } from '../../hooks/useYinshPreferences';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -49,14 +48,19 @@ export function Rankings() {
   return <AppShell title="棋手排行" profile={profile.data}><div className={styles.page}>
     <header className={styles.title}><Eyebrow>THE QUIET MASTERS</Eyebrow>
       <h1>每一次取环，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
-    <section className={styles.rankHero}><BrandMark size={58} /><div><h2>YINSH 棋手榜</h2>
+    <section className={styles.rankHero} data-testid="yinsh-rank-hero"><BrandMark size={58} /><div><h2>YINSH 棋手榜</h2>
       <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div>
       <div>{leaderboard.entries.slice(0, 3).map((entry, index) => <span key={entry.userID}>
         <b>0{index + 1}</b><PlayerAvatar name={entry.displayName} size={index === 0 ? 58 : 48} />
         <strong>{entry.displayName}</strong><small>{Math.round(entry.winRate * 100)}%</small></span>)}</div></section>
-    <section className={styles.panel}><div className={styles.tabs}><button type="button"
-      className={mode === 'winRate' ? styles.active : ''} onClick={() => setMode('winRate')}>胜率榜</button>
-      <button type="button" className={mode === 'games' ? styles.active : ''} onClick={() => setMode('games')}>场次榜</button></div>
+    <section className={styles.panel}><div className={styles.tabs}
+      role="tablist" aria-label="排行榜模式"><button type="button"
+      role="tab" aria-selected={mode === 'winRate'}
+      className={mode === 'winRate' ? styles.active : ''}
+      onClick={() => setMode('winRate')}>胜率榜</button>
+      <button type="button" role="tab" aria-selected={mode === 'games'}
+        className={mode === 'games' ? styles.active : ''}
+        onClick={() => setMode('games')}>场次榜</button></div>
       {leaderboard.loading && !leaderboard.entries.length && <YinshLoading title="正在整理棋手名册。" description="载入排行榜记录" />}
       {leaderboard.error && <Feedback error>{leaderboard.error}<ActionButton onClick={leaderboard.retry}>重试</ActionButton></Feedback>}
       <div className={`${styles.rankRow} ${styles.rankHead}`}><span>名次</span><span>棋手</span><span>完成对局</span><span>胜场</span><span>胜率</span></div>
@@ -76,7 +80,8 @@ export function Guide() {
   return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
     <header className={styles.title}><Eyebrow>THE YINSH HANDBOOK</Eyebrow>
       <h1>简单的规则，安静的较量。</h1><p>四章读懂圆环、翻色和取环。</p></header>
-    <div className={styles.guideLayout}><section className={styles.guideVisual}>
+    <div className={styles.guideLayout}><section className={styles.guideVisual}
+      data-testid="yinsh-guide-visual">
       <span>CHAPTER 0{guide.index + 1}</span>
       {guide.index === 0 && <div className={styles.ringLine}>{[0, 1, 2, 3, 4].map(index => <RingIcon key={index} />)}</div>}
       {guide.index === 1 && <div className={styles.flipLine}><RingIcon /><MarkerToken side="black" /><MarkerToken side="white" /><RotateCw size={28} /><MarkerToken side="white" /><MarkerToken side="black" /></div>}
@@ -98,9 +103,8 @@ export function My() {
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('yinsh');
   const history = useGameHistory({ gameType: 'yinsh', pageSize: 20 });
-  const preferences = useYinshPreferences();
   const logout = useGameLogout();
-  const [panel, setPanel] = useState<'preferences' | 'logout'>();
+  const [logoutOpen, setLogoutOpen] = useState(false);
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
@@ -115,8 +119,8 @@ export function My() {
         <div><b>{stats.data?.totalGames ?? 0}<small>对局</small></b>
           <b>{stats.data?.wins ?? 0}<small>胜场</small></b>
           <b>{Math.round((stats.data?.winRate ?? 0) * 100)}%<small>胜率</small></b></div>
-        <ActionButton onClick={() => setPanel('preferences')}><Settings2 size={16} />显示偏好</ActionButton>
-        <ActionButton variant="quiet" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</ActionButton></aside>
+        <ActionButton variant="quiet" onClick={() => setLogoutOpen(true)}>
+          <LogOut size={14} />退出登录</ActionButton></aside>
         <section className={styles.history}><header><History size={17} /><h2>过去的棋局</h2></header>
           {history.games.map(game => {
             const me = game.players?.find(player => String(player.userID) === String(profile.data?.id));
@@ -129,19 +133,9 @@ export function My() {
           {history.error && <Feedback error>{history.error}<ActionButton onClick={history.retry}>重试</ActionButton></Feedback>}
           {!history.loading && !history.games.length && <Feedback>还没有对局记录。<Link to="/game/yinsh">去大厅开始第一局</Link></Feedback>}
           {history.hasMore && <ActionButton pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}</section></div>}
-    {panel === 'preferences' && <Dialog title="专注于你的下一步。" eyebrow="PLAYING PREFERENCES" onClose={() => setPanel(undefined)}
-      footer={<ActionButton variant="primary" onClick={() => setPanel(undefined)}>完成</ActionButton>}>
-      <div className={styles.preference}>{[
-        { label: '显示合法落点', value: preferences.hints, set: preferences.setHints },
-        { label: '显示棋盘坐标', value: preferences.coordinates, set: preferences.setCoordinates },
-        { label: '落子前确认', value: preferences.confirmMoves, set: preferences.setConfirmMoves },
-        { label: '减少动态效果', value: preferences.reduceMotion, set: preferences.setReduceMotion },
-      ].map(item => <div key={item.label}><span><b>{item.label}</b><small>偏好保存在当前设备</small></span>
-        <button type="button" role="switch" aria-label={item.label} aria-checked={item.value}
-          className={item.value ? styles.switchOn : ''} onClick={() => item.set(!item.value)}><i /></button></div>)}</div>
-    </Dialog>}
-    {panel === 'logout' && <Dialog title="离开当前账号？" eyebrow="SIGN OUT" onClose={() => setPanel(undefined)}
-      footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
+    {logoutOpen && <Dialog title="离开当前账号？" eyebrow="SIGN OUT"
+      onClose={() => setLogoutOpen(false)}
+      footer={<><ActionButton onClick={() => setLogoutOpen(false)}>取消</ActionButton>
         <ActionButton variant="danger" pending={logout.pending} onClick={() => void logout.run()}>退出登录</ActionButton></>}>
       <p className={styles.dialogText}>退出不会删除棋谱与战绩，下次登录后仍可查看。</p>
     </Dialog>}

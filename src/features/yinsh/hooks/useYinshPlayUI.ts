@@ -4,7 +4,6 @@ import type { GameSnapshot } from '../model/session';
 export type YinshPanel =
   | 'activity'
   | 'rules'
-  | 'settings'
   | 'menu'
   | 'resign'
   | 'points';
@@ -13,7 +12,6 @@ export function useYinshPlayUI(data: GameSnapshot) {
   const [panel, setPanel] = useState<YinshPanel>();
   const [selectedRing, setSelectedRing] = useState<string>();
   const [hoveredPoint, setHoveredPoint] = useState<string>();
-  const [pendingPoint, setPendingPoint] = useState<string>();
   const [selectedRowID, setSelectedRowID] = useState<string>();
   const [zoomed, setZoomed] = useState(false);
   const [feedback, setFeedback] = useState<{
@@ -33,8 +31,8 @@ export function useYinshPlayUI(data: GameSnapshot) {
     [data.roomData.legalMoves, selectedRing],
   );
   const preview = useMemo(
-    () => moves.find(move => move.to === (pendingPoint ?? hoveredPoint)),
-    [hoveredPoint, moves, pendingPoint],
+    () => moves.find(move => move.to === hoveredPoint),
+    [hoveredPoint, moves],
   );
   const selectedRow = useMemo(
     () => data.roomData.candidateRows.find(row => row.id === selectedRowID)
@@ -45,7 +43,6 @@ export function useYinshPlayUI(data: GameSnapshot) {
   const clearSelection = useCallback(() => {
     setSelectedRing(undefined);
     setHoveredPoint(undefined);
-    setPendingPoint(undefined);
     setSelectedRowID(undefined);
     setFeedback(undefined);
   }, []);
@@ -87,8 +84,6 @@ export function useYinshPlayUI(data: GameSnapshot) {
     setSelectedRing,
     hoveredPoint,
     setHoveredPoint,
-    pendingPoint,
-    setPendingPoint,
     selectedRowID,
     setSelectedRowID,
     moves,

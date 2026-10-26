@@ -306,7 +306,6 @@ export function Board({
   zoomed = false,
   motion,
   errorPoint,
-  confirmMoves = false,
   reduced = false,
   onPoint,
   onHover,
@@ -331,7 +330,6 @@ export function Board({
   zoomed?: boolean;
   motion?: YinshMotion;
   errorPoint?: string;
-  confirmMoves?: boolean;
   reduced?: boolean;
   onPoint: (pointID: string) => void;
   onHover: (pointID?: string) => void;
@@ -347,7 +345,6 @@ export function Board({
   const handlersRef = useRef({
     interactive,
     legalMoves,
-    confirmMoves,
     onPoint,
     onHover,
     onGrab,
@@ -357,7 +354,6 @@ export function Board({
   handlersRef.current = {
     interactive,
     legalMoves,
-    confirmMoves,
     onPoint,
     onHover,
     onGrab,
@@ -793,7 +789,7 @@ export function Board({
           <text x="58" y="34" textAnchor="middle"
             className={styles.dragCopy}>
             {drag.valid
-              ? `${confirmMoves ? '松手预览' : '松手提交'} · 翻 ${preview?.flips.length ?? 0} 子`
+              ? `松手提交 · 翻 ${preview?.flips.length ?? 0} 子`
               : '移到合法落点，或松手取消'}
           </text>
         </g>

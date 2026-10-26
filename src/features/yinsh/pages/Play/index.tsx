@@ -1,7 +1,7 @@
 import {
-  ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Clock3, Eye, Flag,
-  History, Info, Lightbulb, Maximize2, Minimize2, MoreHorizontal, RotateCcw,
-  Settings2, ShieldCheck, Trophy, Users, X,
+  ArrowLeft, ArrowRight, BookOpen, Check, CheckCircle2, Clock3, Flag,
+  History, Info, Maximize2, Minimize2, MoreHorizontal, RotateCcw,
+  ShieldCheck, Trophy, Users, X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -12,7 +12,6 @@ import { Dialog } from '../../components/Dialog';
 import type { YinshSession } from '../../hooks/useYinshSession';
 import { useYinshMotion } from '../../hooks/useYinshMotion';
 import { useYinshPlayUI } from '../../hooks/useYinshPlayUI';
-import { useYinshPreferences } from '../../hooks/useYinshPreferences';
 import { BOARD_POINTS } from '../../model/board';
 import { invalidMoveReason } from '../../model/interaction';
 import {
@@ -85,12 +84,7 @@ export function Play({
   startNextMatchPending?: boolean;
 }) {
   const ui = useYinshPlayUI(data);
-  const preferences = useYinshPreferences();
-  const motionState = useYinshMotion(
-    data,
-    preferences.reduceMotion,
-    preferences.quickMotion,
-  );
+  const motionState = useYinshMotion(data);
   const boardData = motionState.motion?.before ?? data;
   const ended = data.roomData.gameStatus === 'end';
   const myTurn = data.roomData.currentPlayer === data.playerId;
@@ -101,7 +95,6 @@ export function Play({
   const [phaseTitle, phaseDescription] = phaseCopy(data);
   const whiteID = playerForSide(data, 'white');
   const blackID = playerForSide(data, 'black');
-  const selectedMove = ui.moves.find(move => move.to === ui.pendingPoint);
   const currentRound = boardData.roomData.gameStatus === 'placement'
     ? `${(boardData.roomData.placedRings.white ?? 0) + (boardData.roomData.placedRings.black ?? 0)} / 10 已布置`
     : `第 ${boardData.roomData.roundNo} 局`;
@@ -143,7 +136,6 @@ export function Play({
         return;
       }
       ui.setSelectedRing(current => current === pointID ? undefined : pointID);
-      ui.setPendingPoint(undefined);
       return;
     }
     const move = ui.moves.find(option => option.to === pointID);
@@ -157,16 +149,10 @@ export function Play({
       }), true, pointID);
       return;
     }
-    if (preferences.confirmMoves) {
-      ui.setPendingPoint(pointID);
-      ui.setHoveredPoint(pointID);
-    } else {
-      submitMove(ui.selectedRing, pointID);
-    }
+    submitMove(ui.selectedRing, pointID);
   };
   const onGrab = (pointID: string) => {
     ui.setSelectedRing(pointID);
-    ui.setPendingPoint(undefined);
     ui.setHoveredPoint(undefined);
   };
   const onDrop = (from: string, to?: string) => {
@@ -187,20 +173,12 @@ export function Play({
       }), true, to);
       return;
     }
-    if (preferences.confirmMoves) {
-      ui.setSelectedRing(from);
-      ui.setPendingPoint(to);
-      ui.setHoveredPoint(to);
-    } else {
-      submitMove(from, to);
-    }
+    submitMove(from, to);
   };
   const mainAction = () => {
     if (!interactive) return;
     if (data.roomData.gameStatus === 'remove_row' && ui.selectedRow) {
       session.submit('game_remove_row', { rowID: ui.selectedRow.id });
-    } else if (ui.selectedRing && ui.pendingPoint && selectedMove) {
-      submitMove(ui.selectedRing, ui.pendingPoint);
     } else {
       ui.setPanel('points');
     }
@@ -220,13 +198,11 @@ export function Play({
       ? '按坐标选择圆环'
       : data.roomData.gameStatus === 'placement'
         ? '按坐标布环'
-        : ui.pendingPoint
-          ? '确认落子'
-          : ui.selectedRing
-            ? '按坐标选择落点'
-            : myTurn
-              ? '按坐标选择圆环'
-              : '等待对手行动';
+        : ui.selectedRing
+          ? '按坐标选择落点'
+          : myTurn
+            ? '按坐标选择圆环'
+            : '等待对手行动';
   const actionEnabled = interactive && (
     data.roomData.gameStatus !== 'remove_row' || !!ui.selectedRow
   );
@@ -251,30 +227,32 @@ export function Play({
     } else if (!ui.selectedRing) {
       onGrab(pointID);
     } else {
-      ui.setPendingPoint(pointID);
-      ui.setHoveredPoint(pointID);
+      submitMove(ui.selectedRing, pointID);
     }
   };
 
   if (ended && ui.showResults && !motionState.busy) {
-    return <Results data={data} onViewBoard={() => ui.setShowResults(false)} onLeave={onLeave}
+    return <Results data={data} onViewBoard={() => ui.setShowResults(false)}
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
-  return <div data-testid="yinsh-play" className={`${styles.play} ${preferences.reduceMotion ? styles.reduceMotion : ''}`}>
+  return <div data-testid="yinsh-play" className={styles.play}>
     <header className={styles.topbar}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={20} /></button>
       <Brand /><span className={styles.divider} />
       <div className={styles.room}><strong>{data.roomID}</strong>
         <small>{currentRound} · 经典规则 · 服务端权威</small></div>
       <span className={styles.spacer} />
-      {ended && <ActionButton onClick={() => ui.setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
       <button type="button" aria-label="查看棋谱" onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
       <button type="button" aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>
-      <span className={styles.timer}><small>TIME</small>
-        {data.roomData.turnDeadline && myTurn && !ended
-          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-          : <b>--</b>}</span>
+      {ended
+        ? <button type="button" className={styles.resultReturn}
+          aria-label="返回终局结算" onClick={() => ui.setShowResults(true)}>
+          <Trophy size={15} /><span>结算</span></button>
+        : <span className={styles.timer}><small>TIME</small>
+          {data.roomData.turnDeadline && myTurn
+            ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+            : <b>--</b>}</span>}
     </header>
     <div className={styles.live} role="status" aria-live="polite">
       {motionState.busy ? '服务端已确认，正在展示这一步'
@@ -302,10 +280,6 @@ export function Play({
           <span className={styles.mobilePool}>公共池 <b>{boardData.roomData.markerPool}</b><small> / 51</small></span>
           <div className={styles.arenaTools}><button type="button"
             disabled={motionState.busy}
-            className={preferences.hints ? styles.toolActive : ''}
-            aria-label={preferences.hints ? '关闭落点提示' : '开启落点提示'}
-            onClick={() => preferences.setHints(!preferences.hints)}><Lightbulb size={15} /><span>落点提示</span></button>
-          <button type="button" disabled={motionState.busy}
             aria-label={ui.zoomed ? '缩小棋盘' : '放大棋盘'}
             onClick={() => ui.setZoomed(!ui.zoomed)}>
             {ui.zoomed ? <Minimize2 size={15} /> : <Maximize2 size={15} />}
@@ -317,10 +291,10 @@ export function Play({
               legalMoves={data.roomData.legalMoves}
               candidateRows={boardData.roomData.candidateRows} selectedRow={ui.selectedRow}
               lastAction={boardData.roomData.lastAction} interactive={interactive}
-              coordinates={preferences.coordinates} hints={preferences.hints}
+              coordinates hints
               zoomed={ui.zoomed} motion={motionState.motion}
               errorPoint={ui.feedback?.errorPoint}
-              confirmMoves={preferences.confirmMoves} reduced={preferences.reduceMotion}
+              reduced={motionState.reduced}
               onPoint={onPoint} onHover={ui.setHoveredPoint} onGrab={onGrab}
               onDrop={onDrop} onCancel={ui.clearSelection} />
             <span className={styles.boardEdition}>CLASSIC<br />EDITION</span></div>
@@ -377,10 +351,11 @@ export function Play({
         <Journal data={boardData} /><footer><span>公共棋子池</span><strong>{boardData.roomData.markerPool}<small> / 51</small></strong></footer></section>
       </aside></div>
     </main>
-    <div className={styles.mobileDock}><button type="button" aria-label="取消选择"
+    {!ended && <div className={styles.mobileDock}
+      data-testid="yinsh-mobile-dock"><button type="button" aria-label="取消选择"
       disabled={!ui.selectedRing} onClick={ui.clearSelection}><X size={18} /></button>
       <ActionButton variant="primary" disabled={!actionEnabled}
-        aria-busy={motionState.busy} onClick={mainAction}>{actionLabel}</ActionButton></div>
+        aria-busy={motionState.busy} onClick={mainAction}>{actionLabel}</ActionButton></div>}
 
     {ui.panel === 'activity' && <Dialog title="这一局的每一步" eyebrow="THE GAME JOURNAL"
       onClose={() => ui.setPanel(undefined)}><Journal data={boardData} full /></Dialog>}
@@ -401,7 +376,7 @@ export function Play({
       eyebrow="A PRECISE NEXT STEP"
       onClose={() => ui.setPanel(undefined)}>
       <p className={styles.pointIntro}>{ui.selectedRing
-        ? `已选 ${ui.selectedRing}。选择坐标后会先预览，再回到棋盘确认。`
+        ? `已选 ${ui.selectedRing}。选择合法坐标后会立即提交。`
         : data.roomData.gameStatus === 'remove_ring'
           ? '以下都是可取走的己方圆环，选择后计入得分。'
           : data.roomData.gameStatus === 'placement'
@@ -420,55 +395,8 @@ export function Play({
                 : `${data.roomData.legalMoves[pointID]?.length ?? 0} 个落点`}</small>
         </button>)}</div>
     </Dialog>}
-    {ui.panel === 'settings' && <Dialog title="专注于你的下一步。" eyebrow="PLAYING PREFERENCES"
-      onClose={() => ui.setPanel(undefined)} footer={<ActionButton variant="primary" onClick={() => ui.setPanel(undefined)}>完成</ActionButton>}>
-      <div className={styles.settings}>{[
-        { label: '显示合法落点', value: preferences.hints, set: preferences.setHints },
-        { label: '显示棋盘坐标', value: preferences.coordinates, set: preferences.setCoordinates },
-        { label: '减少动态效果', value: preferences.reduceMotion, set: preferences.setReduceMotion },
-      ].map(item => <div key={item.label}><span><b>{item.label}</b><small>只影响当前设备上的显示和操作</small></span>
-        <button type="button" role="switch" aria-label={item.label} aria-checked={item.value}
-          className={item.value ? styles.switchOn : ''} onClick={() => item.set(!item.value)}><i /></button></div>)}</div>
-      <section className={styles.preferenceMode} aria-label="落子方式">
-        <strong>落子方式</strong><div role="group" aria-label="落子方式选择">
-          <button type="button" className={!preferences.confirmMoves ? styles.modeActive : ''}
-            aria-pressed={!preferences.confirmMoves}
-            onClick={() => preferences.setConfirmMoves(false)}>
-            直接落子{!preferences.confirmMoves && <Check size={12} />}
-          </button>
-          <button type="button" className={preferences.confirmMoves ? styles.modeActive : ''}
-            aria-pressed={preferences.confirmMoves}
-            onClick={() => preferences.setConfirmMoves(true)}>
-            预览后确认{preferences.confirmMoves && <Check size={12} />}
-          </button>
-        </div><p>确认模式会先展示路线和翻子数；确认前可以随时改选。</p>
-      </section>
-      <section className={styles.preferenceMode} aria-label="动作节奏">
-        <strong>动作节奏</strong><div role="group" aria-label="动作节奏选择">
-          <button type="button" className={!preferences.quickMotion ? styles.modeActive : ''}
-            aria-pressed={!preferences.quickMotion} disabled={preferences.reduceMotion}
-            onClick={() => preferences.setQuickMotion(false)}>
-            标准节奏{!preferences.quickMotion && <Check size={12} />}
-          </button>
-          <button type="button" className={preferences.quickMotion ? styles.modeActive : ''}
-            aria-pressed={preferences.quickMotion} disabled={preferences.reduceMotion}
-            onClick={() => preferences.setQuickMotion(true)}>
-            轻快节奏{preferences.quickMotion && <Check size={12} />}
-          </button>
-        </div><p>{preferences.reduceMotion
-          ? '已减少动态效果，动作会直接落定。'
-          : '标准节奏更易读懂逐子翻面；轻快节奏适合连续对弈。'}</p>
-      </section>
-      <div className={styles.motionSystem}>
-        <span>{preferences.followsSystemMotion ? '当前跟随系统' : '当前为手动设置'} ·
-          {preferences.reduceMotion ? ' 已减少动态效果' : ' 完整动态效果'}</span>
-        <button type="button" disabled={preferences.followsSystemMotion}
-          onClick={preferences.followSystemMotion}>跟随系统设置</button>
-      </div>
-    </Dialog>}
     {ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
-      <div className={styles.menu}><button type="button" onClick={() => ui.setPanel('settings')}><Settings2 size={18} /><span><b>对局偏好</b><small>坐标、落点提示与防误触</small></span><ArrowRight size={15} /></button>
-        <button type="button" onClick={() => ui.setPanel('activity')}><History size={18} /><span><b>完整棋谱</b><small>查看本局所有权威动作</small></span><ArrowRight size={15} /></button>
+      <div className={styles.menu}><button type="button" onClick={() => ui.setPanel('activity')}><History size={18} /><span><b>完整棋谱</b><small>查看本局所有权威动作</small></span><ArrowRight size={15} /></button>
         <button type="button" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /><span><b>玩法指南</b><small>移动、翻色、取环与特例</small></span><ArrowRight size={15} /></button>
         <button type="button" className={styles.danger} disabled={ended} onClick={() => ui.setPanel('resign')}><Flag size={18} /><span><b>结束并认输</b><small>对手将立即获胜</small></span><ArrowRight size={15} /></button></div>
     </Dialog>}

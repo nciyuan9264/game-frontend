@@ -1,28 +1,25 @@
-import { ArrowLeft, ArrowRight, Eye, Trophy } from 'lucide-react';
+import { ArrowRight, Eye, Trophy } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { RingIcon } from '../../components/Artwork';
-import type { YinshSession } from '../../hooks/useYinshSession';
 import { playerName, type GameSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export function Results({
   data,
   onViewBoard,
-  onLeave,
   onRestart,
   restarting = false,
   readOnly = false,
 }: {
-  session?: YinshSession;
   data: GameSnapshot;
   onViewBoard: () => void;
-  onLeave: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
 }) {
   const winnerID = data.result?.winnerID ?? '';
+  const owner = data.ownerID === data.playerId;
   const draw = !winnerID;
   const winner = winnerID ? playerName(winnerID, data.roomData.players) : '';
   return <div className={styles.page}><header><span>THE FINAL CHAPTER</span><h1>
@@ -43,10 +40,13 @@ export function Results({
         </article>;
       })}</div>
       <p className={styles.caption}>少一枚圆环，多一种可能。<br /><small>第 {data.roomData.roundNo} 局 · 权威结算</small></p></section>
-    <footer><ActionButton onClick={onViewBoard}><Eye size={15} />回看棋盘</ActionButton>
-      {readOnly ? <ActionButton variant="primary" onClick={onLeave}><ArrowLeft size={15} />返回棋谱</ActionButton>
-        : <><ActionButton onClick={onLeave}><ArrowLeft size={15} />返回大厅</ActionButton>
-          <ActionButton variant="primary" pending={restarting} onClick={() => void onRestart?.()}>
-            再来一局<ArrowRight size={16} /></ActionButton></>}</footer>
+    <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
+      {readOnly ? '回到回放棋盘' : '回到棋盘'}</ActionButton>
+      {!readOnly && (owner
+        ? <ActionButton variant="primary" pending={restarting}
+          disabled={!onRestart} onClick={() => void onRestart?.()}>
+          再来一局<ArrowRight size={16} /></ActionButton>
+        : <ActionButton variant="primary" disabled>
+          等待房主再来一局</ActionButton>)}</footer>
   </div>;
 }

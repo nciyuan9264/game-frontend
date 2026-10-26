@@ -68,15 +68,6 @@
   h1, h2 { font-family: var(--serif); font-weight: 500; }
 }
 
-.reduceMotion {
-  &, * { scroll-behavior: auto !important; }
-  *, *::before, *::after {
-    animation-duration: .001ms !important;
-    animation-iteration-count: 1 !important;
-    transition-duration: .001ms !important;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .root *, .root *::before, .root *::after {
     animation-duration: .001ms !important;

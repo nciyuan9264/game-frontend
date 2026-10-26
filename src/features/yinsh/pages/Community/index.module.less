@@ -1,7 +1,7 @@
 .page { max-width:1180px; margin:auto; padding-bottom:40px; }
 .eyebrow { color:#a1815d; font:9px Georgia,serif; letter-spacing:2px; }
 .title { margin:5px 0 25px; h1 { margin:8px 0 6px; color:#60454b; font-size:32px; } p { color:#8c7e72; font-size:11px; } }
-.rankHero { display:grid; min-height:220px; align-items:center; grid-template-columns:auto 1fr auto; gap:20px; padding:28px 34px; border:1px solid #dfd3c3; border-radius:7px; background:linear-gradient(125deg,#ede3d5,#faf6ee);
+.rankHero { display:grid; min-height:180px; align-items:center; grid-template-columns:auto 1fr auto; gap:18px; padding:22px 30px; border:1px solid #dfd3c3; border-radius:7px; background:linear-gradient(125deg,#ede3d5,#faf6ee);
   > span { color:var(--wine); } h2 { color:#60454b; font:500 25px var(--serif); } > div:nth-child(2) p { margin-top:8px; color:#8e7e6c; font-size:11px; }
   > div:last-child { display:flex; align-items:flex-end; gap:17px; > span { display:flex; align-items:center; flex-direction:column; gap:5px; } > span>b { color:#a38a6b; font:8px Georgia,serif; } strong { max-width:90px; overflow:hidden; font-size:9px; text-overflow:ellipsis; white-space:nowrap; } small { color:var(--wine); font:600 15px var(--serif); } }
 }
@@ -16,7 +16,7 @@
 .rankHead { min-height:39px; border:0; background:#faf6ef; color:#a29486; font-size:9px; }
 .mine { background:#f6eaec; }
 .guideLayout { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
-.guideVisual { position:relative; display:grid; min-height:460px; place-items:center; overflow:hidden; border:1px solid #d9cbbb; border-radius:7px; background:radial-gradient(circle,#faf4e9,#e8ddcd);
+.guideVisual { position:relative; display:grid; min-height:400px; place-items:center; overflow:hidden; border:1px solid #d9cbbb; border-radius:7px; background:radial-gradient(circle,#faf4e9,#e8ddcd);
   > span { position:absolute; top:24px; left:26px; color:#a18360; font:9px Georgia,serif; letter-spacing:2px; }
   > footer { position:absolute; right:24px; bottom:20px; left:24px; display:flex; justify-content:space-between; color:#9f8c73; font:8px Georgia,serif; letter-spacing:1.5px; }
 }
@@ -42,20 +42,29 @@
   article>a { display:grid; width:34px; height:34px; place-items:center; border:1px solid #e2d6c8; border-radius:50%; color:var(--wine); }
   > button { margin:15px auto; }
 }
-.preference { > div { display:flex; align-items:center; justify-content:space-between; gap:15px; padding:15px 0; border-bottom:1px solid #e7ddce;
-  b { display:block; font-size:12px; } small { display:block; margin-top:5px; color:#a18f79; font-size:9px; }
-  button { display:flex; width:39px; height:23px; flex:none; padding:3px; border-radius:20px; background:#d5c9bb!important; i { width:17px; height:17px; border-radius:50%; background:#fff; transition:transform .2s; } }
-  .switchOn { background:var(--wine)!important; i { transform:translateX(16px); } }
-} }
 .dialogText { color:#88796c; font-size:12px; line-height:1.8; }
 @media (max-width:767px) {
   .title h1 { font-size:28px; }
-  .rankHero { grid-template-columns:auto 1fr; padding:22px 18px; > div:last-child { grid-column:1/-1; justify-content:center; } }
+  .rankHero { min-height:0; grid-template-columns:auto 1fr; gap:12px; padding:16px;
+    > span:first-child { --mark-size:44px!important; }
+    h2 { font-size:21px; }
+    > div:nth-child(2) p { margin-top:5px; font-size:9px; }
+    > div:last-child { grid-column:1/-1; justify-content:center; gap:11px;
+      > span { gap:3px; }
+      > span>span { width:38px!important; height:38px!important; }
+      strong { max-width:72px; font-size:8px; }
+      small { font-size:13px; }
+    }
+  }
   .rankRow { grid-template-columns:42px 1fr 64px 54px; padding:0 10px; > span:nth-last-child(2) { display:none; } }
   .rankHead>span:nth-last-child(2) { display:none; }
   .guideLayout { grid-template-columns:1fr; }
-  .guideVisual { min-height:310px; }
-  .guideCopy { padding:18px 16px; nav { grid-template-columns:1fr; } }
+  .guideVisual { min-height:210px; }
+  .guideCopy { padding:16px;
+    nav { grid-template-columns:1fr; gap:5px; margin-bottom:20px;
+      button { min-height:38px; }
+    }
+  }
   .profileLayout { grid-template-columns:1fr; }
   .history>article { grid-template-columns:32px 1fr 45px 38px; padding:10px; }
 }

@@ -56,6 +56,34 @@ function RoomCard({
   </article>;
 }
 
+function JoinCard({
+  code,
+  pending,
+  onChange,
+  onSubmit,
+}: {
+  code: string;
+  pending: boolean;
+  onChange: (value: string) => void;
+  onSubmit: () => void;
+}) {
+  return <section className={styles.joinCard} data-testid="yinsh-join-card">
+    <h3><KeyRound size={18} />朋友已经开好房间？</h3>
+    <p>输入完整房间号，找到朋友的棋室。</p>
+    <form onSubmit={event => {
+      event.preventDefault();
+      onSubmit();
+    }}>
+      <input aria-label="查找房间号" placeholder="输入完整房间号"
+        value={code} disabled={pending}
+        onChange={event => onChange(event.target.value)}
+        autoCapitalize="off" autoCorrect="off" spellCheck={false} />
+      <button type="submit" aria-label="查找房间"
+        disabled={pending || !code.trim()}><ArrowRight size={19} /></button>
+    </form>
+  </section>;
+}
+
 export default function Lobby() {
   const navigate = useNavigate();
   const lobby = useYinshLobby();
@@ -83,6 +111,7 @@ export default function Lobby() {
   const find = async () => {
     if (!code.trim()) return;
     setFoundRoom(undefined);
+    setPanel('join');
     try {
       setFoundRoom(await action.run(signal => lookupYinshRoom(code.trim(), signal)));
     } catch { /* Shared action owns the error state. */ }
@@ -98,7 +127,7 @@ export default function Lobby() {
 
   return <AppShell title="对局大厅" profile={profile.data}>
     {initialLoading ? <YinshLoading description="正在同步棋室与在线棋手" /> : <div className={styles.page}>
-      <section className={styles.hero}><div className={styles.heroCopy}>
+      <section className={styles.hero} data-testid="yinsh-lobby-hero"><div className={styles.heroCopy}>
         <span className={styles.eyebrow}>THE ART OF BALANCE</span>
         <h1>进退之间，<br />自有胜负。</h1>
         <p>在黑白翻转间，找到你的下一步。<br />一场只属于两个人的安静较量。</p>
@@ -107,16 +136,14 @@ export default function Lobby() {
           <Plus size={17} />新开一局<ArrowRight size={17} />
         </ActionButton></div>
         <RingStillLife /><span className={styles.heroCaption}>YINSH / THE QUIET COLLECTION</span></section>
-      <div className={styles.facts}><span><Users size={17} /><b>2</b> 位棋手</span>
+      <div className={styles.facts} data-testid="yinsh-lobby-facts"><span><Users size={17} /><b>2</b> 位棋手</span>
         <span><Clock3 size={17} /><b>60</b> 秒移动</span>
         <span><Trophy size={17} /><b>3</b> 环获胜</span>
         <Link to="/game/yinsh/guide">第一次来？读懂规则 <ArrowRight size={15} /></Link></div>
 
       <div className={styles.layout}><section className={styles.rooms}>
         <header className={styles.sectionHeading}><div><span className={styles.eyebrow}>TAKE YOUR NEXT STEP</span>
-          <h2>挑一局，慢慢想。</h2></div>
-          <button type="button" onClick={() => { setCode(''); action.reset(); setPanel('join'); }}>
-            房间号加入 <ArrowRight size={15} /></button></header>
+          <h2>挑一局，慢慢想。</h2></div></header>
         <div className={styles.toolbar}><div>{roomFilters.map(item => <button type="button" key={item.value}
           className={lobby.filter === item.value ? styles.active : ''}
           onClick={() => lobby.setFilter(item.value)}>{item.label}{item.value === 'all' && <span>{lobby.rooms.length}</span>}</button>)}</div>
@@ -136,10 +163,15 @@ export default function Lobby() {
           <b>{stats.data?.wins ?? '—'}<small>胜场</small></b>
           <b>{stats.data ? `${Math.round(stats.data.winRate * 100)}%` : '—'}<small>胜率</small></b></div>
         <Link to="/game/yinsh/me">查看我的棋谱 <ArrowRight size={15} /></Link></section>
+        <JoinCard code={code} pending={action.pending}
+          onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
+          onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/yinsh/guide"><BookOpen size={34} /><div>
           <span>THE YINSH HANDBOOK</span><h3>每一次翻转，都有章法。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small />
-      </aside></div>
+        <Brand small /></aside></div>
+      <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
+        onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
+        onSubmit={() => void find()} /></div>
     </div>}
 
     {panel === 'create' && <Dialog title="为两个人，开一局。" eyebrow="A TABLE FOR TWO" onClose={close}
