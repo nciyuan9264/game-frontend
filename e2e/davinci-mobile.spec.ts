@@ -25,6 +25,7 @@ const ai = {
 test.use({ viewport: { width: 390, height: 844 } });
 
 async function mockSession(page: Page, snapshot: Record<string, unknown>) {
+  const commands: string[] = [];
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -61,7 +62,9 @@ async function mockSession(page: Page, snapshot: Record<string, unknown>) {
   }));
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(snapshot));
+    socket.onMessage(message => commands.push(String(message)));
   });
+  return commands;
 }
 
 function matchSnapshot() {
@@ -74,6 +77,7 @@ function matchSnapshot() {
     ownerID: human.playerID,
     playerID: human.playerID,
     status: 'match',
+    visibility: 'private',
     maxPlayers: 2,
     playerOrder: [human.playerID],
     players: {
@@ -159,10 +163,34 @@ function initializationSnapshot() {
 }
 
 async function expectNoHorizontalOverflow(page: Page) {
-  await expect.poll(() => page.evaluate(() => ({
+  const size = await page.evaluate(() => ({
     viewport: window.innerWidth,
     document: document.documentElement.scrollWidth,
-  }))).toEqual({ viewport: 390, document: 390 });
+  }));
+  expect(size.document).toBeLessThanOrEqual(size.viewport);
+}
+
+async function expectAlignedPreparationRoom(page: Page) {
+  const table = page.getByTestId('davinci-room-table');
+  const facts = page.getByTestId('davinci-room-facts');
+  const startBar = page.getByTestId('davinci-room-start-bar');
+  await expect(table).toBeVisible();
+  await expect(facts).toBeVisible();
+  await expect(startBar).toBeVisible();
+  const [tableBox, factsBox, startBox, startPosition] = await Promise.all([
+    table.boundingBox(),
+    facts.boundingBox(),
+    startBar.boundingBox(),
+    startBar.evaluate(element => getComputedStyle(element).position),
+  ]);
+  expect(tableBox).not.toBeNull();
+  expect(factsBox).not.toBeNull();
+  expect(startBox).not.toBeNull();
+  if (!tableBox || !factsBox || !startBox) return;
+  expect(Math.abs(tableBox.x - factsBox.x)).toBeLessThanOrEqual(1);
+  expect(Math.abs(tableBox.width - factsBox.width)).toBeLessThanOrEqual(1);
+  expect(tableBox.y + tableBox.height).toBeLessThan(factsBox.y);
+  expect(startPosition).toBe('fixed');
 }
 
 async function expectVerticalScroll(anchor: Locator) {
@@ -189,16 +217,36 @@ async function expectVerticalScroll(anchor: Locator) {
 }
 
 test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
-  await mockSession(page, matchSnapshot());
+  const commands = await mockSession(page, matchSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
   const heading = page.getByRole('heading', { name: new RegExp(roomID) });
   await expect(heading).toBeVisible();
+  await expect(page.getByRole('button', { name: '房间设置' })).toBeVisible();
   await expect(page.getByRole('button', { name: '邀请好友' })).toBeVisible();
-  await expect(page.getByText('空席位')).toBeVisible();
+  await expect(page.getByText('私密房间')).toBeVisible();
+  await expect(page.getByRole('button', {
+    name: '在席位 2 添加人机',
+  })).toBeVisible();
+  await expectAlignedPreparationRoom(page);
   await expectNoHorizontalOverflow(page);
+
+  await page.setViewportSize({ width: 356, height: 783 });
+  await expectAlignedPreparationRoom(page);
+  await expectNoHorizontalOverflow(page);
+
   await page.setViewportSize({ width: 390, height: 430 });
   await expectVerticalScroll(heading);
+
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.getByRole('button', { name: '房间设置' }).click();
+  await expect(page.getByRole('button', { name: /私密房间/ }))
+    .toHaveAttribute('aria-pressed', 'true');
+  await page.getByRole('button', { name: /公开房间/ }).click();
+  await page.getByRole('button', { name: /保存设置/ }).click();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"roomSettings"')
+    && command.includes('"visibility":"public"'))).toBe(true);
 });
 
 test('DaVinci final board can reopen the results panel on mobile', async ({ page }) => {

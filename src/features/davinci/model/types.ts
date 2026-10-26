@@ -4,6 +4,7 @@ import type {
 } from '@/features/game-core/model/room';
 export type { LobbyFilter } from '@/features/game-core/model/room';
 
+export type Visibility = 'public' | 'private';
 export type GameStatus = 'match' | 'initialize' | 'waiting' | 'getCard' | 'guessCard' | 'setCard' | 'end';
 
 export interface Card {
@@ -17,6 +18,7 @@ export interface Card {
 export interface DavinciPlayer extends LobbyPlayerLike {}
 
 export interface DavinciRoom extends LobbyRoomLike {
+  visibility: Visibility;
   roomPlayer: DavinciPlayer[];
   playerOrder?: string[];
 }

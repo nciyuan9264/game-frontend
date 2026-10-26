@@ -9,6 +9,7 @@ const room: DavinciRoom = {
   ownerName: 'Alice-Cooper-42',
   maxPlayers: 2,
   status: 'match',
+  visibility: 'private',
   roomPlayer: [{
     userID: '42', playerID: '42', displayName: 'Alice-Cooper-42', online: true, ready: true, ai: false, seatIndex: 0,
   }],
@@ -16,7 +17,7 @@ const room: DavinciRoom = {
 
 describe('DaVinci protocol model', () => {
   it('accepts v2 snapshots and rejects malformed frames', () => {
-    expect(parseServerMessage(JSON.stringify({
+    const message = parseServerMessage(JSON.stringify({
       schemaVersion: 2,
       type: 'MATCH_SYNC',
       roomID: 'room-1',
@@ -29,7 +30,10 @@ describe('DaVinci protocol model', () => {
       playerOrder: [],
       status: 'match',
       visibility: 'public',
-    }))?.type).toBe('MATCH_SYNC');
+    }));
+    expect(message?.type).toBe('MATCH_SYNC');
+    if (message?.type !== 'MATCH_SYNC') throw new Error('expected match sync');
+    expect(message.visibility).toBe('public');
     expect(parseServerMessage('{"type":"MATCH_SYNC","roomID":"room-1"}')).toBeUndefined();
     expect(parseServerMessage('not-json')).toBeUndefined();
   });

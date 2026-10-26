@@ -44,6 +44,7 @@ const snapshot = (): MatchSnapshot => ({
   phaseVersion: 1,
   turnNumber: 1,
   status: 'match',
+  visibility: 'private',
   maxPlayers: 2,
   playerOrder: ['me'],
   players: {

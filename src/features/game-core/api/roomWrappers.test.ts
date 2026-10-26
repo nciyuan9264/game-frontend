@@ -76,7 +76,7 @@ describe('game room API wrappers', () => {
 
     expect(shared.createGameRoom).toHaveBeenCalledWith(
       'davinci',
-      {},
+      { visibility: 'private', maxPlayers: 2 },
       { signal, authFailure: 'redirect' }
     );
     expect(shared.listGameRooms).toHaveBeenCalledWith(

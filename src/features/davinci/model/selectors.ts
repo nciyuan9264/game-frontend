@@ -12,6 +12,8 @@ export function confirmsCommand(command: PendingCommand, next: Snapshot): boolea
         return Object.keys(next.players).some(id => !before.players[id] && next.players[id].ai);
       case 'match_remove_player':
         return !next.players[String(command.payload.playerID)];
+      case 'room_update_settings':
+        return next.visibility === command.payload.visibility;
       default:
         return false;
     }

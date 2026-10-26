@@ -16,6 +16,7 @@ import type {
   Card,
   DavinciPlayer,
   GameStatus,
+  Visibility,
 } from './types';
 
 export interface LastGuessPayload {
@@ -47,6 +48,7 @@ export interface MatchSnapshot extends SessionSnapshotBase {
   status: GameStatus;
   playerID: string;
   players: Record<string, DavinciPlayer>;
+  visibility: Visibility;
   maxPlayers: number;
   playerOrder: string[];
 }
@@ -65,6 +67,7 @@ export type CommandType =
   | 'match_begin'
   | 'match_add_ai'
   | 'match_remove_player'
+  | 'room_update_settings'
   | 'game_ready'
   | 'game_get_card'
   | 'game_guess_card'
@@ -116,6 +119,7 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
       status: envelope.status as GameStatus,
       playerID: envelope.playerID,
       players: normalizePlayers(envelope.players),
+      visibility: envelope.visibility as Visibility,
       maxPlayers: envelope.maxPlayers,
       playerOrder: envelope.playerOrder,
     };
