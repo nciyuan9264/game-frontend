@@ -1,0 +1,313 @@
+import type { LucideIcon } from 'lucide-react';
+import {
+  Brain,
+  BrickWall,
+  CircleDot,
+  Coins,
+  Cpu,
+  Crown,
+  EyeOff,
+  Flag,
+  Footprints,
+  Gem,
+  Hash,
+  Monitor,
+  Move,
+  Puzzle,
+  Search,
+  Smartphone,
+  Sparkles,
+  Swords,
+  Trophy,
+  Users,
+} from 'lucide-react';
+
+export type GameCategory = 'strategy' | 'deduction' | 'abstract' | 'twoPlayer' | 'multiplayer';
+export type GameCategoryFilter = 'all' | GameCategory;
+
+type GameCatalogRecord = {
+  key: string;
+  title: string;
+  englishTitle: string;
+  status: string;
+  badge: string;
+  description: string;
+  route: string;
+  guideRoute: string;
+  rankingsRoute: string;
+  cta: string;
+  footer: string;
+  players: string;
+  duration: string;
+  difficulty: string;
+  categories: readonly GameCategory[];
+  tags: readonly string[];
+  theme: {
+    primary: string;
+    secondary: string;
+    soft: string;
+    border: string;
+  };
+  features: readonly {
+    icon: LucideIcon;
+    title: string;
+    desc: string;
+  }[];
+};
+
+export const gameCategories = [
+  { key: 'all', label: '全部' },
+  { key: 'strategy', label: '策略' },
+  { key: 'deduction', label: '推理' },
+  { key: 'abstract', label: '抽象' },
+  { key: 'twoPlayer', label: '双人' },
+  { key: 'multiplayer', label: '多人' },
+] as const satisfies readonly { key: GameCategoryFilter; label: string }[];
+
+export const gameCatalog = [
+  {
+    key: 'acquire',
+    title: '并购风云',
+    englishTitle: 'ACQUIRE',
+    status: '商业策略',
+    badge: '经典桌游 · 线上完美还原',
+    description: '选址、注资、合并、清算，在一场价值千万的商业博弈里抢下最后的控制权。',
+    route: '/game/acquire',
+    guideRoute: '/game/acquire/guide',
+    rankingsRoute: '/game/acquire/rankings',
+    cta: '进入并购大厅',
+    footer: 'Portfolio War Room',
+    players: '2-6 人',
+    duration: '45-75 分钟',
+    difficulty: '进阶',
+    categories: ['strategy', 'multiplayer'],
+    tags: ['商业策略', '多人联机', 'AI 陪练'],
+    theme: {
+      primary: '#10b981',
+      secondary: '#3b82f6',
+      soft: 'rgba(16, 185, 129, 0.13)',
+      border: 'rgba(16, 185, 129, 0.35)',
+    },
+    features: [
+      { icon: Smartphone, title: '全平台适配', desc: '手机/平板/PC 随时开局' },
+      { icon: Cpu, title: '智能 AI 陪练', desc: '新手友好，老手过招' },
+      { icon: Users, title: '多人联机', desc: '好友约战，实时竞技' },
+      { icon: Monitor, title: '无需下载', desc: '网页即开即玩，极速体验' },
+    ],
+  },
+  {
+    key: 'davinci',
+    title: '达芬奇密码',
+    englishTitle: 'DA VINCI CODE',
+    status: '隐藏推理',
+    badge: '数字暗牌 · 心理推理对决',
+    description: '黑白数字暗藏线索，观察、试探、排除，在最短时间破解对手的密码序列。',
+    route: '/game/davinci',
+    guideRoute: '/game/davinci/guide',
+    rankingsRoute: '/game/davinci/rankings',
+    cta: '进入达芬奇大厅',
+    footer: 'Cipher Deduction Table',
+    players: '2-4 人',
+    duration: '10-20 分钟',
+    difficulty: '轻量',
+    categories: ['deduction', 'multiplayer'],
+    tags: ['隐藏信息', '逻辑推理', '心理博弈'],
+    theme: {
+      primary: '#f59e0b',
+      secondary: '#7c3aed',
+      soft: 'rgba(245, 158, 11, 0.14)',
+      border: 'rgba(245, 158, 11, 0.35)',
+    },
+    features: [
+      { icon: EyeOff, title: '隐藏信息', desc: '暗牌排列，线索逐步浮现' },
+      { icon: Brain, title: '逻辑推理', desc: '排除猜测，锁定真实数字' },
+      { icon: Puzzle, title: '心理博弈', desc: '诱导对手，保护自身密码' },
+      { icon: Hash, title: '快速开局', desc: '轻量规则，几分钟进入状态' },
+    ],
+  },
+  {
+    key: 'splendor',
+    title: '璀璨宝石',
+    englishTitle: 'SPLENDOR',
+    status: '资源引擎',
+    badge: '宝石商人 · 文艺复兴争锋',
+    description: '收集五色宝石，购入发展卡，赢得贵族青睐，率先夺取 15 分声望。',
+    route: '/game/splendor',
+    guideRoute: '/game/splendor/guide',
+    rankingsRoute: '/game/splendor/rankings',
+    cta: '进入宝石大厅',
+    footer: 'Gem Merchant Guild',
+    players: '2-4 人',
+    duration: '25-40 分钟',
+    difficulty: '轻中量',
+    categories: ['strategy', 'multiplayer'],
+    tags: ['资源管理', '引擎构筑', '多人联机'],
+    theme: {
+      primary: '#a855f7',
+      secondary: '#ec4899',
+      soft: 'rgba(168, 85, 247, 0.15)',
+      border: 'rgba(168, 85, 247, 0.38)',
+    },
+    features: [
+      { icon: Gem, title: '五色宝石', desc: '钻石/蓝宝/祖母绿/红宝/玛瑙' },
+      { icon: Coins, title: '引擎构筑', desc: '发展卡叠加，越滚越强' },
+      { icon: Crown, title: '贵族加冕', desc: '满足条件，坐拥额外声望' },
+      { icon: Sparkles, title: '15 分制胜', desc: '率先达成者赢得对局' },
+    ],
+  },
+  {
+    key: 'yinsh',
+    title: '圈套棋',
+    englishTitle: 'YINSH',
+    status: '抽象策略',
+    badge: '黑白翻转 · 经典三环对决',
+    description: '移动圆环，留下棋子，翻转黑白。连成五子便取走一环，率先拿下第三环。',
+    route: '/game/yinsh',
+    guideRoute: '/game/yinsh/guide',
+    rankingsRoute: '/game/yinsh/rankings',
+    cta: '进入 YINSH 大厅',
+    footer: 'The Quiet Strategy',
+    players: '2 人',
+    duration: '30-45 分钟',
+    difficulty: '硬核',
+    categories: ['strategy', 'abstract', 'twoPlayer'],
+    tags: ['抽象棋', '黑白翻转', '双人对弈'],
+    theme: {
+      primary: '#a65f72',
+      secondary: '#82936d',
+      soft: 'rgba(166, 95, 114, 0.15)',
+      border: 'rgba(166, 95, 114, 0.38)',
+    },
+    features: [
+      { icon: CircleDot, title: '圆环移动', desc: '六向直线，落点由局势决定' },
+      { icon: Move, title: '黑白翻转', desc: '每次跨越都改变棋盘归属' },
+      { icon: Brain, title: '搜索型 AI', desc: '威胁判断与战术防守' },
+      { icon: Trophy, title: '三环制胜', desc: '越接近胜利，行动工具越少' },
+    ],
+  },
+  {
+    key: 'othello',
+    title: '黑白棋',
+    englishTitle: 'OTHELLO',
+    status: '翻转策略',
+    badge: '六十四格 · 经典黑白对弈',
+    description: '落下一子，夹住并翻转对方棋子。争夺角落、控制行动力，让终局盘面站在你这一边。',
+    route: '/game/othello',
+    guideRoute: '/game/othello/guide',
+    rankingsRoute: '/game/othello/rankings',
+    cta: '进入黑白棋大厅',
+    footer: 'The Art of Reversal',
+    players: '2 人',
+    duration: '15-25 分钟',
+    difficulty: '轻中量',
+    categories: ['strategy', 'abstract', 'twoPlayer'],
+    tags: ['抽象棋', '翻转策略', '双人对弈'],
+    theme: {
+      primary: '#d0b177',
+      secondary: '#5f8972',
+      soft: 'rgba(208, 177, 119, 0.14)',
+      border: 'rgba(95, 137, 114, 0.42)',
+    },
+    features: [
+      { icon: CircleDot, title: '八向翻转', desc: '横竖斜线，一步改变多处归属' },
+      { icon: Move, title: '行动力争夺', desc: '压缩落点，掌握回合主动' },
+      { icon: Brain, title: '启发式 AI', desc: '角落、边线与终局综合判断' },
+      { icon: Trophy, title: '实际子数', desc: '双方无子可下时，多者获胜' },
+    ],
+  },
+  {
+    key: 'quoridor',
+    title: '步步为营',
+    englishTitle: 'QUORIDOR',
+    status: '路径策略',
+    badge: '九乘九格 · 经典双人对决',
+    description: '移动棋子，落下围墙，改写对手路线并守住自己的通路，率先抵达棋盘彼岸。',
+    route: '/game/quoridor',
+    guideRoute: '/game/quoridor/guide',
+    rankingsRoute: '/game/quoridor/rankings',
+    cta: '进入步步为营大厅',
+    footer: 'The Art of Finding a Way',
+    players: '2 人',
+    duration: '15-30 分钟',
+    difficulty: '进阶',
+    categories: ['strategy', 'abstract', 'twoPlayer'],
+    tags: ['路径策略', '围墙', '双人对弈'],
+    theme: {
+      primary: '#b78d5d',
+      secondary: '#96586b',
+      soft: 'rgba(183, 141, 93, 0.14)',
+      border: 'rgba(150, 88, 107, 0.4)',
+    },
+    features: [
+      { icon: Footprints, title: '移动与跳跃', desc: '直行、越过与受阻后的斜绕' },
+      { icon: BrickWall, title: '十道围墙', desc: '设障但不能封死任何通路' },
+      { icon: Cpu, title: '权威 AI', desc: '真人与人机使用同一套规则' },
+      { icon: Flag, title: '先到对边', desc: '抵达目标行即刻赢得对局' },
+    ],
+  },
+  {
+    key: 'warchest',
+    title: '战争之匣',
+    englishTitle: 'WAR CHEST',
+    status: '战术调遣',
+    badge: '完整基础版 · 十六兵种在线对决',
+    description: '从军袋抽取指令，部署、增援、调遣并控制战场，率先升起第六面旗帜。',
+    route: '/game/warchest',
+    guideRoute: '/game/warchest/guide',
+    rankingsRoute: '/game/warchest/rankings',
+    cta: '进入战争之匣大厅',
+    footer: 'The Art of Command',
+    players: '2 人',
+    duration: '30-45 分钟',
+    difficulty: '进阶',
+    categories: ['strategy', 'twoPlayer'],
+    tags: ['战术调遣', '兵种组合', '双人对弈'],
+    theme: {
+      primary: '#c6a66d',
+      secondary: '#6f9270',
+      soft: 'rgba(198, 166, 109, 0.14)',
+      border: 'rgba(111, 146, 112, 0.42)',
+    },
+    features: [
+      { icon: Swords, title: '十六兵种', desc: '完整基础版，战术各有章法' },
+      { icon: Flag, title: '六旗制胜', desc: '控制据点，而非歼灭敌军' },
+      { icon: Cpu, title: '公平 AI', desc: '只读取自身可见隐藏信息' },
+      { icon: Brain, title: '三种编成', desc: '推荐、随机与官方轮抽' },
+    ],
+  },
+  {
+    key: 'fugitive',
+    title: '逃亡者',
+    englishTitle: 'FUGITIVE',
+    status: '非对称推理',
+    badge: '午夜追逃 · 二版基础规则',
+    description: '一人暗置路线奔向 42，一人借线索逐步搜查，在不对称信息中决定这场午夜追逐。',
+    route: '/game/fugitive',
+    guideRoute: '/game/fugitive/guide',
+    rankingsRoute: '/game/fugitive/rankings',
+    cta: '进入追逃大厅',
+    footer: 'The Midnight Run',
+    players: '2 人',
+    duration: '15-25 分钟',
+    difficulty: '轻中量',
+    categories: ['deduction', 'twoPlayer'],
+    tags: ['非对称推理', '隐藏路线', '双人对决'],
+    theme: {
+      primary: '#e2915d',
+      secondary: '#86aa8d',
+      soft: 'rgba(226, 145, 93, 0.14)',
+      border: 'rgba(134, 170, 141, 0.42)',
+    },
+    features: [
+      { icon: Footprints, title: '暗置路线', desc: '藏身点与冲刺牌按身份隔离' },
+      { icon: Search, title: '线索搜查', desc: '排除手牌，锁定未知号码' },
+      { icon: Brain, title: '公平 AI', desc: '只依据当前角色可见信息决策' },
+      { icon: EyeOff, title: '最终追缉', desc: '一次失误，逃亡者立即脱身' },
+    ],
+  },
+] as const satisfies readonly GameCatalogRecord[];
+
+export type GameCatalogItem = typeof gameCatalog[number];
+export type GameKey = GameCatalogItem['key'];
+
+export const featuredGameKey = 'acquire' satisfies GameKey;
