@@ -1,0 +1,393 @@
+import { expect, test, type Page } from '@playwright/test';
+
+const roomID = 'warchest_layout';
+const matchID = `${roomID}-r1`;
+const human = {
+  userID: '110',
+  playerID: '110',
+  displayName: '北境来风',
+  avatar: '',
+  seatIndex: 0,
+  online: true,
+  ai: false,
+  ready: true,
+};
+const ai = {
+  playerID: 'ai_2',
+  displayName: '渡鸦',
+  avatar: '',
+  seatIndex: 1,
+  online: true,
+  ai: true,
+  ready: true,
+};
+
+function gameSnapshot() {
+  return {
+    schemaVersion: 2,
+    type: 'ROOM_SYNC',
+    roomID,
+    matchID,
+    seq: 12,
+    view: {
+      warchest: {
+        playerId: human.playerID,
+        ownerID: human.playerID,
+        visibility: 'private',
+        playerData: {
+          [human.playerID]: {
+            side: 'oak',
+            roster: ['sword', 'pike', 'crossbow', 'light'],
+            controlledLocations: 3,
+            bagCount: 4,
+            handCount: 3,
+            supply: { sword: 2, pike: 2, crossbow: 2, light: 1 },
+            discard: [{ coinID: 'oak-light-2', unitType: 'light', faceUp: true }],
+            lost: {},
+          },
+          [ai.playerID]: {
+            side: 'falcon',
+            roster: ['archer', 'cavalry', 'lancer', 'scout'],
+            controlledLocations: 2,
+            bagCount: 5,
+            handCount: 3,
+            supply: { archer: 2, cavalry: 2, lancer: 2, scout: 3 },
+            discard: [{ coinID: 'falcon-hidden', faceUp: false }],
+            lost: {},
+          },
+        },
+        privateData: {
+          hand: [
+            { coinID: 'oak-sword-1', unitType: 'sword', faceUp: true },
+            { coinID: 'oak-pike-1', unitType: 'pike', faceUp: true },
+            { coinID: 'oak-royal', unitType: 'royal', faceUp: true },
+          ],
+          bagCounts: { sword: 1, pike: 1, crossbow: 1, light: 1 },
+        },
+        roomData: {
+          board: [
+            { unitID: 'oak-sword', unitType: 'sword', side: 'oak', cell: '-1,1', coinCount: 2 },
+            { unitID: 'oak-light', unitType: 'light', side: 'oak', cell: '-1,2', coinCount: 1 },
+            { unitID: 'oak-crossbow', unitType: 'crossbow', side: 'oak', cell: '1,1', coinCount: 1 },
+            { unitID: 'falcon-archer', unitType: 'archer', side: 'falcon', cell: '1,-1', coinCount: 1 },
+            { unitID: 'falcon-cavalry', unitType: 'cavalry', side: 'falcon', cell: '-1,0', coinCount: 1 },
+            { unitID: 'falcon-lancer', unitType: 'lancer', side: 'falcon', cell: '2,-2', coinCount: 1 },
+          ],
+          controls: [
+            { cell: '-2,3', side: 'oak' },
+            { cell: '1,2', side: 'oak' },
+            { cell: '-3,2', side: 'oak' },
+            { cell: '-1,-2', side: 'falcon' },
+            { cell: '2,-3', side: 'falcon' },
+          ],
+          currentPlayer: human.playerID,
+          currentSide: 'oak',
+          initiativePlayer: human.playerID,
+          initiativeSide: 'oak',
+          roundNo: 4,
+          gameStatus: 'playing',
+          legalActions: [
+            { actionID: 'action-pass', action: 'pass', coinID: 'oak-sword-1' },
+            {
+              actionID: 'action-move',
+              action: 'move',
+              coinID: 'oak-sword-1',
+              actorUnitID: 'oak-sword',
+              from: '-1,1',
+              to: '0,1',
+              path: ['0,1'],
+            },
+          ],
+          activityLog: [{
+            id: 8,
+            roundNo: 4,
+            playerID: ai.playerID,
+            side: 'falcon',
+            action: 'control',
+            unitType: 'cavalry',
+            to: '-2,0',
+            automatic: false,
+            summary: '骑兵控制 D3 据点',
+          }],
+          lastData: {
+            id: 8,
+            roundNo: 4,
+            playerID: ai.playerID,
+            side: 'falcon',
+            action: 'control',
+            automatic: false,
+            summary: '骑兵控制 D3 据点',
+          },
+          players: { [human.playerID]: human, [ai.playerID]: ai },
+          playerOrder: [human.playerID, ai.playerID],
+          turnDeadline: new Date(Date.now() + 90_000).toISOString(),
+          turnTimeoutMs: '90000',
+        },
+      },
+    },
+  };
+}
+
+async function mockProfile(page: Page) {
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { user_id: human.userID, display_name: human.displayName, avatar: '' },
+    },
+  }));
+}
+
+async function mockPublicData(page: Page) {
+  await mockProfile(page);
+  await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        rooms: [{
+          roomID: '1026_140000',
+          gameType: 'warchest',
+          status: 'match',
+          visibility: 'public',
+          ownerUserID: '220',
+          ownerPlayerID: '220',
+          maxPlayers: 2,
+          playerCount: 1,
+          currentMatchID: '1026_140000-r1',
+          currentMatchStatus: 'preparing',
+          nextRoundNo: 1,
+          createdAt: '2026-10-26T00:00:00Z',
+          updatedAt: '2026-10-26T00:00:00Z',
+          displayName: '雾谷前哨',
+          turnTimeoutSeconds: 90,
+          players: [{ ...human, userID: '220', playerID: '220', displayName: 'Elias' }],
+          metrics: {
+            warchest: {
+              maxControlledLocations: 2,
+              progressCurrent: 2,
+              progressTotal: 6,
+            },
+          },
+        }],
+      },
+    },
+  }));
+  await page.route('**/pam-api/platform/history/stats?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { totalGames: 12, wins: 7, winRate: 7 / 12, avgScore: 4.3 },
+    },
+  }));
+  await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        gameType: 'warchest',
+        entries: [0, 1, 2].map(index => ({
+          userID: String(index + 1),
+          playerID: `commander-${index + 1}`,
+          displayName: `指挥官 ${index + 1}`,
+          totalGames: 20 - index,
+          metric: { warchest: { wins: 12 - index, winRate: .6 - index * .05 } },
+        })),
+      },
+    },
+  }));
+}
+
+async function mockSession(page: Page) {
+  const commands: string[] = [];
+  await mockProfile(page);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        roomID,
+        gameType: 'warchest',
+        status: 'playing',
+        visibility: 'private',
+        ownerUserID: human.userID,
+        ownerPlayerID: human.playerID,
+        maxPlayers: 2,
+        playerCount: 2,
+        currentMatchID: matchID,
+        currentMatchStatus: 'running',
+        nextRoundNo: 2,
+        createdAt: '2026-10-26T00:00:00Z',
+        updatedAt: '2026-10-26T00:00:00Z',
+        displayName: '暮色边境',
+        turnTimeoutSeconds: 90,
+        players: [human, ai],
+        metrics: {
+          warchest: { maxControlledLocations: 3, progressCurrent: 3, progressTotal: 6 },
+        },
+      },
+    },
+  }));
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify(gameSnapshot()));
+    socket.onMessage(message => commands.push(String(message)));
+  });
+  return commands;
+}
+
+function matchSnapshot() {
+  return {
+    schemaVersion: 2,
+    type: 'MATCH_SYNC',
+    roomID,
+    matchID,
+    seq: 4,
+    ownerID: human.playerID,
+    status: 'match',
+    playerID: human.playerID,
+    visibility: 'private',
+    maxPlayers: 2,
+    players: { [human.playerID]: human, [ai.playerID]: ai },
+    playerOrder: [human.playerID, ai.playerID],
+    setup: {
+      warchest: {
+        mode: 'recommended',
+        sides: { [human.playerID]: 'oak', [ai.playerID]: 'falcon' },
+        rosters: {
+          [human.playerID]: ['sword', 'pike', 'crossbow', 'light'],
+          [ai.playerID]: ['archer', 'cavalry', 'lancer', 'scout'],
+        },
+        complete: true,
+        initialPlayerID: human.playerID,
+        initialSide: 'oak',
+      },
+    },
+  };
+}
+
+async function mockPreparation(page: Page) {
+  const commands: string[] = [];
+  await mockProfile(page);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        roomID,
+        gameType: 'warchest',
+        status: 'match',
+        visibility: 'private',
+        ownerUserID: human.userID,
+        ownerPlayerID: human.playerID,
+        maxPlayers: 2,
+        playerCount: 2,
+        currentMatchID: matchID,
+        currentMatchStatus: 'preparing',
+        nextRoundNo: 1,
+        createdAt: '2026-10-26T00:00:00Z',
+        updatedAt: '2026-10-26T00:00:00Z',
+        displayName: '雾谷前哨',
+        turnTimeoutSeconds: 90,
+        players: [human, ai],
+        metrics: {
+          warchest: { maxControlledLocations: 2, progressCurrent: 2, progressTotal: 6 },
+        },
+      },
+    },
+  }));
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify(matchSnapshot()));
+    socket.onMessage(message => commands.push(String(message)));
+  });
+  return commands;
+}
+
+async function expectNoOverflow(page: Page) {
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+}
+
+test('War Chest public pages render the responsive showcase shell', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockPublicData(page);
+  await page.goto('/game/warchest');
+
+  await expect(page.getByRole('heading', { name: /方寸之间/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
+  await expect(page.getByText('雾谷前哨')).toBeVisible();
+  await expect(page.getByRole('navigation', { name: '战争之匣手机导航' })).toBeVisible();
+  await expectNoOverflow(page);
+  await page.screenshot({ path: 'test-results/warchest-lobby-mobile.png' });
+
+  await page.goto('/game/warchest/army');
+  await expect(page.getByRole('heading', { name: '各有所长，合而为军。' })).toBeVisible();
+  await expect(page.locator('.library-card')).toHaveCount(16);
+  await expectNoOverflow(page);
+
+  await page.goto('/game/warchest/guide');
+  await expect(page.getByRole('heading', { name: '懂得规则，才懂得破局。' })).toBeHidden();
+  await expect(page.getByRole('button', { name: /下一步/ })).toBeVisible();
+  await expectNoOverflow(page);
+
+  await page.goto('/game/warchest/rankings');
+  await expect(page.getByRole('heading', { name: '每一次调遣，都留下判断。' })).toBeHidden();
+  await expect(page.getByRole('tablist', { name: '排行榜模式' })).toBeVisible();
+  await expectNoOverflow(page);
+});
+
+
+test('War Chest preparation room exposes all authoritative setup modes', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const commands = await mockPreparation(page);
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  await expect(page.getByRole('heading', { name: /雾谷前哨/ })).toBeVisible();
+  await expect(page.locator('.seat-card')).toHaveCount(2);
+  await expect(page.getByRole('button', { name: /首局推荐/ })).toBeVisible();
+  await expect(page.getByRole('button', { name: /随机编成/ })).toBeVisible();
+  const draftButton = page.getByRole('button', { name: /官方轮抽/ });
+  await expect(draftButton).toBeEnabled();
+  await expect(page.getByRole('button', { name: '开始对局' })).toBeEnabled();
+  await expectNoOverflow(page);
+  await page.screenshot({ path: 'test-results/warchest-room-mobile.png' });
+
+  await draftButton.click();
+  await expect.poll(() => commands.some(value =>
+    value.includes('"game_set_setup_mode"')
+    && value.includes('"mode":"draft"'))).toBe(true);
+});
+
+test('War Chest mobile battle submits only the service action ID', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const commands = await mockSession(page);
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  await expect(page.getByTestId('warchest-board')).toBeVisible();
+  await expect(page.getByTestId('warchest-turn-status')).toHaveText(/轮到你行动/);
+  const mobileBoardBox = await page.getByTestId('warchest-board').boundingBox();
+  expect(mobileBoardBox?.width).toBeGreaterThan(340);
+  await expect(page.getByRole('button', { name: '行动：移动' })).toBeEnabled();
+  await page.screenshot({ path: 'test-results/warchest-battle-mobile.png' });
+  await page.getByRole('button', { name: '行动：移动' }).click();
+  await page.getByRole('button', { name: '确认行动' }).click();
+  await expect.poll(() => commands.some(value =>
+    value.includes('"game_play_action"')
+    && value.includes('"actionID":"action-move"'))).toBe(true);
+  await expectNoOverflow(page);
+});
+
+test('War Chest desktop keeps board, factions, and intelligence visible', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await mockSession(page);
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  const board = page.getByTestId('warchest-board');
+  await expect(board).toBeVisible();
+  await expect(page.getByText('军团情报', { exact: true })).toBeVisible();
+  await expect(page.getByText('最近行动', { exact: true })).toBeVisible();
+  const box = await board.boundingBox();
+  expect(box?.width).toBeGreaterThan(450);
+  expect(box?.height).toBeGreaterThan(450);
+  await expectNoOverflow(page);
+  await page.screenshot({ path: 'test-results/warchest-battle-desktop.png' });
+});

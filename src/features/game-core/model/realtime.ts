@@ -326,6 +326,18 @@ function gamePayload(
         };
     }
   }
+  if (gameType === 'warchest') {
+    switch (commandType) {
+      case 'game_set_setup_mode':
+        return { warchest: { setSetupMode: objectPayload as { mode: string } } };
+      case 'game_draft_unit':
+        return { warchest: { draftUnit: objectPayload as { unitType: string } } };
+      case 'game_play_action':
+        return { warchest: { playAction: objectPayload as { actionID: string } } };
+      case 'game_resign':
+        return { warchest: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

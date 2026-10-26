@@ -33,6 +33,13 @@ import FugitiveGuide from "@/features/fugitive/pages/Guide";
 import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
 import FugitiveRankings from "@/features/fugitive/pages/Rankings";
 import FugitiveProfile from "@/features/fugitive/pages/Profile";
+import WarChestLobby from "@/features/warchest/pages/Lobby";
+import {
+  Army as WarChestArmy,
+  Guide as WarChestGuide,
+  My as WarChestMy,
+  Rankings as WarChestRankings,
+} from "@/features/warchest/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -46,6 +53,8 @@ const YinshReplay = lazy(() => import("@/features/yinsh/pages/Replay"));
 const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
+const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
+const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -117,6 +126,13 @@ export const routes: AppRoute[] = [
   { path: "/game/fugitive/cards", element: <FugitiveCardLibrary /> },
   { path: "/game/fugitive/me", element: <FugitiveProfile /> },
   { path: "/game/fugitive/match", element: <FugitiveSession /> },
+  { path: "/game/warchest", element: <WarChestLobby /> },
+  { path: "/game/warchest/army", element: <WarChestArmy /> },
+  { path: "/game/warchest/rankings", element: <WarChestRankings /> },
+  { path: "/game/warchest/guide", element: <WarChestGuide /> },
+  { path: "/game/warchest/me", element: <WarChestMy /> },
+  { path: "/game/warchest/match", element: <WarChestSession /> },
+  { path: "/game/warchest/replay/:gameId", element: <WarChestReplay /> },
   {
     path: "/",
     element: <Home />

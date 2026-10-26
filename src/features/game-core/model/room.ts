@@ -40,6 +40,7 @@ export interface LobbyRoomLike {
   hiddenHideoutCount?: number;
   progressCurrent?: number;
   progressTotal?: number;
+  maxControlledLocations?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -124,9 +125,12 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     occupiedCount: room.metrics.othello?.occupiedCount,
     highestRevealed: room.metrics.fugitive?.highestRevealed,
     hiddenHideoutCount: room.metrics.fugitive?.hiddenHideoutCount,
+    maxControlledLocations: room.metrics.warchest?.maxControlledLocations,
     progressCurrent: room.metrics.fugitive?.progressCurrent
+      ?? room.metrics.warchest?.progressCurrent
       ?? room.metrics.othello?.progressCurrent,
     progressTotal: room.metrics.fugitive?.progressTotal
+      ?? room.metrics.warchest?.progressTotal
       ?? room.metrics.othello?.progressTotal,
   };
 }

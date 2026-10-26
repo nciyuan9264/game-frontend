@@ -17,7 +17,8 @@ export type HistoryGameType =
   | 'splendor'
   | 'yinsh'
   | 'othello'
-  | 'fugitive';
+  | 'fugitive'
+  | 'warchest';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -125,6 +126,7 @@ export type SplendorLeaderboardEntry = RankLeaderboardEntry;
 export type YinshLeaderboardEntry = DavinciLeaderboardEntry;
 export type OthelloLeaderboardEntry = DavinciLeaderboardEntry;
 export type FugitiveLeaderboardEntry = DavinciLeaderboardEntry;
+export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export interface LeaderboardData {
@@ -174,6 +176,19 @@ export function toLeaderboardEntry(
       wins: entry.metric.fugitive.wins,
       winRate: entry.metric.fugitive.winRate,
     };
+  }
+  if (entry.metric.warchest) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.warchest.wins,
+      winRate: entry.metric.warchest.winRate,
+    };
+  }
+  if (!entry.metric.rank) {
+    throw new Error('排行榜指标类型不受支持');
   }
   return {
     userID: entry.userID,

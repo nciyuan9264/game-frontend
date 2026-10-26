@@ -7,7 +7,8 @@ export type GameType =
   | 'davinci'
   | 'yinsh'
   | 'othello'
-  | 'fugitive';
+  | 'fugitive'
+  | 'warchest';
 export enum GameTypeEnum {
   Acquire = 'acquire',
   Splendor = 'splendor',
@@ -15,6 +16,7 @@ export enum GameTypeEnum {
   Yinsh = 'yinsh',
   Othello = 'othello',
   Fugitive = 'fugitive',
+  WarChest = 'warchest',
 }
 
 const gameTypes: GameType[] = [
@@ -24,6 +26,7 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Yinsh,
   GameTypeEnum.Othello,
   GameTypeEnum.Fugitive,
+  GameTypeEnum.WarChest,
 ];
 
 export const useGameType = () => {

@@ -23,6 +23,11 @@ const games = [
     profileHeading: '你的每一步，都值得回看。',
   },
   {
+    gameType: 'warchest',
+    lobbyHeading: /方寸之间/,
+    profileHeading: '每一步，都留下回响。',
+  },
+  {
     gameType: 'fugitive',
     lobbyHeading: /下一步/,
     profileHeading: '每一场追逐，都有你的痕迹。',

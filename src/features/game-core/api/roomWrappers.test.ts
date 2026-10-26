@@ -23,6 +23,11 @@ import {
   listFugitiveRooms,
   lookupFugitiveRoom,
 } from '@/features/fugitive/api/room';
+import {
+  createWarChestRoom,
+  listWarChestRooms,
+  lookupWarChestRoom,
+} from '@/features/warchest/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -140,6 +145,31 @@ describe('game room API wrappers', () => {
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'fugitive',
       'room-4',
+      options,
+    );
+  });
+
+  it('injects War Chest fixed seats, timeout, and metadata', () => {
+    const signal = new AbortController().signal;
+    createWarChestRoom({ displayName: '雾谷前哨', visibility: 'private' }, signal);
+    listWarChestRooms(signal);
+    lookupWarChestRoom('room-5', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'warchest',
+      {
+        displayName: '雾谷前哨',
+        visibility: 'private',
+        maxPlayers: 2,
+        turnTimeoutSeconds: 90,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('warchest', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'warchest',
+      'room-5',
       options,
     );
   });

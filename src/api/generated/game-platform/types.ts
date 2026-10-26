@@ -86,6 +86,16 @@ export interface FugitiveRoomMetrics {
   progressTotal: number;
 }
 
+export interface WarChestRoomMetrics {
+  maxControlledLocations: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
+export interface QuoridorRoomMetrics {
+  turnCount: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -165,8 +175,26 @@ export interface StartNextMatchResp {
 }
 
 export type RoomMetrics =
-  | { acquire: AcquireRoomMetrics; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci: DavinciRoomMetrics; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
+  | {
+      acquire: AcquireRoomMetrics;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci: DavinciRoomMetrics;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
   | {
       acquire?: never;
       davinci?: never;
@@ -174,9 +202,29 @@ export type RoomMetrics =
       yinsh?: never;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomMetrics; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomMetrics; fugitive?: never }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh: YinshRoomMetrics;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello: OthelloRoomMetrics;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
   | {
       acquire?: never;
       davinci?: never;
@@ -184,6 +232,28 @@ export type RoomMetrics =
       yinsh?: never;
       othello?: never;
       fugitive: FugitiveRoomMetrics;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest: WarChestRoomMetrics;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor: QuoridorRoomMetrics;
     };
 
 export interface AcquireTile {
@@ -631,6 +701,311 @@ export type OthelloCommandPayload =
   | { placeDisc?: never; pass: EmptyPayload; resign?: never }
   | { placeDisc?: never; pass?: never; resign: EmptyPayload };
 
+export type WarChestSide = string;
+
+export type WarChestUnitType = string;
+
+export type WarChestSetupMode = string;
+
+export type WarChestGameStatus = string;
+
+export type WarChestActionType = string;
+
+export type WarChestPendingKind = string;
+
+export interface WarChestDraftState {
+  pool: WarChestUnitType[];
+  availableUnits: WarChestUnitType[];
+  pickedUnits: WarChestUnitType[];
+  rosters: Record<string, WarChestUnitType[]>;
+  firstPickerID: string;
+  currentPickerID?: string;
+  currentPickCount: number;
+  completedPickCount: number;
+  complete: boolean;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+}
+
+export interface WarChestMatchSetup {
+  mode: WarChestSetupMode;
+  sides: Record<string, WarChestSide>;
+  rosters: Record<string, WarChestUnitType[]>;
+  draft?: WarChestDraftState;
+  complete: boolean;
+  initialPlayerID?: string;
+  initialSide?: WarChestSide;
+}
+
+export interface WarChestCoinView {
+  coinID: string;
+  unitType?: WarChestUnitType;
+  faceUp: boolean;
+}
+
+export interface WarChestUnitStack {
+  unitID: string;
+  unitType: WarChestUnitType;
+  side: WarChestSide;
+  cell: string;
+  coinCount: number;
+}
+
+export interface WarChestControl {
+  cell: string;
+  side: WarChestSide;
+}
+
+export interface WarChestDiscardView {
+  coinID: string;
+  unitType?: WarChestUnitType;
+  faceUp: boolean;
+}
+
+export interface WarChestPlayerState {
+  side: WarChestSide;
+  roster: WarChestUnitType[];
+  controlledLocations: number;
+  bagCount: number;
+  handCount: number;
+  supply: Record<string, number>;
+  discard: WarChestDiscardView[];
+  lost: Record<string, number>;
+}
+
+export interface WarChestLegalAction {
+  actionID: string;
+  action: WarChestActionType;
+  coinID?: string;
+  actorUnitID?: string;
+  sourceUnitID?: string;
+  from?: string;
+  to?: string;
+  targetUnitID?: string;
+  recruitUnit?: WarChestUnitType;
+  after?: string;
+  defense?: string;
+  maneuver?: WarChestActionType;
+  path?: string[];
+}
+
+export interface WarChestPendingDecision {
+  kind: WarChestPendingKind;
+  playerID: string;
+  side: WarChestSide;
+  actorUnitID?: string;
+  sourceUnitID?: string;
+  targetUnitID?: string;
+  coinID?: string;
+  unitType?: WarChestUnitType;
+  remainingUnitIDs?: string[];
+  description?: string;
+}
+
+export interface WarChestActionEntry {
+  id: number;
+  roundNo: number;
+  playerID: string;
+  side: WarChestSide;
+  action: WarChestActionType;
+  coinID?: string;
+  unitType?: WarChestUnitType;
+  actorUnitID?: string;
+  sourceUnitID?: string;
+  from?: string;
+  to?: string;
+  targetUnitID?: string;
+  targetUnitType?: WarChestUnitType;
+  recruitUnit?: WarChestUnitType;
+  after?: string;
+  defense?: string;
+  maneuver?: WarChestActionType;
+  path?: string[];
+  automatic: boolean;
+  private?: boolean;
+  summary?: string;
+}
+
+export interface WarChestRoomData {
+  board: WarChestUnitStack[];
+  controls: WarChestControl[];
+  currentPlayer: string;
+  currentSide: WarChestSide;
+  initiativePlayer: string;
+  initiativeSide: WarChestSide;
+  roundNo: number;
+  gameStatus: WarChestGameStatus;
+  pending?: WarChestPendingDecision;
+  legalActions: WarChestLegalAction[];
+  lastData?: WarChestActionEntry;
+  activityLog: WarChestActionEntry[];
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface WarChestPrivateData {
+  hand: WarChestCoinView[];
+  bagCounts: Record<string, number>;
+  bagOrder?: WarChestCoinView[];
+}
+
+export interface WarChestResult {
+  winnerID: string;
+  winnerSide: WarChestSide;
+  reason: string;
+  controlledLocations: Record<string, number>;
+  roundNo: number;
+  actionCount: number;
+}
+
+export interface WarChestRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, WarChestPlayerState>;
+  roomData: WarChestRoomData;
+  privateData: WarChestPrivateData;
+  result?: WarChestResult;
+}
+
+export interface WarChestReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: WarChestRoomData;
+  playersData: Record<string, WarChestPlayerState>;
+  privateData: Record<string, WarChestPrivateData>;
+  result: WarChestResult;
+}
+
+export interface WarChestSetSetupModePayload {
+  mode: WarChestSetupMode;
+}
+
+export interface WarChestDraftUnitPayload {
+  unitType: WarChestUnitType;
+}
+
+export interface WarChestPlayActionPayload {
+  actionID: string;
+}
+
+export type WarChestCommandPayload =
+  | { setSetupMode: WarChestSetSetupModePayload; draftUnit?: never; playAction?: never; resign?: never }
+  | { setSetupMode?: never; draftUnit: WarChestDraftUnitPayload; playAction?: never; resign?: never }
+  | { setSetupMode?: never; draftUnit?: never; playAction: WarChestPlayActionPayload; resign?: never }
+  | { setSetupMode?: never; draftUnit?: never; playAction?: never; resign: EmptyPayload };
+
+export type QuoridorSide = string;
+
+export type QuoridorOrientation = string;
+
+export interface QuoridorCell {
+  row: number;
+  column: number;
+}
+
+export interface QuoridorWallSpec {
+  row: number;
+  column: number;
+  orientation: QuoridorOrientation;
+}
+
+export interface QuoridorWall {
+  row: number;
+  column: number;
+  orientation: QuoridorOrientation;
+  side: QuoridorSide;
+}
+
+export interface QuoridorWallOption {
+  row: number;
+  column: number;
+  orientation: QuoridorOrientation;
+  legal: boolean;
+  reasonCode?: string;
+}
+
+export interface QuoridorActionEntry {
+  id: number;
+  kind: string;
+  playerID: string;
+  side: QuoridorSide;
+  from?: QuoridorCell;
+  to?: QuoridorCell;
+  wall?: QuoridorWallSpec;
+  automatic: boolean;
+}
+
+export interface QuoridorPlayerState {
+  side: QuoridorSide;
+  wallsRemaining: number;
+  distanceToGoal: number;
+}
+
+export interface QuoridorRoomData {
+  pawns: Record<string, QuoridorCell>;
+  walls: QuoridorWall[];
+  wallStock: Record<string, number>;
+  currentPlayer: string;
+  currentSide: QuoridorSide;
+  southPlayerID: string;
+  northPlayerID: string;
+  firstPlayerID: string;
+  roundNo: number;
+  gameStatus: string;
+  legalMoves: QuoridorCell[];
+  wallOptions: QuoridorWallOption[];
+  referencePaths: Record<string, QuoridorCell[]>;
+  moveLog: QuoridorActionEntry[];
+  lastAction?: QuoridorActionEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface QuoridorResult {
+  winnerID?: string;
+  winnerSide?: QuoridorSide;
+  reason: string;
+  turnCount: number;
+  placedWallCount: number;
+}
+
+export interface QuoridorRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, QuoridorPlayerState>;
+  roomData: QuoridorRoomData;
+  result?: QuoridorResult;
+}
+
+export interface QuoridorReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: QuoridorRoomData;
+  playersData: Record<string, QuoridorPlayerState>;
+  result: QuoridorResult;
+}
+
+export interface QuoridorMovePawnPayload {
+  to: QuoridorCell;
+}
+
+export interface QuoridorPlaceWallPayload {
+  wall: QuoridorWallSpec;
+}
+
+export type QuoridorCommandPayload =
+  | { movePawn: QuoridorMovePawnPayload; placeWall?: never; resign?: never }
+  | { movePawn?: never; placeWall: QuoridorPlaceWallPayload; resign?: never }
+  | { movePawn?: never; placeWall?: never; resign: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -701,6 +1076,16 @@ export interface OthelloLeaderboardMetric {
 }
 
 export interface FugitiveLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface WarChestLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface QuoridorLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -810,17 +1195,119 @@ export interface LeaderboardResp {
 }
 
 export type LeaderboardMetric =
-  | { davinci: DavinciLeaderboardMetric; rank?: never; yinsh?: never; othello?: never; fugitive?: never }
-  | { davinci?: never; rank: RankLeaderboardMetric; yinsh?: never; othello?: never; fugitive?: never }
-  | { davinci?: never; rank?: never; yinsh: YinshLeaderboardMetric; othello?: never; fugitive?: never }
-  | { davinci?: never; rank?: never; yinsh?: never; othello: OthelloLeaderboardMetric; fugitive?: never }
-  | { davinci?: never; rank?: never; yinsh?: never; othello?: never; fugitive: FugitiveLeaderboardMetric };
+  | {
+      davinci: DavinciLeaderboardMetric;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank: RankLeaderboardMetric;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh: YinshLeaderboardMetric;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello: OthelloLeaderboardMetric;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive: FugitiveLeaderboardMetric;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest: WarChestLeaderboardMetric;
+      quoridor?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor: QuoridorLeaderboardMetric;
+    };
 
 export type ReplaySnapshot =
-  | { acquire: AcquireReplaySnapshot; splendor?: never; yinsh?: never; othello?: never }
-  | { acquire?: never; splendor: SplendorReplaySnapshot; yinsh?: never; othello?: never }
-  | { acquire?: never; splendor?: never; yinsh: YinshReplaySnapshot; othello?: never }
-  | { acquire?: never; splendor?: never; yinsh?: never; othello: OthelloReplaySnapshot };
+  | {
+      acquire: AcquireReplaySnapshot;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      splendor: SplendorReplaySnapshot;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh: YinshReplaySnapshot;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello: OthelloReplaySnapshot;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest: WarChestReplaySnapshot;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor: QuoridorReplaySnapshot;
+    };
 
 export interface DavinciCard {
   id: string;
@@ -1084,6 +1571,7 @@ export interface MatchSync {
   maxPlayers: number;
   players: Record<string, RoomPlayer>;
   playerOrder: string[];
+  setup?: MatchSetupView;
 }
 
 export interface RoomSync {
@@ -1148,6 +1636,8 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1157,6 +1647,8 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1166,6 +1658,8 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1175,6 +1669,8 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1184,6 +1680,8 @@ export type ClientCommandPayload =
       yinsh: YinshCommandPayload;
       othello?: never;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1193,6 +1691,8 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello: OthelloCommandPayload;
       fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
     }
   | {
       common?: never;
@@ -1202,15 +1702,115 @@ export type ClientCommandPayload =
       yinsh?: never;
       othello?: never;
       fugitive: FugitiveCommandPayload;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest: WarChestCommandPayload;
+      quoridor?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor: QuoridorCommandPayload;
     };
 
+export type MatchSetupView = { warchest: WarChestMatchSetup };
+
 export type RoomView =
-  | { acquire: AcquireRoomView; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci: DavinciRoomView; splendor?: never; yinsh?: never; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci?: never; splendor: SplendorRoomView; yinsh?: never; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh: YinshRoomView; othello?: never; fugitive?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello: OthelloRoomView; fugitive?: never }
-  | { acquire?: never; davinci?: never; splendor?: never; yinsh?: never; othello?: never; fugitive: FugitiveRoomView };
+  | {
+      acquire: AcquireRoomView;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci: DavinciRoomView;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor: SplendorRoomView;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh: YinshRoomView;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello: OthelloRoomView;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive: FugitiveRoomView;
+      warchest?: never;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest: WarChestRoomView;
+      quoridor?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor: QuoridorRoomView;
+    };
 
 export type ServerMessage =
   | { matchSync: MatchSync; roomSync?: never; commandResult?: never; error?: never }

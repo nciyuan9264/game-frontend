@@ -18,6 +18,8 @@ import {
   Search,
   Smartphone,
   Sparkles,
+  Swords,
+  Flag,
   Trophy,
   TrendingUp,
   Users,
@@ -118,6 +120,25 @@ const gameConfigs = [
       { icon: <Move size={20} />, title: '行动力争夺', desc: '压缩落点，掌握回合主动' },
       { icon: <Brain size={20} />, title: '启发式 AI', desc: '角落、边线与终局综合判断' },
       { icon: <Trophy size={20} />, title: '实际子数', desc: '双方无子可下时，多者获胜' },
+    ],
+  },
+  {
+    key: 'warchest',
+    tabTitle: '战争之匣',
+    tabSubtitle: 'WAR CHEST',
+    tabStatus: '战术调遣',
+    badge: '完整基础版 · 十六兵种在线对决',
+    title: 'WAR CHEST',
+    subtitle: '战争之匣',
+    description: '从军袋抽取指令，部署、增援、调遣并控制战场。让十六兵种各展所长，率先升起第六面旗帜。',
+    route: '/game/warchest',
+    cta: '进入战争之匣大厅',
+    footer: 'The Art of Command',
+    features: [
+      { icon: <Swords size={20} />, title: '十六兵种', desc: '完整基础版，战术各有章法' },
+      { icon: <Flag size={20} />, title: '六旗制胜', desc: '控制据点，而非歼灭敌军' },
+      { icon: <Cpu size={20} />, title: '公平 AI', desc: '只读取自身可见隐藏信息' },
+      { icon: <Brain size={20} />, title: '三种编成', desc: '推荐、随机与官方轮抽' },
     ],
   },
   {
@@ -432,6 +453,37 @@ const OthelloVisual = () => {
   </>;
 };
 
+
+const WarChestVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: 3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: -3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.warChestMockup}`}
+    >
+      <div className={styles.warChestUI}>
+        <div className={styles.warChestHeader}><span>ROUND 04</span><b>YOUR COMMAND</b></div>
+        <div className={styles.warChestBoard}>{Array.from({ length: 37 }, (_, index) =>
+          <i key={index} className={[7, 13, 18, 23, 29].includes(index) ? styles.location : ''}>
+            {[9, 17, 25].includes(index) && <span className={index === 25 ? styles.falconCoin : ''}><Swords size={12} /></span>}
+          </i>)}</div>
+        <div className={styles.warChestCommands}>
+          <span><Swords size={15} /></span><span><Flag size={15} /></span><span><Crown size={15} /></span>
+        </div>
+        <div className={styles.warChestFooter}><span>37 HEXES · 10 LOCATIONS</span><span>6 FLAGS TO VICTORY</span></div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingWarCoin} ${styles.oakCoin}`}><Swords size={27} /></motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingWarCoin} ${styles.falconCoin}`}><Flag size={27} /></motion.span>
+  </>
+);
+
 const FugitiveVisual = () => (
   <>
     <motion.div
@@ -476,6 +528,7 @@ export default function Home() {
     splendor: styles.themeSplendor,
     yinsh: styles.themeYinsh,
     othello: styles.themeOthello,
+    warchest: styles.themeWarChest,
     fugitive: styles.themeFugitive,
   } as const;
   const tabThemeMap = {
@@ -484,6 +537,7 @@ export default function Home() {
     splendor: styles.gameTabSplendor,
     yinsh: styles.gameTabYinsh,
     othello: styles.gameTabOthello,
+    warchest: styles.gameTabWarChest,
     fugitive: styles.gameTabFugitive,
   } as const;
   const themeClass = themeMap[activeGame.key];
@@ -585,7 +639,9 @@ export default function Home() {
                         ? <YinshVisual />
                         : activeGame.key === 'othello'
                           ? <OthelloVisual />
-                          : <FugitiveVisual />}
+                          : activeGame.key === 'warchest'
+                            ? <WarChestVisual />
+                            : <FugitiveVisual />}
               </motion.div>
             </AnimatePresence>
           </div>

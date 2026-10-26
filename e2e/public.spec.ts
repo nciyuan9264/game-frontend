@@ -11,6 +11,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('圈套棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('黑白棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('逃亡者', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('战争之匣', { exact: false }).first()).toBeVisible();
   await expect.poll(async () => page.locator('img').evaluateAll(images =>
     images.every(image => (image as HTMLImageElement).complete
       && (image as HTMLImageElement).naturalWidth > 0))).toBeTruthy();
@@ -60,6 +61,7 @@ for (const [gameType, heading] of [
   ['yinsh', '每一次取环，都留下判断。'],
   ['othello', '每一次翻转，都留下判断。'],
   ['fugitive', '城市风云榜'],
+  ['warchest', '每一次调遣，都留下判断。'],
 ] as const) {
   test(`${gameType} ranking page renders`, async ({ context, page }) => {
     test.skip(!process.env.REGRESSION_ACCESS_TOKEN, 'authenticated profile cookie is required');

@@ -19,6 +19,7 @@ const games: Array<{
   { gameType: 'yinsh', playMarker: /轮到你布环/ },
   { gameType: 'othello', playMarker: /轮到你了/ },
   { gameType: 'fugitive', playMarker: /布置 1–2 处初始藏身点/ },
+  { gameType: 'warchest', playMarker: /轮到你行动/ },
 ];
 
 test.beforeEach(async ({ context }) => {
