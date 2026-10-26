@@ -51,7 +51,7 @@ export function roomSeatOrder(data: MatchSnapshot) {
     ...data.playerOrder.filter(id => data.players[id]),
     ...Object.keys(data.players).filter(id => !data.playerOrder.includes(id)),
   ];
-  const seats = Array<string | undefined>(2);
+  const seats = Array<string | undefined>(2).fill(undefined);
   const unassigned: string[] = [];
   order.forEach(id => {
     const seatIndex = data.players[id].seatIndex;

@@ -70,7 +70,7 @@ export function Guide() {
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const current = guide.current;
-  return <AppShell title="玩法指南" profile={profile.data}><div className={styles.page}>
+  return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.title}><Eyebrow>THE OTHELLO HANDBOOK</Eyebrow>
       <h1>简单的规则，安静的较量。</h1><p>四章读懂落子、翻转、跳过与计分。</p></header>
     <div className={styles.guideLayout}><section className={styles.guideVisual}
@@ -81,7 +81,7 @@ export function Guide() {
       {guide.index === 2 && <div className={styles.passLine}><Disc side="black" /><SkipForward size={28} /><Disc side="white" /></div>}
       {guide.index === 3 && <div className={styles.victoryLine}><Disc side="black" /><strong>38</strong><span className={styles.scoreDivider}>:</span><strong>26</strong><Disc side="white" /><Trophy size={34} /></div>}
       <footer>OTHELLO / CLASSIC <span>{guide.index + 1} / 4</span></footer></section>
-      <section className={styles.guideCopy}><nav>{guideSteps.map((step, index) => <button type="button" key={step.name}
+      <section className={styles.guideCopy} data-testid="othello-guide-copy"><nav>{guideSteps.map((step, index) => <button type="button" key={step.name}
         className={guide.index === index ? styles.active : ''} onClick={() => guide.select(index)}>
         <span>0{index + 1}</span>{step.name}</button>)}</nav>
         <Eyebrow>{current.name}</Eyebrow><h2>{current.title}</h2><p>{current.copy}</p>
