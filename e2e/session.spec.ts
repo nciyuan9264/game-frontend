@@ -21,6 +21,7 @@ const games: Array<{
   { gameType: 'fugitive', playMarker: /布置 1–2 处初始藏身点/ },
   { gameType: 'warchest', playMarker: /轮到你行动/ },
   { gameType: 'loveletter', playMarker: /玫瑰庭院/ },
+  { gameType: 'sixnimmt', playMarker: /公共牌桌/ },
 ];
 
 test.beforeEach(async ({ context }) => {

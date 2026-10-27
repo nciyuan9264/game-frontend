@@ -37,6 +37,11 @@ const games = [
     lobbyHeading: /一封密信/,
     profileHeading: '寄出的信，都有回音。',
   },
+  {
+    gameType: 'sixnimmt',
+    lobbyHeading: /别做第六个/,
+    profileHeading: '每一桌，都有点小故事。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {

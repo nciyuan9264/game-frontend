@@ -82,6 +82,8 @@ function unwrapReplaySnapshot<TSnapshot>(
               ? value.quoridor
             : gameType === 'loveletter'
               ? value.loveletter
+            : gameType === 'sixnimmt'
+              ? value.sixnimmt
             : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);

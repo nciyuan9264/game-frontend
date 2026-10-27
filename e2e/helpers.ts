@@ -13,7 +13,8 @@ export type GameType =
   | 'othello'
   | 'fugitive'
   | 'warchest'
-  | 'loveletter';
+  | 'loveletter'
+  | 'sixnimmt';
 
 interface RoomInfo {
   roomID: string;
@@ -65,7 +66,7 @@ export async function createPrivateRoom(
     data: {
       gameType,
       visibility: 'private',
-      maxPlayers: 2,
+      maxPlayers: gameType === 'sixnimmt' ? 10 : 2,
       requestID,
     },
   });

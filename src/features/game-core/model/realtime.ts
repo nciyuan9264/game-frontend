@@ -393,6 +393,26 @@ function gamePayload(
         return { loveletter: { nextRound: {} } };
     }
   }
+  if (gameType === 'sixnimmt') {
+    switch (commandType) {
+      case 'game_lock_card':
+        return {
+          sixnimmt: {
+            lockCard: { card: Number(objectPayload.card) },
+          },
+        };
+      case 'game_unlock_card':
+        return { sixnimmt: { unlockCard: {} } };
+      case 'game_choose_row':
+        return {
+          sixnimmt: {
+            chooseRow: { rowIndex: Number(objectPayload.rowIndex) },
+          },
+        };
+      case 'game_next_round':
+        return { sixnimmt: { nextRound: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

@@ -449,6 +449,33 @@ const LoveLetterVisual = () => (
   </>
 );
 
+const SixNimmtVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={` `}
+    >
+      <div className={styles.sixNimmtUI}>
+        <header><span>ROUND 04 / 10</span><b>18 BULLS</b></header>
+        <div className={styles.sixNimmtRows}>{[
+          [12, 18, 23], [30, 35, 39, 44], [61, 64], [79, 84, 90],
+        ].map((row, index) => <div key={index}><b>{String.fromCharCode(65 + index)}</b>
+          <span>{row.map(card => <i key={card}>{card}</i>)}</span><em>6</em></div>)}</div>
+        <footer>{[24, 55, 68, 88, 103].map(card => <i key={card}>{card}</i>)}</footer>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={` `}>24</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={` `}>55</motion.span>
+  </>
+);
+
 const gameVisuals: Record<GameKey, () => JSX.Element> = {
   acquire: AcquireVisual,
   davinci: DaVinciVisual,
@@ -459,6 +486,7 @@ const gameVisuals: Record<GameKey, () => JSX.Element> = {
   warchest: WarChestVisual,
   fugitive: FugitiveVisual,
   loveletter: LoveLetterVisual,
+  sixnimmt: SixNimmtVisual,
 };
 
 type GameThemeStyle = CSSProperties & {

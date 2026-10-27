@@ -1839,3 +1839,107 @@
   &.oakCoin { top:4.5rem; right:.3rem; background:#385d45; }
   &.falconCoin { bottom:5rem; left:.2rem; background:#9a5e49; }
 }
+
+.sixNimmtMockup {
+  border-color:#708269;
+  background:#e5e9dc;
+}
+
+.sixNimmtUI {
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  gap:.7rem;
+  padding:1rem;
+  color:#405742;
+  background:#e5e9dc;
+
+  header {
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    color:#6d8068;
+    font-size:.55rem;
+    font-weight:800;
+    letter-spacing:.08em;
+  }
+
+  header b { color:#b45a37; }
+
+  footer {
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:.35rem;
+    margin-top:auto;
+    border:1px solid #c8d1bd;
+    border-radius:.5rem;
+    padding:.55rem;
+    background:#f8faef;
+  }
+
+  footer i,.sixNimmtRows i {
+    display:grid;
+    width:2.2rem;
+    height:2.85rem;
+    place-items:center;
+    border:1px solid #d3d5c7;
+    border-bottom-width:.2rem;
+    border-radius:.3rem;
+    color:#466154;
+    background:#fffdf4;
+    font-size:.7rem;
+    font-style:normal;
+    font-weight:850;
+  }
+}
+
+.sixNimmtRows {
+  display:flex;
+  flex-direction:column;
+  gap:.35rem;
+
+  > div {
+    display:grid;
+    min-height:3.35rem;
+    grid-template-columns:1rem 1fr 2rem;
+    align-items:center;
+    gap:.45rem;
+    border:1px solid #c8d1bd;
+    border-radius:.4rem;
+    padding:.25rem .45rem;
+    background:#f4f7eb;
+  }
+
+  > div > b { color:#73876b;font-size:.65rem; }
+  > div > span { display:flex;gap:.3rem; }
+  > div > em {
+    display:grid;
+    height:2.85rem;
+    place-items:center;
+    border:1px dashed #b8b99f;
+    border-radius:.3rem;
+    color:#a37656;
+    font-size:1rem;
+    font-style:normal;
+  }
+}
+
+.floatingSixNimmtCard {
+  position:absolute;
+  z-index:2;
+  display:grid;
+  width:5rem;
+  height:6.8rem;
+  place-items:center;
+  border:.25rem solid #fff9e9;
+  border-bottom-width:.45rem;
+  border-radius:.6rem;
+  color:#425e51;
+  background:#fffdf4;
+  font:900 1.65rem Arial,sans-serif;
+  box-shadow:0 24px 42px rgba(0,0,0,.32);
+
+  &.sixNimmtLow { top:4.6rem;right:.2rem; }
+  &.sixNimmtBull { bottom:5rem;left:.2rem;color:#9d4a37;background:#f9e8df; }
+}
