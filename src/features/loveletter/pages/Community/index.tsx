@@ -1,7 +1,7 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, Check, ChevronRight, Clock3, Heart, Info,
+  ArrowRight, ChevronRight, Clock3, Heart, Info,
   Layers3, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -192,19 +192,22 @@ export function My() {
         <h1>寄出的信，都有回音。</h1></div></header>
       {loading ? <LoveLetterLoading title="正在整理你的信件档案。"
         description="同步身份、战绩与历史对局" /> : <div className="ll-profile-layout">
-        <section className="ll-profile-card">
-          <img src={stillLife} alt="" /><PlayerAvatar name={profile.data?.name || '执笔人'}
-            avatar={profile.data?.avatar} size={72} />
-          <span className="ll-eyebrow">ONLINE LETTER KEEPER</span>
-          <h2>{profile.data?.name || '执笔人'}</h2>
-          <p>PLAYER ID · {profile.data?.id ?? '—'}</p>
-          <div><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>
-          <dl><span><b>{stats.data?.totalGames ?? 0}</b><small>完成对局</small></span>
+        <section className="ll-profile-display">
+          <div className="ll-profile-identity">
+            <PlayerAvatar name={profile.data?.name || '执笔人'}
+              avatar={profile.data?.avatar} size={72} />
+            <div><small className="ll-profile-eyebrow">ONLINE LETTER KEEPER</small>
+              <h2>{profile.data?.name || '执笔人'}</h2>
+              <span>PLAYER ID · {profile.data?.id ?? '—'}</span></div>
+          </div>
+          <div className="ll-profile-email"><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>
+          <div className="ll-profile-stats"><span><b>{stats.data?.totalGames ?? 0}</b><small>完成对局</small></span>
             <span><b>{stats.data?.wins ?? 0}</b><small>胜场</small></span>
-            <span><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><small>平均好感</small></span></dl>
-          <nav><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
-            <button type="button" onClick={() => setPanel('logout')}>
-              <LogOut size={14} />退出登录</button></nav>
+            <span><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><small>平均好感</small></span></div>
+          <div className="ll-profile-manage"><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
+            <button type="button" disabled={logout.pending} onClick={() => setPanel('logout')}>
+              <LogOut size={14} />退出登录</button></div>
+          {logout.error && <p role="alert" className="ll-profile-logout-error">{logout.error}</p>}
         </section>
         <section className="ll-history"><header><h2>信件档案</h2>
           <span>{stats.data?.totalGames ?? 0} 场</span></header>
@@ -242,7 +245,7 @@ export function My() {
       </Dialog>}
       {panel === 'about' && <Dialog title="关于掌心密信 Online"
         eyebrow="ABOUT & CONTACT" onClose={() => setPanel(undefined)}
-        footer={<ActionButton onClick={() => setPanel(undefined)}>知道了<Check size={14} /></ActionButton>}>
+        footer={<ActionButton onClick={() => setPanel(undefined)}>知道了</ActionButton>}>
         <ProjectContact gameName="掌心密信"
           avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
           classes={{ intro: 'll-contact-intro', links: 'll-contact-links', legal: 'll-contact-legal' }} />

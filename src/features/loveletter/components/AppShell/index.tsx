@@ -91,6 +91,7 @@ export function AppShell({
       railBottom: styles.railBottom,
       main: styles.main,
       header: styles.header,
+      brand: styles.brandLink,
       brandLink: styles.brandLink,
       divider: styles.divider,
       breadcrumb: styles.breadcrumb,

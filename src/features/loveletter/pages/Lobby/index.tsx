@@ -1,21 +1,20 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, BookOpen, Check, Copy, Globe2, Heart, KeyRound, LockKeyhole,
+  ArrowRight, Check, Copy, Globe2, Heart, KeyRound, LockKeyhole,
   Mail, Plus, Search, Share2, ShieldCheck, Users, X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
-import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { createLoveLetterRoom, lookupLoveLetterRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Hearts, Seal } from '../../components/Card';
+import { Seal } from '../../components/Card';
 import { Dialog } from '../../components/Dialog';
 import { LoveLetterLoading } from '../../components/LoadingState';
 import { useLoveLetterLobby } from '../../hooks/useLoveLetterLobby';
@@ -29,9 +28,6 @@ import type {
   Visibility,
 } from '../../model/types';
 import hero from '../../assets/hero.webp';
-import stillLife from '../../assets/still-life.webp';
-
-const loadStats = () => getMyStats('loveletter');
 const filters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'all', label: '全部房间' },
   { value: 'joinable', label: '可加入' },
@@ -75,7 +71,6 @@ export default function Lobby() {
   const navigate = useNavigate();
   const lobby = useLoveLetterLobby();
   const profile = useAsyncResource(getProfile);
-  const stats = useAsyncResource(loadStats);
   const action = useLatestAsyncAction();
   const clipboard = useClipboardCopy();
   const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
@@ -156,28 +151,13 @@ export default function Lobby() {
           <Mail size={32} /><h3>这座庭院，等你拆开第一封信。</h3>
           <p>点击上方创建房间，邀请朋友或添加人机开始。</p></div>}
       </section>
-      <aside className="ll-lobby-side"><section className="ll-profile-card">
-        <PlayerAvatar name={profile.data?.name ?? '执笔人'}
-          avatar={profile.data?.avatar} size={54} />
-        <span>YOUR PLAYER CARD</span><h3>{profile.data?.name || '执笔人'}</h3>
-        <Hearts value={0} total={4} />
-        <div><b>{stats.data?.totalGames ?? '—'}<small>对局</small></b>
-          <b>{stats.data?.wins ?? '—'}<small>胜场</small></b>
-          <b>{stats.data ? stats.data.avgScore.toFixed(1) : '—'}<small>平均好感</small></b></div>
-        <Link to="/game/loveletter/me">查看我的信件 <ArrowRight size={15} /></Link>
-      </section>
-      <section className="ll-join-card"><KeyRound size={20} /><h3>朋友已经开好房间？</h3>
+      <aside className="ll-lobby-side"><section className="ll-join-card"><KeyRound size={20} /><h3>朋友已经开好房间？</h3>
         <p>输入完整房间号，找到朋友的庭院。</p>
         <form onSubmit={event => { event.preventDefault(); void find(); }}>
           <input aria-label="查找房间号" placeholder="输入完整房间号"
             value={code} onChange={event => { setCode(event.target.value); setFound(undefined); }} />
           <button aria-label="查找房间" disabled={!code.trim()}><ArrowRight size={18} /></button>
-        </form></section>
-      <Link className="ll-guide-card" to="/game/loveletter/guide">
-        <img src={stillLife} alt="等待拆开的信件" />
-        <span><BookOpen size={20} /><small>THE FIRST LETTER</small>
-          <h3>先懂一招，再猜一颗心。</h3><b>查看玩法 <ArrowRight size={14} /></b></span>
-      </Link></aside></div>
+        </form></section></aside></div>
     </div>}
 
     {panel === 'create' && <Dialog title="开启一封新的密信"
