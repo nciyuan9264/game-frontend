@@ -270,7 +270,7 @@ export function Play({
           <span className={styles.versus}>VS<small>先取三环</small></span>
           {blackID && <PlayerCard playerID={blackID} data={boardData} active={boardData.roomData.currentPlayer === blackID} />}
         </div>
-        <div className={styles.mobileOpponent}>{boardData.roomData.playerOrder.filter(id => id !== boardData.playerId).map(id =>
+        <div className={styles.mobileOpponent} data-testid="mobile-opponent">{boardData.roomData.playerOrder.filter(id => id !== boardData.playerId).map(id =>
           <PlayerCard key={id} playerID={id} data={boardData} active={boardData.roomData.currentPlayer === id} compact />)}</div>
         <section className={styles.arena}><header><span><i />{
           boardData.roomData.gameStatus === 'placement' ? '布环阶段'
@@ -305,12 +305,13 @@ export function Play({
               aria-label="回放上一步" disabled={!motionState.canReplay || !!session.pending}
               onClick={() => motionState.replay()}><RotateCcw size={12} />回放</button></footer>
         </section>
-        <div className={styles.mobileSelf}><PlayerCard playerID={boardData.playerId} data={boardData}
+        <div className={styles.mobileSelf} data-testid="mobile-self"><PlayerCard playerID={boardData.playerId} data={boardData}
           active={boardData.roomData.currentPlayer === boardData.playerId} compact /></div>
         <p className={styles.footnote}><ShieldCheck size={13} />第 {boardData.roomData.roundNo} 局 ·
           {boardData.roomData.players[boardData.playerId]?.ai ? 'AI' : '在线'}对局 · 所有合法操作由服务端确认</p>
       </section>
-      <aside className={styles.sidebar}><section className={`${styles.actionCard} ${motionState.busy ? styles.actionMoving : ''} ${ui.feedback?.error ? styles.actionError : ''}`}>
+      <aside className={styles.sidebar}><section data-testid="turn-status"
+        className={`${styles.actionCard} ${motionState.busy ? styles.actionMoving : ''} ${ui.feedback?.error ? styles.actionError : ''}`}>
         <div className={styles.actionEyebrow}><span className={styles.eyebrow}>{ended ? 'THE FINAL CHAPTER' : myTurn ? 'YOUR TURN' : 'OPPONENT’S TURN'}</span><i /></div>
         <div className={styles.turnCopy}><span className={styles.turnRing}><RingIcon side={motionState.motion?.side ?? currentSide ?? 'white'} /></span><div>
           <h2>{motionState.busy ? '这一手，正在落定' : ui.feedback?.error ? '这里不能落子' : phaseTitle}</h2>

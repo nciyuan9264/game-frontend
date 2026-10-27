@@ -141,18 +141,18 @@
   .playerRings>span { display:none; }
 }
 @media (max-width:767px) {
-  .play { padding-bottom:calc(74px + env(safe-area-inset-bottom)); }
-  .topbar { height:51px; gap:7px; padding:0 9px;
-    > button:not([data-game-action-button]) { width:30px; height:36px; }
+  .play { padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
+  .topbar { height:50px; gap:8px; padding:0 9px;
+    > button:not([data-game-action-button]) { width:31px; height:36px; }
     > span:nth-of-type(1) { display:none; }
     .divider,.room small { display:none; }
     .room { flex:1; }
-    .room strong { max-width:none; color:#765a48; font-size:13px; }
+    .room strong { max-width:none; color:#765a48; font-size:14px; line-height:1.3; }
     .spacer { display:none; }
     > button[aria-label="玩法指南"] { display:none; }
     > button[data-game-action-button] { display:none; }
   }
-  .timer { min-width:36px; }
+  .timer { min-width:34px; }
   .resultReturn {
     min-width:48px;
     height:34px!important;
@@ -161,58 +161,47 @@
     font-size:9px;
     svg { width:13px; height:13px; }
   }
-  .content { width:100%; max-width:470px; padding:9px 12px 8px; }
+  .content { width:100%; max-width:470px; padding:10px 12px 8px; }
   .matchHeading,.desktopPlayers { display:none; }
-  .layout { display:flex; flex-direction:column; gap:10px; }
-  .boardColumn { display:flex; width:100%; flex-direction:column; gap:8px; }
-  .mobileOpponent,.mobileSelf { display:block; width:100%; }
-  .compactPlayer { height:53px; min-height:53px; gap:9px; padding:8px 11px; border-radius:6px;
+  .layout { display:grid; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
+  .boardColumn { display:contents; }
+  .mobileOpponent,.mobileSelf { display:block; min-width:0; order:2; }
+  .compactPlayer { height:58px; min-height:58px; grid-template-columns:auto minmax(0,1fr) auto; gap:6px; padding:7px 8px; border-radius:7px;
+    > span:first-child { width:28px!important; height:28px!important; }
     .playerInfo strong { font-size:11px; }
-    .playerInfo span { margin-top:5px; font-size:8px; }
-    .playerRings { > div { gap:7px; } > span { margin-top:5px; font-size:8px; } }
-    .playerRings>div>span { width:15px; height:15px; border-width:4px; }
+    .playerInfo span { overflow:hidden; margin-top:4px; font-size:8px; line-height:1.3; text-overflow:ellipsis; white-space:nowrap; }
+    .playerRings { > div { gap:2px; } > span { margin-top:4px; font-size:7px; white-space:nowrap; } }
+    .playerRings>div>span { width:13px; height:13px; border-width:3px; }
   }
-  .activeLine { right:12px; left:12px; height:1px; }
-  .arena { width:100%; border-color:#d8c8ad; border-radius:7px; background:#eee5d5; box-shadow:inset 0 0 0 4px #f9f2e438;
-    > header { height:40px; padding:0 11px; font-size:9px; }
-    > footer { min-height:26px; padding:0 11px; font-size:8px; }
+  .activeLine { right:8px; left:8px; height:1px; }
+  .arena { grid-column:1/-1; order:3; width:100%; border-color:#d8c8ad; border-radius:7px; background:#eee5d5; box-shadow:none;
+    > header { height:34px; padding:0 9px; font-size:9px; }
+    > footer { min-height:26px; padding:0 9px; font-size:8px; }
   }
   .mobilePool { display:flex; align-items:center; gap:3px; margin-left:auto; color:#957958; font-size:8px;
     b { color:#8c684a; font:500 14px var(--serif); }
     small { font-size:7px; }
   }
   .arenaTools { gap:1px; }
-  .arenaTools button { min-width:32px; height:38px; padding:0 6px!important; span { display:none; } }
+  .arenaTools button { min-width:30px; height:32px; padding:0 5px!important; span { display:none; } }
   .boardStage { width:100%; min-height:0; aspect-ratio:1; padding:0; }
   .boardCorner,.boardEdition { display:none; }
   .footnote { display:none; }
-  .sidebar { display:block; width:100%; }
-  .actionCard { width:100%; min-height:0; padding:1px 2px 0; border:0; border-radius:0; background:transparent;
+  .sidebar { display:contents; }
+  .actionCard { grid-column:1/-1; order:1; width:100%; min-height:63px; padding:10px 12px; border-color:#e7d2d9; border-radius:6px; background:#faf2f3;
     > button[data-game-action-button] { display:none; }
   }
   .actionMoving { min-height:0; }
   .actionEyebrow { display:none; }
-  .turnCopy { align-items:center; gap:10px; margin:0;
+  .turnCopy { align-items:center; gap:11px; margin:0;
     > div { min-width:0; flex:1; }
-    h2 { color:#885463; font-family:inherit; font-size:12px; font-weight:500; letter-spacing:.2px; }
-    p { min-height:0; margin-top:4px; color:#ae8b7c; font-size:9px; line-height:1.75; }
+    h2 { color:#885463; font-family:inherit; font-size:16px; font-weight:500; line-height:1.45; letter-spacing:.2px; }
+    p { min-height:0; margin-top:4px; color:#ae8b7c; font-size:10px; line-height:1.6; }
   }
-  .turnRing { width:30px; height:30px; align-items:center; justify-content:center; margin:0; flex:none; border:1px solid #d3baa2; border-radius:50%; background:#eee2d1;
-    > span { width:15px; height:15px; border-width:4px; }
+  .turnRing { width:25px; height:25px; align-items:center; justify-content:center; margin:0; flex:none; border:1px solid #d3baa2; border-radius:50%; background:#eee2d1;
+    > span { width:13px; height:13px; border-width:3px; }
   }
-  .steps { justify-content:center; gap:11px; margin-top:12px; padding:8px 0 0; border-top:1px solid #e5d6c2; border-radius:0; background:transparent;
-    span { gap:6px; font-size:9px; }
-    span>b { width:15px; height:15px; }
-    > i { width:28px; }
-  }
-  .placementProgress { gap:13px; margin-top:12px; padding-left:40px;
-    > span:not(:last-child) { width:15px; height:15px; border-width:4px; }
-    > span:last-child { font-size:10px; }
-  }
-  .movePreview { margin-top:9px; padding:7px 12px; strong { font-size:17px; } small { font-size:9px; } }
-  .rowChoices { grid-template-columns:1fr 1fr; margin-top:10px; gap:5px;
-    button { gap:5px; padding:8px; font-size:9px; span { font-size:8px; } }
-  }
+  .steps,.placementProgress,.movePreview,.rowChoices { display:none; }
   .motionStatus { margin-top:9px; }
   .cancel,.goal,.journalCard { display:none; }
   .mobileDock { position:fixed; inset:auto 0 0; z-index:50; display:grid; min-height:calc(68px + env(safe-area-inset-bottom)); align-items:start; grid-template-columns:48px 1fr; gap:8px; padding:10px 12px env(safe-area-inset-bottom); border-top:1px solid #d9cebf; background:#faf7f1f5; backdrop-filter:blur(12px);
