@@ -50,18 +50,6 @@ import type {
   Visibility,
 } from '../../model/types';
 
-interface RoomDraft {
-  name: string;
-  visibility: Visibility;
-  turnTimeoutSeconds: number;
-}
-
-const defaultDraft: RoomDraft = {
-  name: '午夜追缉',
-  visibility: 'public',
-  turnTimeoutSeconds: 60,
-};
-
 const timeoutLabel = (value?: number) =>
   value ? `${value} 秒` : '不限时';
 
@@ -146,7 +134,7 @@ export default function Lobby() {
   const action = useLatestAsyncAction();
   const [panel, setPanel] = useState<'create' | 'join' | 'share'>();
   const shareClipboard = useClipboardCopy();
-  const [draft, setDraft] = useState<RoomDraft>(defaultDraft);
+  const [visibility, setVisibility] = useState<Visibility>('public');
   const [code, setCode] = useState('');
   const [foundRoom, setFoundRoom] = useState<FugitiveRoom>();
   const userID = profile.data?.id ?? '';
@@ -157,18 +145,14 @@ export default function Lobby() {
     }
   };
   const openCreate = () => {
-    setDraft(defaultDraft);
+    setVisibility('public');
     action.reset();
     setPanel('create');
   };
   const create = async () => {
-    const name = draft.name.trim();
-    if (!name) return;
     try {
-      const room = await action.run(signal => createFugitiveRoom({
-        ...draft,
-        displayName: name,
-      }, signal));
+      const room = await action.run(signal =>
+        createFugitiveRoom(visibility, signal));
       navigate(`/game/fugitive/match?roomID=${encodeURIComponent(room.roomID)}`);
     } catch { /* Shared action exposes the error. */ }
   };
@@ -285,46 +269,27 @@ export default function Lobby() {
         </div>
       </main>}
 
-    {panel === 'create' && <Modal title="为这场追逐，留一个名字。"
+    {panel === 'create' && <Modal title="创建房间"
       kicker="OPEN YOUR OWN ROOM" onClose={close}
       footer={<><button className="button secondary" type="button"
         disabled={action.pending} onClick={close}>取消</button>
         <button className="button primary" type="button"
-          disabled={action.pending || !draft.name.trim()} onClick={() => void create()}>
+          disabled={action.pending} onClick={() => void create()}>
           创建并入座<ArrowRight size={16} /></button></>}>
-      <label className="form-label" htmlFor="fugitive-room-name">房间名称</label>
-      <input className="input" id="fugitive-room-name" maxLength={18}
-        value={draft.name} onChange={event => setDraft(current => ({
-          ...current,
-          name: event.target.value,
-        }))} placeholder="给这场追逐起个名字" />
-      {!draft.name.trim() && <p className="field-error">填写房间名称后才能继续。</p>}
+      <p>选择房间的加入方式，创建后立即进入准备席。</p>
       <label className="form-label">谁可以加入？</label>
       <div className="privacy-options">{([
         { id: 'public', title: '公开房间', text: '展示在在线大厅', icon: Globe2 },
         { id: 'private', title: '私密房间', text: '凭完整房间号加入', icon: LockKeyhole },
       ] as const).map(item => <button type="button" key={item.id}
-        className={draft.visibility === item.id ? 'selected' : ''}
-        aria-pressed={draft.visibility === item.id}
-        onClick={() => setDraft(current => ({ ...current, visibility: item.id }))}>
+        className={visibility === item.id ? 'selected' : ''}
+        aria-pressed={visibility === item.id}
+        onClick={() => setVisibility(item.id)}>
         <item.icon size={22} /><span><b>{item.title}</b><small>{item.text}</small></span>
-        {draft.visibility === item.id && <Check size={17} />}
+        {visibility === item.id && <Check size={17} />}
       </button>)}</div>
-      <div className="room-form-split"><div><label className="form-label">席位数量</label>
-        <div className="fixed-capacity"><Users size={17} /><b>2 人固定</b></div></div>
-        <div><label className="form-label" htmlFor="fugitive-turn-time">每回合思考时间</label>
-          <select id="fugitive-turn-time" className="input"
-            value={draft.turnTimeoutSeconds}
-            onChange={event => setDraft(current => ({
-              ...current,
-              turnTimeoutSeconds: Number(event.target.value),
-            }))}>
-            <option value={60}>60 秒</option><option value={90}>90 秒</option>
-            <option value={0}>不限时</option>
-          </select></div>
-      </div>
       <p className="notice"><ShieldCheck size={16} />
-        <span>洗牌、手牌、暗置路线、合法性与胜负均由服务端验证。</span></p>
+        <span>午夜追缉 · 固定 2 人 · 每回合 120 秒</span></p>
       {action.error && <p className="field-error" role="alert">{action.error}</p>}
     </Modal>}
 

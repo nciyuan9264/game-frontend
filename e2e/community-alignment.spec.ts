@@ -98,7 +98,7 @@ const communityCases: Array<{
   {
     gameType: 'fugitive',
     title: {
-      rankings: '城市风云榜',
+      rankings: '每一场追逐，都留下痕迹。',
       guide: '读懂规则，藏好下一步。',
       profile: '每一场追逐，都有你的痕迹。',
     },
@@ -462,6 +462,46 @@ for (const item of communityCases) {
     await expectNoOverflow(page);
   });
 }
+
+test('fugitive rankings and guide use the Acquire content hierarchy', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockCommunityData(page, 'fugitive');
+
+  await page.goto('/game/fugitive/rankings', { waitUntil: 'domcontentloaded' });
+  const rankHero = page.getByTestId('fugitive-rank-hero');
+  const rankPanel = page.getByTestId('fugitive-rank-panel');
+  const [rankHeroBox, rankPanelBox] = await Promise.all([
+    rankHero.boundingBox(),
+    rankPanel.boundingBox(),
+  ]);
+  expect(rankHeroBox).toMatchObject({ x: 14, y: 72, width: 362, height: 166 });
+  expect(rankPanelBox).toMatchObject({ x: 14, width: 362 });
+  expect(rankPanelBox?.y).toBe((rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 18);
+  await expect(page.getByRole('combobox', { name: '排行榜身份' })).toBeVisible();
+
+  await page.goto('/game/fugitive/guide', { waitUntil: 'domcontentloaded' });
+  const guideSummary = page.getByTestId('fugitive-guide-summary');
+  const guidePanel = page.getByTestId('fugitive-guide-panel');
+  await expect.poll(() => guideSummary.boundingBox()).toMatchObject({
+    x: 14,
+    y: 72,
+    width: 362,
+    height: 173,
+  });
+  const [guideSummaryBox, guidePanelBox, navigationBox] = await Promise.all([
+    guideSummary.boundingBox(),
+    guidePanel.boundingBox(),
+    page.getByRole('navigation', { name: 'Fugitive 手机导航' }).boundingBox(),
+  ]);
+  expect(guidePanelBox).toMatchObject({ x: 14, width: 362 });
+  expect(guidePanelBox?.y)
+    .toBe((guideSummaryBox?.y ?? 0) + (guideSummaryBox?.height ?? 0) + 8);
+  expect((guidePanelBox?.y ?? 0) + (guidePanelBox?.height ?? 0))
+    .toBeLessThanOrEqual(navigationBox?.y ?? 0);
+  await expect(page.getByRole('tablist', { name: '玩法章节' }))
+    .toBeVisible();
+  await expectNoOverflow(page);
+});
 
 test('davinci mobile profile keeps the Acquire card geometry on narrow screens', async ({ page }) => {
   await mockCommunityData(page, 'davinci');

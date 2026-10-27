@@ -120,7 +120,59 @@ function gameSnapshot() {
   };
 }
 
-async function mockSession(page: Page) {
+function roomSnapshot() {
+  return {
+    schemaVersion: 2,
+    type: 'MATCH_SYNC',
+    roomID,
+    matchID,
+    seq: 3,
+    ownerID: human.playerID,
+    status: 'match',
+    playerID: human.playerID,
+    visibility: 'private',
+    maxPlayers: 2,
+    players: {
+      [human.playerID]: human,
+      [ai.playerID]: ai,
+    },
+    playerOrder: [human.playerID, ai.playerID],
+  };
+}
+
+function endedSnapshot() {
+  const snapshot = gameSnapshot();
+  const action = snapshot.view.fugitive.roomData.activityLog[0];
+  return {
+    ...snapshot,
+    view: {
+      fugitive: {
+        ...snapshot.view.fugitive,
+        result: {
+          winnerID: human.playerID,
+          winnerRole: 'fugitive',
+          reason: 'escaped',
+          searches: 2,
+        },
+        roomData: {
+          ...snapshot.view.fugitive.roomData,
+          currentPlayer: '',
+          gameStatus: 'end',
+          activityLog: [
+            { ...action, id: 2, playerID: ai.playerID, role: 'marshal', automatic: true },
+            { ...action, id: 3, playerID: human.playerID, automatic: true },
+          ],
+        },
+      },
+    },
+  };
+}
+
+async function mockSession(
+  page: Page,
+  snapshot = gameSnapshot(),
+  status: 'match' | 'playing' = 'playing',
+) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -139,19 +191,19 @@ async function mockSession(page: Page) {
       data: {
         roomID,
         gameType: 'fugitive',
-        status: 'playing',
+        status,
         visibility: 'private',
         ownerUserID: human.userID,
         ownerPlayerID: human.playerID,
         maxPlayers: 2,
         playerCount: 2,
         currentMatchID: matchID,
-        currentMatchStatus: 'running',
+        currentMatchStatus: status === 'match' ? 'preparing' : 'running',
         nextRoundNo: 2,
         createdAt: '2026-10-25T00:00:00Z',
         updatedAt: '2026-10-25T00:00:00Z',
         displayName: '午夜追缉',
-        turnTimeoutSeconds: 60,
+        turnTimeoutSeconds: 120,
         players: [human, ai],
         metrics: {
           fugitive: {
@@ -165,7 +217,7 @@ async function mockSession(page: Page) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(snapshot));
   });
 }
 
@@ -227,6 +279,17 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(shareButton).toHaveCSS('justify-content', 'center');
   await expect(shareButton).toHaveCSS('align-items', 'center');
 
+  await createButton.click();
+  const createDialog = page.getByRole('dialog', { name: '创建房间' });
+  await expect(createDialog).toBeVisible();
+  await expect(createDialog.getByRole('button', { name: '公开房间' })).toBeVisible();
+  await expect(createDialog.getByRole('button', { name: '私密房间' })).toBeVisible();
+  await expect(createDialog.getByText('午夜追缉 · 固定 2 人 · 每回合 120 秒'))
+    .toBeVisible();
+  await expect(createDialog.getByRole('textbox')).toHaveCount(0);
+  await expect(createDialog.getByRole('combobox')).toHaveCount(0);
+  await page.getByRole('button', { name: '关闭弹窗' }).click();
+
   await shareButton.click();
   await expect(page.getByRole('dialog', { name: '分享 Fugitive' })).toBeVisible();
   await expect(page.locator('.share-qr svg')).toHaveCount(1);
@@ -240,6 +303,34 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(mobileJoin.getByRole('button', { name: '查找房间' })).toBeDisabled();
   await expectNoDocumentOverflow(page);
 });
+
+for (const viewport of [
+  { width: 360, height: 800 },
+  { width: 390, height: 844 },
+]) {
+  test(`Fugitive room seats align at ${viewport.width}px`, async ({ page }) => {
+    await page.setViewportSize(viewport);
+    await mockSession(page, roomSnapshot(), 'match');
+    await page.goto(`/game/fugitive/match?roomID=${roomID}`);
+
+    const seats = page.getByTestId('fugitive-room-seat');
+    await expect(seats).toHaveCount(2);
+    const first = await seats.nth(0).boundingBox();
+    const second = await seats.nth(1).boundingBox();
+    expect(first).not.toBeNull();
+    expect(second).not.toBeNull();
+    expect(Math.abs(first!.y - second!.y)).toBeLessThanOrEqual(1);
+    expect(Math.abs(first!.height - second!.height)).toBeLessThanOrEqual(1);
+
+    const remove = await seats.nth(1).locator('.seat-remove').boundingBox();
+    expect(remove).not.toBeNull();
+    expect(remove!.x).toBeGreaterThanOrEqual(second!.x);
+    expect(remove!.y).toBeGreaterThanOrEqual(second!.y);
+    expect(remove!.x + remove!.width).toBeLessThanOrEqual(second!.x + second!.width);
+    expect(remove!.y + remove!.height).toBeLessThanOrEqual(second!.y + second!.height);
+    await expectNoDocumentOverflow(page);
+  });
+}
 
 test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
@@ -259,6 +350,44 @@ test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '前往 20 号藏身点' })).toBeVisible();
   await expectNoDocumentOverflow(page);
   expect(pageErrors).toEqual([]);
+});
+
+test('Fugitive mobile result and final board controls stay aligned', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, endedSnapshot());
+  await page.goto(`/game/fugitive/match?roomID=${roomID}`);
+
+  const review = page.getByRole('button', { name: '查看终局牌桌' });
+  await expect(review).toBeVisible();
+  const reviewLayout = await review.evaluate(element => {
+    const button = element.getBoundingClientRect();
+    const icons = Array.from(element.querySelectorAll('svg'))
+      .map(icon => icon.getBoundingClientRect());
+    return {
+      justifyContent: getComputedStyle(element).justifyContent,
+      leftInset: icons[0].left - button.left,
+      rightInset: button.right - icons[1].right,
+    };
+  });
+  expect(reviewLayout.justifyContent).toBe('center');
+  expect(reviewLayout.leftInset).toBeGreaterThan(50);
+  expect(reviewLayout.rightInset).toBeGreaterThan(50);
+
+  await review.click();
+  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
+  const settlement = page.getByTestId('fugitive-mobile-dock')
+    .getByRole('button', { name: /查看结算/ });
+  const settlementBox = await settlement.boundingBox();
+  expect(settlementBox).not.toBeNull();
+  expect(844 - settlementBox!.y - settlementBox!.height).toBeGreaterThanOrEqual(12);
+
+  await page.getByRole('button', { name: '追逐记录' }).click();
+  const historyDialog = page.getByRole('dialog', { name: '每一步，都留下痕迹。' });
+  await expect(historyDialog.locator('.full-log p')
+    .filter({ hasText: '（AI 操作）' })).toBeVisible();
+  await expect(historyDialog.locator('.full-log p')
+    .filter({ hasText: '（超时托管）' })).toBeVisible();
+  await expectNoDocumentOverflow(page);
 });
 
 test('Fugitive desktop keeps route, hand, and mission visible at 1440x900', async ({ page }) => {

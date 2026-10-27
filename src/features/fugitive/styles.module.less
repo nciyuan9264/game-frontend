@@ -1491,6 +1491,7 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
 .room-seat>small{font-size:10px;color:#a8b393}
 .room-seat h3{display:flex;align-items:center;gap:5px;font-size:14px}
 .room-seat h3 em{font-size:8px;line-height:14px;background:#566040;color:#e1e5ce;border-radius:3px;padding:0 4px}
+.room-seat>.seat-remove{position:absolute;top:4px;right:4px;width:44px;height:44px;min-width:44px;min-height:44px}
 .seat-role,.seat-ready{display:flex;align-items:center;gap:4px;font-size:10px;color:#b8c7a5}
 .seat-ready{color:#b8cba6}
 .seat-ready.unready{color:#d5b487}
@@ -1588,7 +1589,8 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
 .result-summary .result-stats b{font-size:23px}
 .result-summary .result-stats span{font-size:10px}
 .result-explanation{font-size:12px;color:#b5c4a5;line-height:1.8}
-.review-board{width:100%;justify-content:space-between;min-height:44px;margin-top:8px}
+.review-board{width:100%;justify-content:center;gap:7px;min-height:44px;margin-top:8px}
+.review-board>svg{flex:0 0 auto}
 .result-dock{position:fixed;bottom:0;left:0;right:0;z-index:20;background:#17231a;border-top:1px solid #435b3b;padding:12px 16px max(10px,env(safe-area-inset-bottom))}
 .result-dock>div:first-child{display:flex;gap:10px}
 .result-dock .button{min-height:46px;flex:1;font-size:13px}
@@ -1680,12 +1682,12 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .record-row>.record-copy{margin-left:0}
  .record-row>.record-copy>small{font-size:9px}
  .record-row>svg{width:13px}
- .game-header{height:44px;padding:0 8px;gap:1px}
+ .game-header{height:57px;padding:0 8px;gap:1px}
  .game-header>.brand,.game-header>.header-line,.game-header>.spacer{display:none}
  .game-room{display:flex;flex:1;min-width:0;flex-direction:column;gap:2px;margin-left:3px;margin-right:4px}
  .game-room>b{font-size:14px;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
  .game-room>small{font-size:9px;line-height:1.5;color:#a3b397;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
- .game-main{padding:8px 12px 185px}
+ .game-main{padding:8px 12px 197px}
  .framework-player-strip{display:grid;grid-template-columns:1fr 1fr;gap:7px;border:0;min-height:54px;padding:0}
  .framework-player-strip .player-summary{display:flex;min-width:0;min-height:54px;padding:7px 8px;text-align:left;gap:7px;border:1px solid #394e36;border-radius:6px;background:#1c2b20}
  .framework-player-strip .player-summary.acting-player{border-color:#b4965f;box-shadow:inset 0 -2px #b4965f55}
@@ -1708,7 +1710,7 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .hand-panel .section-title>.text-button{min-height:30px;font-size:9px;gap:3px}
  .hand-scroll .compact-card:disabled,.hand-detail-grid .playing-card:disabled{opacity:.78}
  .game-main .hand-hint{display:none}
- .framework-game-dock{padding:8px 14px 0;background:#17251b}
+ .framework-game-dock{padding:8px 14px max(12px,env(safe-area-inset-bottom));background:#17251b}
  .dock-bank-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:5px;min-height:17px}
  .dock-bank-heading h3{font-size:11px;line-height:17px;font-weight:550}
  .dock-bank-heading small{font-size:9px;color:#a9bc9b;line-height:17px}

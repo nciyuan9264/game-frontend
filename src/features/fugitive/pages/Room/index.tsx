@@ -34,8 +34,6 @@ import {
 
 const otherRole = (role: Role): Role =>
   role === 'fugitive' ? 'marshal' : 'fugitive';
-const timeoutLabel = (value?: number) =>
-  value ? `${value} 秒` : '不限时';
 
 export function Room({
   session,
@@ -53,17 +51,7 @@ export function Room({
   >();
   const [target, setTarget] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
-  const [displayName, setDisplayName] = useState(
-    room?.displayName || '午夜追缉',
-  );
-  const [configuredTimeout, setConfiguredTimeout] = useState(
-    room?.turnTimeoutSeconds ?? 60,
-  );
-  const [name, setName] = useState(displayName);
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
-  const [turnTimeoutSeconds, setTurnTimeoutSeconds] = useState(
-    room?.turnTimeoutSeconds ?? 60,
-  );
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
@@ -76,7 +64,7 @@ export function Room({
   const allReady = players.length === 2
     && players.every(([, player]) => (player.online || player.ai) && player.ready);
   const inviteURL = fugitiveRoomInviteURL(data.roomID);
-  const roomName = displayName || '午夜追缉';
+  const roomName = room?.displayName || '午夜追缉';
   const close = () => setPanel(undefined);
   const copy = async (value: string, message: string) => {
     try {
@@ -87,9 +75,7 @@ export function Room({
     }
   };
   const openSettings = () => {
-    setName(displayName);
     setVisibility(data.visibility);
-    setTurnTimeoutSeconds(configuredTimeout);
     setPanel('settings');
   };
 
@@ -132,7 +118,8 @@ export function Room({
           </button>;
         }
         const canRemove = owner && playerID !== data.ownerID && enabled;
-        return <article key={index} className={`room-seat ${self ? 'self-seat' : ''}`}>
+        return <article key={index} data-testid="fugitive-room-seat"
+          className={`room-seat ${self ? 'self-seat' : ''}`}>
           <span className="seat-number">0{index + 1}</span>
           <Portrait role={role} className="avatar" />
           <small>{playerID === data.ownerID ? '房主' : player.ai ? '公平 AI' : '挑战者'}</small>
@@ -143,7 +130,7 @@ export function Room({
             {player.ready ? <Check size={13} /> : <Clock3 size={13} />}
             {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}
           </span>
-          {canRemove && <button className="icon-button" type="button"
+          {canRemove && <button className="icon-button seat-remove" type="button"
             aria-label={`移除 ${playerDisplayName(player)}`}
             onClick={() => { setTarget(playerID); setPanel('remove'); }}>
             <X size={15} /></button>}
@@ -174,7 +161,7 @@ export function Room({
           : '显示在在线大厅，等待另一位玩家加入。'}</small></span>
     </div><dl>
       <div><dt>规则</dt><dd>二版基础 · 固定 2 人</dd></div>
-      <div><dt>思考时间</dt><dd>{timeoutLabel(configuredTimeout)}</dd></div>
+      <div><dt>思考时间</dt><dd>固定 120 秒</dd></div>
       <div><dt>身份</dt><dd>{roleName(selfRole)}</dd></div>
       <div><dt>准备状态</dt><dd>{players.filter(([, player]) => player.ready).length} / {players.length} 人</dd></div>
     </dl><p className="room-seat-note">手牌、抽牌号码和暗置路线按身份隔离；开局后身份锁定。</p>
@@ -202,22 +189,10 @@ export function Room({
       kicker="MAKE THE NEXT CHASE YOURS" onClose={close}
       footer={<><button className="button secondary" type="button"
         onClick={close}>取消</button><button className="button primary" type="button"
-        disabled={!enabled || !name.trim()}
+        disabled={!enabled}
         onClick={() => {
-          if (session.submit('room_update_settings', {
-            visibility,
-            displayName: name.trim(),
-            turnTimeoutSeconds,
-          })) {
-            setDisplayName(name.trim());
-            setConfiguredTimeout(turnTimeoutSeconds);
-            close();
-          }
+          if (session.submit('room_update_settings', { visibility })) close();
         }}>保存设置<Check size={15} /></button></>}>
-      <label className="form-label" htmlFor="room-settings-name">房间名称</label>
-      <input className="input" id="room-settings-name" maxLength={18}
-        value={name}
-        onChange={event => setName(event.target.value)} />
       <label className="form-label">谁可以加入？</label>
       <div className="privacy-options">{(['public', 'private'] as const).map(value =>
         <button type="button" key={value}
@@ -228,12 +203,8 @@ export function Room({
             <small>{value === 'public' ? '展示在在线大厅' : '凭完整房间号加入'}</small></span>
           {visibility === value && <Check size={17} />}
         </button>)}</div>
-      <label className="form-label" htmlFor="room-settings-time">每回合思考时间</label>
-      <select className="input" id="room-settings-time" value={turnTimeoutSeconds}
-        onChange={event => setTurnTimeoutSeconds(Number(event.target.value))}>
-        <option value={60}>60 秒</option><option value={90}>90 秒</option>
-        <option value={0}>不限时</option>
-      </select>
+      <p className="notice"><Shield size={16} />
+        <span>房间名称固定为“午夜追缉”，每回合固定 120 秒。</span></p>
     </Modal>}
 
     {panel === 'invite' && <Modal title="把下一步，留给朋友。"

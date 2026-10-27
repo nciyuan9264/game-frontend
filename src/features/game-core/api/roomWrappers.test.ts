@@ -127,11 +127,7 @@ describe('game room API wrappers', () => {
 
   it('injects Fugitive metadata, fixed seats, and redirect policy', () => {
     const signal = new AbortController().signal;
-    createFugitiveRoom({
-      displayName: '午夜追缉',
-      visibility: 'private',
-      turnTimeoutSeconds: 90,
-    }, signal);
+    createFugitiveRoom('private', signal);
     listFugitiveRooms(signal);
     lookupFugitiveRoom('room-4', signal);
 
@@ -141,7 +137,7 @@ describe('game room API wrappers', () => {
       {
         displayName: '午夜追缉',
         visibility: 'private',
-        turnTimeoutSeconds: 90,
+        turnTimeoutSeconds: 120,
         maxPlayers: 2,
       },
       options,

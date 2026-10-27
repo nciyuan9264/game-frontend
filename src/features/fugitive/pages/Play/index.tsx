@@ -38,6 +38,7 @@ import {
   pad,
   roleName,
 } from '../../components/Visual';
+import { formatActionLog } from '../../model/actionLog';
 import type { FugitiveSession } from '../../hooks/useFugitiveSession';
 import {
   canReach,
@@ -51,7 +52,6 @@ import {
   type GameSnapshot,
 } from '../../model/session';
 import type {
-  ActionLog,
   Role,
   RouteCard,
 } from '../../model/types';
@@ -80,31 +80,6 @@ function useCountdown(deadline?: string) {
   if (!deadline) return '';
   const remaining = Math.max(0, new Date(deadline).getTime() - now);
   return `${Math.ceil(remaining / 1000)}s`;
-}
-
-function actionText(action: ActionLog) {
-  const automatic = action.automatic ? '（超时托管）' : '';
-  switch (action.kind) {
-    case 'draw':
-      return action.numbers?.length
-        ? `从第 ${Number(action.deckIndex) + 1} 堆抽到 ${action.numbers.map(pad).join(' / ')} ${automatic}`
-        : `从第 ${Number(action.deckIndex) + 1} 堆抽了牌 ${automatic}`;
-    case 'playHideout':
-      return action.destination == null
-        ? `设置了一处藏身点 ${automatic}`
-        : `前往 ${pad(action.destination)}，附带 ${action.sprintCount} 张冲刺 ${automatic}`;
-    case 'finishOpening':
-      return `完成了初始路线 ${automatic}`;
-    case 'layLow':
-      return action.numbers?.length
-        ? `选择潜伏，并补到 ${action.numbers.map(pad).join(' / ')} ${automatic}`
-        : `选择潜伏，并从最低牌堆补牌 ${automatic}`;
-    case 'search':
-      return `搜查 ${action.numbers?.map(pad).join(' / ') || '未知地点'}：${
-        action.success ? '命中' : '未命中'} ${automatic}`;
-    default:
-      return `完成一步行动 ${automatic}`;
-  }
 }
 
 function routeCardForViewer(
@@ -477,7 +452,9 @@ export function Play({
               onClick={() => setPanel('history')}>全部 <ChevronRight size={14} /></button>
           </div>{logs.slice(0, 2).map(item =>
             <div key={item.id} className="journal-line"><i /><p>
-              <b>{names[item.role]}</b>{actionText(item)}</p></div>)}</section>
+              <b>{names[item.role]}</b>{formatActionLog(
+                item, data.roomData.players[item.playerID]?.ai === true,
+              )}</p></div>)}</section>
         </aside></div>
         <footer className="game-footnote"><span>FUGITIVE / MIDNIGHT RUN</span>
           <span>服务端权威牌局 · 私密信息按身份投影</span></footer>
@@ -676,7 +653,9 @@ export function Play({
         <div key={item.id}><span>{pad(item.id)}</span><div>
           <b>{names[item.role]}{item.private
             && <small className="private-log-label"><LockKeyhole size={11} />仅你可见</small>}</b>
-          <p>{actionText(item)}</p></div></div>)}</div>
+          <p>{formatActionLog(
+            item, data.roomData.players[item.playerID]?.ai === true,
+          )}</p></div></div>)}</div>
     </Modal>}
 
     {panel === 'rules' && <Modal title="一人逃，一人追。"

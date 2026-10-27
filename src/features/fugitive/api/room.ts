@@ -8,20 +8,16 @@ import type {
   Visibility,
 } from '../model/types';
 
-export interface CreateFugitiveRoomInput {
-  displayName: string;
-  visibility: Visibility;
-  turnTimeoutSeconds: number;
-}
-
 export async function createFugitiveRoom(
-  input: CreateFugitiveRoomInput,
+  visibility: Visibility,
   signal?: AbortSignal,
 ): Promise<{ roomID: string }> {
   return createGameRoom(
     'fugitive',
     {
-      ...input,
+      displayName: '午夜追缉',
+      visibility,
+      turnTimeoutSeconds: 120,
       maxPlayers: 2,
     },
     { signal, authFailure: 'redirect' },
