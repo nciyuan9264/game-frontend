@@ -34,6 +34,12 @@ import {
   My as QuoridorMy,
   Rankings as QuoridorRankings,
 } from "@/features/quoridor/pages/Community";
+import OnitamaLobby from "@/features/onitama/pages/Lobby";
+import {
+  Guide as OnitamaGuide,
+  My as OnitamaMy,
+  Rankings as OnitamaRankings,
+} from "@/features/onitama/pages/Community";
 import FugitiveLobby from "@/features/fugitive/pages/Lobby";
 import FugitiveGuide from "@/features/fugitive/pages/Guide";
 import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
@@ -60,6 +66,8 @@ const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
 const QuoridorSession = lazy(() => import("@/features/quoridor/pages/Session"));
 const QuoridorReplay = lazy(() => import("@/features/quoridor/pages/Replay"));
+const OnitamaSession = lazy(() => import("@/features/onitama/pages/Session"));
+const OnitamaReplay = lazy(() => import("@/features/onitama/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
@@ -134,6 +142,15 @@ export const routes: AppRoute[] = [
   { path: "/game/quoridor/me", element: <QuoridorMy /> },
   { path: "/game/quoridor/match", element: <QuoridorSession /> },
   { path: "/game/quoridor/replay/:gameId", element: <QuoridorReplay /> },
+  {
+    path: "/game/onitama",
+    element: <OnitamaLobby />
+  },
+  { path: "/game/onitama/rankings", element: <OnitamaRankings /> },
+  { path: "/game/onitama/guide", element: <OnitamaGuide /> },
+  { path: "/game/onitama/me", element: <OnitamaMy /> },
+  { path: "/game/onitama/match", element: <OnitamaSession /> },
+  { path: "/game/onitama/replay/:gameId", element: <OnitamaReplay /> },
   {
     path: "/game/fugitive",
     element: <FugitiveLobby />

@@ -135,7 +135,8 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     highestRevealed: room.metrics.fugitive?.highestRevealed,
     hiddenHideoutCount: room.metrics.fugitive?.hiddenHideoutCount,
     maxControlledLocations: room.metrics.warchest?.maxControlledLocations,
-    turnCount: room.metrics.quoridor?.turnCount,
+    turnCount: room.metrics.quoridor?.turnCount
+      ?? room.metrics.onitama?.turnCount,
     progressCurrent: room.metrics.fugitive?.progressCurrent
       ?? room.metrics.warchest?.progressCurrent
       ?? room.metrics.othello?.progressCurrent,

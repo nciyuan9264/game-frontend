@@ -8,7 +8,7 @@ export default defineConfig({
     include: [
       'src/components/GameUI/**/*.test.{ts,tsx}',
       'src/features/game-core/**/*.test.{ts,tsx}',
-      'src/features/{acquire,davinci,splendor,yinsh,othello,fugitive,warchest,quoridor}/**/*.test.{ts,tsx}',
+      'src/features/{acquire,davinci,splendor,yinsh,othello,fugitive,warchest,quoridor,onitama}/**/*.test.{ts,tsx}',
     ],
     restoreMocks: true,
     clearMocks: true,

@@ -33,6 +33,11 @@ import {
   listQuoridorRooms,
   lookupQuoridorRoom,
 } from '@/features/quoridor/api/room';
+import {
+  createOnitamaRoom,
+  listOnitamaRooms,
+  lookupOnitamaRoom,
+} from '@/features/onitama/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -195,6 +200,30 @@ describe('game room API wrappers', () => {
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'quoridor',
       'room-6',
+      options,
+    );
+  });
+
+  it('injects Onitama fixed seats and authoritative timeout', () => {
+    const signal = new AbortController().signal;
+    createOnitamaRoom('private', signal);
+    listOnitamaRooms(signal);
+    lookupOnitamaRoom('room-7', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'onitama',
+      {
+        visibility: 'private',
+        maxPlayers: 2,
+        turnTimeoutSeconds: 60,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('onitama', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'onitama',
+      'room-7',
       options,
     );
   });

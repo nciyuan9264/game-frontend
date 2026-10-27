@@ -1,0 +1,144 @@
+.page { min-width:0; }
+.eyebrow { color:#a0815a; font:9px/1.2 Georgia,serif; letter-spacing:2.2px; }
+.hero { position:relative; display:flex; height:260px; align-items:center; overflow:hidden; border:1px solid #e2d7c8; border-radius:6px; background:linear-gradient(110deg,#eee5d7,#f9f4eb 68%,#ece2d2);
+  > svg { position:absolute; right:-20px; bottom:-7px; width:min(52vw,620px); }
+}
+.heroCopy { position:relative; z-index:2; width:54%; padding:27px 40px;
+  h1 { margin:9px 0 9px; color:#543b40; font-size:35px; line-height:1.4; letter-spacing:1px; }
+  p { color:#796b60; font-size:12px; line-height:1.9; }
+}
+.heroActions { display:flex; gap:9px; margin-top:16px; > button { min-height:40px; padding:0 16px; font-size:11px; } }
+.heroCaption { position:absolute; right:23px; bottom:18px; z-index:2; color:#8e7b65; font:8px Georgia,serif; letter-spacing:2px; }
+.facts { display:flex; align-items:center; gap:32px; margin-bottom:27px; padding:18px 2px 22px; border-bottom:1px solid var(--line);
+  > span { display:flex; align-items:center; gap:6px; color:var(--muted); font-size:10px; white-space:nowrap; }
+  svg { color:#9d8563; } b { color:#6f5a44; font:600 16px var(--serif); }
+  > a { display:flex; align-items:center; gap:6px; margin-left:auto; color:var(--wine); font-size:10px; }
+}
+.layout { display:grid; grid-template-columns:minmax(0,1fr) 260px; gap:27px; }
+.sectionHeading { display:flex; align-items:center; justify-content:space-between; gap:20px;
+  h2 { margin-top:6px; font-size:22px; }
+  > button { display:flex; min-height:42px; align-items:center; gap:6px; color:var(--wine); font-size:10px; }
+}
+.toolbar { display:flex; align-items:center; justify-content:space-between; gap:15px; margin:18px 0 15px;
+  > div { display:flex; gap:21px; }
+  > div button { position:relative; min-height:35px; padding:0 0 8px; color:#8e8177; font-size:12px;
+    > span { display:inline-grid; min-width:17px; height:16px; place-items:center; margin-left:6px; border-radius:9px; background:#e9e2d8; font-size:9px; }
+  }
+  .active { color:var(--wine); font-weight:600; }
+  .active::after { position:absolute; right:0; bottom:0; left:0; height:2px; background:var(--wine); content:''; }
+  > label { display:flex; width:200px; height:34px; align-items:center; gap:7px; padding:0 10px; border:1px solid var(--line); border-radius:4px; background:#fbf8f2; color:#9d8f80; }
+  input { width:100%; border:0; outline:0; background:transparent; color:#66574d; font-size:11px; }
+}
+.roomGrid { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:12px; }
+.roomCard { min-width:0; padding:16px 15px 14px; border:1px solid #e3dbce; border-radius:6px; background:var(--surface);
+  > header { display:flex; align-items:center; gap:6px; }
+  > header > span { display:inline-flex; align-items:center; gap:5px; padding:4px 7px; border-radius:4px; font-size:9px; i { width:5px; height:5px; border-radius:50%; background:currentColor; } }
+  > header > b { overflow:hidden; margin-left:auto; color:#ad9c88; font-size:9px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  > footer { display:flex; align-items:center; justify-content:space-between; gap:8px; margin-top:16px; padding-top:12px; border-top:1px solid #eee6da;
+    > span { overflow:hidden; color:#9b8b78; font-size:9px; text-overflow:ellipsis; white-space:nowrap; }
+    button { min-height:32px; padding:0 10px; font-size:10px; }
+  }
+}
+.waiting { background:#e9eee7; color:#547461; }
+.playing { background:#f1ebdd; color:#9a7840; }
+.roomIdentity { display:flex; align-items:center; gap:12px; margin:20px 0;
+  > span { display:flex; span+span { margin-left:-6px; } }
+  > div { min-width:0; } h3 { overflow:hidden; font-size:14px; font-weight:500; text-overflow:ellipsis; white-space:nowrap; }
+  p { margin-top:6px; color:#a09180; font-size:9px; }
+}
+.players { display:flex; height:34px; align-items:center;
+  > span[aria-hidden=true]+span[aria-hidden=true] { margin-left:-7px; box-shadow:0 0 0 2px #fffdf8; }
+  > span:not([aria-hidden=true]) { display:grid; width:28px; height:28px; place-items:center; margin-left:5px; border:1px dashed #cdbfae; border-radius:50%; color:#b6a48b; }
+  strong { margin-left:auto; color:#6f5b4a; font:500 19px var(--serif); } small { color:#a29280; font:10px sans-serif; }
+}
+.empty { grid-column:1/-1; display:grid; min-height:220px; place-content:center; justify-items:center; gap:10px; border:1px dashed #cdbfae; border-radius:6px; color:#a59178;
+  h3 { color:#705c51; font-weight:500; } p { color:var(--muted); font-size:11px; }
+}
+.side { display:flex; flex-direction:column; gap:14px; }
+.profile { padding:21px 19px 0; border:1px solid #e3d7c4; border-radius:6px; background:#eee7da; text-align:center;
+  > span { display:block; margin-top:9px; color:#9b886f; font-size:9px; } h3 { margin-top:5px; color:#654743; font-size:15px; }
+  > div { display:grid; grid-template-columns:repeat(3,1fr); margin:20px 0 17px; }
+  > div b { display:flex; align-items:center; flex-direction:column; color:#6f4948; font:600 23px var(--serif); }
+  > div b+b { border-left:1px solid #d9cbb8; }
+  small { margin-top:5px; color:#9b886e; font:9px sans-serif; }
+  > a { display:flex; align-items:center; justify-content:space-between; padding:14px 0; border-top:1px solid #dccfb9; color:#8d6c50; font-size:10px; }
+}
+.guide { display:flex; align-items:center; gap:14px; padding:18px; border:1px solid #e3dacf; border-radius:6px; background:#f0ebe2; color:#9c8061;
+  span { font-size:8px; letter-spacing:1.4px; } h3 { margin:7px 0 11px; color:#6c564b; font:500 15px var(--serif); }
+  b { display:flex; align-items:center; gap:7px; color:var(--wine); font-size:10px; font-weight:500; }
+}
+.joinCard { padding:18px 19px; border:1px solid #e3dacf; border-radius:6px; background:#f7f2e9;
+  h3 { display:flex; align-items:center; gap:8px; color:#6c564b; font-size:13px; font-weight:500;
+    svg { color:#9b7960; }
+  }
+  p { margin:8px 0 12px; color:#998878; font-size:10px; line-height:1.7; }
+  form { display:flex; height:38px; overflow:hidden; border:1px solid #d9cebf; border-radius:5px; background:#fffdf8;
+    &:focus-within { border-color:#b58b96; box-shadow:0 0 0 1px #b58b9633; }
+  }
+  input { width:100%; min-width:0; padding:0 10px; border:0; outline:0; background:transparent; color:#66574d; font-size:11px; }
+  button { display:grid; width:40px; flex:none; place-items:center; border-left:1px solid #ded3c4!important; background:#eee4e1!important; color:var(--wine); }
+}
+.mobileJoin { display:none; }
+.create {
+  > p { color:#978571; font-size:13px; }
+  > div { display:grid; gap:8px; margin:17px 0; }
+  > div button { display:flex; min-height:70px; align-items:center; gap:13px; padding:13px 14px; border:1px solid #ded3c4; border-radius:5px; background:#fffaf3; color:#a88d6f; text-align:left;
+    &[aria-pressed=true] { border-color:#95626c; background:#f4e9e8; color:var(--wine); }
+    > span { flex:1; } b { display:block; color:#70524a; font-size:12px; } small { display:block; margin-top:5px; color:#a08b77; font-size:10px; }
+  }
+  dl { margin-bottom:18px; > div { display:flex; justify-content:space-between; padding:9px 0; border-bottom:1px solid #e7ddce; font-size:11px; } dt { color:#9c8d7b; } dd { margin:0; color:#6d5b4a; } }
+  > span { display:flex; gap:8px; padding:13px; border:1px solid #e7ddcb; border-radius:5px; background:#f8f2e6; color:#8e744b; font-size:11px; line-height:1.7; }
+}
+.join { display:grid; justify-items:center; gap:14px; margin-bottom:14px; color:#b7975a;
+  p { color:#978571; font-size:12px; } label { display:grid; gap:7px; width:100%; color:#8d735c; font-size:11px; }
+  input { height:54px; padding:0 13px; border:1px solid #dcd3c7; border-radius:5px; outline:0; background:#fffcf7; color:var(--ink); font-size:17px; }
+}
+.shareContent { display:grid; justify-items:center; gap:14px; }
+.shareQr { padding:11px; border-radius:7px; background:#fffaf3; line-height:0; }
+.shareAddress { width:100%; padding:11px 12px; border:1px solid #ded3c4; border-radius:5px; background:#fffaf3;
+  span { display:block; margin-bottom:5px; color:#9d8f80; font-size:9px; }
+  strong { display:block; overflow-wrap:anywhere; color:#66574d; font:11px/1.5 monospace; }
+}
+.shareHint { display:flex; align-items:flex-start; gap:8px; width:100%; color:#8e744b; font-size:10px; line-height:1.8;
+  svg { flex:none; margin-top:1px; color:var(--wine); }
+}
+@media (max-width:1100px) and (min-width:768px) { .layout { grid-template-columns:1fr; } .side { display:none; } .roomGrid { grid-template-columns:repeat(2,1fr); } }
+@media (max-width:767px) {
+  .hero { height:227px; align-items:flex-start; border-radius:9px; }
+  .heroCopy { height:100%; width:100%; padding:21px 20px;
+    > .eyebrow { display:flex; align-items:center; gap:8px; font-family:inherit; font-size:6px; font-weight:500; line-height:1.5; letter-spacing:.14em;
+      &::before { width:21px; height:1px; flex:none; background:currentColor; content:''; opacity:.75; }
+    }
+    h1 { margin:11px 0 8px; font-size:27px; line-height:1.42; letter-spacing:.02em; }
+    p { max-width:225px; font-size:10px; line-height:1.8; }
+  }
+  .heroActions { gap:8px; margin-top:17px;
+    > button { min-height:39px; padding:0 14px; gap:7px; font-size:11px; }
+    > button:first-child { min-width:129px; font-size:12px; font-weight:600; }
+    > button:last-child { min-width:99px; }
+  }
+  .heroCaption { display:none; }
+  .facts { display:grid; grid-template-columns:repeat(3,minmax(0,1fr)); gap:0; margin-bottom:18px; padding:14px 0;
+    > span { justify-content:center; gap:5px; font-size:10px; }
+    svg { width:14px; height:14px; }
+    b { font-size:13px; }
+    > a { display:none; }
+  }
+  .layout { display:block; }
+  .sectionHeading { align-items:center; gap:8px; margin-bottom:13px;
+    h2 { max-width:230px; margin-top:5px; font-size:16px; line-height:1.6; }
+    .eyebrow { font-size:6px; letter-spacing:.12em; }
+    > button { min-height:44px; }
+  }
+  .toolbar { flex-wrap:wrap; margin-top:12px; > div { width:100%; } > div button { min-height:44px; } > label { width:100%; height:44px; } }
+  .roomGrid { grid-template-columns:1fr; }
+  .roomCard { padding:17px; .roomIdentity h3 { font-size:16px; } > footer button { min-height:44px; min-width:94px; font-size:12px; } }
+  .empty { min-height:340px; padding:28px 19px; h3 { font-size:19px; } p { font-size:11px; } }
+  .side { display:none; }
+  .mobileJoin { display:block; margin-top:13px;
+    .joinCard { padding:18px; }
+    form { height:44px; }
+    input { font-size:12px; }
+    button { width:46px; }
+  }
+}

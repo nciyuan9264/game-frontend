@@ -360,6 +360,28 @@ function gamePayload(
         return { quoridor: { resign: {} } };
     }
   }
+  if (gameType === 'onitama') {
+    switch (commandType) {
+      case 'game_move_piece':
+        return {
+          onitama: {
+            movePiece: objectPayload as {
+              cardID: string;
+              pieceID: string;
+              to: { row: number; column: number };
+            },
+          },
+        };
+      case 'game_pass':
+        return {
+          onitama: {
+            pass: objectPayload as { cardID: string },
+          },
+        };
+      case 'game_resign':
+        return { onitama: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 
