@@ -291,6 +291,11 @@ for (const item of lobbyCases) {
     expect(createBox).toMatchObject({ width: 129, height: 39 });
     expect(shareBox).toMatchObject({ width: 99, height: 39 });
     expect(createBox?.y).toBe(shareBox?.y);
+    if (item.gameType === 'splendor') {
+      const heroBox = await page.getByTestId('splendor-lobby-hero').boundingBox();
+      expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
+        - ((createBox?.y ?? 0) + (createBox?.height ?? 0))).toBeGreaterThanOrEqual(7);
+    }
     const heading = page.getByRole('heading', { name: item.heading });
     await expect(heading).toHaveCSS('font-size', '16px');
     await expect(heading).toHaveCSS('line-height', '25.6px');
