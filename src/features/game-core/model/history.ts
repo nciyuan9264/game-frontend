@@ -8,6 +8,7 @@ import type {
   LeaderboardEntry as GeneratedLeaderboardEntry,
   LoveLetterReplaySnapshot,
   SixNimmtReplaySnapshot,
+  ForSaleReplaySnapshot,
   ReplayEvent,
   RoomPlayer,
 } from '@/api/generated/game-platform';
@@ -23,7 +24,8 @@ export type HistoryGameType =
   | 'warchest'
   | 'quoridor'
   | 'loveletter'
-  | 'sixnimmt';
+  | 'sixnimmt'
+  | 'forsale';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -135,12 +137,16 @@ export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type QuoridorLeaderboardEntry = DavinciLeaderboardEntry;
 export type LoveLetterLeaderboardEntry = RankLeaderboardEntry;
 export type SixNimmtLeaderboardEntry = RankLeaderboardEntry;
+export type ForSaleLeaderboardEntry = RankLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export type LoveLetterSnapshot = LoveLetterReplaySnapshot & {
   currentEvent?: ReplayEventData;
 };
 export type SixNimmtSnapshot = SixNimmtReplaySnapshot & {
+  currentEvent?: ReplayEventData;
+};
+export type ForSaleSnapshot = ForSaleReplaySnapshot & {
   currentEvent?: ReplayEventData;
 };
 

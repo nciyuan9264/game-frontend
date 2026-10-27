@@ -14,6 +14,7 @@ import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
 import { LoveLetterLoading } from '@/features/loveletter/components/LoadingState';
 import { SixNimmtLoading } from '@/features/sixnimmt/components/LoadingState';
+import { ForSaleLoading } from '@/features/forsale/components/LoadingState';
 
 /**
  * 渲染路由
@@ -46,6 +47,8 @@ export const RenderRoutes = () => {
                                         ? <LoveLetterLoading fullScreen title="正在拆开掌心密信。" description="正在准备庭院与角色牌" />
                         : route.path.startsWith('/game/sixnimmt')
                                         ? <SixNimmtLoading fullScreen title="正在进入牧场牌桌。" description="正在准备数字牌与在线玩家" />
+                                    : route.path.startsWith('/game/forsale')
+                                        ? <ForSaleLoading fullScreen title="正在进入周末拍卖所。" description="正在准备房产、支票与在线牌桌" />
                         : <LoadingBlock />;
             return (
                 <Route

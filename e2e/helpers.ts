@@ -14,7 +14,8 @@ export type GameType =
   | 'fugitive'
   | 'warchest'
   | 'loveletter'
-  | 'sixnimmt';
+  | 'sixnimmt'
+  | 'forsale';
 
 interface RoomInfo {
   roomID: string;
@@ -68,7 +69,7 @@ export async function createPrivateRoom(
       visibility: 'private',
       maxPlayers: gameType === 'sixnimmt'
         ? 10
-        : gameType === 'loveletter' ? 6 : 2,
+        : gameType === 'loveletter' || gameType === 'forsale' ? 6 : 2,
       requestID,
     },
   });

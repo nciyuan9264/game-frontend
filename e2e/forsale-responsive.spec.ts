@@ -1,0 +1,325 @@
+import {
+  expect,
+  test,
+  type Page,
+  type TestInfo,
+} from '@playwright/test';
+
+const roomID = 'forsale_layout';
+const matchID = `${roomID}-r1`;
+const players = [
+  {
+    userID: '110',
+    playerID: '110',
+    displayName: '周末买家',
+    avatar: '',
+    seatIndex: 0,
+    online: true,
+    ai: false,
+    ready: true,
+  },
+  {
+    playerID: 'ai_2',
+    displayName: '阿橙',
+    avatar: '',
+    seatIndex: 1,
+    online: true,
+    ai: true,
+    ready: true,
+  },
+  {
+    playerID: 'ai_3',
+    displayName: '松子',
+    avatar: '',
+    seatIndex: 2,
+    online: true,
+    ai: true,
+    ready: true,
+  },
+];
+
+const gameSnapshot = (count = 3) => {
+  const activePlayers = players.slice(0, count);
+  const order = activePlayers.map(player => player.playerID);
+  const roomPlayers = Object.fromEntries(
+    activePlayers.map(player => [player.playerID, player]),
+  );
+  const playerData = Object.fromEntries(activePlayers.map((player, index) => [
+    player.playerID,
+    {
+      seatIndex: index,
+      bid: index,
+      passed: false,
+      propertyCount: 1,
+      chequeCount: 0,
+      locked: false,
+      ...(index === 0 ? {
+        coins: 25,
+        properties: [12],
+        cheques: [],
+        actionDeadline: new Date(Date.now() + 60_000).toISOString(),
+        actionTimeoutMs: '60000',
+      } : {}),
+    },
+  ]));
+  const market = count === 3 ? [4, 19, 27] : [2, 7, 12, 18, 24, 30];
+  return {
+    schemaVersion: 2,
+    type: 'ROOM_SYNC',
+    roomID,
+    matchID,
+    seq: '12',
+    view: {
+      forSale: {
+        playerId: '110',
+        ownerID: '110',
+        visibility: 'private',
+        playerData,
+        result: undefined as Record<string, {
+          chequeTotal: number;
+          coins: number;
+          total: number;
+          rank: number;
+          winner: boolean;
+        }> | undefined,
+        roomData: {
+          gameStatus: 'auction',
+          round: 2,
+          totalRounds: count === 3 ? 8 : 5,
+          propertyMarket: market,
+          chequeMarket: [],
+          highestBid: 2,
+          currentPlayer: '110',
+          starterPlayer: '110',
+          lockedCount: 0,
+          purchases: [],
+          sales: [],
+          actionLog: [],
+          players: roomPlayers,
+          playerOrder: order,
+        },
+      },
+    },
+  };
+};
+
+async function mockProfile(page: Page) {
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        user_id: '110',
+        display_name: '周末买家',
+        email: 'buyer@example.com',
+        avatar: '',
+      },
+    },
+  }));
+}
+
+async function mockPublic(page: Page) {
+  await mockProfile(page);
+  await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
+    json: { status_code: 0, message: 'ok', data: { rooms: [] } },
+  }));
+  await page.route('**/pam-api/platform/history/stats?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { totalGames: 8, wins: 3, winRate: .375, avgScore: 43 },
+    },
+  }));
+}
+
+const saleSnapshot = (status: 'sellSelect' | 'sellLocked' | 'sellReveal' | 'end') => {
+  const snapshot = gameSnapshot(3);
+  const view = snapshot.view.forSale;
+  view.roomData.gameStatus = status;
+  view.roomData.round = 4;
+  view.roomData.propertyMarket = [];
+  view.roomData.currentPlayer = '';
+  view.roomData.chequeMarket = status === 'sellReveal' || status === 'end'
+    ? [] : [0, 8, 15];
+  view.playerData['110'] = {
+    ...view.playerData['110'],
+    bid: 0,
+    propertyCount: status === 'sellReveal' || status === 'end' ? 2 : 3,
+    chequeCount: status === 'end' ? 8 : 3,
+    coins: 7,
+    properties: status === 'sellReveal' || status === 'end' ? [4, 27] : [4, 12, 27],
+    cheques: status === 'end' ? [2, 4, 5, 7, 8, 10, 12, 15] : [4, 7, 12],
+    locked: status === 'sellLocked',
+    lockedProperty: status === 'sellLocked' ? 12 : undefined,
+    actionDeadline: status === 'sellSelect'
+      ? new Date(Date.now() + 60_000).toISOString() : undefined,
+  };
+  if (status === 'sellLocked') {
+    view.roomData.lockedCount = 3;
+    for (const id of ['ai_2', 'ai_3']) {
+      view.playerData[id] = { ...view.playerData[id], locked: true };
+    }
+  }
+  if (status === 'sellReveal' || status === 'end') {
+    view.roomData.sales = [{
+      round: 4,
+      trades: [
+        { playerID: 'ai_2', property: 6, amount: 0 },
+        { playerID: '110', property: 12, amount: 8 },
+        { playerID: 'ai_3', property: 23, amount: 15 },
+      ],
+    }];
+  }
+  if (status === 'end') {
+    view.roomData.round = 8;
+    view.playerData['110'].propertyCount = 0;
+    view.playerData['110'].properties = [];
+    view.result = {
+      '110': { chequeTotal: 63, coins: 7, total: 70, rank: 1, winner: true },
+      ai_2: { chequeTotal: 62, coins: 8, total: 70, rank: 1, winner: true },
+      ai_3: { chequeTotal: 55, coins: 5, total: 60, rank: 3, winner: false },
+    };
+  }
+  return snapshot;
+};
+
+async function mockSession(
+  page: Page,
+  count = 3,
+  customSnapshot?: ReturnType<typeof gameSnapshot>,
+) {
+  await mockProfile(page);
+  const snapshot = customSnapshot ?? gameSnapshot(count);
+  const roomPlayers = Object.values(snapshot.view.forSale.roomData.players);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route =>
+    route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: {
+          roomID,
+          gameType: 'forsale',
+          status: 'playing',
+          visibility: 'private',
+          ownerUserID: '110',
+          ownerPlayerID: '110',
+          maxPlayers: 6,
+          playerCount: count,
+          currentMatchID: matchID,
+          currentMatchStatus: 'running',
+          nextRoundNo: 2,
+          createdAt: '2026-10-27T00:00:00Z',
+          updatedAt: '2026-10-27T00:00:00Z',
+          players: roomPlayers,
+          metrics: {
+            forSale: { progressCurrent: 1, progressTotal: count === 3 ? 16 : 10 },
+          },
+        },
+      },
+    }));
+  const commands: string[] = [];
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify(snapshot));
+    socket.onMessage(message => commands.push(String(message)));
+  });
+  return commands;
+}
+
+const expectNoOverflow = async (page: Page) => {
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+};
+
+const capture = async (page: Page, info: TestInfo, name: string) =>
+  page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true });
+
+test('For Sale public pages follow the Acquire shell at all target widths',
+  async ({ page }, info) => {
+    await mockPublic(page);
+    for (const viewport of [
+      { width: 1440, height: 900 },
+      { width: 1024, height: 768 },
+      { width: 390, height: 844 },
+      { width: 360, height: 780 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/game/forsale');
+      await expect(page.getByRole('heading', {
+        name: /好房在手/,
+      })).toBeVisible();
+      await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
+      await expectNoOverflow(page);
+      await capture(page, info, `lobby-${viewport.width}x${viewport.height}`);
+      await page.goto('/game/forsale/guide');
+      await expect(page.getByRole('heading', {
+        name: /用一笔本金/,
+      })).toBeVisible();
+      await expectNoOverflow(page);
+    }
+  });
+
+test('For Sale mobile auction keeps cards and actions usable',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const commands = await mockSession(page, 3);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.getByTestId('forsale-play')).toBeVisible();
+    await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
+    await expect(page.getByLabel('总出价金币')).toHaveValue('3');
+    await page.getByRole('button', { name: '退出本轮' }).click();
+    await expect(page.getByRole('heading', {
+      name: '这轮收手，也是一笔好买卖。',
+    })).toBeVisible();
+    await expect(page.getByText(/退回钱包/)).toBeVisible();
+    await page.getByRole('button', { name: '确认退出本轮' }).click();
+    await expect.poll(() => commands.some(command =>
+      command.includes('"game_pass"')
+      && command.includes('"forSale"'))).toBe(true);
+    await expectNoOverflow(page);
+    await capture(page, info, 'auction-mobile');
+  });
+
+test('For Sale six-player desktop market remains stable',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 1440, height: 900 });
+    await mockSession(page, 6);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(6);
+    await expect(page.getByRole('heading', {
+      name: /轮到你出价/,
+    })).toBeVisible();
+    await expectNoOverflow(page);
+    await capture(page, info, 'auction-six-player-desktop');
+  });
+
+test('For Sale mobile sale selection locks only after confirmation',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const commands = await mockSession(page, 3, saleSnapshot('sellSelect'));
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.locator('.fs-cheque-market .fs-cheque')).toHaveCount(3);
+    await page.getByRole('button', { name: '选择27号房产' }).click();
+    await expect(page.getByRole('button', {
+      name: '锁定这张房产',
+    })).toBeEnabled();
+    await page.getByRole('button', { name: '锁定这张房产' }).click();
+    await expect.poll(() => commands.some(command =>
+      command.includes('"game_lock_sale"')
+      && command.includes('"property":27'))).toBe(true);
+    await expectNoOverflow(page);
+    await capture(page, info, 'sale-select-mobile');
+  });
+
+test('For Sale results support tied winners and final-table review',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await mockSession(page, 3, saleSnapshot('end'));
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.getByTestId('forsale-results')).toBeVisible();
+    await expect(page.getByText('好买卖，并肩赢。')).toBeVisible();
+    await expect(page.getByText('$70,000').first()).toBeVisible();
+    await capture(page, info, 'results-mobile');
+    await page.getByRole('button', { name: '查看终局牌桌' }).first().click();
+    await expect(page.getByTestId('forsale-play')).toBeVisible();
+    await expectNoOverflow(page);
+  });
