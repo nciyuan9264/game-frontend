@@ -43,6 +43,11 @@ const games = [
     profileHeading: '每一桌，都有点小故事。',
   },
   {
+    gameType: 'forsale',
+    lobbyHeading: /好房在手/,
+    profileHeading: '每一场买卖，都值得回味。',
+  },
+  {
     gameType: 'onitama',
     lobbyHeading: /一招一式/,
     profileHeading: '你的每一步，都值得回看。',

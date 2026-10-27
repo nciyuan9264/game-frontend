@@ -34,6 +34,8 @@ import {
   My as QuoridorMy,
   Rankings as QuoridorRankings,
 } from "@/features/quoridor/pages/Community";
+import HexLobby from "@/features/hex/pages/Lobby";
+import { Guide as HexGuide, My as HexMy, Rankings as HexRankings } from "@/features/hex/pages/Community";
 import OnitamaLobby from "@/features/onitama/pages/Lobby";
 import {
   Guide as OnitamaGuide,
@@ -64,6 +66,12 @@ import {
   My as SixNimmtMy,
   Rankings as SixNimmtRankings,
 } from "@/features/sixnimmt/pages/Community";
+import ForSaleLobby from "@/features/forsale/pages/Lobby";
+import {
+  Guide as ForSaleGuide,
+  My as ForSaleMy,
+  Rankings as ForSaleRankings,
+} from "@/features/forsale/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -78,6 +86,8 @@ const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
 const QuoridorSession = lazy(() => import("@/features/quoridor/pages/Session"));
 const QuoridorReplay = lazy(() => import("@/features/quoridor/pages/Replay"));
+const HexSession = lazy(() => import("@/features/hex/pages/Session"));
+const HexReplay = lazy(() => import("@/features/hex/pages/Replay"));
 const OnitamaSession = lazy(() => import("@/features/onitama/pages/Session"));
 const OnitamaReplay = lazy(() => import("@/features/onitama/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
@@ -87,6 +97,8 @@ const LoveLetterSession = lazy(() => import("@/features/loveletter/pages/Session
 const LoveLetterReplay = lazy(() => import("@/features/loveletter/pages/Replay"));
 const SixNimmtSession = lazy(() => import("@/features/sixnimmt/pages/Session"));
 const SixNimmtReplay = lazy(() => import("@/features/sixnimmt/pages/Replay"));
+const ForSaleSession = lazy(() => import("@/features/forsale/pages/Session"));
+const ForSaleReplay = lazy(() => import("@/features/forsale/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -158,10 +170,13 @@ export const routes: AppRoute[] = [
   { path: "/game/quoridor/me", element: <QuoridorMy /> },
   { path: "/game/quoridor/match", element: <QuoridorSession /> },
   { path: "/game/quoridor/replay/:gameId", element: <QuoridorReplay /> },
-  {
-    path: "/game/onitama",
-    element: <OnitamaLobby />
-  },
+  { path: "/game/hex", element: <HexLobby /> },
+  { path: "/game/hex/rankings", element: <HexRankings /> },
+  { path: "/game/hex/guide", element: <HexGuide /> },
+  { path: "/game/hex/me", element: <HexMy /> },
+  { path: "/game/hex/match", element: <HexSession /> },
+  { path: "/game/hex/replay/:gameId", element: <HexReplay /> },
+  { path: "/game/onitama", element: <OnitamaLobby /> },
   { path: "/game/onitama/rankings", element: <OnitamaRankings /> },
   { path: "/game/onitama/guide", element: <OnitamaGuide /> },
   { path: "/game/onitama/me", element: <OnitamaMy /> },
@@ -195,6 +210,12 @@ export const routes: AppRoute[] = [
   { path: "/game/sixnimmt/me", element: <SixNimmtMy /> },
   { path: "/game/sixnimmt/match", element: <SixNimmtSession /> },
   { path: "/game/sixnimmt/replay/:gameId", element: <SixNimmtReplay /> },
+  { path: "/game/forsale", element: <ForSaleLobby /> },
+  { path: "/game/forsale/rankings", element: <ForSaleRankings /> },
+  { path: "/game/forsale/guide", element: <ForSaleGuide /> },
+  { path: "/game/forsale/me", element: <ForSaleMy /> },
+  { path: "/game/forsale/match", element: <ForSaleSession /> },
+  { path: "/game/forsale/replay/:gameId", element: <ForSaleReplay /> },
   {
     path: "/",
     element: <Home />

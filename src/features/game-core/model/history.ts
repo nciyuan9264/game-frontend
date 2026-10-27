@@ -8,6 +8,7 @@ import type {
   LeaderboardEntry as GeneratedLeaderboardEntry,
   LoveLetterReplaySnapshot,
   SixNimmtReplaySnapshot,
+  ForSaleReplaySnapshot,
   ReplayEvent,
   RoomPlayer,
 } from '@/api/generated/game-platform';
@@ -24,6 +25,8 @@ export type HistoryGameType =
   | 'quoridor'
   | 'loveletter'
   | 'sixnimmt'
+  | 'hex'
+  | 'forsale'
   | 'onitama';
 export type HistoryGameStatus = string;
 export type CmdType = string;
@@ -136,6 +139,8 @@ export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type QuoridorLeaderboardEntry = DavinciLeaderboardEntry;
 export type LoveLetterLeaderboardEntry = RankLeaderboardEntry;
 export type SixNimmtLeaderboardEntry = RankLeaderboardEntry;
+export type HexLeaderboardEntry = DavinciLeaderboardEntry;
+export type ForSaleLeaderboardEntry = RankLeaderboardEntry;
 export type OnitamaLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
@@ -143,6 +148,9 @@ export type LoveLetterSnapshot = LoveLetterReplaySnapshot & {
   currentEvent?: ReplayEventData;
 };
 export type SixNimmtSnapshot = SixNimmtReplaySnapshot & {
+  currentEvent?: ReplayEventData;
+};
+export type ForSaleSnapshot = ForSaleReplaySnapshot & {
   currentEvent?: ReplayEventData;
 };
 
@@ -212,6 +220,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.quoridor.wins,
       winRate: entry.metric.quoridor.winRate,
+    };
+  }
+  if (entry.metric.hex) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.hex.wins,
+      winRate: entry.metric.hex.winRate,
     };
   }
   if (entry.metric.onitama) {

@@ -111,6 +111,22 @@ export interface SixNimmtRoomMetrics {
   progressTotal: number;
 }
 
+export interface HiveRoomMetrics {
+  turnCount: number;
+  placedPieceCount: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
+export interface HexRoomMetrics {
+  turnCount: number;
+}
+
+export interface ForSaleRoomMetrics {
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface OnitamaRoomMetrics {
   turnCount: number;
 }
@@ -205,6 +221,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -218,6 +237,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -231,6 +253,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -244,6 +269,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -257,6 +285,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -270,6 +301,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -283,6 +317,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -296,6 +333,9 @@ export type RoomMetrics =
       quoridor: QuoridorRoomMetrics;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -309,6 +349,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter: LoveLetterRoomMetrics;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -322,6 +365,9 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtRoomMetrics;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -335,6 +381,57 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex: HexRoomMetrics;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleRoomMetrics;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive: HiveRoomMetrics;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama: OnitamaRoomMetrics;
     };
 
@@ -1356,6 +1453,322 @@ export type SixNimmtCommandPayload =
   | { lockCard?: never; unlockCard?: never; chooseRow: SixNimmtChooseRowPayload; nextRound?: never }
   | { lockCard?: never; unlockCard?: never; chooseRow?: never; nextRound: EmptyPayload };
 
+export type HexSide = string;
+
+export type HexGameStatus = string;
+
+export type HexActionKind = string;
+
+export interface HexCell {
+  row: number;
+  column: number;
+}
+
+export interface HexActionEntry {
+  id: number;
+  kind: HexActionKind;
+  playerID: string;
+  side: HexSide;
+  cell?: HexCell;
+  automatic: boolean;
+}
+
+export interface HexPlayerState {
+  side: HexSide;
+  stoneCount: number;
+}
+
+export interface HexRoomData {
+  boardSize: number;
+  board: HexSide[];
+  currentPlayer: string;
+  currentSide: HexSide;
+  redPlayerID: string;
+  tealPlayerID: string;
+  firstPlayerID: string;
+  roundNo: number;
+  gameStatus: HexGameStatus;
+  pieRule: boolean;
+  swapAvailable: boolean;
+  legalMoves: HexCell[];
+  winningPath: HexCell[];
+  moveLog: HexActionEntry[];
+  lastAction?: HexActionEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface HexResult {
+  winnerID?: string;
+  winnerSide?: HexSide;
+  reason: string;
+  turnCount: number;
+  pathLength: number;
+  redStoneCount: number;
+  tealStoneCount: number;
+}
+
+export interface HexRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, HexPlayerState>;
+  roomData: HexRoomData;
+  result?: HexResult;
+}
+
+export interface HexReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: HexRoomData;
+  playersData: Record<string, HexPlayerState>;
+  result?: HexResult;
+}
+
+export interface HexPlaceStonePayload {
+  cell: HexCell;
+}
+
+export type HexCommandPayload =
+  | { placeStone: HexPlaceStonePayload; swap?: never; resign?: never }
+  | { placeStone?: never; swap: EmptyPayload; resign?: never }
+  | { placeStone?: never; swap?: never; resign: EmptyPayload };
+
+export type ForSaleGameStatus = string;
+
+export type ForSaleActionSource = string;
+
+export interface ForSaleTrade {
+  playerID: string;
+  property: number;
+  amount: number;
+}
+
+export interface ForSaleRoundRecord {
+  round: number;
+  trades: ForSaleTrade[];
+}
+
+export interface ForSaleActionEntry {
+  id: number;
+  round: number;
+  phase: string;
+  kind: string;
+  playerID: string;
+  source: ForSaleActionSource;
+  amount?: number;
+  property?: number;
+  cheque?: number;
+  paid?: number;
+}
+
+export interface ForSalePlayerState {
+  seatIndex: number;
+  bid: number;
+  passed: boolean;
+  propertyCount: number;
+  chequeCount: number;
+  locked: boolean;
+  coins?: number;
+  properties?: number[];
+  cheques?: number[];
+  lockedProperty?: number;
+  wonProperty?: number;
+  roundCost?: number;
+  actionDeadline?: string;
+  actionTimeoutMs?: string;
+}
+
+export interface ForSaleRoomData {
+  gameStatus: ForSaleGameStatus;
+  round: number;
+  totalRounds: number;
+  propertyMarket: number[];
+  chequeMarket: number[];
+  highestBid: number;
+  currentPlayer: string;
+  starterPlayer: string;
+  lockedCount: number;
+  purchases: ForSaleRoundRecord[];
+  sales: ForSaleRoundRecord[];
+  actionLog: ForSaleActionEntry[];
+  lastAction?: ForSaleActionEntry;
+  transitionDeadline?: string;
+  transitionTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface ForSalePlayerResult {
+  chequeTotal: number;
+  coins: number;
+  total: number;
+  rank: number;
+  winner: boolean;
+}
+
+export interface ForSaleRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, ForSalePlayerState>;
+  roomData: ForSaleRoomData;
+  result?: Record<string, ForSalePlayerResult>;
+}
+
+export interface ForSaleReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: ForSaleRoomData;
+  playersData: Record<string, ForSalePlayerState>;
+  result: Record<string, ForSalePlayerResult>;
+}
+
+export interface ForSaleBidPayload {
+  amount: number;
+}
+
+export interface ForSaleLockSalePayload {
+  property: number;
+}
+
+export type ForSaleCommandPayload =
+  | {
+      bid: ForSaleBidPayload;
+      pass?: never;
+      lockSale?: never;
+      revealSale?: never;
+      nextRound?: never;
+      startSelling?: never;
+    }
+  | { bid?: never; pass: EmptyPayload; lockSale?: never; revealSale?: never; nextRound?: never; startSelling?: never }
+  | {
+      bid?: never;
+      pass?: never;
+      lockSale: ForSaleLockSalePayload;
+      revealSale?: never;
+      nextRound?: never;
+      startSelling?: never;
+    }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale: EmptyPayload; nextRound?: never; startSelling?: never }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale?: never; nextRound: EmptyPayload; startSelling?: never }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale?: never; nextRound?: never; startSelling: EmptyPayload };
+
+export type HiveSide = string;
+
+export type HivePieceKind = string;
+
+export type HiveActionKind = string;
+
+export interface HiveHex {
+  q: number;
+  r: number;
+}
+
+export interface HivePiece {
+  pieceID: string;
+  side: HiveSide;
+  kind: HivePieceKind;
+  number: number;
+}
+
+export interface HiveStack {
+  position: HiveHex;
+  pieces: HivePiece[];
+}
+
+export interface HiveMoveOption {
+  kind: HiveActionKind;
+  pieceID: string;
+  to: HiveHex;
+  path: HiveHex[];
+}
+
+export interface HiveActionEntry {
+  id: number;
+  kind: HiveActionKind;
+  playerID: string;
+  side: HiveSide;
+  pieceID?: string;
+  from?: HiveHex;
+  to?: HiveHex;
+  path: HiveHex[];
+  automatic: boolean;
+}
+
+export interface HivePlayerState {
+  side: HiveSide;
+  turnsTaken: number;
+  queenPlaced: boolean;
+  queenPressure: number;
+  reserveByKind: Record<string, number>;
+}
+
+export interface HiveRoomData {
+  stacks: HiveStack[];
+  currentPlayer: string;
+  currentSide: HiveSide;
+  whitePlayerID: string;
+  blackPlayerID: string;
+  firstPlayerID: string;
+  roundNo: number;
+  gameStatus: string;
+  legalActions: HiveMoveOption[];
+  moveLog: HiveActionEntry[];
+  lastAction?: HiveActionEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface HiveResult {
+  winnerID?: string;
+  winnerSide?: HiveSide;
+  draw: boolean;
+  reason: string;
+  turnCount: number;
+  placedPieceCount: number;
+  maxStackHeight: number;
+}
+
+export interface HiveRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, HivePlayerState>;
+  roomData: HiveRoomData;
+  result?: HiveResult;
+}
+
+export interface HiveReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: HiveRoomData;
+  playersData: Record<string, HivePlayerState>;
+  result?: HiveResult;
+}
+
+export interface HivePlacePiecePayload {
+  pieceID: string;
+  to: HiveHex;
+}
+
+export interface HiveMovePiecePayload {
+  pieceID: string;
+  to: HiveHex;
+}
+
+export type HiveCommandPayload =
+  | { placePiece: HivePlacePiecePayload; movePiece?: never; resign?: never }
+  | { placePiece?: never; movePiece: HiveMovePiecePayload; resign?: never }
+  | { placePiece?: never; movePiece?: never; resign: EmptyPayload };
+
 export type OnitamaSide = string;
 
 export type OnitamaPieceKind = string;
@@ -1549,6 +1962,16 @@ export interface QuoridorLeaderboardMetric {
   winRate: number;
 }
 
+export interface HexLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface HiveLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
 export interface OnitamaLeaderboardMetric {
   wins: number;
   winRate: number;
@@ -1667,6 +2090,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1677,6 +2102,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1687,6 +2114,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1697,6 +2126,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1707,6 +2138,8 @@ export type LeaderboardMetric =
       fugitive: FugitiveLeaderboardMetric;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1717,6 +2150,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest: WarChestLeaderboardMetric;
       quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1727,6 +2162,8 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorLeaderboardMetric;
+      hex?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1737,6 +2174,32 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex: HexLeaderboardMetric;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      hex?: never;
+      hive: HiveLeaderboardMetric;
+      onitama?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      hex?: never;
+      hive?: never;
       onitama: OnitamaLeaderboardMetric;
     };
 
@@ -1750,6 +2213,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1761,6 +2227,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1772,6 +2241,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1783,6 +2255,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1794,6 +2269,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1805,6 +2283,9 @@ export type ReplaySnapshot =
       quoridor: QuoridorReplaySnapshot;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1816,6 +2297,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter: LoveLetterReplaySnapshot;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1827,6 +2311,9 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtReplaySnapshot;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -1838,6 +2325,51 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex: HexReplaySnapshot;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleReplaySnapshot;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive: HiveReplaySnapshot;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama: OnitamaReplaySnapshot;
     };
 
@@ -2172,6 +2704,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2186,6 +2721,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2200,6 +2738,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2214,6 +2755,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2228,6 +2772,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2242,6 +2789,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2256,6 +2806,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2270,6 +2823,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2284,6 +2840,9 @@ export type ClientCommandPayload =
       quoridor: QuoridorCommandPayload;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2298,6 +2857,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter: LoveLetterCommandPayload;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2312,6 +2874,9 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtCommandPayload;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2326,6 +2891,60 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex: HexCommandPayload;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleCommandPayload;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive: HiveCommandPayload;
+      onitama?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama: OnitamaCommandPayload;
     };
 
@@ -2343,6 +2962,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2356,6 +2978,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2369,6 +2994,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2382,6 +3010,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2395,6 +3026,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2408,6 +3042,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2421,6 +3058,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2434,6 +3074,9 @@ export type RoomView =
       quoridor: QuoridorRoomView;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2447,6 +3090,9 @@ export type RoomView =
       quoridor?: never;
       loveletter: LoveLetterRoomView;
       sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2460,6 +3106,9 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtRoomView;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama?: never;
     }
   | {
@@ -2473,6 +3122,57 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex: HexRoomView;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleRoomView;
+      hive?: never;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive: HiveRoomView;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
       onitama: OnitamaRoomView;
     };
 

@@ -413,6 +413,40 @@ function gamePayload(
         return { sixnimmt: { nextRound: {} } };
     }
   }
+  if (gameType === 'hex') {
+    switch (commandType) {
+      case 'game_place_stone':
+        return { hex: { placeStone: objectPayload as { cell: { row: number; column: number } } } };
+      case 'game_swap':
+        return { hex: { swap: {} } };
+      case 'game_resign':
+        return { hex: { resign: {} } };
+    }
+  }
+  if (gameType === 'forsale') {
+    switch (commandType) {
+      case 'game_bid':
+        return {
+          forSale: {
+            bid: { amount: Number(objectPayload.amount) },
+          },
+        };
+      case 'game_pass':
+        return { forSale: { pass: {} } };
+      case 'game_lock_sale':
+        return {
+          forSale: {
+            lockSale: { property: Number(objectPayload.property) },
+          },
+        };
+      case 'game_reveal_sale':
+        return { forSale: { revealSale: {} } };
+      case 'game_next_round':
+        return { forSale: { nextRound: {} } };
+      case 'game_start_selling':
+        return { forSale: { startSelling: {} } };
+    }
+  }
   if (gameType === 'onitama') {
     switch (commandType) {
       case 'game_move_piece':

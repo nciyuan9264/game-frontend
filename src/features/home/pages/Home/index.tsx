@@ -10,7 +10,9 @@ import {
   Swords,
   Flag,
   Flower2,
+  Gavel,
   Heart,
+  Home as HomeIcon,
   Mail,
   X,
 } from 'lucide-react';
@@ -394,6 +396,52 @@ const OnitamaVisual = () => (
   </>
 );
 
+const HexVisual = () => {
+  const stones: Record<number, 'red' | 'teal'> = {
+    3: 'red',
+    10: 'red',
+    17: 'red',
+    24: 'red',
+    31: 'red',
+    38: 'red',
+    21: 'teal',
+    22: 'teal',
+    23: 'teal',
+    25: 'teal',
+    26: 'teal',
+    27: 'teal',
+  };
+  return <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.hexMockup}`}
+    >
+      <div className={styles.hexUI}>
+        <div className={styles.hexHeader}>
+          <span>YOUR CONNECTION</span><b>RED · NORTH / SOUTH</b>
+        </div>
+        <div className={styles.hexBoard}>
+          {Array.from({ length: 49 }, (_, index) =>
+            <i key={index}>{stones[index]
+              && <span className={styles[stones[index]]} />}</i>)}
+        </div>
+        <div className={styles.hexFooter}>
+          <span>11 × 11 CLASSIC</span><span>TWO SHORES · ONE PATH</span>
+        </div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingHexStone} ${styles.red}`} />
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingHexStone} ${styles.teal}`} />
+  </>;
+};
+
 
 const WarChestVisual = () => (
   <>
@@ -519,18 +567,53 @@ const SixNimmtVisual = () => (
   </>
 );
 
+const ForSaleVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.loveLetterMockup}`}
+    >
+      <div className={styles.loveLetterUI}>
+        <div className={styles.loveLetterHeader}><span>THE SUNDAY AUCTION</span>
+          <b><Gavel size={11} /> 03 / 07</b></div>
+        <div className={styles.loveLetterCourt}>
+          <span><HomeIcon size={20} /></span><span><Gavel size={22} /></span>
+          <span><HomeIcon size={20} /></span>
+        </div>
+        <div className={styles.loveLetterHand}>
+          {[7, 24].map(rank => <span key={rank}><b>{rank}</b><i />
+            <small>{rank === 7 ? 'COTTAGE' : 'ESTATE'}</small></span>)}
+        </div>
+        <div className={styles.loveLetterFooter}><span>BUY LOW · SELL SMART</span>
+          <span>30 PROPERTIES</span></div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingLetterCard} ${styles.letterGuard}`}>12</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingLetterCard} ${styles.letterPrincess}`}>$15K</motion.span>
+  </>
+);
+
 const gameVisuals: Record<GameKey, () => JSX.Element> = {
   acquire: AcquireVisual,
   davinci: DaVinciVisual,
   splendor: SplendorVisual,
   yinsh: YinshVisual,
   othello: OthelloVisual,
+  hex: HexVisual,
   quoridor: QuoridorVisual,
   onitama: OnitamaVisual,
   warchest: WarChestVisual,
   fugitive: FugitiveVisual,
   loveletter: LoveLetterVisual,
   sixnimmt: SixNimmtVisual,
+  forsale: ForSaleVisual,
 };
 
 type GameThemeStyle = CSSProperties & {

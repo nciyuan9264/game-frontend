@@ -47,6 +47,8 @@ export interface LobbyRoomLike {
   targetFavor?: number;
   maxPenalty?: number;
   targetPenalty?: number;
+  forSaleProgressCurrent?: number;
+  forSaleProgressTotal?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -140,23 +142,28 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     highestRevealed: room.metrics.fugitive?.highestRevealed,
     hiddenHideoutCount: room.metrics.fugitive?.hiddenHideoutCount,
     maxControlledLocations: room.metrics.warchest?.maxControlledLocations,
-    turnCount: room.metrics.quoridor?.turnCount
+    turnCount: room.metrics.hex?.turnCount
+      ?? room.metrics.quoridor?.turnCount
       ?? room.metrics.onitama?.turnCount,
     currentRound: room.metrics.loveletter?.currentRound,
     maxFavor: room.metrics.loveletter?.maxFavor,
     targetFavor: room.metrics.loveletter?.targetFavor,
     maxPenalty: room.metrics.sixnimmt?.maxPenalty,
     targetPenalty: room.metrics.sixnimmt?.targetPenalty,
+    forSaleProgressCurrent: room.metrics.forSale?.progressCurrent,
+    forSaleProgressTotal: room.metrics.forSale?.progressTotal,
     progressCurrent: room.metrics.fugitive?.progressCurrent
       ?? room.metrics.warchest?.progressCurrent
       ?? room.metrics.othello?.progressCurrent
       ?? room.metrics.loveletter?.progressCurrent
-      ?? room.metrics.sixnimmt?.progressCurrent,
+      ?? room.metrics.sixnimmt?.progressCurrent
+      ?? room.metrics.forSale?.progressCurrent,
     progressTotal: room.metrics.fugitive?.progressTotal
       ?? room.metrics.warchest?.progressTotal
       ?? room.metrics.othello?.progressTotal
       ?? room.metrics.loveletter?.progressTotal
-      ?? room.metrics.sixnimmt?.progressTotal,
+      ?? room.metrics.sixnimmt?.progressTotal
+      ?? room.metrics.forSale?.progressTotal,
   };
 }
 
