@@ -111,6 +111,10 @@ export interface SixNimmtRoomMetrics {
   progressTotal: number;
 }
 
+export interface HexRoomMetrics {
+  turnCount: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -201,6 +205,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -213,6 +218,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -225,6 +231,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -237,6 +244,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -249,6 +257,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -261,6 +270,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -273,6 +283,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -285,6 +296,7 @@ export type RoomMetrics =
       quoridor: QuoridorRoomMetrics;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -297,6 +309,7 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter: LoveLetterRoomMetrics;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -309,6 +322,20 @@ export type RoomMetrics =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtRoomMetrics;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex: HexRoomMetrics;
     };
 
 export interface AcquireTile {
@@ -1329,6 +1356,90 @@ export type SixNimmtCommandPayload =
   | { lockCard?: never; unlockCard?: never; chooseRow: SixNimmtChooseRowPayload; nextRound?: never }
   | { lockCard?: never; unlockCard?: never; chooseRow?: never; nextRound: EmptyPayload };
 
+export type HexSide = string;
+
+export type HexGameStatus = string;
+
+export type HexActionKind = string;
+
+export interface HexCell {
+  row: number;
+  column: number;
+}
+
+export interface HexActionEntry {
+  id: number;
+  kind: HexActionKind;
+  playerID: string;
+  side: HexSide;
+  cell?: HexCell;
+  automatic: boolean;
+}
+
+export interface HexPlayerState {
+  side: HexSide;
+  stoneCount: number;
+}
+
+export interface HexRoomData {
+  boardSize: number;
+  board: HexSide[];
+  currentPlayer: string;
+  currentSide: HexSide;
+  redPlayerID: string;
+  tealPlayerID: string;
+  firstPlayerID: string;
+  roundNo: number;
+  gameStatus: HexGameStatus;
+  pieRule: boolean;
+  swapAvailable: boolean;
+  legalMoves: HexCell[];
+  winningPath: HexCell[];
+  moveLog: HexActionEntry[];
+  lastAction?: HexActionEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface HexResult {
+  winnerID?: string;
+  winnerSide?: HexSide;
+  reason: string;
+  turnCount: number;
+  pathLength: number;
+  redStoneCount: number;
+  tealStoneCount: number;
+}
+
+export interface HexRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, HexPlayerState>;
+  roomData: HexRoomData;
+  result?: HexResult;
+}
+
+export interface HexReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: HexRoomData;
+  playersData: Record<string, HexPlayerState>;
+  result?: HexResult;
+}
+
+export interface HexPlaceStonePayload {
+  cell: HexCell;
+}
+
+export type HexCommandPayload =
+  | { placeStone: HexPlaceStonePayload; swap?: never; resign?: never }
+  | { placeStone?: never; swap: EmptyPayload; resign?: never }
+  | { placeStone?: never; swap?: never; resign: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -1409,6 +1520,11 @@ export interface WarChestLeaderboardMetric {
 }
 
 export interface QuoridorLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface HexLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -1526,6 +1642,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1535,6 +1652,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1544,6 +1662,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1553,6 +1672,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1562,6 +1682,7 @@ export type LeaderboardMetric =
       fugitive: FugitiveLeaderboardMetric;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1571,6 +1692,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest: WarChestLeaderboardMetric;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1580,6 +1702,17 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorLeaderboardMetric;
+      hex?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      hex: HexLeaderboardMetric;
     };
 
 export type ReplaySnapshot =
@@ -1592,6 +1725,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1602,6 +1736,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1612,6 +1747,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1622,6 +1758,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1632,6 +1769,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1642,6 +1780,7 @@ export type ReplaySnapshot =
       quoridor: QuoridorReplaySnapshot;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1652,6 +1791,7 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter: LoveLetterReplaySnapshot;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1662,6 +1802,18 @@ export type ReplaySnapshot =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtReplaySnapshot;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex: HexReplaySnapshot;
     };
 
 export interface DavinciCard {
@@ -1995,6 +2147,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2008,6 +2161,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2021,6 +2175,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2034,6 +2189,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2047,6 +2203,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2060,6 +2217,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2073,6 +2231,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2086,6 +2245,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2099,6 +2259,7 @@ export type ClientCommandPayload =
       quoridor: QuoridorCommandPayload;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2112,6 +2273,7 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter: LoveLetterCommandPayload;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -2125,6 +2287,21 @@ export type ClientCommandPayload =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtCommandPayload;
+      hex?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex: HexCommandPayload;
     };
 
 export type MatchSetupView = { warchest: WarChestMatchSetup };
@@ -2141,6 +2318,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2153,6 +2331,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2165,6 +2344,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2177,6 +2357,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2189,6 +2370,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2201,6 +2383,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2213,6 +2396,7 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2225,6 +2409,7 @@ export type RoomView =
       quoridor: QuoridorRoomView;
       loveletter?: never;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2237,6 +2422,7 @@ export type RoomView =
       quoridor?: never;
       loveletter: LoveLetterRoomView;
       sixnimmt?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -2249,6 +2435,20 @@ export type RoomView =
       quoridor?: never;
       loveletter?: never;
       sixnimmt: SixNimmtRoomView;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex: HexRoomView;
     };
 
 export type ServerMessage =

@@ -34,6 +34,8 @@ import {
   My as QuoridorMy,
   Rankings as QuoridorRankings,
 } from "@/features/quoridor/pages/Community";
+import HexLobby from "@/features/hex/pages/Lobby";
+import { Guide as HexGuide, My as HexMy, Rankings as HexRankings } from "@/features/hex/pages/Community";
 import FugitiveLobby from "@/features/fugitive/pages/Lobby";
 import FugitiveGuide from "@/features/fugitive/pages/Guide";
 import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
@@ -72,6 +74,8 @@ const OthelloSession = lazy(() => import("@/features/othello/pages/Session"));
 const OthelloReplay = lazy(() => import("@/features/othello/pages/Replay"));
 const QuoridorSession = lazy(() => import("@/features/quoridor/pages/Session"));
 const QuoridorReplay = lazy(() => import("@/features/quoridor/pages/Replay"));
+const HexSession = lazy(() => import("@/features/hex/pages/Session"));
+const HexReplay = lazy(() => import("@/features/hex/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
@@ -150,6 +154,12 @@ export const routes: AppRoute[] = [
   { path: "/game/quoridor/me", element: <QuoridorMy /> },
   { path: "/game/quoridor/match", element: <QuoridorSession /> },
   { path: "/game/quoridor/replay/:gameId", element: <QuoridorReplay /> },
+  { path: "/game/hex", element: <HexLobby /> },
+  { path: "/game/hex/rankings", element: <HexRankings /> },
+  { path: "/game/hex/guide", element: <HexGuide /> },
+  { path: "/game/hex/me", element: <HexMy /> },
+  { path: "/game/hex/match", element: <HexSession /> },
+  { path: "/game/hex/replay/:gameId", element: <HexReplay /> },
   {
     path: "/game/fugitive",
     element: <FugitiveLobby />

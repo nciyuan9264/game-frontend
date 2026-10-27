@@ -11,7 +11,8 @@ export type GameType =
   | 'warchest'
   | 'quoridor'
   | 'loveletter'
-  | 'sixnimmt';
+  | 'sixnimmt'
+  | 'hex';
 export enum GameTypeEnum {
   Acquire = 'acquire',
   Splendor = 'splendor',
@@ -23,6 +24,7 @@ export enum GameTypeEnum {
   Quoridor = 'quoridor',
   LoveLetter = 'loveletter',
   SixNimmt = 'sixnimmt',
+  Hex = 'hex',
 }
 
 const gameTypes: GameType[] = [
@@ -36,6 +38,7 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Quoridor,
   GameTypeEnum.LoveLetter,
   GameTypeEnum.SixNimmt,
+  GameTypeEnum.Hex,
 ];
 
 export const useGameType = () => {

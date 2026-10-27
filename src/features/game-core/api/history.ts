@@ -80,11 +80,13 @@ function unwrapReplaySnapshot<TSnapshot>(
             ? value.warchest
             : gameType === 'quoridor'
               ? value.quoridor
-            : gameType === 'loveletter'
-              ? value.loveletter
-            : gameType === 'sixnimmt'
-              ? value.sixnimmt
-            : undefined;
+              : gameType === 'loveletter'
+                ? value.loveletter
+                : gameType === 'sixnimmt'
+                  ? value.sixnimmt
+                  : gameType === 'hex'
+                    ? value.hex
+                    : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);
   }

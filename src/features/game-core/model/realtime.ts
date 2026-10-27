@@ -413,6 +413,16 @@ function gamePayload(
         return { sixnimmt: { nextRound: {} } };
     }
   }
+  if (gameType === 'hex') {
+    switch (commandType) {
+      case 'game_place_stone':
+        return { hex: { placeStone: objectPayload as { cell: { row: number; column: number } } } };
+      case 'game_swap':
+        return { hex: { swap: {} } };
+      case 'game_resign':
+        return { hex: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

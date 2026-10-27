@@ -10,6 +10,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('璀璨宝石', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('圈套棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('黑白棋', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('连边棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('逃亡者', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('战争之匣', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('掌心密信', { exact: false }).first()).toBeVisible();
@@ -29,7 +30,7 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   const catalog = page.locator('[aria-label="选择游戏"]');
   await expect(categories).toBeVisible();
   await expect(catalog).toBeVisible();
-  await expect(catalog.locator('article')).toHaveCount(10);
+  await expect(catalog.locator('article')).toHaveCount(11);
 
   const layout = await catalog.evaluate(element => {
     const firstCard = element.querySelector('article');
@@ -53,6 +54,9 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   await expect(loveLetter).toBeVisible();
   await loveLetter.click();
   await expect(page.getByRole('heading', { name: '掌心密信', level: 2 })).toBeVisible();
+  const hex = catalog.getByRole('button', { name: '预览连边棋' });
+  await hex.scrollIntoViewIfNeeded();
+  await expect(hex).toBeVisible();
 });
 
 for (const [gameType, heading] of [
@@ -63,6 +67,7 @@ for (const [gameType, heading] of [
   ['othello', '每一次翻转，都留下判断。'],
   ['fugitive', '城市风云榜'],
   ['warchest', '每一次调遣，都留下判断。'],
+  ['hex', '每一条路，都留下判断。'],
   ['loveletter', '每一封信，都算数。'],
   ['sixnimmt', '每一桌，都算数。'],
 ] as const) {

@@ -16,7 +16,7 @@
   background:
     linear-gradient(180deg, rgba(10, 15, 22, 0.96), rgba(13, 20, 34, 0.98) 46%, #111827),
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 42%);
-  font-family: Inter, system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: Inter, 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
 }
 
 .backgroundDecor {
@@ -1611,6 +1611,88 @@
     bottom:5rem;
     left:.2rem;
     background:#b97a86;
+  }
+}
+
+.hexMockup {
+  border-color:#6f8d82;
+  background:linear-gradient(180deg,#e5e8da,#8aa090);
+}
+
+.hexUI {
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  gap:.65rem;
+  padding:1rem;
+  color:#44584f;
+  background:#e8ebdf;
+}
+
+.hexHeader,.hexFooter {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#687b70;
+  font-size:.58rem;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.hexHeader b { color:#a05f4d; font-size:.68rem; }
+
+.hexBoard {
+  display:grid;
+  flex:1;
+  grid-template:repeat(7,1fr)/repeat(7,1fr);
+  align-content:center;
+  padding:.65rem 1.05rem;
+  transform:skewX(30deg);
+
+  > i {
+    position:relative;
+    display:grid;
+    aspect-ratio:1;
+    place-items:center;
+    margin:-.08rem .04rem;
+    border:1px solid rgba(102,119,105,.35);
+    background:#f8f5e8;
+    clip-path:polygon(25% 6.7%,75% 6.7%,100% 50%,75% 93.3%,25% 93.3%,0 50%);
+  }
+
+  i > span {
+    display:block;
+    width:68%;
+    aspect-ratio:1;
+    transform:skewX(-30deg);
+    border-radius:50%;
+    box-shadow:inset -2px -2px 3px rgba(0,0,0,.18),0 2px 3px rgba(45,62,51,.25);
+  }
+
+  .red { background:radial-gradient(circle at 32% 24%,#e1a28b,#b86f57 67%,#944d3a); }
+  .teal { background:radial-gradient(circle at 32% 24%,#85aaa1,#39776f 67%,#25574f); }
+}
+
+.floatingHexStone {
+  position:absolute;
+  z-index:2;
+  width:5rem;
+  height:5rem;
+  border-radius:50%;
+  box-shadow:inset -4px -5px 8px rgba(0,0,0,.2),0 24px 42px rgba(0,0,0,.35);
+
+  &.red {
+    top:4.5rem;
+    right:.3rem;
+    border:2px solid #8d4838;
+    background:radial-gradient(circle at 32% 24%,#e0a088,#b86f57 68%,#934b39);
+  }
+
+  &.teal {
+    bottom:5rem;
+    left:.2rem;
+    border:2px solid #24564e;
+    background:radial-gradient(circle at 32% 24%,#86aaa1,#39766d 68%,#24564d);
   }
 }
 

@@ -23,7 +23,8 @@ export type HistoryGameType =
   | 'warchest'
   | 'quoridor'
   | 'loveletter'
-  | 'sixnimmt';
+  | 'sixnimmt'
+  | 'hex';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -135,6 +136,7 @@ export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type QuoridorLeaderboardEntry = DavinciLeaderboardEntry;
 export type LoveLetterLeaderboardEntry = RankLeaderboardEntry;
 export type SixNimmtLeaderboardEntry = RankLeaderboardEntry;
+export type HexLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export type LoveLetterSnapshot = LoveLetterReplaySnapshot & {
@@ -210,6 +212,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.quoridor.wins,
       winRate: entry.metric.quoridor.winRate,
+    };
+  }
+  if (entry.metric.hex) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.hex.wins,
+      winRate: entry.metric.hex.winRate,
     };
   }
   if (!entry.metric.rank) {
