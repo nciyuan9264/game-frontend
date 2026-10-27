@@ -66,7 +66,9 @@ export async function createPrivateRoom(
     data: {
       gameType,
       visibility: 'private',
-      maxPlayers: gameType === 'sixnimmt' ? 10 : 2,
+      maxPlayers: gameType === 'sixnimmt'
+        ? 10
+        : gameType === 'loveletter' ? 6 : 2,
       requestID,
     },
   });
