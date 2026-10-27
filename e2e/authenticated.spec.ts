@@ -42,6 +42,11 @@ const games = [
     lobbyHeading: /别做第六个/,
     profileHeading: '每一桌，都有点小故事。',
   },
+  {
+    gameType: 'forsale',
+    lobbyHeading: /好房在手/,
+    profileHeading: '每一场买卖，都值得回味。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {

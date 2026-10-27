@@ -86,6 +86,8 @@ function unwrapReplaySnapshot<TSnapshot>(
                   ? value.sixnimmt
                   : gameType === 'hex'
                     ? value.hex
+                    : gameType === 'forsale'
+                      ? value.forSale
                     : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);

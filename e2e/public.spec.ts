@@ -15,6 +15,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('战争之匣', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('掌心密信', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('6 nimmt!', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('地产拍卖', { exact: false }).first()).toBeVisible();
   await expect.poll(async () => page.locator('img').evaluateAll(images =>
     images.every(image => (image as HTMLImageElement).complete
       && (image as HTMLImageElement).naturalWidth > 0))).toBeTruthy();
@@ -30,7 +31,7 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   const catalog = page.locator('[aria-label="选择游戏"]');
   await expect(categories).toBeVisible();
   await expect(catalog).toBeVisible();
-  await expect(catalog.locator('article')).toHaveCount(11);
+  await expect(catalog.locator('article')).toHaveCount(12);
 
   const layout = await catalog.evaluate(element => {
     const firstCard = element.querySelector('article');
@@ -70,6 +71,7 @@ for (const [gameType, heading] of [
   ['hex', '每一条路，都留下判断。'],
   ['loveletter', '每一封信，都算数。'],
   ['sixnimmt', '每一桌，都算数。'],
+  ['forsale', '每一笔买卖，都算数。'],
 ] as const) {
   test(`${gameType} ranking page renders`, async ({ context, page }) => {
     test.skip(!process.env.REGRESSION_ACCESS_TOKEN, 'authenticated profile cookie is required');

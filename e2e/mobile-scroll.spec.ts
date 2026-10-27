@@ -8,6 +8,8 @@ const games = [
   { gameType: 'othello', mobileNavigation: 'OTHELLO 手机导航' },
   { gameType: 'fugitive', mobileNavigation: 'Fugitive 手机导航' },
   { gameType: 'warchest', mobileNavigation: '战争之匣手机导航' },
+  { gameType: 'loveletter', mobileNavigation: '掌心密信手机导航' },
+  { gameType: 'forsale', mobileNavigation: 'For Sale 手机导航' },
 ] as const;
 
 async function mockProfile(page: Page) {

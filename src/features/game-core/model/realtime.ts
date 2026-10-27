@@ -423,6 +423,30 @@ function gamePayload(
         return { hex: { resign: {} } };
     }
   }
+  if (gameType === 'forsale') {
+    switch (commandType) {
+      case 'game_bid':
+        return {
+          forSale: {
+            bid: { amount: Number(objectPayload.amount) },
+          },
+        };
+      case 'game_pass':
+        return { forSale: { pass: {} } };
+      case 'game_lock_sale':
+        return {
+          forSale: {
+            lockSale: { property: Number(objectPayload.property) },
+          },
+        };
+      case 'game_reveal_sale':
+        return { forSale: { revealSale: {} } };
+      case 'game_next_round':
+        return { forSale: { nextRound: {} } };
+      case 'game_start_selling':
+        return { forSale: { startSelling: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

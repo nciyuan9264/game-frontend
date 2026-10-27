@@ -115,6 +115,11 @@ export interface HexRoomMetrics {
   turnCount: number;
 }
 
+export interface ForSaleRoomMetrics {
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -206,6 +211,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -219,6 +225,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -232,6 +239,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -245,6 +253,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -258,6 +267,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -271,6 +281,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -284,6 +295,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -297,6 +309,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -310,6 +323,7 @@ export type RoomMetrics =
       loveletter: LoveLetterRoomMetrics;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -323,6 +337,7 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt: SixNimmtRoomMetrics;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -336,6 +351,21 @@ export type RoomMetrics =
       loveletter?: never;
       sixnimmt?: never;
       hex: HexRoomMetrics;
+      forSale?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleRoomMetrics;
     };
 
 export interface AcquireTile {
@@ -1440,6 +1470,127 @@ export type HexCommandPayload =
   | { placeStone?: never; swap: EmptyPayload; resign?: never }
   | { placeStone?: never; swap?: never; resign: EmptyPayload };
 
+export type ForSaleGameStatus = string;
+
+export type ForSaleActionSource = string;
+
+export interface ForSaleTrade {
+  playerID: string;
+  property: number;
+  amount: number;
+}
+
+export interface ForSaleRoundRecord {
+  round: number;
+  trades: ForSaleTrade[];
+}
+
+export interface ForSaleActionEntry {
+  id: number;
+  round: number;
+  phase: string;
+  kind: string;
+  playerID: string;
+  source: ForSaleActionSource;
+  amount?: number;
+  property?: number;
+  cheque?: number;
+  paid?: number;
+}
+
+export interface ForSalePlayerState {
+  seatIndex: number;
+  bid: number;
+  passed: boolean;
+  propertyCount: number;
+  chequeCount: number;
+  locked: boolean;
+  coins?: number;
+  properties?: number[];
+  cheques?: number[];
+  lockedProperty?: number;
+  wonProperty?: number;
+  roundCost?: number;
+  actionDeadline?: string;
+  actionTimeoutMs?: string;
+}
+
+export interface ForSaleRoomData {
+  gameStatus: ForSaleGameStatus;
+  round: number;
+  totalRounds: number;
+  propertyMarket: number[];
+  chequeMarket: number[];
+  highestBid: number;
+  currentPlayer: string;
+  starterPlayer: string;
+  lockedCount: number;
+  purchases: ForSaleRoundRecord[];
+  sales: ForSaleRoundRecord[];
+  actionLog: ForSaleActionEntry[];
+  lastAction?: ForSaleActionEntry;
+  transitionDeadline?: string;
+  transitionTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface ForSalePlayerResult {
+  chequeTotal: number;
+  coins: number;
+  total: number;
+  rank: number;
+  winner: boolean;
+}
+
+export interface ForSaleRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, ForSalePlayerState>;
+  roomData: ForSaleRoomData;
+  result?: Record<string, ForSalePlayerResult>;
+}
+
+export interface ForSaleReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: ForSaleRoomData;
+  playersData: Record<string, ForSalePlayerState>;
+  result: Record<string, ForSalePlayerResult>;
+}
+
+export interface ForSaleBidPayload {
+  amount: number;
+}
+
+export interface ForSaleLockSalePayload {
+  property: number;
+}
+
+export type ForSaleCommandPayload =
+  | {
+      bid: ForSaleBidPayload;
+      pass?: never;
+      lockSale?: never;
+      revealSale?: never;
+      nextRound?: never;
+      startSelling?: never;
+    }
+  | { bid?: never; pass: EmptyPayload; lockSale?: never; revealSale?: never; nextRound?: never; startSelling?: never }
+  | {
+      bid?: never;
+      pass?: never;
+      lockSale: ForSaleLockSalePayload;
+      revealSale?: never;
+      nextRound?: never;
+      startSelling?: never;
+    }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale: EmptyPayload; nextRound?: never; startSelling?: never }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale?: never; nextRound: EmptyPayload; startSelling?: never }
+  | { bid?: never; pass?: never; lockSale?: never; revealSale?: never; nextRound?: never; startSelling: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -1726,6 +1877,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1737,6 +1889,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1748,6 +1901,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1759,6 +1913,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1770,6 +1925,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1781,6 +1937,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1792,6 +1949,7 @@ export type ReplaySnapshot =
       loveletter: LoveLetterReplaySnapshot;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1803,6 +1961,7 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt: SixNimmtReplaySnapshot;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -1814,6 +1973,19 @@ export type ReplaySnapshot =
       loveletter?: never;
       sixnimmt?: never;
       hex: HexReplaySnapshot;
+      forSale?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleReplaySnapshot;
     };
 
 export interface DavinciCard {
@@ -2148,6 +2320,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2162,6 +2335,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2176,6 +2350,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2190,6 +2365,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2204,6 +2380,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2218,6 +2395,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2232,6 +2410,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2246,6 +2425,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2260,6 +2440,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2274,6 +2455,7 @@ export type ClientCommandPayload =
       loveletter: LoveLetterCommandPayload;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2288,6 +2470,7 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt: SixNimmtCommandPayload;
       hex?: never;
+      forSale?: never;
     }
   | {
       common?: never;
@@ -2302,6 +2485,22 @@ export type ClientCommandPayload =
       loveletter?: never;
       sixnimmt?: never;
       hex: HexCommandPayload;
+      forSale?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleCommandPayload;
     };
 
 export type MatchSetupView = { warchest: WarChestMatchSetup };
@@ -2319,6 +2518,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2332,6 +2532,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2345,6 +2546,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2358,6 +2560,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2371,6 +2574,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2384,6 +2588,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2397,6 +2602,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2410,6 +2616,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2423,6 +2630,7 @@ export type RoomView =
       loveletter: LoveLetterRoomView;
       sixnimmt?: never;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2436,6 +2644,7 @@ export type RoomView =
       loveletter?: never;
       sixnimmt: SixNimmtRoomView;
       hex?: never;
+      forSale?: never;
     }
   | {
       acquire?: never;
@@ -2449,6 +2658,21 @@ export type RoomView =
       loveletter?: never;
       sixnimmt?: never;
       hex: HexRoomView;
+      forSale?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale: ForSaleRoomView;
     };
 
 export type ServerMessage =

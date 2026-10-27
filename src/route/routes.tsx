@@ -60,6 +60,12 @@ import {
   My as SixNimmtMy,
   Rankings as SixNimmtRankings,
 } from "@/features/sixnimmt/pages/Community";
+import ForSaleLobby from "@/features/forsale/pages/Lobby";
+import {
+  Guide as ForSaleGuide,
+  My as ForSaleMy,
+  Rankings as ForSaleRankings,
+} from "@/features/forsale/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -83,6 +89,8 @@ const LoveLetterSession = lazy(() => import("@/features/loveletter/pages/Session
 const LoveLetterReplay = lazy(() => import("@/features/loveletter/pages/Replay"));
 const SixNimmtSession = lazy(() => import("@/features/sixnimmt/pages/Session"));
 const SixNimmtReplay = lazy(() => import("@/features/sixnimmt/pages/Replay"));
+const ForSaleSession = lazy(() => import("@/features/forsale/pages/Session"));
+const ForSaleReplay = lazy(() => import("@/features/forsale/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -188,6 +196,12 @@ export const routes: AppRoute[] = [
   { path: "/game/sixnimmt/me", element: <SixNimmtMy /> },
   { path: "/game/sixnimmt/match", element: <SixNimmtSession /> },
   { path: "/game/sixnimmt/replay/:gameId", element: <SixNimmtReplay /> },
+  { path: "/game/forsale", element: <ForSaleLobby /> },
+  { path: "/game/forsale/rankings", element: <ForSaleRankings /> },
+  { path: "/game/forsale/guide", element: <ForSaleGuide /> },
+  { path: "/game/forsale/me", element: <ForSaleMy /> },
+  { path: "/game/forsale/match", element: <ForSaleSession /> },
+  { path: "/game/forsale/replay/:gameId", element: <ForSaleReplay /> },
   {
     path: "/",
     element: <Home />
