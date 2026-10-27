@@ -42,6 +42,12 @@ import {
   My as OnitamaMy,
   Rankings as OnitamaRankings,
 } from "@/features/onitama/pages/Community";
+import HiveLobby from "@/features/hive/pages/Lobby";
+import {
+  Guide as HiveGuide,
+  My as HiveMy,
+  Rankings as HiveRankings,
+} from "@/features/hive/pages/Community";
 import FugitiveLobby from "@/features/fugitive/pages/Lobby";
 import FugitiveGuide from "@/features/fugitive/pages/Guide";
 import FugitiveCardLibrary from "@/features/fugitive/pages/CardLibrary";
@@ -90,6 +96,8 @@ const HexSession = lazy(() => import("@/features/hex/pages/Session"));
 const HexReplay = lazy(() => import("@/features/hex/pages/Replay"));
 const OnitamaSession = lazy(() => import("@/features/onitama/pages/Session"));
 const OnitamaReplay = lazy(() => import("@/features/onitama/pages/Replay"));
+const HiveSession = lazy(() => import("@/features/hive/pages/Session"));
+const HiveReplay = lazy(() => import("@/features/hive/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
@@ -182,6 +190,15 @@ export const routes: AppRoute[] = [
   { path: "/game/onitama/me", element: <OnitamaMy /> },
   { path: "/game/onitama/match", element: <OnitamaSession /> },
   { path: "/game/onitama/replay/:gameId", element: <OnitamaReplay /> },
+  {
+    path: "/game/hive",
+    element: <HiveLobby />
+  },
+  { path: "/game/hive/rankings", element: <HiveRankings /> },
+  { path: "/game/hive/guide", element: <HiveGuide /> },
+  { path: "/game/hive/me", element: <HiveMy /> },
+  { path: "/game/hive/match", element: <HiveSession /> },
+  { path: "/game/hive/replay/:gameId", element: <HiveReplay /> },
   {
     path: "/game/fugitive",
     element: <FugitiveLobby />

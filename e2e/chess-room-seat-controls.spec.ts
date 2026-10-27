@@ -59,6 +59,18 @@ const games = [
       },
     },
   },
+  {
+    game: 'hive',
+    seatTestID: 'hive-room-seat',
+    metrics: {
+      hive: {
+        turnCount: 0,
+        placedPieceCount: 0,
+        progressCurrent: 0,
+        progressTotal: 6,
+      },
+    },
+  },
 ] as const;
 
 async function mockRoom(

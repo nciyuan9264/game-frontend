@@ -5,6 +5,8 @@ import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowRight,
   Crown,
+  Move,
+  Puzzle,
   Search,
   Sparkles,
   Swords,
@@ -442,6 +444,52 @@ const HexVisual = () => {
   </>;
 };
 
+const HiveVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.warChestMockup}`}
+    >
+      <div className={styles.warChestUI}>
+        <div className={styles.warChestHeader}>
+          <span>WHITE · YOUR MOVE</span><b>ONE HIVE</b>
+        </div>
+        <div className={styles.warChestBoard}>
+          {Array.from({ length: 37 }, (_, index) =>
+            <i key={index}
+              className={[7, 12, 13, 18, 19, 23, 24, 29].includes(index)
+                ? styles.location
+                : ''}>
+              {[12, 18, 19, 24].includes(index) &&
+                <span><Crown size={index === 18 ? 13 : 10} /></span>}
+            </i>)}
+        </div>
+        <div className={styles.warChestCommands}>
+          <span><Puzzle size={15} /></span>
+          <span><Move size={15} /></span>
+          <span><Crown size={15} /></span>
+        </div>
+        <div className={styles.warChestFooter}>
+          <span>22 TILES · NO BOARD</span><span>SURROUND THE QUEEN</span>
+        </div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingWarCoin} ${styles.oakCoin}`}>
+      <Puzzle size={27} />
+    </motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingWarCoin} ${styles.falconCoin}`}>
+      <Crown size={27} />
+    </motion.span>
+  </>
+);
+
 
 const WarChestVisual = () => (
   <>
@@ -609,6 +657,7 @@ const gameVisuals: Record<GameKey, () => JSX.Element> = {
   hex: HexVisual,
   quoridor: QuoridorVisual,
   onitama: OnitamaVisual,
+  hive: HiveVisual,
   warchest: WarChestVisual,
   fugitive: FugitiveVisual,
   loveletter: LoveLetterVisual,

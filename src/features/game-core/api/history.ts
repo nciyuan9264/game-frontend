@@ -88,9 +88,11 @@ function unwrapReplaySnapshot<TSnapshot>(
                     ? value.hex
                     : gameType === 'forsale'
                       ? value.forSale
-                    : gameType === 'onitama'
-                      ? value.onitama
-                    : undefined;
+                      : gameType === 'onitama'
+                        ? value.onitama
+                      : gameType === 'hive'
+                        ? value.hive
+                        : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);
   }

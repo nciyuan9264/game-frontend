@@ -469,6 +469,30 @@ function gamePayload(
         return { onitama: { resign: {} } };
     }
   }
+  if (gameType === 'hive') {
+    switch (commandType) {
+      case 'game_place_piece':
+        return {
+          hive: {
+            placePiece: objectPayload as {
+              pieceID: string;
+              to: { q: number; r: number };
+            },
+          },
+        };
+      case 'game_move_piece':
+        return {
+          hive: {
+            movePiece: objectPayload as {
+              pieceID: string;
+              to: { q: number; r: number };
+            },
+          },
+        };
+      case 'game_resign':
+        return { hive: { resign: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

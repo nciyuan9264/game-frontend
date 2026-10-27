@@ -14,7 +14,8 @@ export type GameType =
   | 'sixnimmt'
   | 'hex'
   | 'forsale'
-  | 'onitama';
+  | 'onitama'
+  | 'hive';
 export enum GameTypeEnum {
   Acquire = 'acquire',
   Splendor = 'splendor',
@@ -29,6 +30,7 @@ export enum GameTypeEnum {
   Hex = 'hex',
   ForSale = 'forsale',
   Onitama = 'onitama',
+  Hive = 'hive',
 }
 
 const gameTypes: GameType[] = [
@@ -45,6 +47,7 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Hex,
   GameTypeEnum.ForSale,
   GameTypeEnum.Onitama,
+  GameTypeEnum.Hive,
 ];
 
 export const useGameType = () => {

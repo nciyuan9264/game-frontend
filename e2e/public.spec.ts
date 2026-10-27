@@ -17,6 +17,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('6 nimmt!', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('地产拍卖', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('御神乐棋', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('虫棋', { exact: false }).first()).toBeVisible();
   await expect.poll(async () => page.locator('img').evaluateAll(images =>
     images.every(image => (image as HTMLImageElement).complete
       && (image as HTMLImageElement).naturalWidth > 0))).toBeTruthy();
@@ -32,7 +33,7 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   const catalog = page.locator('[aria-label="选择游戏"]');
   await expect(categories).toBeVisible();
   await expect(catalog).toBeVisible();
-  await expect(catalog.locator('article')).toHaveCount(13);
+  await expect(catalog.locator('article')).toHaveCount(14);
 
   const layout = await catalog.evaluate(element => {
     const firstCard = element.querySelector('article');
@@ -56,6 +57,11 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   await expect(loveLetter).toBeVisible();
   await loveLetter.click();
   await expect(page.getByRole('heading', { name: '掌心密信', level: 2 })).toBeVisible();
+  const hive = catalog.getByRole('button', { name: '预览虫棋' });
+  await hive.scrollIntoViewIfNeeded();
+  await expect(hive).toBeVisible();
+  await hive.click();
+  await expect(page.getByRole('heading', { name: '虫棋', level: 2 })).toBeVisible();
   const hex = catalog.getByRole('button', { name: '预览连边棋' });
   await hex.scrollIntoViewIfNeeded();
   await expect(hex).toBeVisible();
@@ -67,6 +73,7 @@ for (const [gameType, heading] of [
   ['splendor', '让每一次远见，都留下声望。'],
   ['yinsh', '每一次取环，都留下判断。'],
   ['othello', '每一次翻转，都留下判断。'],
+  ['hive', '每一条路，都留下判断。'],
   ['fugitive', '城市风云榜'],
   ['warchest', '每一次调遣，都留下判断。'],
   ['hex', '每一条路，都留下判断。'],

@@ -33,6 +33,7 @@ const games = [
   { game: 'fugitive', maxPlayers: 2 },
   { game: 'warchest', maxPlayers: 2 },
   { game: 'quoridor', maxPlayers: 2 },
+  { game: 'hive', maxPlayers: 2 },
 ] as const;
 
 function warChestSetup() {

@@ -12,6 +12,7 @@ import { OthelloSessionLoading } from '@/features/othello/pages/Session/Loading'
 import { QuoridorLoading } from '@/features/quoridor/components/LoadingState';
 import { HexLoading } from '@/features/hex/components/LoadingState';
 import { OnitamaLoading } from '@/features/onitama/components/LoadingState';
+import { HiveLoading } from '@/features/hive/components/LoadingState';
 import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
 import { LoveLetterLoading } from '@/features/loveletter/components/LoadingState';
@@ -45,6 +46,8 @@ export const RenderRoutes = () => {
                                     ? <HexLoading fullScreen />
                                 : route.path.startsWith('/game/onitama')
                                     ? <OnitamaLoading fullScreen />
+                                : route.path.startsWith('/game/hive')
+                                    ? <HiveLoading fullScreen />
                                 : route.path.startsWith('/game/fugitive')
                                     ? <FugitiveLoading fullScreen />
                                     : route.path.startsWith('/game/warchest')

@@ -27,7 +27,8 @@ export type HistoryGameType =
   | 'sixnimmt'
   | 'hex'
   | 'forsale'
-  | 'onitama';
+  | 'onitama'
+  | 'hive';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -142,6 +143,7 @@ export type SixNimmtLeaderboardEntry = RankLeaderboardEntry;
 export type HexLeaderboardEntry = DavinciLeaderboardEntry;
 export type ForSaleLeaderboardEntry = RankLeaderboardEntry;
 export type OnitamaLeaderboardEntry = DavinciLeaderboardEntry;
+export type HiveLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export type LoveLetterSnapshot = LoveLetterReplaySnapshot & {
@@ -240,6 +242,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.onitama.wins,
       winRate: entry.metric.onitama.winRate,
+    };
+  }
+  if (entry.metric.hive) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.hive.wins,
+      winRate: entry.metric.hive.winRate,
     };
   }
   if (!entry.metric.rank) {

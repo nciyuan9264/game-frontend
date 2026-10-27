@@ -7,6 +7,7 @@ type GameType =
   | 'yinsh'
   | 'othello'
   | 'quoridor'
+  | 'hive'
   | 'fugitive'
   | 'warchest';
 
@@ -22,6 +23,7 @@ const lobbyCases: Array<{
   { gameType: 'yinsh', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'YINSH 手机导航' },
   { gameType: 'othello', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'OTHELLO 手机导航' },
   { gameType: 'quoridor', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一条路，慢慢走。', mobileNavigation: 'QUORIDOR 手机导航' },
+  { gameType: 'hive', searchPlaceholder: '搜索房间号 / 房主', heading: '从一枚棋子，长成一片蜂巢。', mobileNavigation: 'HIVE 手机导航' },
   { gameType: 'fugitive', searchPlaceholder: '搜索房间号 / 房主', heading: '找一个对手，开一场追逐。', mobileNavigation: 'Fugitive 手机导航' },
   { gameType: 'warchest', searchPlaceholder: '搜索房间号 / 房主', heading: '为下一场交锋，入席。', mobileNavigation: '战争之匣手机导航' },
 ];
@@ -94,6 +96,15 @@ const communityCases: Array<{
       profile: '你的每一步，都值得回看。',
     },
     mobileNavigation: 'QUORIDOR 手机导航',
+  },
+  {
+    gameType: 'hive',
+    title: {
+      rankings: '每一条路，都留下判断。',
+      guide: '规则很短，蜂巢没有边界。',
+      profile: '你的每一步，都值得回看。',
+    },
+    mobileNavigation: 'HIVE 手机导航',
   },
   {
     gameType: 'fugitive',
@@ -207,7 +218,8 @@ function ownerIdentityRoom(gameType: GameType) {
     updatedAt: '2026-10-26T00:00:00Z',
     displayName: gameType === 'fugitive' ? '午夜追缉'
       : gameType === 'warchest' ? '雾谷前哨' : undefined,
-    turnTimeoutSeconds: gameType === 'warchest' ? 90 : 60,
+    turnTimeoutSeconds: gameType === 'warchest' ? 90
+      : gameType === 'hive' ? 120 : 60,
     players: [{
       userID: '330',
       playerID: 'guest-330',
@@ -243,6 +255,12 @@ function ownerIdentityRoom(gameType: GameType) {
       },
       warchest: { maxControlledLocations: 0, progressCurrent: 0, progressTotal: 6 },
       quoridor: { turnCount: 0 },
+      hive: {
+        turnCount: 0,
+        placedPieceCount: 0,
+        progressCurrent: 0,
+        progressTotal: 6,
+      },
     },
   };
 }

@@ -6,6 +6,8 @@ const games = [
   { gameType: 'splendor', mobileNavigation: '璀璨宝石手机导航' },
   { gameType: 'yinsh', mobileNavigation: 'YINSH 手机导航' },
   { gameType: 'othello', mobileNavigation: 'OTHELLO 手机导航' },
+  { gameType: 'quoridor', mobileNavigation: 'QUORIDOR 手机导航' },
+  { gameType: 'hive', mobileNavigation: 'HIVE 手机导航' },
   { gameType: 'fugitive', mobileNavigation: 'Fugitive 手机导航' },
   { gameType: 'warchest', mobileNavigation: '战争之匣手机导航' },
   { gameType: 'loveletter', mobileNavigation: '掌心密信手机导航' },

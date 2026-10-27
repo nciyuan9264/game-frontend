@@ -43,6 +43,11 @@ import {
   listOnitamaRooms,
   lookupOnitamaRoom,
 } from '@/features/onitama/api/room';
+import {
+  createHiveRoom,
+  listHiveRooms,
+  lookupHiveRoom,
+} from '@/features/hive/api/room';
 
 const shared = vi.hoisted(() => ({
   createGameRoom: vi.fn(),
@@ -254,6 +259,30 @@ describe('game room API wrappers', () => {
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'onitama',
       'room-8',
+      options,
+    );
+  });
+
+  it('injects Hive fixed seats and authoritative timeout', () => {
+    const signal = new AbortController().signal;
+    createHiveRoom('private', signal);
+    listHiveRooms(signal);
+    lookupHiveRoom('room-9', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'hive',
+      {
+        visibility: 'private',
+        maxPlayers: 2,
+        turnTimeoutSeconds: 120,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('hive', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'hive',
+      'room-9',
       options,
     );
   });
