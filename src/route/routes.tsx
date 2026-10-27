@@ -72,6 +72,12 @@ import {
   My as SixNimmtMy,
   Rankings as SixNimmtRankings,
 } from "@/features/sixnimmt/pages/Community";
+import CantStopLobby from "@/features/cantstop/pages/Lobby";
+import {
+  Guide as CantStopGuide,
+  My as CantStopMy,
+  Rankings as CantStopRankings,
+} from "@/features/cantstop/pages/Community";
 import ForSaleLobby from "@/features/forsale/pages/Lobby";
 import {
   Guide as ForSaleGuide,
@@ -105,6 +111,8 @@ const LoveLetterSession = lazy(() => import("@/features/loveletter/pages/Session
 const LoveLetterReplay = lazy(() => import("@/features/loveletter/pages/Replay"));
 const SixNimmtSession = lazy(() => import("@/features/sixnimmt/pages/Session"));
 const SixNimmtReplay = lazy(() => import("@/features/sixnimmt/pages/Replay"));
+const CantStopSession = lazy(() => import("@/features/cantstop/pages/Session"));
+const CantStopReplay = lazy(() => import("@/features/cantstop/pages/Replay"));
 const ForSaleSession = lazy(() => import("@/features/forsale/pages/Session"));
 const ForSaleReplay = lazy(() => import("@/features/forsale/pages/Replay"));
 
@@ -227,6 +235,12 @@ export const routes: AppRoute[] = [
   { path: "/game/sixnimmt/me", element: <SixNimmtMy /> },
   { path: "/game/sixnimmt/match", element: <SixNimmtSession /> },
   { path: "/game/sixnimmt/replay/:gameId", element: <SixNimmtReplay /> },
+  { path: "/game/cantstop", element: <CantStopLobby /> },
+  { path: "/game/cantstop/rankings", element: <CantStopRankings /> },
+  { path: "/game/cantstop/guide", element: <CantStopGuide /> },
+  { path: "/game/cantstop/me", element: <CantStopMy /> },
+  { path: "/game/cantstop/match", element: <CantStopSession /> },
+  { path: "/game/cantstop/replay/:gameId", element: <CantStopReplay /> },
   { path: "/game/forsale", element: <ForSaleLobby /> },
   { path: "/game/forsale/rankings", element: <ForSaleRankings /> },
   { path: "/game/forsale/guide", element: <ForSaleGuide /> },

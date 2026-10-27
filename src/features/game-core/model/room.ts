@@ -47,6 +47,8 @@ export interface LobbyRoomLike {
   targetFavor?: number;
   maxPenalty?: number;
   targetPenalty?: number;
+  maxClaimedColumns?: number;
+  targetColumns?: number;
   forSaleProgressCurrent?: number;
   forSaleProgressTotal?: number;
   placedPieceCount?: number;
@@ -153,6 +155,8 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     targetFavor: room.metrics.loveletter?.targetFavor,
     maxPenalty: room.metrics.sixnimmt?.maxPenalty,
     targetPenalty: room.metrics.sixnimmt?.targetPenalty,
+    maxClaimedColumns: room.metrics.cantstop?.maxClaimedColumns,
+    targetColumns: room.metrics.cantstop?.targetColumns,
     forSaleProgressCurrent: room.metrics.forSale?.progressCurrent,
     forSaleProgressTotal: room.metrics.forSale?.progressTotal,
     progressCurrent: room.metrics.fugitive?.progressCurrent
@@ -160,6 +164,7 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
       ?? room.metrics.othello?.progressCurrent
       ?? room.metrics.loveletter?.progressCurrent
       ?? room.metrics.sixnimmt?.progressCurrent
+      ?? room.metrics.cantstop?.progressCurrent
       ?? room.metrics.forSale?.progressCurrent
       ?? room.metrics.hive?.progressCurrent,
     progressTotal: room.metrics.fugitive?.progressTotal
@@ -167,6 +172,7 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
       ?? room.metrics.othello?.progressTotal
       ?? room.metrics.loveletter?.progressTotal
       ?? room.metrics.sixnimmt?.progressTotal
+      ?? room.metrics.cantstop?.progressTotal
       ?? room.metrics.forSale?.progressTotal
       ?? room.metrics.hive?.progressTotal,
   };

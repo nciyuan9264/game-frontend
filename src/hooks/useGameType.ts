@@ -12,6 +12,7 @@ export type GameType =
   | 'quoridor'
   | 'loveletter'
   | 'sixnimmt'
+  | 'cantstop'
   | 'hex'
   | 'forsale'
   | 'onitama'
@@ -27,6 +28,7 @@ export enum GameTypeEnum {
   Quoridor = 'quoridor',
   LoveLetter = 'loveletter',
   SixNimmt = 'sixnimmt',
+  CantStop = 'cantstop',
   Hex = 'hex',
   ForSale = 'forsale',
   Onitama = 'onitama',
@@ -44,6 +46,7 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Quoridor,
   GameTypeEnum.LoveLetter,
   GameTypeEnum.SixNimmt,
+  GameTypeEnum.CantStop,
   GameTypeEnum.Hex,
   GameTypeEnum.ForSale,
   GameTypeEnum.Onitama,

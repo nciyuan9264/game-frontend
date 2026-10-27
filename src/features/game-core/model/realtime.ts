@@ -413,6 +413,22 @@ function gamePayload(
         return { sixnimmt: { nextRound: {} } };
     }
   }
+  if (gameType === 'cantstop') {
+    switch (commandType) {
+      case 'game_roll_dice':
+        return { cantstop: { rollDice: {} } };
+      case 'game_advance':
+        return {
+          cantstop: {
+            advance: { actionID: String(objectPayload.actionID ?? '') },
+          },
+        };
+      case 'game_bank':
+        return { cantstop: { bank: {} } };
+      case 'game_next_turn':
+        return { cantstop: { nextTurn: {} } };
+    }
+  }
   if (gameType === 'hex') {
     switch (commandType) {
       case 'game_place_stone':

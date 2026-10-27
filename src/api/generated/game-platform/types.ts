@@ -131,6 +131,13 @@ export interface OnitamaRoomMetrics {
   turnCount: number;
 }
 
+export interface CantStopRoomMetrics {
+  maxClaimedColumns: number;
+  targetColumns: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -225,6 +232,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -241,6 +249,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -257,6 +266,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -273,6 +283,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -289,6 +300,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -305,6 +317,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -321,6 +334,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -337,6 +351,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -353,6 +368,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -369,6 +385,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -385,6 +402,7 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -401,6 +419,7 @@ export type RoomMetrics =
       forSale: ForSaleRoomMetrics;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -417,6 +436,7 @@ export type RoomMetrics =
       forSale?: never;
       hive: HiveRoomMetrics;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -433,6 +453,24 @@ export type RoomMetrics =
       forSale?: never;
       hive?: never;
       onitama: OnitamaRoomMetrics;
+      cantstop?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+      cantstop: CantStopRoomMetrics;
     };
 
 export interface AcquireTile {
@@ -1878,6 +1916,100 @@ export type OnitamaCommandPayload =
   | { movePiece?: never; pass: OnitamaPassPayload; resign?: never }
   | { movePiece?: never; pass?: never; resign: EmptyPayload };
 
+export type CantStopGameStatus = string;
+
+export type CantStopActionKind = string;
+
+export interface CantStopPairingOption {
+  actionID: string;
+  pairingIndex: number;
+  variantIndex: number;
+  sums: number[];
+  diceIndexes: number[];
+  advances: Record<number, number>;
+  runnerPositions: Record<number, number>;
+  stepCount: number;
+}
+
+export interface CantStopPlayerState {
+  savedProgress: Record<number, number>;
+  claimedColumns: number[];
+  savedStepCount: number;
+}
+
+export interface CantStopActionEntry {
+  id: number;
+  turnNumber: number;
+  rollNumber: number;
+  kind: CantStopActionKind;
+  playerID: string;
+  dice?: number[];
+  actionID?: string;
+  columns: number[];
+  gain: number;
+  automatic: boolean;
+  summary?: string;
+}
+
+export interface CantStopRoomData {
+  gameStatus: CantStopGameStatus;
+  currentPlayer: string;
+  nextPlayer: string;
+  turnNumber: number;
+  rollNumber: number;
+  dice: number[];
+  pairingOptions: CantStopPairingOption[];
+  runners: Record<number, number>;
+  claimedBy: Record<number, string>;
+  activityLog: CantStopActionEntry[];
+  lastAction?: CantStopActionEntry;
+  bustRisk: number;
+  turnGain: number;
+  lostGain: number;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  turnTransitionDeadline?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface CantStopResult {
+  winnerID: string;
+  claimedColumns: number[];
+  turnCount: number;
+  rollCount: number;
+  bustCounts: Record<string, number>;
+  reason: string;
+}
+
+export interface CantStopRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, CantStopPlayerState>;
+  roomData: CantStopRoomData;
+  result?: CantStopResult;
+}
+
+export interface CantStopReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: CantStopRoomData;
+  playersData: Record<string, CantStopPlayerState>;
+  result?: CantStopResult;
+}
+
+export interface CantStopAdvancePayload {
+  actionID: string;
+}
+
+export type CantStopCommandPayload =
+  | { rollDice: EmptyPayload; advance?: never; bank?: never; nextTurn?: never }
+  | { rollDice?: never; advance: CantStopAdvancePayload; bank?: never; nextTurn?: never }
+  | { rollDice?: never; advance?: never; bank: EmptyPayload; nextTurn?: never }
+  | { rollDice?: never; advance?: never; bank?: never; nextTurn: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -1973,6 +2105,11 @@ export interface HiveLeaderboardMetric {
 }
 
 export interface OnitamaLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface CantStopLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -2093,6 +2230,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2105,6 +2243,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2117,6 +2256,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2129,6 +2269,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2141,6 +2282,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2153,6 +2295,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2165,6 +2308,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2177,6 +2321,7 @@ export type LeaderboardMetric =
       hex: HexLeaderboardMetric;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2189,6 +2334,7 @@ export type LeaderboardMetric =
       hex?: never;
       hive: HiveLeaderboardMetric;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       davinci?: never;
@@ -2201,6 +2347,20 @@ export type LeaderboardMetric =
       hex?: never;
       hive?: never;
       onitama: OnitamaLeaderboardMetric;
+      cantstop?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      hex?: never;
+      hive?: never;
+      onitama?: never;
+      cantstop: CantStopLeaderboardMetric;
     };
 
 export type ReplaySnapshot =
@@ -2217,6 +2377,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2231,6 +2392,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2245,6 +2407,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2259,6 +2422,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2273,6 +2437,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2287,6 +2452,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2301,6 +2467,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2315,6 +2482,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2329,6 +2497,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2343,6 +2512,7 @@ export type ReplaySnapshot =
       forSale: ForSaleReplaySnapshot;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2357,6 +2527,7 @@ export type ReplaySnapshot =
       forSale?: never;
       hive: HiveReplaySnapshot;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2371,6 +2542,22 @@ export type ReplaySnapshot =
       forSale?: never;
       hive?: never;
       onitama: OnitamaReplaySnapshot;
+      cantstop?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+      cantstop: CantStopReplaySnapshot;
     };
 
 export interface DavinciCard {
@@ -2708,6 +2895,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2725,6 +2913,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2742,6 +2931,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2759,6 +2949,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2776,6 +2967,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2793,6 +2985,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2810,6 +3003,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2827,6 +3021,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2844,6 +3039,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2861,6 +3057,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2878,6 +3075,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2895,6 +3093,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2912,6 +3111,7 @@ export type ClientCommandPayload =
       forSale: ForSaleCommandPayload;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2929,6 +3129,7 @@ export type ClientCommandPayload =
       forSale?: never;
       hive: HiveCommandPayload;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       common?: never;
@@ -2946,6 +3147,25 @@ export type ClientCommandPayload =
       forSale?: never;
       hive?: never;
       onitama: OnitamaCommandPayload;
+      cantstop?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+      cantstop: CantStopCommandPayload;
     };
 
 export type MatchSetupView = { warchest: WarChestMatchSetup };
@@ -2966,6 +3186,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2982,6 +3203,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -2998,6 +3220,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3014,6 +3237,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3030,6 +3254,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3046,6 +3271,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3062,6 +3288,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3078,6 +3305,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3094,6 +3322,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3110,6 +3339,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3126,6 +3356,7 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3142,6 +3373,7 @@ export type RoomView =
       forSale: ForSaleRoomView;
       hive?: never;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3158,6 +3390,7 @@ export type RoomView =
       forSale?: never;
       hive: HiveRoomView;
       onitama?: never;
+      cantstop?: never;
     }
   | {
       acquire?: never;
@@ -3174,6 +3407,24 @@ export type RoomView =
       forSale?: never;
       hive?: never;
       onitama: OnitamaRoomView;
+      cantstop?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
+      hex?: never;
+      forSale?: never;
+      hive?: never;
+      onitama?: never;
+      cantstop: CantStopRoomView;
     };
 
 export type ServerMessage =

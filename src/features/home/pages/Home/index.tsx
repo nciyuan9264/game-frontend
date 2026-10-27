@@ -615,6 +615,33 @@ const SixNimmtVisual = () => (
   </>
 );
 
+const CantStopVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={` `}
+    >
+      <div className={styles.sixNimmtUI}>
+        <header><span>TURN 07</span><b>3 ROUTES</b></header>
+        <div className={styles.sixNimmtRows}>{[
+          [2, 3, 4], [5, 6, 7], [8, 9, 10], [11, 12],
+        ].map((row, index) => <div key={index}><b>{index + 1}</b>
+          <span>{row.map(route => <i key={route}>{route}</i>)}</span><em>▲</em></div>)}</div>
+        <footer>{[1, 3, 4, 6].map((die, index) => <i key={index}>{die}</i>)}</footer>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={` `}>7</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={` `}>▲</motion.span>
+  </>
+);
+
 const ForSaleVisual = () => (
   <>
     <motion.div
@@ -662,6 +689,7 @@ const gameVisuals: Record<GameKey, () => JSX.Element> = {
   fugitive: FugitiveVisual,
   loveletter: LoveLetterVisual,
   sixnimmt: SixNimmtVisual,
+  cantstop: CantStopVisual,
   forsale: ForSaleVisual,
 };
 
