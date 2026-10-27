@@ -36,6 +36,9 @@ const modes: Array<{
   { id: 'draft', title: '官方轮抽', copy: '公开八兵种，按 1-2-2-2-1 选择', icon: Swords },
 ];
 
+const isUnitId = (value: string): value is UnitId =>
+  Object.prototype.hasOwnProperty.call(UNITS, value);
+
 function Lineup({
   title,
   units,
@@ -47,10 +50,13 @@ function Lineup({
 }) {
   return <section className="warchest-lineup"><h3><Crest side={side} size={31} />{title}</h3>
     <div className="lineup-cards">{units.map(value => {
-      const type = value as UnitId;
-      return <div key={type}><TroopArt type={type} /><Coin type={type} side={side} size={34} />
-        <h3>{UNITS[type]?.name ?? value}</h3><span>{UNITS[type]?.role}</span>
-        <small>2 枚入袋 / {(UNITS[type]?.total ?? 2) - 2} 枚补给</small></div>;
+      const type = isUnitId(value) ? value : undefined;
+      const unit = type ? UNITS[type] : undefined;
+      return <div key={value}>{type
+        ? <><TroopArt type={type} /><Coin type={type} side={side} size={34} /></>
+        : <div className="troop-art royal-art"><Swords size={72} /></div>}
+        <h3>{unit?.name ?? value}</h3><span>{unit?.role ?? '未知兵种'}</span>
+        <small>2 枚入袋 / {(unit?.total ?? 2) - 2} 枚补给</small></div>;
     })}</div></section>;
 }
 
@@ -93,15 +99,26 @@ export function Room({
   const oakID = Object.keys(setup.sides).find(id => setup.sides[id] === 'oak') ?? data.playerOrder[0];
   const falconID = Object.keys(setup.sides).find(id => setup.sides[id] === 'falcon') ?? data.playerOrder[1];
   const draft = setup.draft;
+  const draftPool = Array.isArray(draft?.pool) ? draft.pool : [];
+  const availableDraftUnits = Array.isArray(draft?.availableUnits) ? draft.availableUnits : [];
+  const pickedDraftUnits = Array.isArray(draft?.pickedUnits) ? draft.pickedUnits : [];
+  const draftPickerName = draft?.currentPickerID
+    ? playerDisplayName(data.players[draft.currentPickerID], draft.currentPickerID)
+    : '下一位指挥官';
 
-  return <main className="page room-page"><div className="section-heading room-heading"><div>
-    <Eyebrow>RAISE YOUR BANNER</Eyebrow><h1>{displayName}<span className="status-tag"><i />备战中</span></h1>
-    <div className="room-id"><span>房间号 <b>{data.roomID}</b></span>
-      <button className="icon-button" type="button" aria-label="复制房间号"
-        onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={14} /></button>
-      <span>· {data.visibility === 'private' ? '私密房间' : '公开房间'} · 90 秒行动</span></div></div>
-    <button className="button secondary" type="button" onClick={() => { setCopyMessage(''); setPanel('invite'); }}>
-      <UserPlus size={17} />邀请好友</button></div>
+  return <main className="page room-page"><div className="section-heading room-heading">
+    <div className="room-heading-identity"><button className="room-back-button" type="button"
+      aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button><div>
+      <Eyebrow>RAISE YOUR BANNER</Eyebrow><h1>{displayName}<span className="status-tag"><i />备战中</span></h1>
+      <div className="room-id"><span>房间号 <b>{data.roomID}</b></span>
+        <button className="icon-button" type="button" aria-label="复制房间号"
+          onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={14} /></button>
+        <span>· {data.visibility === 'private' ? '私密房间' : '公开房间'} · 90 秒行动</span></div></div></div>
+    <div className="room-heading-actions">{owner && <button className="button secondary" type="button" onClick={() => {
+      setName(displayName); setVisibility(data.visibility); setPanel('settings');
+    }}><Settings2 size={16} />房间设置</button>}
+      <button className="button primary" type="button" onClick={() => { setCopyMessage(''); setPanel('invite'); }}>
+        <UserPlus size={17} />邀请好友</button></div></div>
 
     <div className="room-stepper"><span className={players.length === 2 ? 'done' : 'active'}>
       <i>{players.length === 2 ? <Check size={13} /> : '01'}</i>就位</span><b />
@@ -145,26 +162,33 @@ export function Room({
           onClick={() => session.submit('game_set_setup_mode', { mode: item.id })}>
           <item.icon size={14} />{item.title}</button>)}</div>
         <p className="roster-intro">{modes.find(item => item.id === setup.mode)?.copy}</p>
-        {setup.mode === 'draft' && draft && <section className="warchest-draft">
-          <div className="draft-status"><Swords size={19} /><div><b>{draft.complete ? '轮抽完成' : `轮到 ${playerDisplayName(data.players[draft.currentPickerID ?? ''])}`}</b>
+        {setup.mode === 'draft' && <section className="warchest-draft">
+          {draft && draftPool.length > 0 ? <>
+            <div className="draft-status"><Swords size={19} /><div><b>{draft.complete ? '轮抽完成' : `轮到 ${draftPickerName}`}</b>
             <small>{draft.completedPickCount} / 8 已选择 · 本次连续选择 {draft.currentPickCount} 种</small></div>
             {draft.turnDeadline && <span><Clock3 size={13} />90 秒</span>}</div>
-          <div className="roster-pool">{draft.pool.map(value => {
-            const type = value as UnitId;
-            const picked = draft.pickedUnits.includes(value);
-            const available = draft.availableUnits.includes(value);
-            return <button key={type} type="button" className={picked ? 'occupied' : ''}
-              disabled={!enabled || !available || draft.currentPickerID !== data.playerID}
-              onClick={() => session.submit('game_draft_unit', { unitType: type })}>
-              <Coin type={type} size={34} /><span><b>{UNITS[type]?.name ?? type}</b>
+            <div className="roster-pool">{draftPool.map(value => {
+              const type = isUnitId(value) ? value : undefined;
+              const picked = pickedDraftUnits.includes(value);
+              const available = availableDraftUnits.includes(value);
+              return <button key={value} type="button" className={picked ? 'occupied' : ''}
+                disabled={!enabled || !available || draft.currentPickerID !== data.playerID || !type}
+                onClick={() => type && session.submit('game_draft_unit', { unitType: type })}>
+                <Coin type={type ?? 'royal'} size={34} /><span><b>{type ? UNITS[type].name : value}</b>
                 <small>{picked ? '已被选择' : available ? '可选择' : '等待轮次'}</small></span>
-              {picked && <Check size={13} />}</button>;
-          })}</div></section>}
+                {picked && <Check size={13} />}</button>;
+            })}</div>
+          </> : <div className="draft-status"><Swords size={19} /><div><b>正在初始化官方轮抽</b>
+            <small>轮抽池会随服务端确认状态自动出现</small></div></div>}
+        </section>}
         {setup.rosters[oakID]?.length > 0 && <Lineup title={`${playerDisplayName(data.players[oakID])} · 橡木军团`}
           units={setup.rosters[oakID]} side={0} />}
         {setup.rosters[falconID]?.length > 0 && <div className="opponent-lineup"><b>{playerDisplayName(data.players[falconID])} · 赤隼军团</b>
-          <div>{setup.rosters[falconID].map(value => <span key={value}><Coin type={value as UnitId} side={1} size={31} />
-            {UNITS[value as UnitId]?.name ?? value}</span>)}</div></div>}
+          <div>{setup.rosters[falconID].map(value => {
+            const type = isUnitId(value) ? value : undefined;
+            return <span key={value}><Coin type={type ?? 'royal'} side={1} size={31} />
+              {type ? UNITS[type].name : value}</span>;
+          })}</div></div>}
       </div>}
     </section>
 
@@ -183,13 +207,9 @@ export function Room({
           onClick={() => session.submit('match_ready', { ready: !data.players[data.playerID]?.ready })}>
           {data.players[data.playerID]?.ready ? '已准备 · 取消准备' : '我准备好了'}
           {data.players[data.playerID]?.ready ? <Check size={17} /> : <ArrowRight size={17} />}</button>}
-      <button className="text-button full" type="button" onClick={onLeave}><ArrowLeft size={15} />离开房间</button>
       <small className="room-start-note">{players.length < 2 ? '邀请好友或添加一位公平 AI。'
         : !setup.complete ? '完成官方轮抽后才能准备开局。'
           : allReady ? '双方已准备，可以开始交锋。' : '等待另一位指挥官准备。'}</small>
-      {owner && <button className="text-button full" type="button" onClick={() => {
-        setName(displayName); setVisibility(data.visibility); setPanel('settings');
-      }}><Settings2 size={14} />房间设置</button>}
     </aside></div>
 
     {panel === 'invite' && <Modal title="一场好局，等你入席。" eyebrow="AN INVITATION"

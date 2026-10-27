@@ -87,6 +87,7 @@ const classes = {
   railBottom: 'sn-rail-bottom',
   main: 'sn-main',
   header: 'sn-header',
+  brand: 'sn-brand',
   brandLink: 'sn-brand-link',
   divider: 'sn-divider',
   breadcrumb: 'sn-breadcrumb',

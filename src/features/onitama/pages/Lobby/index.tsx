@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowRight, BookOpen, Check, Clock3, Copy, Globe2, Grid3X3,
+  ArrowRight, BookOpen, Check, Clock3, Copy, Globe2,
   KeyRound, LockKeyhole, Plus, Repeat2, Search, Share2, ShieldCheck, Users, X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
@@ -145,7 +145,6 @@ export default function Lobby() {
           <Share2 size={16} />分享游戏</ActionButton></div></div>
         <OnitamaStillLife /><span className={styles.heroCaption}>ONITAMA / THE QUIET COLLECTION</span></section>
       <div className={styles.facts} data-testid="onitama-lobby-facts"><span><Users size={17} /><b>2</b> 位棋手</span>
-        <span><Grid3X3 size={17} /><b>5 × 5</b> 经典棋盘</span>
         <span><Repeat2 size={17} /><b>16 取 5</b> 公开招式</span>
         <span><Clock3 size={17} /><b>约 15 分钟</b></span>
         <Link to="/game/onitama/guide">第一次来？读懂规则 <ArrowRight size={15} /></Link></div>

@@ -2,7 +2,7 @@ import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, Info, Layers3,
-  Lightbulb, LogOut, Pencil, ShieldCheck, Trophy, Users,
+  Lightbulb, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
@@ -110,15 +110,21 @@ export function My() {
     <header className="sn-community-heading"><div><span className="sn-eyebrow">YOUR TABLE STORIES</span>
       <h1>每一桌，都有点小故事。</h1></div></header>
     {loading ? <SixNimmtLoading title="正在整理你的牧场档案。" description="同步身份、战绩与历史对局" /> : <div className="sn-profile-layout">
-      <section className="sn-profile-card sn-profile-detail"><img src={mascot} alt="" />
-        <PlayerAvatar name={profile.data?.name || '牧场玩家'} avatar={profile.data?.avatar} size={72} />
-        <span className="sn-eyebrow">ONLINE HERD KEEPER</span><h2>{profile.data?.name || '牧场玩家'}</h2>
-        <p>PLAYER ID · {profile.data?.id ?? '—'}</p><dl>
-          <span><b>{stats.data?.totalGames ?? 0}</b><small>完成对局</small></span>
+      <section className="sn-profile-display">
+        <div className="sn-profile-identity">
+          <PlayerAvatar name={profile.data?.name || '牧场玩家'} avatar={profile.data?.avatar} size={72} />
+          <div><small className="sn-profile-eyebrow">ONLINE HERD KEEPER</small>
+            <h2>{profile.data?.name || '牧场玩家'}</h2>
+            <span>PLAYER ID · {profile.data?.id ?? '—'}</span></div>
+        </div>
+        <div className="sn-profile-email"><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>
+        <div className="sn-profile-stats"><span><b>{stats.data?.totalGames ?? 0}</b><small>完成对局</small></span>
           <span><b>{stats.data?.wins ?? 0}</b><small>胜场</small></span>
-          <span><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><small>平均牛头</small></span></dl>
-        <nav><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
-          <button type="button" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</button></nav></section>
+          <span><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><small>平均牛头</small></span></div>
+        <div className="sn-profile-manage"><a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
+          <button type="button" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</button></div>
+        {logout.error && <p role="alert" className="sn-profile-logout-error">{logout.error}</p>}
+      </section>
       <section className="sn-history"><header><h2>牌局档案</h2><span>{stats.data?.totalGames ?? 0} 场</span></header>
         {history.error && <Feedback error>{history.error}<ActionButton onClick={history.retry}>重试</ActionButton></Feedback>}
         {history.games.map(game => {

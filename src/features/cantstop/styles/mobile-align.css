@@ -1,0 +1,9 @@
+@media(max-width:767px){
+  .cs-profile-detail{display:grid!important;grid-template-columns:60px minmax(0,1fr);column-gap:14px;align-items:center;text-align:left}
+  .cs-profile-detail>.cs-avatar{grid-row:1/4}
+  .cs-profile-detail>span.cs-eyebrow,.cs-profile-detail h2,.cs-profile-detail>p{grid-column:2;min-width:0}
+  .cs-profile-detail>p{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cs-profile-detail dl,.cs-profile-detail nav{grid-column:1/-1}
+  .cs-profile-detail dl{margin-top:28px}
+  .cs-profile-detail dl,.cs-profile-detail nav{text-align:center}
+}

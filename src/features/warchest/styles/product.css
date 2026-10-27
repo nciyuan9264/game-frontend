@@ -286,6 +286,11 @@
 .warchest-root .lineup-cards > div > small { display: block; padding: 0 12px; color: #9f987c; font-size: 8px; }
 .warchest-root .lineup-cards > div > small { padding-top: 8px; }
 .warchest-root .warchest-seat-remove { position: absolute; right: 9px; top: 9px; }
+.warchest-root .room-heading-identity { display: flex; min-width: 0; align-items: center; gap: 15px; }
+.warchest-root .room-heading-identity > div { min-width: 0; }
+.warchest-root .room-back-button { display: grid; width: 36px; height: 36px; flex: 0 0 auto; place-items: center; border: 1px solid #d8ddcf; border-radius: 6px; background: #f9f9f4; color: var(--green); }
+.warchest-root .room-back-button:hover { background: #eeeee4; }
+.warchest-root .room-heading-actions { display: flex; flex-shrink: 0; align-items: center; gap: 10px; }
 @media (max-width: 760px) {
   .warchest-root .lobby-page .hero { height: 227px; border-radius: 9px; }
   .warchest-root .lobby-page .hero-copy { width: 100%; padding: 21px 20px; }
@@ -330,4 +335,10 @@
   .warchest-root .battle-timer { min-width: 44px; font-size: 10px; }
   .warchest-root .warchest-lineup .lineup-cards > div > .troop-art { height: 176px; width: 118px; }
   .warchest-root .warchest-lineup .lineup-cards > div > .coin { top: 149px; }
+  .warchest-root .room-heading { flex-direction: column; align-items: stretch; gap: 12px; }
+  .warchest-root .room-heading-identity { gap: 10px; }
+  .warchest-root .room-back-button { width: 34px; height: 34px; }
+  .warchest-root .room-heading-actions { width: 100%; gap: 8px; }
+  .warchest-root .room-heading-actions .button { flex: 1; min-height: 35px; padding: 0 10px; gap: 5px; font-size: 10px; }
+  .warchest-root .room-heading-actions .button > svg { width: 14px; height: 14px; }
 }

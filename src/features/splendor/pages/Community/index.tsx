@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft, ArrowRight, Bookmark, ChevronRight, Crown, Gem, Info, Layers,
-  LogOut, Mail, Pencil, Settings2, ShieldCheck, Trophy,
+  LogOut, Mail, Pencil, ShieldCheck, Trophy,
 } from 'lucide-react';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
@@ -23,7 +23,6 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { Artwork, Eyebrow, GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { SplendorLoading } from '../../components/LoadingState';
-import { useSplendorPreferences } from '../../hooks/useSplendorPreferences';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -153,7 +152,6 @@ function PlusMark() {
 export function My() {
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('splendor');
-  const preferences = useSplendorPreferences();
   const {
     games,
     loading,
@@ -163,7 +161,7 @@ export function My() {
     retry,
   } = useGameHistory({ gameType: 'splendor', pageSize: 20 });
   const logoutAction = useGameLogout();
-  const [panel, setPanel] = useState<'preferences' | 'logout' | 'about'>();
+  const [panel, setPanel] = useState<'logout' | 'about'>();
   const doLogout = async () => {
     await logoutAction.run();
   };
@@ -185,7 +183,6 @@ export function My() {
           <div><b>{(stats.data?.avgScore ?? 0).toFixed(1)}</b><span>平均声望</span></div></div>
         <div className={styles.profileActions}><a href="https://auth.gamebus.online/profile">
           <Pencil size={14} />编辑资料</a>
-          <ActionButton variant="quiet" onClick={() => setPanel('preferences')}><Settings2 size={15} />显示偏好</ActionButton>
           <ActionButton variant="quiet" onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</ActionButton></div>
       </section>
       <section className={styles.history}><div className={styles.highlights}>
@@ -217,20 +214,10 @@ export function My() {
       <ProjectContact gameName="Splendor" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
         classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
     </Dialog>}
-    {panel === 'preferences' && <Dialog title="让收藏，更顺手。" eyebrow="MAKE YOURSELF AT HOME"
-      onClose={() => setPanel(undefined)} footer={<ActionButton variant="primary" onClick={() => setPanel(undefined)}>完成</ActionButton>}>
-      <div className={styles.preferences}><div><span><b>更清晰的文字</b><small>提高辅助文字的对比度</small></span>
-        <button role="switch" aria-label="更清晰的文字" aria-checked={preferences.highContrast}
-          className={preferences.highContrast ? styles.on : ''} onClick={() => preferences.setHighContrast(!preferences.highContrast)}><i /></button></div>
-        <div><span><b>减少动效</b><small>关闭位移与装饰动画</small></span>
-          <button role="switch" aria-label="减少动效" aria-checked={preferences.reduceMotion}
-            className={preferences.reduceMotion ? styles.on : ''} onClick={() => preferences.setReduceMotion(!preferences.reduceMotion)}><i /></button></div>
-        <p><ShieldCheck size={15} />宝石始终使用颜色、形状和数量共同编码。</p></div>
-    </Dialog>}
     {panel === 'logout' && <Dialog title="退出当前收藏家账号？" eyebrow="UNTIL NEXT TIME"
       onClose={() => setPanel(undefined)} footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
         <ActionButton variant="danger" pending={logoutAction.pending} onClick={() => void doLogout()}>确认退出</ActionButton></>}>
-      <p className={styles.logoutCopy}>退出后将返回登录页，本地显示偏好会保留。</p>
+      <p className={styles.logoutCopy}>退出后将返回登录页。</p>
       {logoutAction.error && <Feedback error>{logoutAction.error}</Feedback>}
     </Dialog>}
   </div></AppShell>;

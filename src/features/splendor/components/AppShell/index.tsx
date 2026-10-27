@@ -1,16 +1,13 @@
-import { useState, type ReactNode } from 'react';
+import type { ReactNode } from 'react';
 import {
-  BookOpen, Bot, ChevronDown, LayoutGrid, Settings2, Trophy, UserRound,
+  BookOpen, Bot, ChevronDown, LayoutGrid, Trophy, UserRound,
 } from 'lucide-react';
 import type { AuthProfile } from '@/features/game-core/api/auth';
 import { GameAppShell } from '@/components/GameUI/GameAppShell';
 import { GameAvatar } from '@/components/GameUI/GameAvatar';
 import { ClickFeedback } from '@/components/GameUI/ClickFeedback';
-import { ActionButton } from '@/components/GameUI/ActionButton';
 import gameRoot from '@/components/GameUI/styles/root.module.less';
 import { BrandMark } from '../Artwork';
-import { Dialog } from '../Dialog';
-import { useSplendorPreferences } from '../../hooks/useSplendorPreferences';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -69,17 +66,11 @@ export function AppShell({
   compactMobileFooter?: boolean;
   tools?: ReactNode;
 }) {
-  const [preferencesOpen, setPreferencesOpen] = useState(false);
-  const preferences = useSplendorPreferences();
   const rootClassName = [
     gameRoot.root,
     rootStyles.root,
-    preferences.highContrast ? rootStyles.highContrast : '',
-    preferences.reduceMotion ? rootStyles.reduceMotion : '',
   ].filter(Boolean).join(' ');
 
-  const preferenceButton = <button type="button" aria-label="显示偏好" title="显示偏好"
-    onClick={() => setPreferencesOpen(true)}><Settings2 size={19} /></button>;
   return <GameAppShell
     rootClassName={rootClassName}
     classes={{
@@ -113,22 +104,7 @@ export function AppShell({
     renderBrand={() => <Brand />}
     renderAvatar={avatarProps => <PlayerAvatar {...avatarProps} />}
     profileAccessory={<ChevronDown size={13} />}
-    railAccessory={preferenceButton}
-    renderFeedback={() => <>{preferencesOpen && <Dialog title="让收藏，更顺手。" eyebrow="MAKE YOURSELF AT HOME"
-      onClose={() => setPreferencesOpen(false)}
-      footer={<ActionButton variant="primary" onClick={() => setPreferencesOpen(false)}>完成</ActionButton>}>
-      <div className={styles.preference}>
-        <div><span><b>更清晰的文字</b><small>提高辅助文字的对比度</small></span>
-          <button type="button" role="switch" aria-label="更清晰的文字"
-            aria-checked={preferences.highContrast} className={preferences.highContrast ? styles.switchOn : ''}
-            onClick={() => preferences.setHighContrast(!preferences.highContrast)}><i /></button></div>
-        <div><span><b>减少动效</b><small>关闭位移与装饰动画</small></span>
-          <button type="button" role="switch" aria-label="减少动效"
-            aria-checked={preferences.reduceMotion} className={preferences.reduceMotion ? styles.switchOn : ''}
-            onClick={() => preferences.setReduceMotion(!preferences.reduceMotion)}><i /></button></div>
-        <p>宝石始终使用颜色、形状和数量共同编码。</p>
-      </div>
-    </Dialog>}<ClickFeedback /></>}
+    renderFeedback={() => <ClickFeedback />}
     showRailInMatch={false}
     showOnlineStatus={false}
     environmentLabel="在线"

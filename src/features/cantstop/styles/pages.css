@@ -7,3 +7,127 @@
 @media(max-width:360px){.cs-hero>div{padding-inline:15px}.cs-hero h1{font-size:25px}.cs-hero>div>div{left:15px}.cs-seat-grid{gap:8px}.cs-rank-row{grid-template-columns:38px minmax(0,1fr) 58px 58px;padding-inline:7px}.cs-guide-sixth .cs-number-card{width:33px}.cs-point-guide .cs-number-card{width:46px}}
 .cs-seat-grid{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:767px){.cs-seat-grid{grid-template-columns:repeat(2,1fr)}}
+
+@media(max-width:767px){
+  .cantstop-root .cs-lobby,.cantstop-root .cs-room-page,.cantstop-root .cs-community{padding-bottom:0}
+  .cantstop-root .cs-lobby{display:flex;min-width:0;flex-direction:column}
+  .cantstop-root .cs-eyebrow{font-size:6px;letter-spacing:.14em}
+
+  .cs-hero{height:227px;border-radius:9px;background:linear-gradient(135deg,#f3dfb0,#ebe9dc)}
+  .cs-hero>img{object-position:63% 51%;opacity:.14;filter:saturate(.55) contrast(.68);mix-blend-mode:multiply}
+  .cs-hero:after{background:linear-gradient(90deg,#f3dfb0 0,#f3dfb0f2 54%,#f3dfb040 100%),linear-gradient(0deg,#f3dfb082,transparent 65%)}
+  .cs-hero>div{width:100%;height:100%;padding:21px 20px}
+  .cs-hero h1{margin:11px 0 8px;font-size:27px;line-height:1.42}
+  .cs-hero p{max-width:225px;font-size:10px;line-height:1.8}
+  .cs-hero>div>div{right:20px;bottom:17px;left:20px;align-items:center;gap:8px}
+  .cs-hero>div>div>button{min-height:39px;height:39px;padding:0 14px;gap:7px;font-size:11px;white-space:nowrap}
+  .cs-hero>div>div>button:first-child{min-width:129px;font-size:12px;font-weight:600}
+  .cs-hero>div>div>button:last-child{min-width:99px}
+  .cs-hero-stamp{top:14px;right:16px;width:48px;height:48px}
+
+  .cs-facts{min-height:63px;grid-template-columns:repeat(3,minmax(0,1fr));gap:0;margin-bottom:19px;padding:8px 0;font-size:8px;overflow:hidden}
+  .cs-facts>span{min-width:0;justify-content:center;gap:4px;text-align:center;white-space:nowrap}
+  .cs-facts svg{width:16px;height:16px;flex:none}
+  .cs-facts>a{display:none}
+
+  .cs-room-browser>header{align-items:center;margin-bottom:13px}
+  .cs-room-browser>header h2{max-width:230px;margin-top:5px;font-size:16px;line-height:1.6}
+  .cs-room-browser>header>span{display:none}
+  .cs-room-tools{align-items:stretch;flex-direction:column;gap:12px;margin:0 0 14px}
+  .cs-room-tools>div{display:flex;width:100%;align-items:center;gap:23px;overflow-x:auto;scrollbar-width:none}
+  .cs-room-tools>div::-webkit-scrollbar{display:none}
+  .cs-room-tools>div button{flex:0 0 auto;min-height:35px;border-bottom:2px solid transparent;border-radius:0;padding:8px 0;background:transparent!important;color:#7f897b;font-size:12px;white-space:nowrap}
+  .cs-room-tools>div button.active{border-bottom-color:var(--cs-orange);background:transparent!important;color:var(--cs-orange)}
+  .cs-room-tools label{width:100%;height:39px;min-height:39px;padding:0 11px;border-radius:6px;background:var(--cs-surface)}
+  .cs-room-tools input{font-size:11px}
+  .cs-room-grid{gap:12px}
+  .cs-empty{min-height:340px;gap:14px;padding:28px 19px;border-style:dashed;border-radius:10px}
+  .cs-empty h3{font-size:19px}
+  .cs-empty p{font-size:11px;line-height:1.9}
+  .cs-lobby-side{gap:0;margin-top:13px}
+  .cs-lobby-side>.cs-profile-card,.cs-guide-card{display:none}
+  .cs-join-card{border-radius:9px;padding:18px}
+  .cs-join-card>svg{width:18px;height:18px}
+  .cs-join-card h3{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:13px}
+  .cs-join-card p{margin:8px 0 12px;font-size:10px;line-height:1.8}
+  .cs-join-card form{height:40px;overflow:hidden;border:1px solid var(--cs-line);border-radius:5px;background:#fafbf6}
+  .cs-join-card input{border:0;padding:0 10px;background:transparent;font-size:12px}
+  .cs-join-card button{width:42px;border-radius:0}
+
+  .cs-room-page{padding-bottom:calc(131px + env(safe-area-inset-bottom))}
+  .cs-room-heading{gap:16px;margin:0 2px 17px}
+  .cs-room-heading>div{min-width:0}
+  .cs-room-heading>div>span{min-width:0;flex:1}
+  .cs-room-heading small{font-size:6px;letter-spacing:.12em}
+  .cs-room-heading h1{max-width:100%;font-size:21px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .cs-room-heading nav button{min-height:35px;padding:0 10px;gap:5px;font-size:10px}
+  .cs-room-heading nav svg{width:13px;height:13px}
+  .cs-room-banner{min-height:76px;border-radius:9px;padding:12px 16px}
+  .cs-room-banner h2{font-size:18px}
+  .cs-seat-grid{gap:12px;margin:15px 0}
+  .cs-seat{min-height:128px;border-radius:8px;padding:14px 9px 11px}
+  .cs-seat h3{max-width:100%;font-size:11px;text-overflow:ellipsis}
+  .cs-seat-empty{gap:10px}
+  .cs-room-summary{display:block;margin-bottom:0;border-radius:9px}
+  .cs-room-summary>div{padding:21px 18px}
+  .cs-room-summary dl{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px 20px;border-top:1px solid var(--cs-line);padding:17px 18px}
+  .cs-room-summary dl div{padding:0;border:0}
+  .cs-room-summary>p{padding:12px 18px;font-size:9px;line-height:1.8}
+  .cs-ready-dock{z-index:60;gap:11px;padding:13px 16px calc(14px + env(safe-area-inset-bottom))}
+  .cs-ready-dock>p{font-size:9px;line-height:1.6}
+  .cs-ready-dock>[data-game-action-button]{height:39px;min-height:39px;font-size:12px}
+
+  .cs-community-heading{display:none}
+  .cs-rank-hero{position:relative;display:block;min-height:166px;margin-bottom:18px;overflow:hidden;border-radius:9px;padding:23px 18px}
+  .cs-rank-hero>svg{position:absolute;top:19px;right:14px;width:47px;height:47px;padding:11px;opacity:.35}
+  .cs-rank-hero small{font-size:6px;letter-spacing:.14em}
+  .cs-rank-hero h2{margin:10px 0 0;font-size:24px}
+  .cs-rank-hero p{max-width:255px;margin-top:9px;font-size:10px;line-height:1.9}
+  .cs-rank-hero aside{display:none}
+  .cs-rank-panel{margin-top:0;border-radius:8px;padding:14px 10px 10px}
+  .cs-rank-panel>.cs-tabs{margin:-14px -10px 0;padding:9px 10px;overflow-x:auto;scrollbar-width:none}
+  .cs-rank-panel>.cs-tabs::-webkit-scrollbar{display:none}
+  .cs-rank-row{grid-template-columns:28px minmax(0,1fr) 54px 54px;gap:7px;min-height:63px;padding:0 5px;font-size:12px}
+  .cs-rank-row.head{min-height:31px;font-size:8px}
+  .cs-rank-row>span:nth-child(2){min-width:0;gap:7px}
+  .cs-rank-row>span:nth-child(2)>.cs-avatar{display:inline-flex!important;width:29px!important;height:29px!important;flex:none}
+  .cs-rank-row>span:nth-child(2)>b{min-width:0;overflow:hidden;font-size:11px;text-overflow:ellipsis;white-space:nowrap}
+  .cs-rank-row em{margin-left:-3px;padding:1px 2px;font-size:6px}
+  .cs-rank-row>strong{font-size:16px}
+
+  .cs-guide-layout{display:flex;flex-direction:column;gap:8px;margin-top:0}
+  .cs-guide-layout>aside{margin-bottom:0;border-radius:9px;background:#e7eadf}
+  .cs-guide-layout>aside img{display:none}
+  .cs-guide-layout>aside>div{padding:17px 10px}
+  .cs-guide-layout>aside span{gap:6px;font-size:9px}
+  .cs-guide-layout>aside svg{width:16px;height:16px}
+  .cs-guide-layout>section{border-radius:9px;padding:19px 17px 16px}
+  .cs-guide-layout>section>.cs-tabs{margin:-19px -17px 18px;padding:9px 7px;overflow-x:auto;scrollbar-width:none}
+  .cs-guide-layout>section>.cs-tabs::-webkit-scrollbar{display:none}
+  .cs-guide-layout>section>h2{margin:10px 0 11px;font-size:21px;line-height:1.55}
+  .cs-guide-layout>section>p{font-size:11px;line-height:1.8}
+  .cs-guide-layout ol{margin:14px 0}
+  .cs-guide-layout li{gap:9px;padding:9px 0;font-size:10px;line-height:1.7}
+  .cs-guide-layout li:before{font-size:15px}
+  .cs-guide-hint{margin:12px 0;padding:10px;font-size:9px}
+  .cs-guide-actions{gap:10px;padding-top:4px}
+  .cs-guide-actions>button{flex:1;min-height:41px;padding:0 12px;font-size:11px}
+
+  .cs-profile-layout{display:flex;flex-direction:column;gap:19px;margin-top:0}
+  .cs-profile-detail{margin-bottom:0;border-radius:10px;padding:24px 19px 20px}
+  .cs-profile-detail>img{display:none}
+  .cs-profile-detail>.cs-avatar{width:60px!important;height:60px!important}
+  .cs-profile-detail h2{margin:7px 0;font-size:26px;line-height:1.25}
+  .cs-profile-detail dl{margin:19px -4px 0;padding-top:20px;border-top:1px solid var(--cs-line);border-bottom:0}
+  .cs-profile-detail dl b{font-size:22px}
+  .cs-profile-detail dl small{margin-top:8px;font-size:9px}
+  .cs-profile-detail nav{margin-top:14px;padding-top:11px;border-top:1px solid var(--cs-line)}
+  .cs-history{max-height:min(460px,55dvh);overflow-y:auto;border-radius:9px;padding:23px 19px}
+  .cs-about-entry{min-height:55px;margin-top:0;border-radius:8px;padding:9px 3px}
+  .cs-about-entry>span:first-child{width:29px;height:29px}
+}
+
+@media(max-width:360px){
+  .cs-room-tools>div{gap:18px}
+  .cs-rank-row{grid-template-columns:24px minmax(0,1fr) 50px 50px}
+}

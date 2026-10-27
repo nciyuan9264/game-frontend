@@ -18,6 +18,7 @@ import { playerDisplayName } from '@/features/game-core/model/room';
 import {
   fugitiveRoomInviteURL,
 } from '../../model/adapters';
+import { ProfileMonogram } from '../../components/AppShell';
 import type { FugitiveSession } from '../../hooks/useFugitiveSession';
 import type { MatchSnapshot } from '../../model/session';
 import type {
@@ -28,7 +29,6 @@ import type {
 import {
   Eyebrow,
   Modal,
-  Portrait,
   roleName,
 } from '../../components/Visual';
 
@@ -121,7 +121,10 @@ export function Room({
         return <article key={index} data-testid="fugitive-room-seat"
           className={`room-seat ${self ? 'self-seat' : ''}`}>
           <span className="seat-number">0{index + 1}</span>
-          <Portrait role={role} className="avatar" />
+          <ProfileMonogram profile={{
+            name: playerDisplayName(player),
+            avatar: player.avatar,
+          }} className="avatar" />
           <small>{playerID === data.ownerID ? '房主' : player.ai ? '公平 AI' : '挑战者'}</small>
           <h3>{playerDisplayName(player)}{self && <em>你</em>}</h3>
           <span className="seat-role">{role === 'fugitive'

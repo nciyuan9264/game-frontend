@@ -2,7 +2,9 @@ import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowDown,
+  ArrowLeft,
   ArrowRight,
+  ChevronRight,
   Check,
   Clock3,
   Gavel,
@@ -18,8 +20,9 @@ import {
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { Feedback } from '@/components/GameUI/Panel';
+import { ProjectContact } from '@/components/GameUI/ProjectContact';
+import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -180,10 +183,15 @@ export const Guide = () => {
             <span><small>最终财富</small><b>{chequeMoney(45)}</b></span></div>}
           <div className="fs-guide-hint"><ShieldCheck size={15} />
             <span>在线版本每次操作 60 秒；超时由只读取当前席位可见信息的公平 AI 托管。</span></div>
-          <ActionButton variant="primary" onClick={() =>
-            guide.isLast ? navigate('/game/forsale') : guide.next()}>
-            {guide.isLast ? '进入大厅' : '下一章'}<ArrowRight size={15} />
-          </ActionButton></section></div>
+          <div className="fs-guide-actions">
+            <ActionButton disabled={guide.isFirst} onClick={guide.previous}>
+              <ArrowLeft size={14} />上一章
+            </ActionButton>
+            <ActionButton variant="primary" onClick={() =>
+              guide.isLast ? navigate('/game/forsale') : guide.next()}>
+              {guide.isLast ? '进入大厅' : '下一章'}<ArrowRight size={15} />
+            </ActionButton>
+          </div></section></div>
     </div>
   </AppShell>;
 };
@@ -199,7 +207,7 @@ export const My = () => {
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
   return <AppShell title="我的对局" profile={profile.data} compactMobileFooter>
-    <div className="fs-community fs-profile"><header className="fs-community-heading">
+    <div className="fs-community fs-profile-page"><header className="fs-community-heading">
       <div><span className="fs-eyebrow">EVERY DEAL HAS A STORY</span>
         <h1>每一场买卖，都值得回味。</h1></div></header>
       {loading ? <ForSaleLoading /> : <div className="fs-profile-layout">
@@ -243,8 +251,8 @@ export const My = () => {
             disabled={history.loading}>加载更多对局</ActionButton>}
         </section></div>}
       <button className="fs-about-entry" type="button" onClick={() => setPanel('about')}>
-        <Info size={16} /><span><b>关于与联系</b>
-          <small>项目作者、源码与联系方式</small></span></button>
+        <span><Info size={16} /></span><span><b>关于与联系</b>
+          <small>项目作者、源码与联系方式</small></span><ChevronRight size={16} /></button>
       {panel === 'logout' && <ResponsiveDialog title="离开当前账号？"
         eyebrow="SIGN OUT" onClose={() => setPanel(undefined)}
         footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
@@ -256,7 +264,12 @@ export const My = () => {
         eyebrow="ABOUT & CONTACT" onClose={() => setPanel(undefined)}
         footer={<ActionButton onClick={() => setPanel(undefined)}>
           知道了<Check size={14} /></ActionButton>}>
-        <p>For Sale 在线版是 GameBus 的多人桌游实现，规则、随机与结算由服务端权威执行。</p>
+        <ProjectContact gameName="For Sale" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+          classes={{
+            intro: 'fs-contact-intro',
+            links: 'fs-contact-links',
+            legal: 'fs-contact-legal',
+          }} />
       </ResponsiveDialog>}
     </div>
   </AppShell>;

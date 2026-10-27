@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight,
-  BookOpen,
   Check,
   Copy,
   Globe2,
@@ -41,7 +40,6 @@ import type {
   Visibility,
 } from '../../model/types';
 import hero from '../../assets/hero.webp';
-import mascot from '../../assets/mascot.webp';
 
 const loadStats = () => getMyStats('sixnimmt');
 const filters: Array<{ value: LobbyFilter; label: string }> = [
@@ -195,12 +193,7 @@ export default function Lobby() {
           <button aria-label="查找房间" disabled={!code.trim()}>
             <ArrowRight size={18} /></button>
         </form></section>
-      <Link className="sn-guide-card" to="/game/sixnimmt/guide">
-        <img src={mascot} alt="抱着数字牌的小牛" />
-        <span><BookOpen size={20} /><small>THE RULES, WITHOUT THE RULEBOOK</small>
-          <h3>三分钟，读懂这一桌。</h3>
-          <b>查看玩法 <ArrowRight size={14} /></b></span>
-      </Link></aside></div>
+      </aside></div>
     </div>}
 
     {panel === 'create' && <Dialog title="开一张新的牧场牌桌"
