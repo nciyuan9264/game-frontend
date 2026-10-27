@@ -46,6 +46,12 @@ import {
   My as WarChestMy,
   Rankings as WarChestRankings,
 } from "@/features/warchest/pages/Community";
+import LoveLetterLobby from "@/features/loveletter/pages/Lobby";
+import {
+  Guide as LoveLetterGuide,
+  My as LoveLetterMy,
+  Rankings as LoveLetterRankings,
+} from "@/features/loveletter/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -63,6 +69,8 @@ const QuoridorReplay = lazy(() => import("@/features/quoridor/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
+const LoveLetterSession = lazy(() => import("@/features/loveletter/pages/Session"));
+const LoveLetterReplay = lazy(() => import("@/features/loveletter/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -150,6 +158,12 @@ export const routes: AppRoute[] = [
   { path: "/game/warchest/me", element: <WarChestMy /> },
   { path: "/game/warchest/match", element: <WarChestSession /> },
   { path: "/game/warchest/replay/:gameId", element: <WarChestReplay /> },
+  { path: "/game/loveletter", element: <LoveLetterLobby /> },
+  { path: "/game/loveletter/rankings", element: <LoveLetterRankings /> },
+  { path: "/game/loveletter/guide", element: <LoveLetterGuide /> },
+  { path: "/game/loveletter/me", element: <LoveLetterMy /> },
+  { path: "/game/loveletter/match", element: <LoveLetterSession /> },
+  { path: "/game/loveletter/replay/:gameId", element: <LoveLetterReplay /> },
   {
     path: "/",
     element: <Home />

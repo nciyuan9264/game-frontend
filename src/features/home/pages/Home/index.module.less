@@ -1490,6 +1490,130 @@
   box-shadow:0 20px 34px rgba(0,0,0,.34);
 }
 
+.loveLetterMockup {
+  border-color:#8d5660;
+  background:#efe5d7;
+}
+
+.loveLetterUI {
+  display:flex;
+  height:100%;
+  flex-direction:column;
+  gap:.8rem;
+  padding:1rem;
+  color:#67434a;
+  background:#f2eadf;
+}
+
+.loveLetterHeader,.loveLetterFooter {
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  color:#987a68;
+  font-size:.55rem;
+  font-weight:800;
+  letter-spacing:.08em;
+}
+
+.loveLetterHeader b {
+  display:flex;
+  align-items:center;
+  gap:.25rem;
+  color:#a45162;
+}
+
+.loveLetterCourt {
+  display:flex;
+  min-height:8rem;
+  align-items:center;
+  justify-content:space-around;
+  border:1px solid #9b7b663d;
+  border-radius:50% 50% .6rem .6rem;
+  color:#d1ad7c;
+  background:#49353a;
+
+  span {
+    display:grid;
+    width:2.7rem;
+    height:2.7rem;
+    place-items:center;
+    border:1px solid #d0b38355;
+    border-radius:50%;
+    background:#65474d;
+  }
+}
+
+.loveLetterHand {
+  display:flex;
+  flex:1;
+  align-items:center;
+  justify-content:center;
+  gap:.75rem;
+
+  > span {
+    position:relative;
+    display:flex;
+    width:4.6rem;
+    aspect-ratio:.66;
+    align-items:center;
+    flex-direction:column;
+    border:.25rem solid #fff7e8;
+    border-radius:.45rem;
+    background:#ead6b9;
+    box-shadow:0 5px 12px rgba(81,47,50,.17);
+  }
+
+  b {
+    position:absolute;
+    top:.15rem;
+    left:.2rem;
+    color:#7b3f49;
+    font:800 1.1rem Georgia,serif;
+  }
+
+  i {
+    width:100%;
+    height:67%;
+    border-bottom:1px solid #c2a47e;
+    background:linear-gradient(145deg,#d3aa87,#8d5961);
+  }
+
+  small {
+    margin-top:.45rem;
+    color:#8a6257;
+    font-size:.42rem;
+    font-style:normal;
+  }
+}
+
+.floatingLetterCard {
+  position:absolute;
+  z-index:2;
+  display:flex;
+  width:5.3rem;
+  height:7.5rem;
+  align-items:flex-start;
+  justify-content:flex-start;
+  border:.35rem solid #fff2dc;
+  border-radius:.65rem;
+  padding:.35rem;
+  color:#743f48;
+  font:900 1.7rem Georgia,serif;
+  box-shadow:0 24px 42px rgba(0,0,0,.34);
+
+  &.letterGuard {
+    top:4.6rem;
+    right:.25rem;
+    background:#d5af86;
+  }
+
+  &.letterPrincess {
+    bottom:5rem;
+    left:.2rem;
+    background:#b97a86;
+  }
+}
+
 .fugitiveMockup {
   border-color:#5f6f61;
   background:#101713;

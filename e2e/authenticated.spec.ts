@@ -32,6 +32,11 @@ const games = [
     lobbyHeading: /下一步/,
     profileHeading: '每一场追逐，都有你的痕迹。',
   },
+  {
+    gameType: 'loveletter',
+    lobbyHeading: /一封密信/,
+    profileHeading: '寄出的信，都有回音。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {

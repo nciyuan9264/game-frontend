@@ -360,6 +360,39 @@ function gamePayload(
         return { quoridor: { resign: {} } };
     }
   }
+  if (gameType === 'loveletter') {
+    switch (commandType) {
+      case 'game_draw_card':
+        return { loveletter: { drawCard: {} } };
+      case 'game_play_card':
+        return {
+          loveletter: {
+            playCard: {
+              cardID: String(objectPayload.cardID ?? ''),
+              targetPlayerID: typeof objectPayload.targetPlayerID === 'string'
+                ? objectPayload.targetPlayerID
+                : undefined,
+              guessRank: typeof objectPayload.guessRank === 'number'
+                ? objectPayload.guessRank
+                : undefined,
+            },
+          },
+        };
+      case 'game_settle_chancellor':
+        return {
+          loveletter: {
+            settleChancellor: {
+              keepCardID: String(objectPayload.keepCardID ?? ''),
+              bottomCardIDs: Array.isArray(objectPayload.bottomCardIDs)
+                ? objectPayload.bottomCardIDs.map(String)
+                : [],
+            },
+          },
+        };
+      case 'game_next_round':
+        return { loveletter: { nextRound: {} } };
+    }
+  }
   throw new Error(`不支持的实时命令: ${gameType}/${commandType}`);
 }
 

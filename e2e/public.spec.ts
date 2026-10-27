@@ -12,6 +12,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('黑白棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('逃亡者', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('战争之匣', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('掌心密信', { exact: false }).first()).toBeVisible();
   await expect.poll(async () => page.locator('img').evaluateAll(images =>
     images.every(image => (image as HTMLImageElement).complete
       && (image as HTMLImageElement).naturalWidth > 0))).toBeTruthy();
@@ -21,37 +22,36 @@ test('home and static assets render without browser or server errors', async ({ 
 test('home game switcher remains usable on a narrow mobile viewport', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.waitForLoadState('load');
 
-  const switcher = page.locator('[aria-label="选择游戏"]');
-  await expect(switcher).toBeVisible();
-  expect(await switcher.locator('button').count()).toBeGreaterThanOrEqual(6);
+  const categories = page.locator('[aria-label="游戏分类"]');
+  const catalog = page.locator('[aria-label="选择游戏"]');
+  await expect(categories).toBeVisible();
+  await expect(catalog).toBeVisible();
+  await expect(catalog.locator('article')).toHaveCount(9);
 
-  const layout = await switcher.evaluate(element => {
-    const content = element.nextElementSibling;
-    const firstTab = element.querySelector('button');
-    const title = firstTab?.querySelector('span > span');
+  const layout = await catalog.evaluate(element => {
+    const firstCard = element.querySelector('article');
+    const scrollRoot = element.closest('main')?.parentElement;
     return {
-      switcherTop: element.getBoundingClientRect().top,
-      switcherScrollable: element.scrollWidth > element.clientWidth,
-      firstTabWidth: firstTab?.getBoundingClientRect().width ?? 0,
-      titleSingleLine: !!title && getComputedStyle(title).whiteSpace === 'nowrap'
-        && title.scrollHeight <= title.clientHeight,
-      contentScrollable: !!content && content.scrollHeight > content.clientHeight,
+      catalogTop: element.getBoundingClientRect().top,
+      firstCardWidth: firstCard?.getBoundingClientRect().width ?? 0,
+      documentFits: document.documentElement.scrollWidth <= window.innerWidth,
+      pageScrollable: !!scrollRoot
+        && scrollRoot.scrollHeight > scrollRoot.clientHeight,
     };
   });
 
-  expect(layout.switcherTop).toBeGreaterThanOrEqual(0);
-  expect(layout.switcherScrollable).toBe(true);
-  expect(layout.firstTabWidth).toBeGreaterThanOrEqual(100);
-  expect(layout.titleSingleLine).toBe(true);
-  expect(layout.contentScrollable).toBe(true);
+  expect(layout.catalogTop).toBeGreaterThanOrEqual(0);
+  expect(layout.firstCardWidth).toBeGreaterThanOrEqual(260);
+  expect(layout.documentFits).toBe(true);
+  expect(layout.pageScrollable).toBe(true);
 
-  const othelloTab = switcher.getByRole('button', { name: /黑白棋/ });
-  await othelloTab.scrollIntoViewIfNeeded();
-  await expect(othelloTab).toBeVisible();
-  const fugitiveTab = switcher.getByRole('button', { name: /逃亡者/ });
-  await fugitiveTab.scrollIntoViewIfNeeded();
-  await expect(fugitiveTab).toBeVisible();
+  const loveLetter = catalog.getByRole('button', { name: '预览掌心密信' });
+  await loveLetter.scrollIntoViewIfNeeded();
+  await expect(loveLetter).toBeVisible();
+  await loveLetter.click();
+  await expect(page.getByRole('heading', { name: '掌心密信', level: 2 })).toBeVisible();
 });
 
 for (const [gameType, heading] of [
@@ -62,6 +62,7 @@ for (const [gameType, heading] of [
   ['othello', '每一次翻转，都留下判断。'],
   ['fugitive', '城市风云榜'],
   ['warchest', '每一次调遣，都留下判断。'],
+  ['loveletter', '每一封信，都算数。'],
 ] as const) {
   test(`${gameType} ranking page renders`, async ({ context, page }) => {
     test.skip(!process.env.REGRESSION_ACCESS_TOKEN, 'authenticated profile cookie is required');

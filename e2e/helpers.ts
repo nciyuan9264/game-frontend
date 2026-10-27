@@ -12,7 +12,8 @@ export type GameType =
   | 'yinsh'
   | 'othello'
   | 'fugitive'
-  | 'warchest';
+  | 'warchest'
+  | 'loveletter';
 
 interface RoomInfo {
   roomID: string;

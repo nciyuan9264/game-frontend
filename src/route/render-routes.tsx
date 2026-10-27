@@ -12,6 +12,7 @@ import { OthelloSessionLoading } from '@/features/othello/pages/Session/Loading'
 import { QuoridorLoading } from '@/features/quoridor/components/LoadingState';
 import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
+import { LoveLetterLoading } from '@/features/loveletter/components/LoadingState';
 
 /**
  * 渲染路由
@@ -40,6 +41,8 @@ export const RenderRoutes = () => {
                                     ? <FugitiveLoading fullScreen />
                                     : route.path.startsWith('/game/warchest')
                                         ? <div className="warchest-root"><WarChestLoading text="正在进入战争之匣。" /></div>
+                                    : route.path.startsWith('/game/loveletter')
+                                        ? <LoveLetterLoading fullScreen title="正在拆开掌心密信。" description="正在准备庭院与角色牌" />
                         : <LoadingBlock />;
             return (
                 <Route

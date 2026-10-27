@@ -6,6 +6,7 @@ import type {
   AcquireTile,
   HistoryStats,
   LeaderboardEntry as GeneratedLeaderboardEntry,
+  LoveLetterReplaySnapshot,
   ReplayEvent,
   RoomPlayer,
 } from '@/api/generated/game-platform';
@@ -19,7 +20,8 @@ export type HistoryGameType =
   | 'othello'
   | 'fugitive'
   | 'warchest'
-  | 'quoridor';
+  | 'quoridor'
+  | 'loveletter';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -129,7 +131,12 @@ export type OthelloLeaderboardEntry = DavinciLeaderboardEntry;
 export type FugitiveLeaderboardEntry = DavinciLeaderboardEntry;
 export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type QuoridorLeaderboardEntry = DavinciLeaderboardEntry;
+export type LoveLetterLeaderboardEntry = RankLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
+
+export type LoveLetterSnapshot = LoveLetterReplaySnapshot & {
+  currentEvent?: ReplayEventData;
+};
 
 export interface LeaderboardData {
   gameType: HistoryGameType;
