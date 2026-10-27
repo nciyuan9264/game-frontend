@@ -10,6 +10,7 @@ import { YinshLoading } from '@/features/yinsh/components/LoadingState';
 import { OthelloLoading } from '@/features/othello/components/LoadingState';
 import { OthelloSessionLoading } from '@/features/othello/pages/Session/Loading';
 import { QuoridorLoading } from '@/features/quoridor/components/LoadingState';
+import { HexLoading } from '@/features/hex/components/LoadingState';
 import { FugitiveLoading } from '@/features/fugitive/components/LoadingState';
 import { Loading as WarChestLoading } from '@/features/warchest/components/Shell';
 
@@ -36,6 +37,8 @@ export const RenderRoutes = () => {
                                 ? <OthelloLoading fullScreen />
                                 : route.path.startsWith('/game/quoridor')
                                     ? <QuoridorLoading fullScreen />
+                                : route.path.startsWith('/game/hex')
+                                    ? <HexLoading fullScreen />
                                 : route.path.startsWith('/game/fugitive')
                                     ? <FugitiveLoading fullScreen />
                                     : route.path.startsWith('/game/warchest')

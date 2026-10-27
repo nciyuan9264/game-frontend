@@ -348,6 +348,52 @@ const QuoridorVisual = () => (
   </>
 );
 
+const HexVisual = () => {
+  const stones: Record<number, 'red' | 'teal'> = {
+    3: 'red',
+    10: 'red',
+    17: 'red',
+    24: 'red',
+    31: 'red',
+    38: 'red',
+    21: 'teal',
+    22: 'teal',
+    23: 'teal',
+    25: 'teal',
+    26: 'teal',
+    27: 'teal',
+  };
+  return <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.hexMockup}`}
+    >
+      <div className={styles.hexUI}>
+        <div className={styles.hexHeader}>
+          <span>YOUR CONNECTION</span><b>RED · NORTH / SOUTH</b>
+        </div>
+        <div className={styles.hexBoard}>
+          {Array.from({ length: 49 }, (_, index) =>
+            <i key={index}>{stones[index]
+              && <span className={styles[stones[index]]} />}</i>)}
+        </div>
+        <div className={styles.hexFooter}>
+          <span>11 × 11 CLASSIC</span><span>TWO SHORES · ONE PATH</span>
+        </div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-8, -4, -8] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingHexStone} ${styles.red}`} />
+    <motion.span animate={{ y: [0, 11, 0], rotate: [9, 4, 9] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingHexStone} ${styles.teal}`} />
+  </>;
+};
+
 
 const WarChestVisual = () => (
   <>
@@ -419,6 +465,7 @@ const gameVisuals: Record<GameKey, () => JSX.Element> = {
   splendor: SplendorVisual,
   yinsh: YinshVisual,
   othello: OthelloVisual,
+  hex: HexVisual,
   quoridor: QuoridorVisual,
   warchest: WarChestVisual,
   fugitive: FugitiveVisual,
@@ -605,7 +652,7 @@ export default function Home() {
           </div>
 
           {filteredGames.length > 0 ? (
-            <div className={styles.gameGrid}>
+            <div className={styles.gameGrid} aria-label="游戏目录">
               {filteredGames.map((game, index) => {
                 const PreviewIcon = game.features[0].icon;
                 const selected = game.key === activeGame.key;

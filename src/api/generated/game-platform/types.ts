@@ -96,6 +96,18 @@ export interface QuoridorRoomMetrics {
   turnCount: number;
 }
 
+export interface LoveLetterRoomMetrics {
+  currentRound: number;
+  maxFavor: number;
+  targetFavor: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
+export interface HexRoomMetrics {
+  turnCount: number;
+}
+
 export interface RoomInfo {
   roomID: string;
   gameType: GameType;
@@ -184,6 +196,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -194,6 +208,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -204,6 +220,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -214,6 +232,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -224,6 +244,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -234,6 +256,8 @@ export type RoomMetrics =
       fugitive: FugitiveRoomMetrics;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -244,6 +268,8 @@ export type RoomMetrics =
       fugitive?: never;
       warchest: WarChestRoomMetrics;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -254,6 +280,32 @@ export type RoomMetrics =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorRoomMetrics;
+      loveletter?: never;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter: LoveLetterRoomMetrics;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      hex: HexRoomMetrics;
     };
 
 export interface AcquireTile {
@@ -1006,6 +1058,216 @@ export type QuoridorCommandPayload =
   | { movePawn?: never; placeWall: QuoridorPlaceWallPayload; resign?: never }
   | { movePawn?: never; placeWall?: never; resign: EmptyPayload };
 
+export type LoveLetterGameStatus = string;
+
+export type LoveLetterActionKind = string;
+
+export type LoveLetterPrivateEffectKind = string;
+
+export interface LoveLetterCard {
+  cardID: string;
+  rank: number;
+}
+
+export interface LoveLetterPlayerState {
+  favors: number;
+  alive: boolean;
+  protected: boolean;
+  spyUsed: boolean;
+  handCount: number;
+  discards: LoveLetterCard[];
+}
+
+export interface LoveLetterPrivateEffect {
+  effectID: string;
+  kind: LoveLetterPrivateEffectKind;
+  targetPlayerID?: string;
+  targetRank?: number;
+  actorRank?: number;
+  summary?: string;
+}
+
+export interface LoveLetterPrivateData {
+  hand: LoveLetterCard[];
+  legalCardIDs: string[];
+  legalTargets: Record<string, string[]>;
+  guardGuessRanks: number[];
+  effect?: LoveLetterPrivateEffect;
+}
+
+export interface LoveLetterActionEntry {
+  id: number;
+  roundNo: number;
+  kind: LoveLetterActionKind;
+  playerID: string;
+  cardRank?: number;
+  targetPlayerID?: string;
+  guessRank?: number;
+  success?: boolean;
+  automatic: boolean;
+  private?: boolean;
+  summary?: string;
+}
+
+export interface LoveLetterRoundResult {
+  winnerIDs: string[];
+  spyPlayerID?: string;
+  reason: string;
+  favorsBefore: Record<string, number>;
+  favorsAfter: Record<string, number>;
+  revealedHands: Record<string, LoveLetterCard>;
+  matchWinnerIDs: string[];
+}
+
+export interface LoveLetterResult {
+  winnerIDs: string[];
+  favors: Record<string, number>;
+  finalRanks: Record<string, number>;
+  roundNo: number;
+  reason: string;
+}
+
+export interface LoveLetterRoomData {
+  currentPlayer: string;
+  gameStatus: LoveLetterGameStatus;
+  roundNo: number;
+  goal: number;
+  deckCount: number;
+  reserveCount: number;
+  burnCards: LoveLetterCard[];
+  activityLog: LoveLetterActionEntry[];
+  lastData?: LoveLetterActionEntry;
+  roundResult?: LoveLetterRoundResult;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  roundTransitionDeadline?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface LoveLetterRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, LoveLetterPlayerState>;
+  roomData: LoveLetterRoomData;
+  privateData: LoveLetterPrivateData;
+  result?: LoveLetterResult;
+}
+
+export interface LoveLetterReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: LoveLetterRoomData;
+  playersData: Record<string, LoveLetterPlayerState>;
+  privateData: Record<string, LoveLetterPrivateData>;
+  deck: LoveLetterCard[];
+  reserve?: LoveLetterCard;
+  result?: LoveLetterResult;
+}
+
+export interface LoveLetterPlayCardPayload {
+  cardID: string;
+  targetPlayerID?: string;
+  guessRank?: number;
+}
+
+export interface LoveLetterSettleChancellorPayload {
+  keepCardID: string;
+  bottomCardIDs: string[];
+}
+
+export type LoveLetterCommandPayload =
+  | { drawCard: EmptyPayload; playCard?: never; settleChancellor?: never; nextRound?: never }
+  | { drawCard?: never; playCard: LoveLetterPlayCardPayload; settleChancellor?: never; nextRound?: never }
+  | { drawCard?: never; playCard?: never; settleChancellor: LoveLetterSettleChancellorPayload; nextRound?: never }
+  | { drawCard?: never; playCard?: never; settleChancellor?: never; nextRound: EmptyPayload };
+
+export type HexSide = string;
+
+export type HexGameStatus = string;
+
+export type HexActionKind = string;
+
+export interface HexCell {
+  row: number;
+  column: number;
+}
+
+export interface HexActionEntry {
+  id: number;
+  kind: HexActionKind;
+  playerID: string;
+  side: HexSide;
+  cell?: HexCell;
+  automatic: boolean;
+}
+
+export interface HexPlayerState {
+  side: HexSide;
+  stoneCount: number;
+}
+
+export interface HexRoomData {
+  boardSize: number;
+  board: HexSide[];
+  currentPlayer: string;
+  currentSide: HexSide;
+  redPlayerID: string;
+  tealPlayerID: string;
+  firstPlayerID: string;
+  roundNo: number;
+  gameStatus: HexGameStatus;
+  pieRule: boolean;
+  swapAvailable: boolean;
+  legalMoves: HexCell[];
+  winningPath: HexCell[];
+  moveLog: HexActionEntry[];
+  lastAction?: HexActionEntry;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface HexResult {
+  winnerID?: string;
+  winnerSide?: HexSide;
+  reason: string;
+  turnCount: number;
+  pathLength: number;
+  redStoneCount: number;
+  tealStoneCount: number;
+}
+
+export interface HexRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, HexPlayerState>;
+  roomData: HexRoomData;
+  result?: HexResult;
+}
+
+export interface HexReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: HexRoomData;
+  playersData: Record<string, HexPlayerState>;
+  result?: HexResult;
+}
+
+export interface HexPlaceStonePayload {
+  cell: HexCell;
+}
+
+export type HexCommandPayload =
+  | { placeStone: HexPlaceStonePayload; swap?: never; resign?: never }
+  | { placeStone?: never; swap: EmptyPayload; resign?: never }
+  | { placeStone?: never; swap?: never; resign: EmptyPayload };
+
 export interface HistoryGamePlayer {
   id: string;
   gameID: string;
@@ -1086,6 +1348,11 @@ export interface WarChestLeaderboardMetric {
 }
 
 export interface QuoridorLeaderboardMetric {
+  wins: number;
+  winRate: number;
+}
+
+export interface HexLeaderboardMetric {
   wins: number;
   winRate: number;
 }
@@ -1203,6 +1470,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1212,6 +1480,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1221,6 +1490,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1230,6 +1500,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1239,6 +1510,7 @@ export type LeaderboardMetric =
       fugitive: FugitiveLeaderboardMetric;
       warchest?: never;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1248,6 +1520,7 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest: WarChestLeaderboardMetric;
       quoridor?: never;
+      hex?: never;
     }
   | {
       davinci?: never;
@@ -1257,6 +1530,17 @@ export type LeaderboardMetric =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorLeaderboardMetric;
+      hex?: never;
+    }
+  | {
+      davinci?: never;
+      rank?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      hex: HexLeaderboardMetric;
     };
 
 export type ReplaySnapshot =
@@ -1267,6 +1551,8 @@ export type ReplaySnapshot =
       othello?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1275,6 +1561,8 @@ export type ReplaySnapshot =
       othello?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1283,6 +1571,8 @@ export type ReplaySnapshot =
       othello?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1291,6 +1581,8 @@ export type ReplaySnapshot =
       othello: OthelloReplaySnapshot;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1299,6 +1591,8 @@ export type ReplaySnapshot =
       othello?: never;
       warchest: WarChestReplaySnapshot;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1307,6 +1601,28 @@ export type ReplaySnapshot =
       othello?: never;
       warchest?: never;
       quoridor: QuoridorReplaySnapshot;
+      loveletter?: never;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter: LoveLetterReplaySnapshot;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      hex: HexReplaySnapshot;
     };
 
 export interface DavinciCard {
@@ -1638,6 +1954,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1649,6 +1967,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1660,6 +1980,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1671,6 +1993,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1682,6 +2006,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1693,6 +2019,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1704,6 +2032,8 @@ export type ClientCommandPayload =
       fugitive: FugitiveCommandPayload;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1715,6 +2045,8 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest: WarChestCommandPayload;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       common?: never;
@@ -1726,6 +2058,34 @@ export type ClientCommandPayload =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorCommandPayload;
+      loveletter?: never;
+      hex?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter: LoveLetterCommandPayload;
+      hex?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      hex: HexCommandPayload;
     };
 
 export type MatchSetupView = { warchest: WarChestMatchSetup };
@@ -1740,6 +2100,8 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1750,6 +2112,8 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1760,6 +2124,8 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1770,6 +2136,8 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1780,6 +2148,8 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1790,6 +2160,8 @@ export type RoomView =
       fugitive: FugitiveRoomView;
       warchest?: never;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1800,6 +2172,8 @@ export type RoomView =
       fugitive?: never;
       warchest: WarChestRoomView;
       quoridor?: never;
+      loveletter?: never;
+      hex?: never;
     }
   | {
       acquire?: never;
@@ -1810,6 +2184,32 @@ export type RoomView =
       fugitive?: never;
       warchest?: never;
       quoridor: QuoridorRoomView;
+      loveletter?: never;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter: LoveLetterRoomView;
+      hex?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      hex: HexRoomView;
     };
 
 export type ServerMessage =

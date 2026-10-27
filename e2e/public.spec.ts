@@ -10,6 +10,7 @@ test('home and static assets render without browser or server errors', async ({ 
   await expect(page.getByText('璀璨宝石', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('圈套棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('黑白棋', { exact: false }).first()).toBeVisible();
+  await expect(page.getByText('连边棋', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('逃亡者', { exact: false }).first()).toBeVisible();
   await expect(page.getByText('战争之匣', { exact: false }).first()).toBeVisible();
   await expect.poll(async () => page.locator('img').evaluateAll(images =>
@@ -18,40 +19,46 @@ test('home and static assets render without browser or server errors', async ({ 
   assertClean();
 });
 
-test('home game switcher remains usable on a narrow mobile viewport', async ({ page }) => {
+test('home game catalog remains usable on a narrow mobile viewport', async ({ page }) => {
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
 
-  const switcher = page.locator('[aria-label="选择游戏"]');
-  await expect(switcher).toBeVisible();
-  expect(await switcher.locator('button').count()).toBeGreaterThanOrEqual(6);
+  const categories = page.locator('[aria-label="游戏分类"]');
+  const catalog = page.locator('[aria-label="游戏目录"]');
+  await expect(categories).toBeVisible();
+  await expect(categories.getByRole('button')).toHaveCount(6);
+  await expect(catalog).toBeVisible();
+  await expect(catalog.getByRole('button', { name: /^预览/ })).toHaveCount(9);
+  await categories.scrollIntoViewIfNeeded();
 
-  const layout = await switcher.evaluate(element => {
-    const content = element.nextElementSibling;
-    const firstTab = element.querySelector('button');
-    const title = firstTab?.querySelector('span > span');
+  const layout = await categories.evaluate((element, gameCatalog) => {
+    const firstCard = gameCatalog.querySelector('article');
+    const categoryButtons = [...element.querySelectorAll('button')];
+    const firstTop = categoryButtons[0]?.getBoundingClientRect().top ?? 0;
+    const pageScroller = document.querySelector('main')?.parentElement;
     return {
-      switcherTop: element.getBoundingClientRect().top,
-      switcherScrollable: element.scrollWidth > element.clientWidth,
-      firstTabWidth: firstTab?.getBoundingClientRect().width ?? 0,
-      titleSingleLine: !!title && getComputedStyle(title).whiteSpace === 'nowrap'
-        && title.scrollHeight <= title.clientHeight,
-      contentScrollable: !!content && content.scrollHeight > content.clientHeight,
+      categoriesSingleLine: categoryButtons.every(button =>
+        Math.abs(button.getBoundingClientRect().top - firstTop) <= 1),
+      cardFitsViewport: (firstCard?.getBoundingClientRect().width ?? 0)
+        <= window.innerWidth,
+      pageHasNoHorizontalOverflow:
+        document.documentElement.scrollWidth <= window.innerWidth,
+      pageScrollable: !!pageScroller
+        && pageScroller.scrollHeight > pageScroller.clientHeight,
     };
-  });
+  }, await catalog.elementHandle());
 
-  expect(layout.switcherTop).toBeGreaterThanOrEqual(0);
-  expect(layout.switcherScrollable).toBe(true);
-  expect(layout.firstTabWidth).toBeGreaterThanOrEqual(100);
-  expect(layout.titleSingleLine).toBe(true);
-  expect(layout.contentScrollable).toBe(true);
+  expect(layout.categoriesSingleLine).toBe(true);
+  expect(layout.cardFitsViewport).toBe(true);
+  expect(layout.pageHasNoHorizontalOverflow).toBe(true);
+  expect(layout.pageScrollable).toBe(true);
 
-  const othelloTab = switcher.getByRole('button', { name: /黑白棋/ });
-  await othelloTab.scrollIntoViewIfNeeded();
-  await expect(othelloTab).toBeVisible();
-  const fugitiveTab = switcher.getByRole('button', { name: /逃亡者/ });
-  await fugitiveTab.scrollIntoViewIfNeeded();
-  await expect(fugitiveTab).toBeVisible();
+  const hexCard = catalog.getByRole('button', { name: '预览连边棋' });
+  await hexCard.scrollIntoViewIfNeeded();
+  await expect(hexCard).toBeVisible();
+  const fugitiveCard = catalog.getByRole('button', { name: '预览逃亡者' });
+  await fugitiveCard.scrollIntoViewIfNeeded();
+  await expect(fugitiveCard).toBeVisible();
 });
 
 for (const [gameType, heading] of [

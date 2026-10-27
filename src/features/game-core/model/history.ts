@@ -19,7 +19,8 @@ export type HistoryGameType =
   | 'othello'
   | 'fugitive'
   | 'warchest'
-  | 'quoridor';
+  | 'quoridor'
+  | 'hex';
 export type HistoryGameStatus = string;
 export type CmdType = string;
 export type Stats = HistoryStats;
@@ -129,6 +130,7 @@ export type OthelloLeaderboardEntry = DavinciLeaderboardEntry;
 export type FugitiveLeaderboardEntry = DavinciLeaderboardEntry;
 export type WarChestLeaderboardEntry = DavinciLeaderboardEntry;
 export type QuoridorLeaderboardEntry = DavinciLeaderboardEntry;
+export type HexLeaderboardEntry = DavinciLeaderboardEntry;
 export type LeaderboardEntry = DavinciLeaderboardEntry | RankLeaderboardEntry;
 
 export interface LeaderboardData {
@@ -197,6 +199,16 @@ export function toLeaderboardEntry(
       totalGames: entry.totalGames,
       wins: entry.metric.quoridor.wins,
       winRate: entry.metric.quoridor.winRate,
+    };
+  }
+  if (entry.metric.hex) {
+    return {
+      userID: entry.userID,
+      playerID: entry.playerID,
+      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+      totalGames: entry.totalGames,
+      wins: entry.metric.hex.wins,
+      winRate: entry.metric.hex.winRate,
     };
   }
   if (!entry.metric.rank) {

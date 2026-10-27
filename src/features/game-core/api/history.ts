@@ -80,7 +80,9 @@ function unwrapReplaySnapshot<TSnapshot>(
             ? value.warchest
             : gameType === 'quoridor'
               ? value.quoridor
-            : undefined;
+              : gameType === 'hex'
+                ? value.hex
+                : undefined;
   if (!snapshot) {
     throw new Error(`回放快照与游戏类型 ${gameType} 不匹配`);
   }
