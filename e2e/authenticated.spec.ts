@@ -32,6 +32,21 @@ const games = [
     lobbyHeading: /下一步/,
     profileHeading: '每一场追逐，都有你的痕迹。',
   },
+  {
+    gameType: 'loveletter',
+    lobbyHeading: /一封密信/,
+    profileHeading: '寄出的信，都有回音。',
+  },
+  {
+    gameType: 'sixnimmt',
+    lobbyHeading: /别做第六个/,
+    profileHeading: '每一桌，都有点小故事。',
+  },
+  {
+    gameType: 'onitama',
+    lobbyHeading: /一招一式/,
+    profileHeading: '你的每一步，都值得回看。',
+  },
 ] as const;
 
 test.beforeEach(async ({ context }) => {

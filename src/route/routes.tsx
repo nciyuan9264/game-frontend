@@ -52,6 +52,18 @@ import {
   My as WarChestMy,
   Rankings as WarChestRankings,
 } from "@/features/warchest/pages/Community";
+import LoveLetterLobby from "@/features/loveletter/pages/Lobby";
+import {
+  Guide as LoveLetterGuide,
+  My as LoveLetterMy,
+  Rankings as LoveLetterRankings,
+} from "@/features/loveletter/pages/Community";
+import SixNimmtLobby from "@/features/sixnimmt/pages/Lobby";
+import {
+  Guide as SixNimmtGuide,
+  My as SixNimmtMy,
+  Rankings as SixNimmtRankings,
+} from "@/features/sixnimmt/pages/Community";
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
@@ -71,6 +83,10 @@ const OnitamaReplay = lazy(() => import("@/features/onitama/pages/Replay"));
 const FugitiveSession = lazy(() => import("@/features/fugitive/pages/Session"));
 const WarChestSession = lazy(() => import("@/features/warchest/pages/Session"));
 const WarChestReplay = lazy(() => import("@/features/warchest/pages/Replay"));
+const LoveLetterSession = lazy(() => import("@/features/loveletter/pages/Session"));
+const LoveLetterReplay = lazy(() => import("@/features/loveletter/pages/Replay"));
+const SixNimmtSession = lazy(() => import("@/features/sixnimmt/pages/Session"));
+const SixNimmtReplay = lazy(() => import("@/features/sixnimmt/pages/Replay"));
 
 export interface AppRoute {
   path: string;
@@ -167,6 +183,18 @@ export const routes: AppRoute[] = [
   { path: "/game/warchest/me", element: <WarChestMy /> },
   { path: "/game/warchest/match", element: <WarChestSession /> },
   { path: "/game/warchest/replay/:gameId", element: <WarChestReplay /> },
+  { path: "/game/loveletter", element: <LoveLetterLobby /> },
+  { path: "/game/loveletter/rankings", element: <LoveLetterRankings /> },
+  { path: "/game/loveletter/guide", element: <LoveLetterGuide /> },
+  { path: "/game/loveletter/me", element: <LoveLetterMy /> },
+  { path: "/game/loveletter/match", element: <LoveLetterSession /> },
+  { path: "/game/loveletter/replay/:gameId", element: <LoveLetterReplay /> },
+  { path: "/game/sixnimmt", element: <SixNimmtLobby /> },
+  { path: "/game/sixnimmt/rankings", element: <SixNimmtRankings /> },
+  { path: "/game/sixnimmt/guide", element: <SixNimmtGuide /> },
+  { path: "/game/sixnimmt/me", element: <SixNimmtMy /> },
+  { path: "/game/sixnimmt/match", element: <SixNimmtSession /> },
+  { path: "/game/sixnimmt/replay/:gameId", element: <SixNimmtReplay /> },
   {
     path: "/",
     element: <Home />

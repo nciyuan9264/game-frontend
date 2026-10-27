@@ -10,6 +10,8 @@ export type GameType =
   | 'fugitive'
   | 'warchest'
   | 'quoridor'
+  | 'loveletter'
+  | 'sixnimmt'
   | 'onitama';
 export enum GameTypeEnum {
   Acquire = 'acquire',
@@ -20,6 +22,8 @@ export enum GameTypeEnum {
   Fugitive = 'fugitive',
   WarChest = 'warchest',
   Quoridor = 'quoridor',
+  LoveLetter = 'loveletter',
+  SixNimmt = 'sixnimmt',
   Onitama = 'onitama',
 }
 
@@ -32,6 +36,8 @@ const gameTypes: GameType[] = [
   GameTypeEnum.Fugitive,
   GameTypeEnum.WarChest,
   GameTypeEnum.Quoridor,
+  GameTypeEnum.LoveLetter,
+  GameTypeEnum.SixNimmt,
   GameTypeEnum.Onitama,
 ];
 

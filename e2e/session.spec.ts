@@ -20,6 +20,9 @@ const games: Array<{
   { gameType: 'othello', playMarker: /轮到你了/ },
   { gameType: 'fugitive', playMarker: /布置 1–2 处初始藏身点/ },
   { gameType: 'warchest', playMarker: /轮到你行动/ },
+  { gameType: 'loveletter', playMarker: /玫瑰庭院/ },
+  { gameType: 'sixnimmt', playMarker: /公共牌桌/ },
+  { gameType: 'onitama', playMarker: /轮到你了/ },
 ];
 
 test.beforeEach(async ({ context }) => {

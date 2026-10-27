@@ -34,6 +34,11 @@ import {
   lookupQuoridorRoom,
 } from '@/features/quoridor/api/room';
 import {
+  createLoveLetterRoom,
+  listLoveLetterRooms,
+  lookupLoveLetterRoom,
+} from '@/features/loveletter/api/room';
+import {
   createOnitamaRoom,
   listOnitamaRooms,
   lookupOnitamaRoom,
@@ -204,11 +209,36 @@ describe('game room API wrappers', () => {
     );
   });
 
+  it('injects Love Letter official deck room defaults', () => {
+    const signal = new AbortController().signal;
+    createLoveLetterRoom('private', signal);
+    listLoveLetterRooms(signal);
+    lookupLoveLetterRoom('room-7', signal);
+
+    const options = { signal, authFailure: 'redirect' };
+    expect(shared.createGameRoom).toHaveBeenCalledWith(
+      'loveletter',
+      {
+        visibility: 'private',
+        displayName: '掌心密信',
+        maxPlayers: 6,
+        turnTimeoutSeconds: 60,
+      },
+      options,
+    );
+    expect(shared.listGameRooms).toHaveBeenCalledWith('loveletter', options);
+    expect(shared.lookupGameRoom).toHaveBeenCalledWith(
+      'loveletter',
+      'room-7',
+      options,
+    );
+  });
+
   it('injects Onitama fixed seats and authoritative timeout', () => {
     const signal = new AbortController().signal;
     createOnitamaRoom('private', signal);
     listOnitamaRooms(signal);
-    lookupOnitamaRoom('room-7', signal);
+    lookupOnitamaRoom('room-8', signal);
 
     const options = { signal, authFailure: 'redirect' };
     expect(shared.createGameRoom).toHaveBeenCalledWith(
@@ -223,7 +253,7 @@ describe('game room API wrappers', () => {
     expect(shared.listGameRooms).toHaveBeenCalledWith('onitama', options);
     expect(shared.lookupGameRoom).toHaveBeenCalledWith(
       'onitama',
-      'room-7',
+      'room-8',
       options,
     );
   });

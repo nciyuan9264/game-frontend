@@ -80,6 +80,10 @@ function unwrapReplaySnapshot<TSnapshot>(
             ? value.warchest
             : gameType === 'quoridor'
               ? value.quoridor
+            : gameType === 'loveletter'
+              ? value.loveletter
+            : gameType === 'sixnimmt'
+              ? value.sixnimmt
             : gameType === 'onitama'
               ? value.onitama
             : undefined;

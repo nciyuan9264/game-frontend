@@ -42,6 +42,11 @@ export interface LobbyRoomLike {
   progressTotal?: number;
   maxControlledLocations?: number;
   turnCount?: number;
+  currentRound?: number;
+  maxFavor?: number;
+  targetFavor?: number;
+  maxPenalty?: number;
+  targetPenalty?: number;
 }
 
 export type LobbyFilter = 'all' | 'joinable' | 'playing';
@@ -137,12 +142,21 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     maxControlledLocations: room.metrics.warchest?.maxControlledLocations,
     turnCount: room.metrics.quoridor?.turnCount
       ?? room.metrics.onitama?.turnCount,
+    currentRound: room.metrics.loveletter?.currentRound,
+    maxFavor: room.metrics.loveletter?.maxFavor,
+    targetFavor: room.metrics.loveletter?.targetFavor,
+    maxPenalty: room.metrics.sixnimmt?.maxPenalty,
+    targetPenalty: room.metrics.sixnimmt?.targetPenalty,
     progressCurrent: room.metrics.fugitive?.progressCurrent
       ?? room.metrics.warchest?.progressCurrent
-      ?? room.metrics.othello?.progressCurrent,
+      ?? room.metrics.othello?.progressCurrent
+      ?? room.metrics.loveletter?.progressCurrent
+      ?? room.metrics.sixnimmt?.progressCurrent,
     progressTotal: room.metrics.fugitive?.progressTotal
       ?? room.metrics.warchest?.progressTotal
-      ?? room.metrics.othello?.progressTotal,
+      ?? room.metrics.othello?.progressTotal
+      ?? room.metrics.loveletter?.progressTotal
+      ?? room.metrics.sixnimmt?.progressTotal,
   };
 }
 

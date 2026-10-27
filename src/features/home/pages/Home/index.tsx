@@ -9,6 +9,9 @@ import {
   Sparkles,
   Swords,
   Flag,
+  Flower2,
+  Heart,
+  Mail,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -456,6 +459,66 @@ const FugitiveVisual = () => (
   </>
 );
 
+const LoveLetterVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: 3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: -3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={`${styles.mockup} ${styles.loveLetterMockup}`}
+    >
+      <div className={styles.loveLetterUI}>
+        <div className={styles.loveLetterHeader}><span>THE QUIET COURT</span>
+          <b><Heart size={11} /> 02 / 04</b></div>
+        <div className={styles.loveLetterCourt}>
+          <span><Flower2 size={20} /></span><span><Mail size={22} /></span>
+          <span><Flower2 size={20} /></span>
+        </div>
+        <div className={styles.loveLetterHand}>
+          {[1, 4].map(rank => <span key={rank}><b>{rank}</b><i />
+            <small>{rank === 1 ? 'GUARD' : 'HANDMAID'}</small></span>)}
+        </div>
+        <div className={styles.loveLetterFooter}><span>DRAW ONE · PLAY ONE</span>
+          <span>21 CARDS</span></div>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={`${styles.floatingLetterCard} ${styles.letterGuard}`}>1</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={`${styles.floatingLetterCard} ${styles.letterPrincess}`}>9</motion.span>
+  </>
+);
+
+const SixNimmtVisual = () => (
+  <>
+    <motion.div
+      initial={{ scale: .82, opacity: 0, rotate: -3 }}
+      animate={{ scale: 1, opacity: 1, rotate: 0 }}
+      exit={{ scale: .92, opacity: 0, rotate: 3 }}
+      transition={{ type: 'spring', stiffness: 120, damping: 18 }}
+      className={` `}
+    >
+      <div className={styles.sixNimmtUI}>
+        <header><span>ROUND 04 / 10</span><b>18 BULLS</b></header>
+        <div className={styles.sixNimmtRows}>{[
+          [12, 18, 23], [30, 35, 39, 44], [61, 64], [79, 84, 90],
+        ].map((row, index) => <div key={index}><b>{String.fromCharCode(65 + index)}</b>
+          <span>{row.map(card => <i key={card}>{card}</i>)}</span><em>6</em></div>)}</div>
+        <footer>{[24, 55, 68, 88, 103].map(card => <i key={card}>{card}</i>)}</footer>
+      </div>
+    </motion.div>
+    <motion.span animate={{ y: [0, -11, 0], rotate: [-9, -5, -9] }}
+      transition={{ duration: 4.6, repeat: Infinity, ease: 'easeInOut' }}
+      className={` `}>24</motion.span>
+    <motion.span animate={{ y: [0, 11, 0], rotate: [10, 5, 10] }}
+      transition={{ duration: 5.1, repeat: Infinity, ease: 'easeInOut', delay: .4 }}
+      className={` `}>55</motion.span>
+  </>
+);
+
 const gameVisuals: Record<GameKey, () => JSX.Element> = {
   acquire: AcquireVisual,
   davinci: DaVinciVisual,
@@ -466,6 +529,8 @@ const gameVisuals: Record<GameKey, () => JSX.Element> = {
   onitama: OnitamaVisual,
   warchest: WarChestVisual,
   fugitive: FugitiveVisual,
+  loveletter: LoveLetterVisual,
+  sixnimmt: SixNimmtVisual,
 };
 
 type GameThemeStyle = CSSProperties & {
@@ -649,7 +714,7 @@ export default function Home() {
           </div>
 
           {filteredGames.length > 0 ? (
-            <div className={styles.gameGrid}>
+            <div className={styles.gameGrid} aria-label="选择游戏">
               {filteredGames.map((game, index) => {
                 const PreviewIcon = game.features[0].icon;
                 const selected = game.key === activeGame.key;

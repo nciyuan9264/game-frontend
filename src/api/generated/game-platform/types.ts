@@ -104,6 +104,13 @@ export interface LoveLetterRoomMetrics {
   progressTotal: number;
 }
 
+export interface SixNimmtRoomMetrics {
+  maxPenalty: number;
+  targetPenalty: number;
+  progressCurrent: number;
+  progressTotal: number;
+}
+
 export interface OnitamaRoomMetrics {
   turnCount: number;
 }
@@ -197,6 +204,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -209,6 +217,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -221,6 +230,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -233,6 +243,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -245,6 +256,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -257,6 +269,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -269,6 +282,7 @@ export type RoomMetrics =
       warchest: WarChestRoomMetrics;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -281,6 +295,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor: QuoridorRoomMetrics;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -293,6 +308,7 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter: LoveLetterRoomMetrics;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -305,6 +321,20 @@ export type RoomMetrics =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt: SixNimmtRoomMetrics;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
       onitama: OnitamaRoomMetrics;
     };
 
@@ -1184,6 +1214,148 @@ export type LoveLetterCommandPayload =
   | { drawCard?: never; playCard?: never; settleChancellor: LoveLetterSettleChancellorPayload; nextRound?: never }
   | { drawCard?: never; playCard?: never; settleChancellor?: never; nextRound: EmptyPayload };
 
+export type SixNimmtGameStatus = string;
+
+export type SixNimmtPlacementKind = string;
+
+export type SixNimmtActionKind = string;
+
+export type SixNimmtAutomationKind = string;
+
+export interface SixNimmtRow {
+  index: number;
+  cards: number[];
+  bullheads: number;
+}
+
+export interface SixNimmtPlayerState {
+  roundPenalty: number;
+  totalPenalty: number;
+  handCount: number;
+  takenCount: number;
+  locked: boolean;
+}
+
+export interface SixNimmtPrivateData {
+  hand: number[];
+  legalCards: number[];
+  lockedCard?: number;
+}
+
+export interface SixNimmtSelection {
+  playerID: string;
+  card: number;
+  automationKind?: SixNimmtAutomationKind;
+}
+
+export interface SixNimmtPlacement {
+  playerID: string;
+  card: number;
+  rowIndex: number;
+  kind: SixNimmtPlacementKind;
+  collectedCards: number[];
+  penalty: number;
+  automationKind?: SixNimmtAutomationKind;
+}
+
+export interface SixNimmtTurnResolution {
+  resolutionID: string;
+  roundNo: number;
+  turnNo: number;
+  rowsBefore: SixNimmtRow[];
+  selections: SixNimmtSelection[];
+  placements: SixNimmtPlacement[];
+  rowsAfter: SixNimmtRow[];
+  complete: boolean;
+}
+
+export interface SixNimmtPendingChoice {
+  playerID: string;
+  card: number;
+  rowPenalties: number[];
+}
+
+export interface SixNimmtActionEntry {
+  id: number;
+  roundNo: number;
+  turnNo: number;
+  kind: SixNimmtActionKind;
+  playerID: string;
+  card?: number;
+  rowIndex?: number;
+  penalty?: number;
+  automationKind?: SixNimmtAutomationKind;
+  summary?: string;
+}
+
+export interface SixNimmtRoundResult {
+  roundNo: number;
+  roundPenalties: Record<string, number>;
+  totalPenalties: Record<string, number>;
+  thresholdReached: boolean;
+  nextRoundDeadline?: string;
+}
+
+export interface SixNimmtResult {
+  winnerIDs: string[];
+  totalPenalties: Record<string, number>;
+  finalRanks: Record<string, number>;
+  roundNo: number;
+  reason: string;
+}
+
+export interface SixNimmtRoomData {
+  gameStatus: SixNimmtGameStatus;
+  roundNo: number;
+  turnNo: number;
+  rows: SixNimmtRow[];
+  lockedPlayerIDs: string[];
+  activityLog: SixNimmtActionEntry[];
+  lastResolution?: SixNimmtTurnResolution;
+  pendingChoice?: SixNimmtPendingChoice;
+  roundResult?: SixNimmtRoundResult;
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
+  roundTransitionDeadline?: string;
+  players: Record<string, RoomPlayer>;
+  playerOrder: string[];
+}
+
+export interface SixNimmtRoomView {
+  playerId: string;
+  ownerID: string;
+  visibility: string;
+  playerData: Record<string, SixNimmtPlayerState>;
+  privateData: SixNimmtPrivateData;
+  roomData: SixNimmtRoomData;
+  result?: SixNimmtResult;
+}
+
+export interface SixNimmtReplaySnapshot {
+  seq: number;
+  totalEvents: number;
+  currentEvent?: ReplayEvent;
+  roomData: SixNimmtRoomData;
+  playersData: Record<string, SixNimmtPlayerState>;
+  privateData: Record<string, SixNimmtPrivateData>;
+  unusedCards: number[];
+  result?: SixNimmtResult;
+}
+
+export interface SixNimmtLockCardPayload {
+  card: number;
+}
+
+export interface SixNimmtChooseRowPayload {
+  rowIndex: number;
+}
+
+export type SixNimmtCommandPayload =
+  | { lockCard: SixNimmtLockCardPayload; unlockCard?: never; chooseRow?: never; nextRound?: never }
+  | { lockCard?: never; unlockCard: EmptyPayload; chooseRow?: never; nextRound?: never }
+  | { lockCard?: never; unlockCard?: never; chooseRow: SixNimmtChooseRowPayload; nextRound?: never }
+  | { lockCard?: never; unlockCard?: never; chooseRow?: never; nextRound: EmptyPayload };
+
 export type OnitamaSide = string;
 
 export type OnitamaPieceKind = string;
@@ -1577,6 +1749,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1587,6 +1760,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1597,6 +1771,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1607,6 +1782,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1617,6 +1793,7 @@ export type ReplaySnapshot =
       warchest: WarChestReplaySnapshot;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1627,6 +1804,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor: QuoridorReplaySnapshot;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1637,6 +1815,7 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter: LoveLetterReplaySnapshot;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1647,6 +1826,18 @@ export type ReplaySnapshot =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt: SixNimmtReplaySnapshot;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
       onitama: OnitamaReplaySnapshot;
     };
 
@@ -1980,6 +2171,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -1993,6 +2185,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2006,6 +2199,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2019,6 +2213,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2032,6 +2227,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2045,6 +2241,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2058,6 +2255,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2071,6 +2269,7 @@ export type ClientCommandPayload =
       warchest: WarChestCommandPayload;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2084,6 +2283,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor: QuoridorCommandPayload;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2097,6 +2297,7 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter: LoveLetterCommandPayload;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2110,6 +2311,21 @@ export type ClientCommandPayload =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt: SixNimmtCommandPayload;
+      onitama?: never;
+    }
+  | {
+      common?: never;
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
       onitama: OnitamaCommandPayload;
     };
 
@@ -2126,6 +2342,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2138,6 +2355,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2150,6 +2368,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2162,6 +2381,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2174,6 +2394,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2186,6 +2407,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2198,6 +2420,7 @@ export type RoomView =
       warchest: WarChestRoomView;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2210,6 +2433,7 @@ export type RoomView =
       warchest?: never;
       quoridor: QuoridorRoomView;
       loveletter?: never;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2222,6 +2446,7 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter: LoveLetterRoomView;
+      sixnimmt?: never;
       onitama?: never;
     }
   | {
@@ -2234,6 +2459,20 @@ export type RoomView =
       warchest?: never;
       quoridor?: never;
       loveletter?: never;
+      sixnimmt: SixNimmtRoomView;
+      onitama?: never;
+    }
+  | {
+      acquire?: never;
+      davinci?: never;
+      splendor?: never;
+      yinsh?: never;
+      othello?: never;
+      fugitive?: never;
+      warchest?: never;
+      quoridor?: never;
+      loveletter?: never;
+      sixnimmt?: never;
       onitama: OnitamaRoomView;
     };
 

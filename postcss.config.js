@@ -8,7 +8,7 @@ export default {
             replace: true,
             mediaQuery: false,
             minPixelValue: 0,
-            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/](?:splendor|othello|yinsh|quoridor|fugitive|warchest)[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci)|components[\\/]GameUI)[\\/])/,
+            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/](?:splendor|othello|yinsh|quoridor|fugitive|warchest|loveletter|sixnimmt|onitama)[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci)|components[\\/]GameUI)[\\/])/,
         },
     },
 };
