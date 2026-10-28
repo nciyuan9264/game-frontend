@@ -385,6 +385,21 @@ test('Onitama confirms a service-provided move before submitting', async ({
   const board = page.getByRole('grid', { name: '御神乐棋 5 乘 5 棋盘' });
   await expect(board).toBeVisible();
   await expect(board.getByRole('gridcell')).toHaveCount(25);
+  await expect.poll(() => board.evaluate(element => {
+    const grid = getComputedStyle(element);
+    const cell = getComputedStyle(element.querySelector('[role="gridcell"]')!);
+    return {
+      rowGap: grid.rowGap,
+      columnGap: grid.columnGap,
+      cellBorderRight: cell.borderRightWidth,
+      cellBorderBottom: cell.borderBottomWidth,
+    };
+  })).toEqual({
+    rowGap: '1px',
+    columnGap: '1px',
+    cellBorderRight: '0px',
+    cellBorderBottom: '0px',
+  });
   await page.getByRole('button', { name: '使用虎式' }).click();
   await page.locator('[data-testid="cell-4-2"]:visible').click();
   await page.locator('[data-testid="cell-2-2"]:visible').click();
@@ -423,6 +438,9 @@ test('Onitama results return to a compact final board', async ({
   await expect(page.getByRole('button', { name: '对局菜单' })).toHaveCount(0);
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-final-board');
+
+  await page.getByRole('button', { name: '返回终局结算' }).click();
+  await expect(page.getByTestId('result-page')).toBeVisible();
 });
 
 test('Onitama desktop keeps cards, board, and journal visible', async ({

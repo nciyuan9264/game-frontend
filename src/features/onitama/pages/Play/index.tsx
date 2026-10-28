@@ -12,6 +12,7 @@ import {
   MoreHorizontal,
   Repeat2,
   ShieldCheck,
+  Trophy,
   X,
 } from 'lucide-react';
 import { useEffect } from 'react';
@@ -373,6 +374,8 @@ export function Play({
         onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" className="icon-button" aria-label="规则速查"
         onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
+      {ended && <button type="button" className="icon-button" aria-label="返回终局结算"
+        onClick={() => ui.setShowResults(true)}><Trophy size={18} /></button>}
       {!ended && <button type="button" className="icon-button" aria-label="对局菜单"
         onClick={() => ui.setPanel('menu')}><MoreHorizontal size={20} /></button>}
     </header>
