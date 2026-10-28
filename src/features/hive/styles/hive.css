@@ -769,16 +769,6 @@
   }
   .hive-result-heading h1 { margin: 10px 0 0; color: #867453; font-size: 29px; }
   .hive-result-heading p { margin: 7px 0 0; color: #a99a7a; font-size: 11px; }
-  .hive-result-heading > small {
-    display: inline-block;
-    margin-top: 9px;
-    padding: 4px 7px;
-    border: 1px solid #d6deca;
-    border-radius: 4px;
-    background: #edf1e5;
-    color: #78835f;
-    font-size: 8px;
-  }
   .hive-result-grid { display: grid; grid-template-columns: minmax(0, 1fr) 350px; gap: 22px; margin-top: 25px; }
   .hive-result-board {
     position: relative;

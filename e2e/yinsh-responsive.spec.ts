@@ -296,6 +296,7 @@ test('YINSH final result returns through the timer slot', async ({ page }) => {
   await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
   await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
   await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
+  await expect(page.getByText(/权威结算/)).toHaveCount(0);
 
   await page.getByRole('button', { name: '回到棋盘' }).click();
   const button = page.getByRole('button', { name: '返回终局结算' });

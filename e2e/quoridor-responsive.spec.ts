@@ -349,6 +349,15 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   await expect(topbar.locator('.match-context > small')).toBeHidden();
   await expect(topbar.locator('.turn-context > small')).toBeHidden();
   await capture(page, testInfo, 'mobile-topbar-360');
+  await page.getByRole('button', { name: '打开对局菜单' }).click();
+  const gameMenu = page.getByTestId('quoridor-game-menu');
+  await expect(gameMenu).toHaveCSS('display', 'flex');
+  await expect(gameMenu.locator(':scope > button')).toHaveCount(3);
+  await expect(gameMenu.locator('small').first()).toHaveCSS('display', 'block');
+  expect((await gameMenu.locator(':scope > button').first().boundingBox())?.height)
+    .toBeGreaterThanOrEqual(60);
+  await capture(page, testInfo, 'mobile-game-menu');
+  await page.getByRole('button', { name: '关闭面板' }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   const centerOffset = await actionButton.evaluate(element => {
     const label = [...element.childNodes].find(node =>
@@ -416,6 +425,7 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
+  await expect(page.getByText(/权威结算/)).toHaveCount(0);
   const actions = page.locator('.result-certificate > .page-actions');
   expect((await actions.boundingBox())?.height).toBe(66);
   await capture(page, testInfo, 'mobile-results');

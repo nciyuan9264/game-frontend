@@ -302,6 +302,7 @@ test('Hex result returns to a compact final board', async ({
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
+  await expect(page.getByText(/权威结算/)).toHaveCount(0);
   await capture(page, testInfo, 'result-mobile-390x844');
   await page.getByRole('button', { name: '查看终局棋盘' }).click();
   await expect(page.getByRole('group', {

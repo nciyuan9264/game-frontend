@@ -37,7 +37,7 @@ export function Results({
   return <div className={styles.page}>
     <header><span>THE FINAL CHAPTER</span>
       <h1>{draw ? '棋逢对手，平局收场。' : '黑白落定，胜负已分。'}</h1>
-      <p>{data.result?.reason || '对局已经由服务端完成结算。'}</p></header>
+      <p>下一次翻转，仍有新的可能。</p></header>
     <section className={styles.result}>
       <div className={styles.seal}><span /><Trophy size={37} /><span /></div>
       <span className={styles.eyebrow}>{draw ? 'A PERFECT BALANCE' : 'WELL PLAYED'}</span>
@@ -55,8 +55,6 @@ export function Results({
       })}</div>
       <div className={styles.ratio}><i style={{ width: `${blackCount / total * 100}%` }} /></div>
       <p className={styles.scoreNote}>终局实际子数 · 空格不补计分</p>
-      <p className={styles.caption}>下一次翻转，仍有新的可能。
-        <small>第 {data.roomData.roundNo} 局 · 权威结算</small></p>
     </section>
     <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
       {readOnly ? '回到回放棋盘' : '回到棋盘'}</ActionButton>

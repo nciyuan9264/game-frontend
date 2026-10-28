@@ -242,19 +242,15 @@ test('Othello mobile final result returns through the timer slot', async ({
   await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
   await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
   const scoreNote = page.getByText('终局实际子数 · 空格不补计分');
-  const caption = page.getByText('下一次翻转，仍有新的可能。', { exact: false });
   const ratio = scoreNote.locator('xpath=preceding-sibling::div[1]');
-  const [ratioBox, scoreNoteBox, captionBox] = await Promise.all([
+  const [ratioBox, scoreNoteBox] = await Promise.all([
     ratio.boundingBox(),
     scoreNote.boundingBox(),
-    caption.boundingBox(),
   ]);
   expect(ratioBox).not.toBeNull();
   expect(scoreNoteBox).not.toBeNull();
-  expect(captionBox).not.toBeNull();
   expect(scoreNoteBox!.y - (ratioBox!.y + ratioBox!.height)).toBeGreaterThanOrEqual(12);
-  expect(captionBox!.y - (scoreNoteBox!.y + scoreNoteBox!.height)).toBeGreaterThanOrEqual(24);
-  await expect(caption.locator('small')).toHaveCSS('margin-top', '9px');
+  await expect(page.getByText(/权威结算/)).toHaveCount(0);
   await page.screenshot({
     path: testInfo.outputPath('othello-mobile-results.png'),
     fullPage: true,

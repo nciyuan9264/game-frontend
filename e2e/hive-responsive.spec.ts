@@ -387,6 +387,7 @@ test('Hive mobile results return to a compact final board', async ({
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expect(page.locator('.hive-result-board')).toHaveCount(0);
+  await expect(page.getByText(/权威结算/)).toHaveCount(0);
   expect((await page.locator('.hive-result-actions').boundingBox())?.height)
     .toBe(66);
   await page.getByRole('button', { name: '回看终局蜂巢' }).click();

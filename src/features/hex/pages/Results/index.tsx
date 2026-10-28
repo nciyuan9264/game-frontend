@@ -51,8 +51,7 @@ export function Results({
           <b>{state?.stoneCount ?? 0}<small> 子</small></b>
         </article>;
       })}</div>
-      <p className={styles.caption}>连接不必笔直，抵达自有方向。<br />
-        <small>第 {data.roomData.roundNo} 局 · 权威结算</small></p></section>
+      <p className={styles.caption}>连接不必笔直，抵达自有方向。</p></section>
     <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
       {readOnly ? '回到回放棋盘' : '查看终局棋盘'}</ActionButton>
       {!readOnly && (owner

@@ -67,7 +67,6 @@ export function Results({
       <p>{draw
         ? result?.reason || '双方在同一局面中达成和棋。'
         : `${winner}获胜，${result?.reason || '对方蜂后已被围住。'}`}</p>
-      <small>第 {data.roomData.roundNo} 局 · 服务端权威结算</small>
     </header>
     <div className="hive-result-grid">
       {!isMobile && <section className="hive-result-board">

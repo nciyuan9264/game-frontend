@@ -39,7 +39,7 @@ export function Results({
           <b>{state?.ringsRemoved ?? 0}<small> 环</small></b>
         </article>;
       })}</div>
-      <p className={styles.caption}>少一枚圆环，多一种可能。<br /><small>第 {data.roomData.roundNo} 局 · 权威结算</small></p></section>
+      <p className={styles.caption}>少一枚圆环，多一种可能。</p></section>
     <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
       {readOnly ? '回到回放棋盘' : '回到棋盘'}</ActionButton>
       {!readOnly && (owner

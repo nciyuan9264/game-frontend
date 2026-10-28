@@ -52,7 +52,6 @@ export function Results({
   return <main className="collection-content result-page" data-testid="result-page">
     <div className="result-eyebrow">
       <span className="eyebrow"><i />THE OTHER SIDE OF THE JOURNEY</span>
-      <span className="quiet-badge">第 {data.roomData.roundNo} 局 · 权威结算</span>
     </div>
     <div className="result-grid">
       <section className="result-certificate">
