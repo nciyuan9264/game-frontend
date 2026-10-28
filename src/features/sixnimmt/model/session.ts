@@ -1,7 +1,15 @@
 import type {
   RoomPlayer,
+  SixNimmtActionEntry,
+  SixNimmtPlayerState,
+  SixNimmtPrivateData,
   SixNimmtReplaySnapshot,
+  SixNimmtResult,
+  SixNimmtRoomData,
   SixNimmtRoomView,
+  SixNimmtRoundResult,
+  SixNimmtRow,
+  SixNimmtTurnResolution,
 } from '@/api/generated/game-platform';
 import type {
   SessionPendingCommand,
@@ -71,28 +79,135 @@ const statuses = new Set<GameStatus>([
   'match', 'waiting', 'selecting', 'chooseRow', 'roundEnd', 'end',
 ]);
 
+const arrayOrEmpty = <T>(value: T[] | null | undefined): T[] =>
+  Array.isArray(value) ? value : [];
+
+const recordOrEmpty = <T>(
+  value: Record<string, T> | null | undefined,
+): Record<string, T> =>
+  value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+
 const normalizePlayers = (
-  players: Record<string, RoomPlayer>,
-): Record<string, SixNimmtPlayer> => Object.fromEntries(
-  Object.entries(players ?? {}).map(([id, player]) => [
-    id,
-    {
+  players: Record<string, RoomPlayer | null> | null | undefined,
+): Record<string, SixNimmtPlayer> => {
+  const result: Record<string, SixNimmtPlayer> = {};
+  for (const [id, player] of Object.entries(recordOrEmpty(players))) {
+    if (!player) continue;
+    result[id] = {
       ...player,
       displayName: player.displayName || (player.ai ? '公平 AI' : `玩家 ${id}`),
       name: player.displayName,
-    },
-  ]),
+    };
+  }
+  return result;
+};
+
+const normalizePlayerData = (
+  values: Record<string, SixNimmtPlayerState | null> | null | undefined,
+): Record<string, SixNimmtPlayerState> => Object.fromEntries(
+  Object.entries(recordOrEmpty(values)).filter((entry):
+    entry is [string, SixNimmtPlayerState] => !!entry[1]),
 );
 
+const normalizePrivateData = (
+  value: Partial<SixNimmtPrivateData> | null | undefined,
+): SixNimmtPrivateData => ({
+  hand: arrayOrEmpty(value?.hand),
+  legalCards: arrayOrEmpty(value?.legalCards),
+  lockedCard: value?.lockedCard == null ? undefined : value.lockedCard,
+});
+
+const normalizeRows = (rows: SixNimmtRow[] | null | undefined) =>
+  arrayOrEmpty(rows).map(row => ({
+    ...row,
+    cards: arrayOrEmpty(row.cards),
+  }));
+
+const normalizeResolution = (
+  value: SixNimmtTurnResolution | null | undefined,
+): SixNimmtTurnResolution | undefined =>
+  value
+    ? {
+      ...value,
+      rowsBefore: normalizeRows(value.rowsBefore),
+      selections: arrayOrEmpty(value.selections),
+      placements: arrayOrEmpty(value.placements).map(placement => ({
+        ...placement,
+        collectedCards: arrayOrEmpty(placement.collectedCards),
+      })),
+      rowsAfter: normalizeRows(value.rowsAfter),
+    }
+    : undefined;
+
+const normalizeRoundResult = (
+  value: SixNimmtRoundResult | null | undefined,
+): SixNimmtRoundResult | undefined =>
+  value
+    ? {
+      ...value,
+      roundPenalties: recordOrEmpty(value.roundPenalties),
+      totalPenalties: recordOrEmpty(value.totalPenalties),
+    }
+    : undefined;
+
+const normalizeResult = (
+  value: SixNimmtResult | null | undefined,
+): SixNimmtResult | undefined =>
+  value
+    ? {
+      ...value,
+      winnerIDs: arrayOrEmpty(value.winnerIDs),
+      totalPenalties: recordOrEmpty(value.totalPenalties),
+      finalRanks: recordOrEmpty(value.finalRanks),
+    }
+    : undefined;
+
+const validRows = (rows: SixNimmtRow[]) => rows.length === 4
+  && rows.every((row, index) =>
+    row.index === index
+    && row.cards.length >= 1
+    && row.cards.length <= 5
+    && row.cards.every(card => card >= 1 && card <= 104));
+
 function validRoomView(view: SixNimmtRoomView) {
-  return statuses.has(view.roomData.gameStatus as GameStatus)
-    && view.roomData.rows.length === 4
-    && view.roomData.rows.every((row, index) =>
-      row.index === index
-      && row.cards.length >= 1
-      && row.cards.length <= 5
-      && row.cards.every(card => card >= 1 && card <= 104))
-    && view.privateData.hand.every(card => card >= 1 && card <= 104);
+  const rows = normalizeRows(view.roomData.rows);
+  const status = view.roomData.gameStatus as GameStatus;
+  return statuses.has(status)
+    && (status === 'waiting' ? rows.length === 0 || validRows(rows) : validRows(rows))
+    && arrayOrEmpty(view.privateData?.hand).every(card => card >= 1 && card <= 104)
+    && arrayOrEmpty(view.privateData?.legalCards).every(card => card >= 1 && card <= 104);
+}
+
+function normalizeRoomData(
+  value: SixNimmtRoomData,
+): GameSnapshot['roomData'] {
+  const roomData = value as SixNimmtRoomData & {
+    activityLog?: SixNimmtActionEntry[] | null;
+    lastResolution?: SixNimmtTurnResolution | null;
+    pendingChoice?: SixNimmtRoomData['pendingChoice'] | null;
+    playerOrder?: string[] | null;
+    players?: Record<string, RoomPlayer | null> | null;
+    roundResult?: SixNimmtRoundResult | null;
+    rows?: SixNimmtRow[] | null;
+    turnTimeoutMs?: string | number | null;
+  };
+  const players = normalizePlayers(roomData.players);
+  const playerOrder = arrayOrEmpty(roomData.playerOrder);
+  return {
+    ...roomData,
+    gameStatus: roomData.gameStatus as GameStatus,
+    rows: normalizeRows(roomData.rows),
+    lockedPlayerIDs: arrayOrEmpty(roomData.lockedPlayerIDs),
+    activityLog: arrayOrEmpty(roomData.activityLog),
+    lastResolution: normalizeResolution(roomData.lastResolution),
+    pendingChoice: roomData.pendingChoice ?? undefined,
+    roundResult: normalizeRoundResult(roomData.roundResult),
+    turnTimeoutMs: roomData.turnTimeoutMs == null
+      ? undefined
+      : Number(roomData.turnTimeoutMs),
+    players,
+    playerOrder: playerOrder.length ? playerOrder : Object.keys(players),
+  };
 }
 
 export function parseServerMessage(value: string): ServerMessage | undefined {
@@ -131,17 +246,10 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     playerId: view.playerId,
     ownerID: view.ownerID,
     visibility: view.visibility as Visibility,
-    playerData: view.playerData,
-    privateData: view.privateData,
-    result: view.result,
-    roomData: {
-      ...view.roomData,
-      gameStatus: view.roomData.gameStatus as GameStatus,
-      turnTimeoutMs: view.roomData.turnTimeoutMs == null
-        ? undefined
-        : Number(view.roomData.turnTimeoutMs),
-      players: normalizePlayers(view.roomData.players),
-    },
+    playerData: normalizePlayerData(view.playerData),
+    privateData: normalizePrivateData(view.privateData),
+    result: normalizeResult(view.result),
+    roomData: normalizeRoomData(view.roomData),
   };
 }
 
@@ -174,17 +282,10 @@ export function parseReplaySnapshot(
     playerId: viewer,
     ownerID: '',
     visibility: 'private',
-    playerData: view.playerData,
-    privateData: view.privateData,
-    result: view.result,
-    roomData: {
-      ...view.roomData,
-      gameStatus: view.roomData.gameStatus as GameStatus,
-      turnTimeoutMs: view.roomData.turnTimeoutMs == null
-        ? undefined
-        : Number(view.roomData.turnTimeoutMs),
-      players: normalizePlayers(view.roomData.players),
-    },
+    playerData: normalizePlayerData(view.playerData),
+    privateData: normalizePrivateData(view.privateData),
+    result: normalizeResult(view.result),
+    roomData: normalizeRoomData(view.roomData),
   };
 }
 
