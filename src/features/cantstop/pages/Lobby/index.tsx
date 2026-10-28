@@ -42,13 +42,37 @@ import type {
 } from '../../model/types';
 
 const loadStats = () => getMyStats('cantstop');
-const hero = 'https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=realistic%20board%20game%20table%20for%20Can%27t%20Stop%2C%20clay%20mountain%20board%20with%20numbered%20routes%202%20to%2012%2C%20four%20dice%2C%20small%20summit%20flags%2C%20warm%20natural%20light%2C%20editorial%20product%20photography%2C%20no%20text&image_size=landscape_16_9';
 const mascot = 'https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=realistic%20tabletop%20scene%20with%20a%20mountain%20trail%20board%20game%2C%20four%20dice%2C%20small%20flags%2C%20camping%20gear%2C%20warm%20daylight%2C%20suitable%20for%20a%20board%20game%20website%2C%20no%20text&image_size=square_hd';
 const filters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'all', label: '全部房间' },
   { value: 'joinable', label: '可加入' },
   { value: 'playing', label: '对局中' },
 ];
+
+function HeroArt() {
+  return <div className="cs-hero-art" aria-hidden="true">
+    <svg viewBox="0 0 360 240" focusable="false">
+      <path className="cs-hero-shadow" d="M44 190c58 26 189 26 260 2 16-6 20-16 8-25-42-31-194-35-259-8-22 9-27 22-9 31z" />
+      <path className="cs-hero-board" d="M39 126c36-52 81-80 134-84 58-5 103 21 139 77 10 16 8 35-7 47-43 34-185 40-250 10-20-9-28-33-16-50z" />
+      <path className="cs-hero-route" d="M80 142c18-23 36-38 55-45 18-8 37-8 57 1 23 9 42 28 58 56" />
+      {[76, 104, 135, 169, 205, 239].map((x, index) =>
+        <circle key={x} className={`cs-hero-step step-${index}`} cx={x} cy={151 - index * 8} r="8" />)}
+      <path className="cs-hero-peak" d="M154 93l30-48 23 47 18-25 42 87H96l36-61 16 26z" />
+      <path className="cs-hero-snow" d="M184 45l-10 32 12-8 10 19 11 4-23-47zM154 93l-12 32 23-18 16 26 11-11-38-29z" />
+      <g className="cs-hero-dice">
+        <rect x="226" y="50" width="37" height="37" rx="8" />
+        <circle cx="237" cy="61" r="3" />
+        <circle cx="252" cy="76" r="3" />
+        <rect x="274" y="84" width="37" height="37" rx="8" />
+        <circle cx="285" cy="95" r="3" />
+        <circle cx="299" cy="95" r="3" />
+        <circle cx="292" cy="110" r="3" />
+      </g>
+      <path className="cs-hero-flag" d="M203 44V21h31l-8 9 8 9h-31z" />
+      <path className="cs-hero-pole" d="M203 21v57" />
+    </svg>
+  </div>;
+}
 
 function RoomCard({
   room,
@@ -132,8 +156,8 @@ export default function Lobby() {
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <CantStopLoading /> : <div className="cs-lobby">
       <section className="cs-hero">
-        <img src={hero} alt="陶土山峰、攀登路线与山顶旗帜" />
-        <div><span className="cs-eyebrow">ONE MORE ROLL. ONE MORE SUMMIT.</span>
+        <HeroArt />
+        <div className="cs-hero-copy"><span className="cs-eyebrow">ONE MORE ROLL. ONE MORE SUMMIT.</span>
           <h1>再高一点，<br /><em>还是见好就收？</em></h1>
           <p>四枚骰子，三位攀登者。<br />率先占领三条路线，就赢下这座山。</p>
           <div><ActionButton variant="primary" disabled={!profile.data}

@@ -45,6 +45,7 @@ test('Cant Stop mobile lobby uses the Acquire scale and spacing',
       return {
         contentPaddingLeft: getComputedStyle(document.querySelector('.cs-content')!)
           .paddingLeft,
+        heroArt: rect('.cs-hero-art'),
         hero: rect('.cs-hero'),
         heroHeight: rect('.cs-hero')?.height ?? 0,
         facts: rect('.cs-facts'),
@@ -59,6 +60,8 @@ test('Cant Stop mobile lobby uses the Acquire scale and spacing',
       };
     });
     expect(geometry.contentPaddingLeft).toBe('14px');
+    expect(geometry.heroArt?.width ?? 0).toBeGreaterThan(190);
+    expect(geometry.heroArt?.height ?? 0).toBeGreaterThan(190);
     expect(geometry.hero).toMatchObject({ x: 14, y: 72, width: 362, height: 227 });
     expect(geometry.facts).toMatchObject({ x: 14, y: 299, width: 362, height: 63 });
     expect(geometry.browser).toMatchObject({ x: 14, y: 381, width: 362 });
