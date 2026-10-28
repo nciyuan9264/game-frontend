@@ -289,6 +289,8 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
   await expect(results.getByText('结算结果来自本局服务端快照')).toHaveCount(0);
   await expect(results.getByRole('button', { name: '查看终局牌面' })).toBeVisible();
   await expect(results.getByRole('button', { name: /再来一局/ })).toBeVisible();
+  await expect(page.getByTestId('splendor-results-table')
+    .locator('svg.lucide-trophy')).toHaveCount(0);
 
   const headerMetrics = await page.getByTestId('splendor-results-header')
     .locator(':scope > span').evaluateAll(elements => elements.map(element => ({

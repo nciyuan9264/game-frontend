@@ -44,14 +44,13 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
             <span>收藏家</span><span>发展卡</span><span>贵族</span><span>总声望</span></div>
           {players.map(([id, player], index) => {
             const result = data.result?.[id];
-            const champion = winners.includes(id);
             return <div key={id} className={`${styles.row} ${id === data.playerId ? styles.mine : ''}`}>
               <div><b>{String(index + 1).padStart(2, '0')}</b>
                 <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={player.avatar} ai={player.ai} size={36} />
                 <strong>{playerName(id, data.roomData.players)}{id === data.playerId && <small>你</small>}</strong></div>
               <span>{result?.cards ?? data.playerData[id]?.normalCard.length ?? 0}<small>张</small></span>
               <span>{result?.nobles ?? data.playerData[id]?.nobleCard.length ?? 0}<small>位</small></span>
-              <b>{result?.score ?? data.playerData[id]?.score ?? 0}</b>{champion && <Trophy size={15} />}
+              <b>{result?.score ?? data.playerData[id]?.score ?? 0}</b>
             </div>;
           })}</div>
         <p className={styles.note}><ShieldCheck size={15} />同分时发展卡更少者优先；仍相同则共享胜利。</p>
