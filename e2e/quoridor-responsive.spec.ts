@@ -323,8 +323,33 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   await expect(page.locator('.playing-page > .top-shell > .app-header'))
     .toHaveCSS('height', '57px');
   await expect(board.getByTestId(/^cell-/)).toHaveCount(81);
+  const dock = page.getByTestId('quoridor-mobile-dock');
+  const cancelButton = dock.getByRole('button', { name: '取消选择' });
   const actionButton = page.getByRole('button', { name: '当前行动状态' });
   await expect(actionButton).toBeDisabled();
+  const [dockBox, cancelBox, actionBox] = await Promise.all([
+    dock.boundingBox(),
+    cancelButton.boundingBox(),
+    actionButton.boundingBox(),
+  ]);
+  expect(dockBox).toMatchObject({ x: 0, width: 390, height: 68 });
+  expect(cancelBox).toMatchObject({ width: 48, height: 44 });
+  expect(actionBox?.height).toBe(44);
+  expect((actionBox?.x ?? 0) - ((cancelBox?.x ?? 0) + (cancelBox?.width ?? 0))).toBe(8);
+  await expect(actionButton.locator('svg')).toBeHidden();
+  await page.setViewportSize({ width: 360, height: 800 });
+  const topbar = page.locator('.playing-page > .top-shell > .app-header');
+  const visibleTopbarBoxes = await topbar.locator(':scope > *').evaluateAll(elements =>
+    elements.flatMap(element => {
+      const box = element.getBoundingClientRect();
+      return box.width && box.height ? [{ left: box.left, right: box.right }] : [];
+    }));
+  expect(visibleTopbarBoxes.every((box, index) =>
+    index === 0 || visibleTopbarBoxes[index - 1].right <= box.left)).toBe(true);
+  await expect(topbar.locator('.match-context > small')).toBeHidden();
+  await expect(topbar.locator('.turn-context > small')).toBeHidden();
+  await capture(page, testInfo, 'mobile-topbar-360');
+  await page.setViewportSize({ width: 390, height: 844 });
   const centerOffset = await actionButton.evaluate(element => {
     const label = [...element.childNodes].find(node =>
       node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
@@ -339,6 +364,7 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
     );
   });
   expect(centerOffset).toBeLessThanOrEqual(1);
+  await capture(page, testInfo, 'mobile-game-dock');
   await page.getByTestId('cell-E7').click();
   await expect(page.getByRole('button', { name: '确认移动' })).toBeEnabled();
   await page.getByRole('button', { name: '确认移动' }).click();
@@ -347,7 +373,22 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
     && command.includes('"row":6')
     && command.includes('"column":4'))).toBe(true);
 
+  const mobilePlayers = page.locator('.mobile-player');
+  const [moveBoardBox, moveOpponentBox, moveSelfBox] = await Promise.all([
+    board.boundingBox(),
+    mobilePlayers.first().boundingBox(),
+    mobilePlayers.last().boundingBox(),
+  ]);
   await page.getByRole('button', { name: '放置围墙' }).click();
+  const [wallBoardBox, wallOpponentBox, wallSelfBox] = await Promise.all([
+    board.boundingBox(),
+    mobilePlayers.first().boundingBox(),
+    mobilePlayers.last().boundingBox(),
+  ]);
+  expect(wallBoardBox).toEqual(moveBoardBox);
+  expect(wallOpponentBox).toEqual(moveOpponentBox);
+  expect(wallSelfBox).toEqual(moveSelfBox);
+  await capture(page, testInfo, 'mobile-wall-mode');
   await page.getByRole('button', { name: '精确选择墙槽' }).click();
   await expect(page.getByTestId('wall-slot-picker')).toBeVisible();
   await page.getByRole('button', { name: '选择第 D 列' }).click();
@@ -355,6 +396,10 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   await expect(page.getByRole('button', {
     name: /返回棋盘预览/,
   })).toBeEnabled();
+  const slotNote = page.getByTestId('wall-slot-note');
+  await expect(slotNote).toHaveCSS('white-space', 'nowrap');
+  expect(await slotNote.evaluate(element =>
+    element.scrollWidth <= element.clientWidth)).toBe(true);
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-wall-picker');
   expect(pageErrors).toEqual([]);

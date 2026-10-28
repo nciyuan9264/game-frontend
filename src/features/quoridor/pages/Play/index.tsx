@@ -518,7 +518,7 @@ export function Play({
       <div className="game-footer"><Brand small />
         <span>有墙的地方，也有路。</span>
         <span>QUORIDOR · ABSTRACT STRATEGY</span></div>
-      <div className="mobile-game-dock"><div>
+      <div className="mobile-game-dock" data-testid="quoridor-mobile-dock"><div>
         <button type="button" className="dock-undo" aria-label="取消选择"
           disabled={!selected} onClick={ui.clearSelection}><X size={21} /></button>
         {primaryAction}

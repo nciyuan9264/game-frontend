@@ -96,7 +96,7 @@
 .slot-wall-horizontal, .slot-wall-vertical { background: linear-gradient(90deg,#c49d6a,#997048); border: 1px solid #a37b4f; border-radius: 1px; display: block; }
 .slot-wall-horizontal { width: 22px; height: 5px; }
 .slot-wall-vertical { width: 5px; height: 22px; }
-.phone-slot-note { margin-top: 16px; color: #9e8a6c; font-size: 10px; line-height: 1.9; text-align: center; }
+.phone-slot-note { margin-top: 16px; color: #9e8a6c; font-size: 10px; line-height: 1.9; text-align: center; white-space: nowrap; }
 
 /* One manual checkpoint, with a compact board instead of a desktop sidebar. */
 .phone-storage-caption { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 14px; color: #9b8461; font-size: 10px; }
@@ -149,10 +149,7 @@
   .q-app .setting-row .switch > i { position: absolute; left: 7px; top: 14px; width: 16px; height: 16px; margin: 0; transform: none; }
   .q-app .setting-row .switch.on > i { transform: translateX(18px); }
   .game-main .board-stage > .q-board { width: min(100%, max(236px, calc(100dvh - 490px))); }
-  .game-main.wall-turn .board-stage > .q-board { width: min(calc(100% - 38px), max(220px, calc(100dvh - 534px))); }
-  .wall-turn .player-card { height: 48px; padding-top: 6px; padding-bottom: 6px; }
-  .wall-turn .mobile-player { margin-bottom: 6px; }
-  .wall-turn .mobile-player.self { margin-top: 6px; margin-bottom: 6px; }
+  .wall-turn .board-stage { padding: 4px; }
   .action-panel .action-tabs { height: 44px; }
   .action-panel .action-tabs > button { min-height: 43px; }
   .action-panel .wall-tools, .action-panel .wall-nudge { display: none; }
@@ -186,7 +183,7 @@
     white-space: nowrap;
   }
   :scope.q-app.playing-page .app-header > .match-context { flex: 1 1 auto; }
-  :scope.q-app.playing-page .app-header > .turn-context { flex: 0 1 auto; }
+  :scope.q-app.playing-page .app-header > .turn-context { min-width: 34px; flex: 0 0 auto; justify-content: center; }
   :scope.q-app.playing-page .app-header > .header-context > strong,
   :scope.q-app.playing-page .app-header > .header-context > small {
     display: block;
@@ -196,10 +193,40 @@
     text-overflow: ellipsis;
     white-space: nowrap;
   }
+  :scope.q-app.playing-page .app-header > .header-context > small {
+    display: none;
+  }
   :scope.q-app .phone-activity-dialog .activity-journal-card {
     display: block;
     max-height: calc(100dvh - 190px);
     overflow-y: auto;
+  }
+  :scope.q-app .mobile-game-dock {
+    z-index: 50;
+    min-height: calc(68px + env(safe-area-inset-bottom));
+    padding: 10px 12px env(safe-area-inset-bottom);
+    border-top-color: #d9cebf;
+    background: #faf7f1f5;
+    backdrop-filter: blur(12px);
+  }
+  :scope.q-app .mobile-game-dock > div:first-child {
+    display: grid;
+    align-items: start;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 8px;
+  }
+  :scope.q-app .mobile-game-dock .dock-undo {
+    width: 48px;
+    height: 44px;
+    border-color: #ddd1c3;
+    border-radius: 5px;
+    background: #fffdf8;
+  }
+  :scope.q-app .mobile-game-dock .button {
+    min-height: 44px;
+  }
+  :scope.q-app .mobile-game-dock .button > svg:last-child {
+    display: none;
   }
   :scope.q-app.playing-page .toast { top: 124px; bottom: auto; }
 }
@@ -220,7 +247,6 @@
   .phone-slot-field { margin-bottom: 10px; }
   .phone-slot-field > span { margin-bottom: 7px; }
   .phone-slot-note { margin-top: 10px; font-size: 9px; line-height: 1.8; }
-  .phone-slot-note br { display: none; }
   .phone-replay-transport { gap: 8px; }
 }
 }

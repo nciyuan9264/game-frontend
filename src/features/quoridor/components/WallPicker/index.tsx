@@ -119,9 +119,8 @@ export function WallPicker({
         ><i className="slot-wall-vertical" />纵向
           {wall.orientation === 'v' && <Check size={14} />}</button>
       </div>
-      <p className="phone-slot-note">
-        这里只选位置，不会消耗围墙。<br />
-        返回棋盘后，仍需确认放墙。
+      <p className="phone-slot-note" data-testid="wall-slot-note">
+        这里只选位置，不会消耗围墙。返回棋盘后，仍需确认放墙。
       </p>
     </div>
   </Dialog>;
