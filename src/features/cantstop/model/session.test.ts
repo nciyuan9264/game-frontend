@@ -73,6 +73,89 @@ describe('Cant Stop realtime model', () => {
     expect(parsed.playerData.p2.claimedColumns).toEqual([2]);
   });
 
+  it('parses waiting snapshots with nullable transient fields', () => {
+    const parsed = parseServerMessage(JSON.stringify({
+      schemaVersion: 2,
+      type: 'ROOM_SYNC',
+      roomID: 'cantstop-room',
+      matchID: 'cantstop-room-r1',
+      seq: '5',
+      view: {
+        cantstop: {
+          playerId: '3',
+          ownerID: '3',
+          visibility: 'public',
+          playerData: {
+            '3': {
+              savedProgress: {},
+              claimedColumns: [],
+              savedStepCount: 0,
+              busts: 0,
+            },
+            ai_2: {
+              savedProgress: {},
+              claimedColumns: [],
+              savedStepCount: 0,
+              busts: 0,
+            },
+          },
+          result: null,
+          roomData: {
+            gameStatus: 'waiting',
+            currentPlayer: '',
+            nextPlayer: '',
+            turnNumber: 0,
+            rollNumber: 0,
+            dice: null,
+            pairingOptions: [],
+            runners: {},
+            claimedBy: {},
+            activityLog: null,
+            lastAction: null,
+            bustRisk: 0,
+            turnGain: 0,
+            lostGain: 0,
+            turnDeadline: null,
+            turnTimeoutMs: null,
+            turnTransitionDeadline: null,
+            turnTransitionTimeoutMs: null,
+            columnHeights: { 2: 3, 3: 5, 4: 7 },
+            targetColumns: 3,
+            players: {
+              '3': {
+                playerID: '3',
+                displayName: 'N次元',
+                seatIndex: 0,
+                online: true,
+                ai: false,
+                ready: false,
+                userID: '3',
+              },
+              ai_2: {
+                playerID: 'ai_2',
+                displayName: '阿橙',
+                seatIndex: 1,
+                online: true,
+                ai: true,
+                ready: true,
+                userID: '',
+              },
+            },
+            playerOrder: ['3', 'ai_2'],
+          },
+        },
+      },
+    }));
+
+    expect(parsed?.type).toBe('ROOM_SYNC');
+    if (parsed?.type !== 'ROOM_SYNC') throw new Error('room sync expected');
+    expect(parsed.roomData.gameStatus).toBe('waiting');
+    expect(parsed.roomData.dice).toEqual([]);
+    expect(parsed.roomData.activityLog).toEqual([]);
+    expect(parsed.roomData.turnTimeoutMs).toBeUndefined();
+    expect(parsed.result).toBeUndefined();
+  });
+
   it('confirms explicit match state changes', () => {
     const before: MatchSnapshot = {
       schemaVersion: 2, type: 'MATCH_SYNC', roomID: 'r1', matchID: 'm1', seq: 1,

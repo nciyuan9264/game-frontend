@@ -1,4 +1,6 @@
 import type {
+  CantStopActionEntry,
+  CantStopPairingOption,
   CantStopPlayerState,
   RoomPlayer,
   CantStopReplaySnapshot,
@@ -21,9 +23,23 @@ import type {
 } from './types';
 
 type ExtraRoomData = CantStopRoomView['roomData'] & {
+  activityLog?: CantStopActionEntry[] | null;
   columnHeights?: Record<number, number>;
+  claimedBy?: Record<number, string> | null;
+  dice?: number[] | null;
+  pairingOptions?: CantStopPairingOption[] | null;
+  playerOrder?: string[] | null;
+  players?: Record<string, RoomPlayer | null> | null;
+  runners?: Record<number, number> | null;
   targetColumns?: number;
-  turnTransitionTimeoutMs?: string;
+  turnTimeoutMs?: string | null;
+  turnTransitionTimeoutMs?: string | null;
+};
+
+type NullablePlayerState = Partial<CantStopPlayerState> & {
+  savedProgress?: Record<number, number> | null;
+  claimedColumns?: number[] | null;
+  busts?: number;
 };
 
 export type CantStopPublicPlayerState = CantStopPlayerState & {
@@ -88,44 +104,102 @@ const statuses = new Set<GameStatus>([
   'match', 'waiting', 'roll', 'choose', 'decide', 'bust', 'banked', 'end',
 ]);
 
+const arrayOrEmpty = <T>(value: T[] | null | undefined): T[] =>
+  Array.isArray(value) ? value : [];
+
+const recordOrEmpty = <T>(
+  value: Record<string, T> | null | undefined,
+): Record<string, T> =>
+  value && typeof value === 'object' && !Array.isArray(value) ? value : {};
+
 const normalizePlayers = (
-  players: Record<string, RoomPlayer>,
-): Record<string, CantStopPlayer> => Object.fromEntries(
-  Object.entries(players ?? {}).map(([id, player]) => [
-    id,
-    {
+  players: Record<string, RoomPlayer | null> | null | undefined,
+): Record<string, CantStopPlayer> => {
+  const result: Record<string, CantStopPlayer> = {};
+  for (const [id, player] of Object.entries(recordOrEmpty(players))) {
+    if (!player) continue;
+    result[id] = {
       ...player,
       displayName: player.displayName || (player.ai ? '公平 AI' : `玩家 ${id}`),
       name: player.displayName,
-    },
-  ]),
-);
+    };
+  }
+  return result;
+};
+
+const normalizePlayerData = (
+  values: Record<string, NullablePlayerState | null> | null | undefined,
+): Record<string, CantStopPublicPlayerState> => {
+  const result: Record<string, CantStopPublicPlayerState> = {};
+  for (const [id, player] of Object.entries(recordOrEmpty(values))) {
+    if (!player) continue;
+    result[id] = {
+      ...player,
+      savedProgress: recordOrEmpty(player.savedProgress),
+      claimedColumns: arrayOrEmpty(player.claimedColumns),
+      savedStepCount: Number(player.savedStepCount ?? 0),
+    };
+  }
+  return result;
+};
+
+const normalizePairingOptions = (
+  values: CantStopPairingOption[] | null | undefined,
+): CantStopPairingOption[] => arrayOrEmpty(values).map(option => ({
+  ...option,
+  sums: arrayOrEmpty(option.sums),
+  diceIndexes: arrayOrEmpty(option.diceIndexes),
+  advances: recordOrEmpty(option.advances),
+  runnerPositions: recordOrEmpty(option.runnerPositions),
+}));
+
+const normalizeActions = (
+  values: CantStopActionEntry[] | null | undefined,
+): CantStopActionEntry[] => arrayOrEmpty(values).map(action => ({
+  ...action,
+  dice: action.dice == null ? undefined : arrayOrEmpty(action.dice),
+  columns: arrayOrEmpty(action.columns),
+}));
 
 function validRoomView(view: CantStopRoomView) {
-  return statuses.has(view.roomData.gameStatus as GameStatus)
-    && Array.isArray(view.roomData.playerOrder)
-    && view.roomData.playerOrder.length >= 2
-    && view.roomData.playerOrder.length <= 4
-    && Array.isArray(view.roomData.dice)
-    && view.roomData.dice.every(value =>
+  const roomData = view.roomData as ExtraRoomData;
+  const playerOrder = arrayOrEmpty(roomData.playerOrder);
+  const playerCount = playerOrder.length || Object.keys(recordOrEmpty(
+    roomData.players,
+  )).length;
+  const dice = arrayOrEmpty(roomData.dice);
+  return statuses.has(roomData.gameStatus as GameStatus)
+    && playerCount >= 2
+    && playerCount <= 4
+    && dice.every(value =>
       Number.isInteger(value) && value >= 1 && value <= 6)
-    && Array.isArray(view.roomData.pairingOptions);
+    && arrayOrEmpty(roomData.pairingOptions).every(option =>
+      arrayOrEmpty(option.sums).every(sum =>
+        Number.isInteger(sum) && sum >= 2 && sum <= 12));
 }
 
 function normalizeRoomData(
   value: CantStopRoomView['roomData'],
 ): CantStopGameRoomData {
   const roomData = value as ExtraRoomData;
+  const players = normalizePlayers(roomData.players);
+  const playerOrder = arrayOrEmpty(roomData.playerOrder);
   return {
     ...roomData,
     gameStatus: roomData.gameStatus as GameStatus,
+    dice: arrayOrEmpty(roomData.dice),
+    pairingOptions: normalizePairingOptions(roomData.pairingOptions),
+    runners: recordOrEmpty(roomData.runners),
+    claimedBy: recordOrEmpty(roomData.claimedBy),
+    activityLog: normalizeActions(roomData.activityLog),
     turnTimeoutMs: roomData.turnTimeoutMs == null
       ? undefined
       : Number(roomData.turnTimeoutMs),
     turnTransitionTimeoutMs: roomData.turnTransitionTimeoutMs == null
       ? undefined
       : Number(roomData.turnTransitionTimeoutMs),
-    players: normalizePlayers(roomData.players),
+    players,
+    playerOrder: playerOrder.length ? playerOrder : Object.keys(players),
   };
 }
 
@@ -165,8 +239,8 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
     playerId: view.playerId,
     ownerID: view.ownerID,
     visibility: view.visibility as Visibility,
-    playerData: view.playerData,
-    result: view.result,
+    playerData: normalizePlayerData(view.playerData),
+    result: view.result ?? undefined,
     roomData: normalizeRoomData(view.roomData),
   };
 }
@@ -196,8 +270,8 @@ export function parseReplaySnapshot(
     playerId: viewer,
     ownerID: '',
     visibility: 'private',
-    playerData: view.playerData,
-    result: view.result,
+    playerData: normalizePlayerData(view.playerData),
+    result: view.result ?? undefined,
     roomData: normalizeRoomData(view.roomData),
   };
 }
