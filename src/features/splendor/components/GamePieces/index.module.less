@@ -104,10 +104,10 @@ button.noble:hover { border-color:#b99b6b; }
 @media (max-width:767px) {
   .tokenControl { min-height:54px; gap:4px; }
   .tokenDisc { width:36px; height:36px; }
-  .resourceMatrix { --resource-label-width:44px; --resource-bank-height:64px; --resource-row-height:20px; --resource-disc-size:32px; margin-top:7px; }
+  .resourceMatrix { --resource-label-width:44px; --resource-bank-height:68px; --resource-row-height:20px; --resource-disc-size:32px; margin-top:7px; }
   .tokenMatrix { height:100%; min-height:0; gap:0;
     .tokenDisc { width:var(--resource-disc-size); height:var(--resource-disc-size); }
-    .tokenDisc > b { bottom:-27px; }
+    .tokenDisc > b { bottom:-35px; }
     > span:last-child { margin-top:2px; line-height:11px; }
   }
   .resourceDiscount { min-width:22px; height:16px; font-size:11px; line-height:14px; }
@@ -131,11 +131,13 @@ button.noble:hover { border-color:#b99b6b; }
   .cardboard .cardCosts>span { min-height:12px; gap:2px; font-size:10px; line-height:12px; }
   .cardboard .cardCosts svg { width:9px; height:10px; }
   .cardboard .canBuy { top:5px; width:14px; height:14px; padding:0; border-radius:50%; i { display:none; } }
-  .nobleCompact { display:grid; height:68px; grid-template-columns:34px minmax(0,1fr); grid-template-rows:22px 24px; align-content:center; gap:3px 7px; padding:6px;
-    .noblePortrait { width:34px; height:54px; grid-column:1; grid-row:1/-1; }
+  .nobleCompact { display:grid; height:74px; grid-template-columns:44px minmax(0,1fr); grid-template-rows:25px 25px; align-content:center; gap:3px 8px; padding:7px;
+    .noblePortrait { width:44px; height:58px; grid-column:1; grid-row:1/-1; border-radius:4px 18px 4px 4px; }
     .nobleInfo { display:contents; }
-    .nobleTop { position:static; grid-column:2; grid-row:1; align-self:center; justify-content:flex-end; }
-    .nobleRequirements { grid-column:2; grid-row:2; align-self:center; gap:4px; margin-top:0; }
+    .nobleTop { position:static; grid-column:2; grid-row:1; align-self:center; justify-content:flex-start; }
+    .nobleTop>strong { min-height:23px; padding:0 6px; border-radius:3px; background:#efe4d1; }
+    .nobleRequirements { grid-column:2; grid-row:2; align-self:center; gap:3px; margin-top:0; }
+    .nobleRequirements>i { font-size:11px; }
   }
 }
 

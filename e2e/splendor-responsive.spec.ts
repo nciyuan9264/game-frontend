@@ -179,10 +179,10 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
     };
   });
   expect(nobleGeometry.scrollWidth).toBeGreaterThan(nobleGeometry.clientWidth);
-  expect(nobleGeometry.tileWidth).toBeGreaterThanOrEqual(130);
-  expect(nobleGeometry.tileHeight).toBeGreaterThanOrEqual(68);
+  expect(nobleGeometry.tileWidth).toBeGreaterThanOrEqual(138);
+  expect(nobleGeometry.tileHeight).toBeGreaterThanOrEqual(74);
   expect(nobleGeometry.requirementsBottom).toBeLessThanOrEqual(
-    nobleGeometry.tileBottom - 4,
+    nobleGeometry.tileBottom - 6,
   );
 
   await expect(page.getByTestId('splendor-deck').first()).toBeHidden();
@@ -216,11 +216,23 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
   ]);
   expect(marketBox).not.toBeNull();
   expect(bankBox).not.toBeNull();
-  expect(bankBox!.height).toBeGreaterThanOrEqual(215);
+  expect(bankBox!.height).toBeGreaterThanOrEqual(195);
   expect(bankBox!.y + bankBox!.height).toBeLessThanOrEqual(844);
   expect(bankBox!.y - (marketBox!.y + marketBox!.height)).toBeGreaterThanOrEqual(0);
   expect(bankBox!.y - (marketBox!.y + marketBox!.height)).toBeLessThanOrEqual(64);
   await expect(mobileBank).toHaveCSS('padding-bottom', '10px');
+  await expect(mobileBank.getByRole('heading', { name: '宝石银行' })).toHaveCount(0);
+  await expect(mobileBank.getByText('直接选择宝石，再确认拿取')).toHaveCount(0);
+  const bankTextSpacing = await mobileBank.getByRole('button', {
+    name: '选择钻石',
+  }).evaluate(element => {
+    const label = element.querySelector<HTMLElement>(':scope > span:last-child');
+    const count = element.querySelector<HTMLElement>(':scope > span:first-child > b');
+    const labelBox = label?.getBoundingClientRect();
+    const countBox = count?.getBoundingClientRect();
+    return labelBox && countBox ? countBox.top - labelBox.bottom : 0;
+  });
+  expect(bankTextSpacing).toBeGreaterThanOrEqual(5);
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 

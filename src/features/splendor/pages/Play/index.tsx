@@ -252,9 +252,7 @@ export function Play({
       </aside></div>
     </main>
 
-    <div className={styles.mobileDock} data-testid="splendor-mobile-bank"><section><div><h3>宝石银行</h3><small>{selectedGemCount
-      ? `已选 ${selectedGemCount} 枚${tokenTotal(me) + selectedGemCount > 10 ? ` · 需退 ${tokenTotal(me) + selectedGemCount - 10} 枚` : ''}`
-      : interactive ? '直接选择宝石，再确认拿取' : '当前牌桌只读'}</small></div>{resources}</section>
+    <div className={styles.mobileDock} data-testid="splendor-mobile-bank"><section>{resources}</section>
       <div className={styles.mobileWalletHead}><button type="button" onClick={() => ui.openCollection(data.playerId)}>我的资源</button>
         <span>筹码 <b>{tokenTotal(me)} / 10</b></span>
         <button type="button" onClick={() => ui.openCollection(data.playerId)}><Bookmark size={12} />预留 {reserved.length}/3</button></div>
