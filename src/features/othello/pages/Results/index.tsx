@@ -55,7 +55,7 @@ export function Results({
       })}</div>
       <div className={styles.ratio}><i style={{ width: `${blackCount / total * 100}%` }} /></div>
       <p className={styles.scoreNote}>终局实际子数 · 空格不补计分</p>
-      <p className={styles.caption}>下一次翻转，仍有新的可能。<br />
+      <p className={styles.caption}>下一次翻转，仍有新的可能。
         <small>第 {data.roomData.roundNo} 局 · 权威结算</small></p>
     </section>
     <footer><ActionButton onClick={onViewBoard}><Eye size={15} />

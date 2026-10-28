@@ -1,4 +1,4 @@
-import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
 
 const roomID = 'othello_layout';
 const matchID = `${roomID}-r1`;
@@ -231,7 +231,9 @@ test('Othello desktop keeps board and sidebar visible at 1440x900', async ({ pag
   await expectNoOverflow(page);
 });
 
-test('Othello mobile final result returns through the timer slot', async ({ page }) => {
+test('Othello mobile final result returns through the timer slot', async ({
+  page,
+}, testInfo: TestInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, endedSnapshot());
   await page.goto(`/game/othello/match?roomID=${roomID}`);
@@ -239,6 +241,24 @@ test('Othello mobile final result returns through the timer slot', async ({ page
   await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
   await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
   await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
+  const scoreNote = page.getByText('终局实际子数 · 空格不补计分');
+  const caption = page.getByText('下一次翻转，仍有新的可能。', { exact: false });
+  const ratio = scoreNote.locator('xpath=preceding-sibling::div[1]');
+  const [ratioBox, scoreNoteBox, captionBox] = await Promise.all([
+    ratio.boundingBox(),
+    scoreNote.boundingBox(),
+    caption.boundingBox(),
+  ]);
+  expect(ratioBox).not.toBeNull();
+  expect(scoreNoteBox).not.toBeNull();
+  expect(captionBox).not.toBeNull();
+  expect(scoreNoteBox!.y - (ratioBox!.y + ratioBox!.height)).toBeGreaterThanOrEqual(12);
+  expect(captionBox!.y - (scoreNoteBox!.y + scoreNoteBox!.height)).toBeGreaterThanOrEqual(24);
+  await expect(caption.locator('small')).toHaveCSS('margin-top', '9px');
+  await page.screenshot({
+    path: testInfo.outputPath('othello-mobile-results.png'),
+    fullPage: true,
+  });
 
   await page.getByRole('button', { name: '回到棋盘' }).click();
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();

@@ -44,9 +44,9 @@
 .ratio { width:230px; height:5px; overflow:hidden; margin:19px auto 0; border:1px solid #d7ccb3; border-radius:4px; background:#e6dfca;
   i { display:block; height:100%; border-radius:3px; background:#464841; }
 }
-.scoreNote { margin-top:9px; color:#b29d7e; font-size:9px; }
-.caption { margin-top:20px; color:#8e806e; font:italic 14px/1.7 var(--serif);
-  small { font:9px sans-serif; letter-spacing:1px; }
+.result > .scoreNote { margin-top:9px; color:#b29d7e; font-size:9px; }
+.result > .caption { margin-top:20px; color:#8e806e; font:italic 14px/1.7 var(--serif);
+  small { display:block; margin-top:8px; font:9px sans-serif; letter-spacing:1px; }
 }
 @media(max-width:620px) {
   .page { place-content:start center; padding-top:70px;
@@ -58,4 +58,8 @@
   }
   .result { padding:24px 17px; }
   .score { grid-template-columns:1fr; }
+  .result > .scoreNote { margin-top:12px; }
+  .result > .caption { margin-top:24px;
+    small { margin-top:9px; }
+  }
 }
