@@ -1061,11 +1061,14 @@
 }
 
 @media (max-width: 767px) {
+  .fs-brand { gap: 14px; }
+  .fs-brand .fs-mark { flex: 0 0 auto; margin-right: 2px; }
   .fs-room-page { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
-  .fs-room-heading { align-items: stretch; gap: 12px; }
+  .fs-room-heading { align-items: stretch; gap: 12px; margin-bottom: 11px; }
   .fs-room-heading > div { min-width: 0; }
   .fs-room-heading > div > span { min-width: 0; flex: 1; }
-  .fs-room-heading h1 { max-width: 100%; overflow: hidden; font-size: 20px; text-overflow: ellipsis; white-space: nowrap; }
+  .fs-room-heading small { display: block; line-height: 1; }
+  .fs-room-heading h1 { max-width: 100%; margin-top: 2px; overflow: hidden; font-size: 20px; line-height: 1.18; text-overflow: ellipsis; white-space: nowrap; }
   .fs-room-heading nav { gap: 8px; }
   .fs-room-heading nav button { min-height: 36px; }
 
@@ -1079,6 +1082,8 @@
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 12px;
     margin: 15px 0 17px;
+    padding: 0 10px;
+    box-sizing: border-box;
   }
   .fs-seat,
   .fs-seat-grid:has(> :nth-child(5)) .fs-seat {

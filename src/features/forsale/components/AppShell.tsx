@@ -57,6 +57,7 @@ export const AppShell = ({
     railBottom: 'fs-rail-bottom',
     main: 'fs-main',
     header: 'fs-header',
+    brand: 'fs-brand',
     brandLink: 'fs-brand',
     divider: 'fs-divider',
     breadcrumb: 'fs-breadcrumb',

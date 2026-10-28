@@ -315,13 +315,27 @@ test('For Sale mobile room follows the Acquire preparation layout',
       const style = getComputedStyle(element);
       const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
       const box = seat?.getBoundingClientRect();
+      const brand = document.querySelector<HTMLElement>('.fs-brand');
+      const mark = brand?.querySelector<HTMLElement>('.fs-mark');
+      const label = document.querySelector<HTMLElement>('.fs-room-heading small')?.getBoundingClientRect();
+      const roomName = document.querySelector<HTMLElement>('.fs-room-heading h1')?.getBoundingClientRect();
       return {
+        brandGap: brand ? getComputedStyle(brand).gap : '',
         columns: columns.length,
+        headingGap: label && roomName ? roomName.top - label.bottom : 0,
+        markMarginRight: mark ? getComputedStyle(mark).marginRight : '',
+        paddingLeft: style.paddingLeft,
+        paddingRight: style.paddingRight,
         seatWidth: box?.width ?? 0,
         seatHeight: box?.height ?? 0,
       };
     });
+    expect(geometry.brandGap).toBe('14px');
     expect(geometry.columns).toBe(2);
+    expect(geometry.headingGap).toBeLessThanOrEqual(4);
+    expect(geometry.markMarginRight).toBe('2px');
+    expect(geometry.paddingLeft).toBe('10px');
+    expect(geometry.paddingRight).toBe('10px');
     expect(geometry.seatWidth).toBeGreaterThan(160);
     expect(geometry.seatHeight).toBeLessThanOrEqual(140);
     await expectNoOverflow(page);
