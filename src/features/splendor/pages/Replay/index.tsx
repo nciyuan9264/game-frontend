@@ -118,7 +118,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
 
   if (showResults && finalData) {
     return <AppShell inMatch hideHeader title="最终结算" profile={replay.profile}>
-      <Results readOnly data={finalData} onViewBoard={() => setShowResults(false)} onLeave={() => setShowResults(false)} />
+      <Results readOnly data={finalData} onViewBoard={() => setShowResults(false)} />
     </AppShell>;
   }
 

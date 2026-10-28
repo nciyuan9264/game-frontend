@@ -55,7 +55,7 @@ const nobles = [
   { id: 'N5', cost: { Red: 4, Black: 4 }, points: 3, state: 1 },
 ];
 
-function gameSnapshot() {
+function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
   const emptyPlayer = {
     normalCard: [],
     nobleCard: [],
@@ -74,6 +74,10 @@ function gameSnapshot() {
         playerId: human.playerID,
         ownerID: human.playerID,
         visibility: 'private',
+        result: gameStatus === 'end' ? {
+          [human.playerID]: { score: 17, cards: 19, nobles: 2 },
+          [ai.playerID]: { score: 3, cards: 11, nobles: 0 },
+        } : undefined,
         playerData: {
           [human.playerID]: emptyPlayer,
           [ai.playerID]: emptyPlayer,
@@ -88,8 +92,10 @@ function gameSnapshot() {
           gems: { White: 7, Blue: 7, Green: 7, Red: 7, Black: 7, Gold: 5 },
           nobles,
           currentPlayer: human.playerID,
-          gameStatus: 'playing',
-          turnDeadline: new Date(Date.now() + 60_000).toISOString(),
+          gameStatus,
+          turnDeadline: gameStatus === 'playing'
+            ? new Date(Date.now() + 60_000).toISOString()
+            : undefined,
           turnTimeoutMs: '60000',
           players: {
             [human.playerID]: human,
@@ -102,7 +108,10 @@ function gameSnapshot() {
   };
 }
 
-async function mockSession(page: Page) {
+async function mockSession(
+  page: Page,
+  snapshot: ReturnType<typeof gameSnapshot> = gameSnapshot(),
+) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -121,7 +130,7 @@ async function mockSession(page: Page) {
       data: {
         roomID,
         gameType: 'splendor',
-        status: 'playing',
+        status: snapshot.view.splendor.roomData.gameStatus === 'end' ? 'finished' : 'playing',
         visibility: 'private',
         ownerUserID: human.userID,
         ownerPlayerID: human.playerID,
@@ -142,7 +151,7 @@ async function mockSession(page: Page) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(snapshot));
   });
 }
 
@@ -263,4 +272,59 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
   await expect(page.getByTestId('splendor-deck').first()).toBeVisible();
   await expect(page.getByTestId('splendor-card-name').first()).toBeVisible();
   await expect(costList).toHaveCSS('flex-direction', 'row');
+});
+
+test('Splendor mobile results keep the ranking and board return chrome orderly', async ({
+  page,
+}, testInfo: TestInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('end'));
+  await page.goto(`/game/splendor/match?roomID=${roomID}`);
+
+  const results = page.getByTestId('splendor-results');
+  await expect(results).toBeVisible();
+  await expect(results.getByRole('button', { name: '返回大厅' })).toHaveCount(0);
+  await expect(results.getByText('结算结果来自本局服务端快照')).toHaveCount(0);
+  await expect(results.getByRole('button', { name: '查看终局牌面' })).toBeVisible();
+  await expect(results.getByRole('button', { name: /再来一局/ })).toBeVisible();
+
+  const headerMetrics = await page.getByTestId('splendor-results-header')
+    .locator(':scope > span').evaluateAll(elements => elements.map(element => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      whiteSpace: getComputedStyle(element).whiteSpace,
+    })));
+  expect(headerMetrics).toHaveLength(4);
+  expect(headerMetrics.every(metric =>
+    metric.whiteSpace === 'nowrap' && metric.scrollWidth <= metric.clientWidth)).toBe(true);
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+  await page.screenshot({
+    path: testInfo.outputPath('splendor-mobile-results.png'),
+    fullPage: true,
+  });
+
+  await results.getByRole('button', { name: '查看终局牌面' }).click();
+  await expect(page.getByTestId('splendor-market')).toBeVisible();
+  const topbarStatus = page.getByTestId('splendor-topbar-status');
+  const resultsButton = topbarStatus.getByRole('button', { name: '查看结算' });
+  await expect(resultsButton).toBeVisible();
+  await expect(topbarStatus.getByText('--', { exact: true })).toHaveCount(0);
+  expect(await resultsButton.evaluate(element =>
+    element.parentElement?.getAttribute('data-testid'))).toBe('splendor-topbar-status');
+  await page.screenshot({
+    path: testInfo.outputPath('splendor-mobile-board-return.png'),
+    fullPage: true,
+  });
+
+  await resultsButton.click();
+  await expect(results).toBeVisible();
+  await page.setViewportSize({ width: 360, height: 800 });
+  const narrowHeaderFits = await page.getByTestId('splendor-results-header')
+    .locator(':scope > span').evaluateAll(elements =>
+      elements.every(element => element.scrollWidth <= element.clientWidth));
+  expect(narrowHeaderFits).toBe(true);
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });

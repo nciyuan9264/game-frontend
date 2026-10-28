@@ -1,9 +1,8 @@
 .results { min-height:100dvh; background:#f4f0e8; color:var(--ink); }
 .topbar { display:flex; height:66px; align-items:center; gap:14px; padding:0 32px; border-bottom:1px solid var(--line); background:#fbf8f1;
-  > button { display:grid; width:40px; height:40px; place-items:center; border-radius:50%; color:#8d735c; }
-  > span:nth-child(3) { flex:1; }
   > em { padding:6px 11px; border:1px solid #decfb9; border-radius:4px; background:#f0e8da; color:#8d775e; font-size:10px; font-style:normal; }
 }
+.spacer { flex:1; }
 .brand { display:flex; align-items:center; gap:8px; color:var(--wine);
   b { display:block; font:600 21px/1 var(--serif); letter-spacing:2.5px; }
   small { display:block; margin-top:5px; color:#917e67; font-size:6px; letter-spacing:1.5px; }
@@ -45,12 +44,11 @@
 .actions { display:flex; gap:12px; margin-top:27px;
   > button { min-height:45px; flex:1; font-size:12px; }
 }
-.disclaimer { margin-top:14px; color:#b19a77; font-size:10px; text-align:center; }
 @media (max-width:1150px) and (min-width:768px) { .page { gap:23px; padding-inline:23px; } .row { grid-template-columns:minmax(0,1fr) 61px 53px 57px; padding-inline:12px; } }
 @media (max-width:767px) {
-  .topbar { height:44px; padding:0 10px; >button { width:44px; height:44px; } >em { margin-right:6px; padding:5px 7px; font-size:9px; } }
-  .brand { b { font-size:18px; letter-spacing:2px; } small { font-size:5px; } }
-  .page { display:flex; flex-direction:column; gap:19px; padding:18px 16px 126px; }
+  .topbar { height:44px; gap:10px; padding:0 14px; >em { padding:5px 7px; font-size:9px; white-space:nowrap; } }
+  .brand { gap:7px; b { font-size:17px; letter-spacing:2px; } small { margin-top:4px; font-size:5px; } }
+  .page { display:flex; flex-direction:column; gap:16px; padding:15px 14px 112px; }
   .celebration { min-height:0; height:160px; border-radius:6px;
     >img { object-position:65% 54%; }
     >div { display:grid; grid-template-columns:minmax(0,1fr) 75px; grid-template-rows:auto auto 1fr; align-items:center; padding:16px 18px; text-align:left; column-gap:9px; }
@@ -61,13 +59,24 @@
     >div>strong { grid-column:2; grid-row:3; align-self:end; margin:0; padding:0; font-size:50px; text-align:center; }
     >div>strong small { margin-top:4px; font-size:8px; letter-spacing:2px; }
   }
-  .summary { padding:0; >header h2 { margin-top:7px; font-size:24px; } }
-  .table { margin-top:15px; }
-  .row { min-height:67px; grid-template-columns:minmax(0,1fr) 47px 40px 49px; gap:3px; padding:13px 10px;
-    >div { gap:6px; } >div>b { width:12px; font-size:19px; } >div>span { width:28px!important; height:28px!important; }
-    >div strong { font-size:11px; } >span { font-size:21px; } >b { font-size:29px; }
+  .summary { padding:0;
+    >header { align-items:center; }
+    >header h2 { margin-top:7px; font-size:22px; line-height:1.25; }
+    >header>span { margin-bottom:0; font-size:9px; }
   }
-  .tableHead { min-height:37px; padding-block:9px; }
-  .note { margin-top:15px; }
+  .table { margin-top:13px; }
+  .row { min-height:62px; grid-template-columns:minmax(0,1fr) 52px 44px 54px; gap:2px; padding:11px 8px; font-family:inherit; font-size:10px;
+    >div { gap:6px; } >div>b { width:14px; font:500 14px/1 var(--serif); } >div>span { width:30px!important; height:30px!important; }
+    >div strong { font-size:12px; }
+    >span { display:flex; align-items:baseline; justify-content:center; gap:2px; font-family:inherit; font-size:17px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; white-space:nowrap; }
+    >span small { display:inline; margin:0; font-family:inherit; font-size:9px; line-height:1; }
+    >b { font-family:inherit; font-size:20px; font-weight:600; font-variant-numeric:tabular-nums; line-height:1; }
+  }
+  .tableHead { min-height:38px; padding-block:0; font-size:10px; line-height:1;
+    >span { display:block; font-family:inherit; font-size:10px; font-weight:500; line-height:1; white-space:nowrap; }
+  }
+  .note { align-items:center; margin-top:13px; font-size:10px; line-height:1.5; white-space:nowrap;
+    svg { margin-top:0; }
+  }
   .actions { position:fixed; right:0; bottom:0; left:0; z-index:50; gap:10px; margin:0; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid #dfd1bf; background:#fbf7f0; }
 }

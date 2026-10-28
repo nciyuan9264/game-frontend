@@ -1,4 +1,4 @@
-import { ArrowLeft, ArrowRight, Eye, RotateCcw, ShieldCheck, Trophy } from 'lucide-react';
+import { ArrowRight, Eye, RotateCcw, ShieldCheck, Trophy } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import hero from '../../assets/hero.webp';
 import { PlayerAvatar } from '../../components/AppShell';
@@ -8,11 +8,10 @@ import { playerName, type GameSnapshot } from '../../model/session';
 import { winnerIDs } from '../../model/selectors';
 import styles from './index.module.less';
 
-export function Results({ session, data, onViewBoard, onLeave, onRestart, restarting = false, readOnly = false }: {
+export function Results({ session, data, onViewBoard, onRestart, restarting = false, readOnly = false }: {
   session?: SplendorSession;
   data: GameSnapshot;
   onViewBoard: () => void;
-  onLeave: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
@@ -29,10 +28,10 @@ export function Results({ session, data, onViewBoard, onLeave, onRestart, restar
     .map(([id]) => playerName(id, data.roomData.players)).join('、');
   const topScore = players[0] ? data.result?.[players[0][0]]?.score ?? data.playerData[players[0][0]]?.score ?? 0 : 0;
 
-  return <div className={styles.results}>
-    <header className={styles.topbar}><button type="button" aria-label="返回大厅" onClick={onLeave}><ArrowLeft size={20} /></button>
+  return <div className={styles.results} data-testid="splendor-results">
+    <header className={styles.topbar}>
       <span className={styles.brand}><BrandMark size={25} /><span><b>SPLENDOR</b><small>璀 璨 宝 石 · 商 会</small></span></span>
-      <span /><em>{readOnly ? '只读回放 · 最终结算' : '对局结算'}</em></header>
+      <span className={styles.spacer} /><em>{readOnly ? '只读回放 · 最终结算' : '对局结算'}</em></header>
     <main className={styles.page}><section className={styles.celebration}><img src={hero} alt="暮色中的文艺复兴宝石商港" />
       <i /><div><Eyebrow>THE ART OF PROSPERITY</Eyebrow><Trophy size={48} strokeWidth={1.2} />
         <h1>{won ? '荣耀，属于你的远见。' : '每一次选择，都有回响。'}</h1>
@@ -40,7 +39,9 @@ export function Results({ session, data, onViewBoard, onLeave, onRestart, restar
         <strong>{topScore}<small>最终声望</small></strong></div></section>
       <section className={styles.summary}><header><div><Eyebrow>THE FINAL COLLECTION</Eyebrow><h2>这一局的璀璨</h2></div>
         <span>第 {Math.max(1, data.turnNumber)} 轮 · 已完成</span></header>
-        <div className={styles.table}><div className={`${styles.row} ${styles.tableHead}`}><span>收藏家</span><span>发展卡</span><span>贵族</span><span>总声望</span></div>
+        <div className={styles.table} data-testid="splendor-results-table">
+          <div className={`${styles.row} ${styles.tableHead}`} data-testid="splendor-results-header">
+            <span>收藏家</span><span>发展卡</span><span>贵族</span><span>总声望</span></div>
           {players.map(([id, player], index) => {
             const result = data.result?.[id];
             const champion = winners.includes(id);
@@ -53,13 +54,12 @@ export function Results({ session, data, onViewBoard, onLeave, onRestart, restar
               <b>{result?.score ?? data.playerData[id]?.score ?? 0}</b>{champion && <Trophy size={15} />}
             </div>;
           })}</div>
-        <p className={styles.note}><ShieldCheck size={15} />已完成触发终局的当前轮，每位玩家行动次数相同。
-          同分时发展卡更少者优先；仍相同则共享胜利。</p>
-        <div className={styles.actions}><ActionButton onClick={onViewBoard}><Eye size={16} />查看终局牌面</ActionButton>
+        <p className={styles.note}><ShieldCheck size={15} />同分时发展卡更少者优先；仍相同则共享胜利。</p>
+        <div className={styles.actions} data-testid="splendor-results-actions">
+          <ActionButton onClick={onViewBoard}><Eye size={16} />查看终局牌面</ActionButton>
           {!readOnly && owner && session && onRestart && <ActionButton variant="primary"
             disabled={!!session.pending || restarting} onClick={() => { void onRestart(); }}>
             <RotateCcw size={16} />再来一局<ArrowRight size={17} /></ActionButton>}</div>
-        <p className={styles.disclaimer}>结算结果来自本局服务端快照</p>
       </section></main>
   </div>;
 }

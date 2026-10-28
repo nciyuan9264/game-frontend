@@ -93,7 +93,7 @@ export function Play({
 
   if (!me) return null;
   if (data.roomData.gameStatus === 'end' && showResults) {
-    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave}
+    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)}
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 
@@ -167,12 +167,15 @@ export function Play({
       <span className={styles.divider} /><div className={styles.roomName}><strong>{data.roomID}</strong>
         <small>{playerIDs.length} 人 · {roundTitle} · {roundDescription}</small></div>
       <span className={styles.spacer} />
-      {data.roomData.gameStatus === 'end' && <ActionButton onClick={() => setShowResults(true)}><Eye size={15} />查看结算</ActionButton>}
       <button type="button" aria-label="商会动态" onClick={() => ui.openPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="对局规则" onClick={() => ui.openPanel('rules')}><BookOpen size={19} /></button>
-      <span className={styles.timer}>{data.roomData.turnDeadline && playable && myTurn
-        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-        : <b>--</b>}</span>
+      <span className={`${styles.timer} ${data.roomData.gameStatus === 'end' ? styles.resultsTimer : ''}`}
+        data-testid="splendor-topbar-status">{data.roomData.gameStatus === 'end'
+          ? <button type="button" aria-label="查看结算" onClick={() => setShowResults(true)}>
+            <Eye size={13} /><span>查看结算</span></button>
+          : data.roomData.turnDeadline && playable && myTurn
+            ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+            : <b>--</b>}</span>
     </header>
     <span className={styles.live} role="status" aria-live="polite">{roundDescription}。{phaseDescription}</span>
     <main className={styles.content}>
