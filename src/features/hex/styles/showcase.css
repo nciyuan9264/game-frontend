@@ -95,6 +95,27 @@
     color: #fff9e47f;
     font: 16px/1 Georgia, serif;
   }
+  .stone > i {
+    position: relative;
+    display: block;
+    width: 43%;
+    height: 43%;
+  }
+  .stone-red > i {
+    border: 1.5px solid #fff8ed80;
+    border-radius: 50%;
+  }
+  .stone-teal > i::before,
+  .stone-teal > i::after {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 112%;
+    border-top: 1.5px solid #fff8ed80;
+    content: "";
+  }
+  .stone-teal > i::before { transform: translate(-50%, -50%) rotate(45deg); }
+  .stone-teal > i::after { transform: translate(-50%, -50%) rotate(-45deg); }
   .stone-red {
     border: 1px solid #9b523e;
     background: radial-gradient(circle at 34% 24%, #e0a088, #b86f57 66%, #944d3a);
@@ -613,8 +634,8 @@
     .arena-header { height: 34px; margin: 0 10px; font-size: 8px; }
     .arena-header > div { gap: 10px; }
     .arena-header button { font-size: 8px; }
-    .board-stage { min-height: 0; padding: 1px 2px; }
-    .board-stage .hex-board { width: 108%; max-width: 108%; margin-left: -4%; }
+    .board-stage { min-height: 0; padding: 4px 8px 2px; }
+    .board-stage .hex-board { width: 100%; max-width: 100%; margin-left: 0; }
     .hex-coordinates { font-size: 8px; }
     .board-legend { height: 28px; gap: 15px; font-size: 7px; }
     .board-legend span:last-child { display: none; }
@@ -629,23 +650,32 @@
       position: fixed;
       inset: auto 0 0;
       z-index: 60;
-      display: block;
-      padding: 10px 14px calc(10px + env(safe-area-inset-bottom));
-      border-top: 1px solid #d6dacb;
-      background: #f8f7f0f5;
+      display: grid;
+      min-height: calc(68px + env(safe-area-inset-bottom));
+      align-items: start;
+      grid-template-columns: 48px 1fr;
+      gap: 8px;
+      padding: 10px 12px env(safe-area-inset-bottom);
+      border-top: 1px solid #d9cebf;
+      background: #faf7f1f5;
       backdrop-filter: blur(12px);
     }
-    .mobile-game-dock > div { display: flex; align-items: center; gap: 9px; }
-    .mobile-game-dock .button { min-width: 0; flex: 1; min-height: 44px; }
+    .mobile-game-dock > button[data-game-action-button] {
+      min-width: 0;
+      min-height: 44px;
+      --game-primary: #794453;
+      --game-primary-gradient: none;
+      --game-primary-border: #794453;
+      --game-primary-text: #fffaf3;
+    }
     .dock-undo {
-      width: 48px;
+      display: grid;
       height: 44px;
-      flex: none;
-      border: 1px solid #d0d5c7;
-      border-radius: 6px;
-      background: #fcfaf4;
-      color: #77867b;
-      font-size: 10px;
+      place-items: center;
+      border: 1px solid #ddd1c3 !important;
+      border-radius: 5px;
+      background: #fffdf8 !important;
+      color: #77695f;
     }
 
     .collection-content { padding: 17px 14px calc(82px + env(safe-area-inset-bottom)); }

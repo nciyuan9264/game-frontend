@@ -1,6 +1,6 @@
 import {
   ArrowLeft, ArrowLeftRight, BookOpen, Check, Flag, History,
-  Maximize2, MoreHorizontal, ShieldCheck, Trophy,
+  Maximize2, MoreHorizontal, ShieldCheck, Trophy, X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -165,12 +165,14 @@ export function Play({
       </aside></div>
     </main>
 
-    <div className="mobile-game-dock"><div>
-      {ui.selected && <button className="dock-undo" onClick={ui.clearSelection}>取消</button>}
-      <button className="button primary" disabled={!selectedLegal || !interactive}
+    {!ended && <div className="mobile-game-dock" data-testid="hex-mobile-dock">
+      <button type="button" className="dock-undo" aria-label="取消选择"
+        disabled={!ui.selected} onClick={ui.clearSelection}><X size={18} /></button>
+      <ActionButton variant="primary" disabled={!selectedLegal || !interactive}
         onClick={() => ui.selected && commit(ui.selected)}>
-        {ui.selected ? `确认落子 ${coordinate(ui.selected)}` : status}<Check size={17} />
-      </button></div></div>
+        {ui.selected ? `确认落子 ${coordinate(ui.selected)}` : status}
+        {selectedLegal && <Check size={17} />}
+      </ActionButton></div>}
     {ui.panel === 'activity' && <Dialog title="行棋记录" eyebrow="THE PATH SO FAR"
       onClose={() => ui.setPanel(undefined)}><Journal data={data} full /></Dialog>}
     {ui.panel === 'rules' && <Dialog title="玩法指南" eyebrow="A SMALL GUIDE TO HEX"

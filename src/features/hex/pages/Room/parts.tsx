@@ -13,7 +13,7 @@ import {
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
-import { Brand, Disc } from '../../components/Artwork';
+import { Disc } from '../../components/Artwork';
 import { playerName, type MatchSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
@@ -123,7 +123,6 @@ export function TablePanel(props: RoomProps) {
           02 准备</span><i /><span>03 开局</span></div></header>
     <div className={styles.tableStage}>
       <div className={styles.boardPattern} aria-hidden="true" />
-      <Brand small />
       <Seats {...props} />
       <div className={styles.coordinates}><span>HEX / CLASSIC</span>
         <span>THE QUIET TABLE</span></div>

@@ -1,0 +1,102 @@
+.page {
+  display:grid;
+  min-height:100dvh;
+  place-content:center;
+  padding:32px 20px;
+  background:radial-gradient(circle at 50% 35%,#fffaf1,#eee5d8);
+  text-align:center;
+
+  > header {
+    span { color:#a1815d; font:9px Georgia,serif; letter-spacing:2.4px; }
+    h1 { margin:10px 0; color:#445f56; font-size:35px; }
+    p { color:#7e8a7c; font-size:12px; line-height:1.8; }
+  }
+
+  > footer {
+    display:flex;
+    justify-content:center;
+    gap:10px;
+    margin-top:22px;
+
+    button { min-width:132px; }
+    button:only-child { min-width:220px; }
+  }
+}
+
+.result {
+  width:min(620px,calc(100vw - 40px));
+  margin-top:24px;
+  padding:31px;
+  border:1px solid #ddcfbc;
+  border-radius:7px;
+  background:#fffdf8;
+  box-shadow:0 22px 60px #58443318;
+
+  h2 { margin:17px 0 23px; color:#4c675c; font:500 24px var(--serif); }
+}
+
+.seal {
+  display:grid;
+  justify-items:center;
+  gap:12px;
+  color:#71845e;
+
+  > div { display:flex; align-items:center; gap:7px; color:#84907f; font-size:9px; }
+  :global(.stone) { width:22px; height:22px; box-shadow:inset -1px -2px 3px #0002,0 1px 2px #41443b1f,inset 1px 1px 2px #ffffff40; }
+}
+
+.score {
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+
+  article {
+    display:grid;
+    align-items:center;
+    grid-template-columns:auto 1fr auto;
+    gap:10px;
+    padding:14px;
+    border:1px solid #e1dfd2;
+    border-radius:5px;
+    text-align:left;
+  }
+
+  article>div { min-width:0; }
+  strong { display:block; overflow:hidden; color:#40574e; font-size:12px; text-overflow:ellipsis; white-space:nowrap; }
+  small { display:block; margin-top:4px; color:#879183; font-size:9px; }
+  article>b { color:#3f7069; font:600 28px var(--serif); text-align:center; }
+  article>b small { font:9px Inter,'Noto Sans SC',sans-serif; }
+}
+
+.winner {
+  border-color:#6e988655!important;
+  background:#edf3ed;
+}
+
+.caption {
+  margin-top:22px;
+  color:#74836d;
+  font:italic 14px/1.7 var(--serif);
+
+  small { font:9px Inter,'Noto Sans SC',sans-serif; letter-spacing:1px; }
+}
+
+@media (max-width:620px) {
+  .page {
+    place-content:start center;
+    padding-top:70px;
+
+    > header h1 { font-size:29px; }
+    > footer {
+      display:grid;
+      width:min(100%,420px);
+      grid-template-columns:repeat(2,minmax(0,1fr));
+
+      button { min-width:0; min-height:44px; padding:0 9px; }
+      button:only-child { grid-column:1/-1; min-width:0; }
+    }
+  }
+
+  .result { padding:24px 17px; }
+  .score { grid-template-columns:1fr; }
+}

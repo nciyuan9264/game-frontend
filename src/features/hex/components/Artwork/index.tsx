@@ -13,7 +13,7 @@ export function Stone({
   return <span
     className={`stone stone-${side} ${ghost ? 'ghost' : ''} ${className}`}
     aria-hidden="true"
-  >{side === 'red' ? '○' : '×'}</span>;
+  ><i /></span>;
 }
 
 export const Pawn = Stone;

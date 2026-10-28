@@ -60,6 +60,15 @@ const games = [
     },
   },
   {
+    game: 'hex',
+    seatTestID: 'hex-room-seat',
+    metrics: {
+      hex: {
+        turnCount: 0,
+      },
+    },
+  },
+  {
     game: 'hive',
     seatTestID: 'hive-room-seat',
     metrics: {
