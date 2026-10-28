@@ -104,7 +104,7 @@ button.noble:hover { border-color:#b99b6b; }
 @media (max-width:767px) {
   .tokenControl { min-height:54px; gap:4px; }
   .tokenDisc { width:36px; height:36px; }
-  .resourceMatrix { --resource-label-width:44px; --resource-bank-height:58px; --resource-row-height:18px; --resource-disc-size:30px; margin-top:5px; }
+  .resourceMatrix { --resource-label-width:44px; --resource-bank-height:64px; --resource-row-height:20px; --resource-disc-size:32px; margin-top:7px; }
   .tokenMatrix { height:100%; min-height:0; gap:0;
     .tokenDisc { width:var(--resource-disc-size); height:var(--resource-disc-size); }
     .tokenDisc > b { bottom:-27px; }
@@ -122,25 +122,27 @@ button.noble:hover { border-color:#b99b6b; }
   .playerResourceRow:first-child .playerResourceUnavailable { background:transparent; color:#aa9b86; font-size:10px; }
   .playerResourceGold { border-radius:8px; background:#efe4cc; color:#836438!important; }
   .playerResourceZero b { color:#978877; font-weight:400!important; }
-  .cardboard .cardImage { height:clamp(40px,calc((100dvh - 676px)/3),60px); }
+  .cardboard .cardImage { height:clamp(84px,calc((100dvh - 535px)/3),100px); }
   .cardboard .cardPoints { left:4px; top:3px; font-size:22px; }
   .cardboard .cardBonus { right:3px; top:3px; width:22px; height:23px; }
   .cardboard .cardBonus svg { width:18px; height:18px; }
-  .cardboard .cardName { left:4px; right:3px; bottom:4px; font-size:9px; }
-  .cardboard .cardCosts { height:20px; gap:2px; padding:0 3px; }
-  .cardboard .cardCosts svg { width:8px; height:10px; }
+  .cardboard .cardName { display:none; }
+  .cardboard .cardCosts { position:absolute; z-index:2; bottom:4px; left:4px; display:flex; width:auto; height:auto; align-items:flex-start; flex-direction:column; gap:1px; padding:2px 3px; border-radius:3px; background:#fffaf0e8; box-shadow:0 1px 4px #281c1824; }
+  .cardboard .cardCosts>span { min-height:12px; gap:2px; font-size:10px; line-height:12px; }
+  .cardboard .cardCosts svg { width:9px; height:10px; }
   .cardboard .canBuy { top:5px; width:14px; height:14px; padding:0; border-radius:50%; i { display:none; } }
-  .nobleCompact { display:grid; height:50px; grid-template-rows:26px 13px; gap:3px;
-    .noblePortrait { width:25px; height:27px; }
+  .nobleCompact { display:grid; height:68px; grid-template-columns:34px minmax(0,1fr); grid-template-rows:22px 24px; align-content:center; gap:3px 7px; padding:6px;
+    .noblePortrait { width:34px; height:54px; grid-column:1; grid-row:1/-1; }
     .nobleInfo { display:contents; }
-    .nobleTop { position:absolute; right:5px; top:7px; }
+    .nobleTop { position:static; grid-column:2; grid-row:1; align-self:center; justify-content:flex-end; }
+    .nobleRequirements { grid-column:2; grid-row:2; align-self:center; gap:4px; margin-top:0; }
   }
 }
 
 @media (max-width:389px) {
   .playerResourceRow { grid-template-columns:19px repeat(6,minmax(0,1fr)); column-gap:1px; }
   .playerResourceRow > span svg { width:9px; height:9px; }
-  .cardboard .cardCosts { justify-content:space-between; gap:1px; padding:0 1px; }
+  .cardboard .cardCosts { gap:1px; padding:2px 3px; }
   .cardboard .cardCosts > span { min-width:0; gap:0; font-size:9px; }
-  .cardboard .cardCosts svg { width:6px; height:8px; }
+  .cardboard .cardCosts svg { width:8px; height:9px; }
 }

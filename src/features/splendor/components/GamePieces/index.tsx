@@ -138,9 +138,9 @@ export function DevelopmentCardView({
     <i className={styles.cardShade} /><span className={styles.cardPoints}>
       {card.points > 0 ? card.points : '—'}</span>
     <span className={styles.cardBonus}><GemIcon color={card.bonus} size={26} /></span>
-    <span className={styles.cardName}>{display.name}</span>
+    <span className={styles.cardName} data-testid="splendor-card-name">{display.name}</span>
     {affordable && <span className={styles.canBuy}><Check size={11} /><i>可购</i></span>}</span>
-    <span className={styles.cardCosts}>{cardColors.map(color => {
+    <span className={styles.cardCosts} data-testid="splendor-card-costs">{cardColors.map(color => {
       const cost = card.cost[color] ?? 0;
       return cost > 0 ? <span key={color} title={`${gemMeta[color].label} ${cost}`}>
         <GemIcon color={color} size={15} /><b>{cost}</b>
@@ -172,13 +172,15 @@ export function NobleTile({ noble, progress, compact = false, onClick }: {
     </span></>;
   const className = `${styles.noble} ${compact ? styles.nobleCompact : ''} ${progress && !missing ? styles.nobleEligible : ''}`;
   return onClick
-    ? <button type="button" className={className} aria-label={`查看贵族${display.name}`} onClick={onClick}>{content}</button>
-    : <span className={className}>{content}</span>;
+    ? <button type="button" className={className} data-testid="splendor-noble"
+      aria-label={`查看贵族${display.name}`} onClick={onClick}>{content}</button>
+    : <span className={className} data-testid="splendor-noble">{content}</span>;
 }
 
 export function DeckBack({ level, count }: { level: 1 | 2 | 3; count: number }) {
   const color: CardColor = level === 3 ? 'Red' : level === 2 ? 'Blue' : 'Green';
-  return <span className={`${styles.deck} ${styles[`deck${level}`]}`} aria-label={`${level} 阶牌堆，剩余 ${count} 张`}>
+  return <span className={`${styles.deck} ${styles[`deck${level}`]}`} data-testid="splendor-deck"
+    aria-label={`${level} 阶牌堆，剩余 ${count} 张`}>
     <strong>{['Ⅰ', 'Ⅱ', 'Ⅲ'][level - 1]}</strong><GemIcon color={color} size={25} /><small>{count}</small>
   </span>;
 }

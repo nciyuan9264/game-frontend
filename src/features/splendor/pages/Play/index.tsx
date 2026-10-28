@@ -202,14 +202,14 @@ export function Play({
         })}
       </section>
 
-      <section className={styles.market}>
+      <section className={styles.market} data-testid="splendor-market">
         <div className={styles.nobleArea}><header><Crown size={14} /><span>贵族的青睐</span>
           <small>只计算永久折扣 · 自动结算</small></header>
-          <div>{nobles.map(noble => <NobleTile key={noble.id} noble={noble}
+          <div data-testid="splendor-noble-track">{nobles.map(noble => <NobleTile key={noble.id} noble={noble}
             progress={myDiscounts} compact onClick={() => ui.openNoble(noble.id)} />)}</div></div>
         <div className={styles.marketArea}><header><span><Layers size={14} />发展卡市场</span>
           <small>{interactive ? <><Check size={13} />绿色标记 · 可购买</> : '当前牌桌只读'}</small></header>
-          <div className={styles.cardRows}>{([3, 2, 1] as const).map(level => <div className={styles.cardRow} key={level}>
+          <div className={styles.cardRows} data-testid="splendor-card-market">{([3, 2, 1] as const).map(level => <div className={styles.cardRow} key={level}>
             <DeckBack level={level} count={deckCount(data, level)} />
             {cards.filter(card => card.level === level).map(card => <DevelopmentCardView key={card.id}
               card={card} affordable={interactive && canBuyCard(data, data.playerId, card)}
@@ -252,7 +252,7 @@ export function Play({
       </aside></div>
     </main>
 
-    <div className={styles.mobileDock}><section><div><h3>宝石银行</h3><small>{selectedGemCount
+    <div className={styles.mobileDock} data-testid="splendor-mobile-bank"><section><div><h3>宝石银行</h3><small>{selectedGemCount
       ? `已选 ${selectedGemCount} 枚${tokenTotal(me) + selectedGemCount > 10 ? ` · 需退 ${tokenTotal(me) + selectedGemCount - 10} 枚` : ''}`
       : interactive ? '直接选择宝石，再确认拿取' : '当前牌桌只读'}</small></div>{resources}</section>
       <div className={styles.mobileWalletHead}><button type="button" onClick={() => ui.openCollection(data.playerId)}>我的资源</button>
