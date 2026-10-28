@@ -15,7 +15,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createHiveRoom, lookupHiveRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Brand, Disc, HiveStillLife } from '../../components/Artwork';
+import { Disc, HiveStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { HiveLoading } from '../../components/LoadingState';
 import { useHiveLobby } from '../../hooks/useHiveLobby';
@@ -176,7 +176,7 @@ export default function Lobby() {
           onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/hive/guide"><BookOpen size={34} /><div>
           <span>THE HIVE HANDBOOK</span><h3>先懂虫群，再落第一子。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small /></aside></div>
+      </aside></div>
       <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
         onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
         onSubmit={() => void find()} /></div>

@@ -15,7 +15,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createYinshRoom, lookupYinshRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Brand, RingIcon, RingStillLife } from '../../components/Artwork';
+import { RingIcon, RingStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { YinshLoading } from '../../components/LoadingState';
 import { useYinshLobby } from '../../hooks/useYinshLobby';
@@ -176,7 +176,7 @@ export default function Lobby() {
           onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/yinsh/guide"><BookOpen size={34} /><div>
           <span>THE YINSH HANDBOOK</span><h3>每一次翻转，都有章法。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small /></aside></div>
+      </aside></div>
       <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
         onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
         onSubmit={() => void find()} /></div>

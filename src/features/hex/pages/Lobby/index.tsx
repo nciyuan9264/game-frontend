@@ -15,7 +15,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createHexRoom, lookupHexRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Brand, Disc, HexStillLife } from '../../components/Artwork';
+import { Disc, HexStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { HexLoading } from '../../components/LoadingState';
 import { useHexLobby } from '../../hooks/useHexLobby';
@@ -176,7 +176,7 @@ export default function Lobby() {
           onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/hex/guide"><BookOpen size={34} /><div>
           <span>THE HEX HANDBOOK</span><h3>先读路，再启程。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small /></aside></div>
+      </aside></div>
       <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
         onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
         onSubmit={() => void find()} /></div>

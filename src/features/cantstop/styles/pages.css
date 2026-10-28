@@ -133,3 +133,8 @@
   .cs-room-tools>div{gap:18px}
   .cs-rank-row{grid-template-columns:24px minmax(0,1fr) 50px 50px}
 }
+
+@media(min-width:768px){
+  .cs-profile-page .cs-profile-layout{margin-bottom:18px}
+  .cs-profile-page .cs-about-entry{margin-top:auto}
+}

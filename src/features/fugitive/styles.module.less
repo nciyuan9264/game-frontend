@@ -828,6 +828,13 @@ to{opacity:1;transform:translateY(0)}
 .dossier-top dd{margin:0;color:#c0d294;font-weight:500}
 .dossier-source{display:inline-flex;align-items:center;gap:4px;font-size:10px;color:#bed597;margin-top:16px}
 
+@media(min-width:701px){
+.compact-mobile-footer{display:flex;min-height:100dvh;flex-direction:column}
+.compact-mobile-footer>.profile-page{display:flex;min-height:0;flex:1;flex-direction:column}
+.compact-mobile-footer>.profile-page>.profile-layout{margin-bottom:18px}
+.compact-mobile-footer>.profile-page>.profile-about{margin-top:auto}
+}
+
 /* Laptop / narrow desktop */
 @media(min-width:701px) and (max-width:1180px){.page-content{padding:18px 22px 14px}
 .app-header{padding:0 22px}

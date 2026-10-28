@@ -15,7 +15,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createQuoridorRoom, lookupQuoridorRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Brand, Disc, QuoridorStillLife } from '../../components/Artwork';
+import { Disc, QuoridorStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { QuoridorLoading } from '../../components/LoadingState';
 import { useQuoridorLobby } from '../../hooks/useQuoridorLobby';
@@ -176,7 +176,7 @@ export default function Lobby() {
           onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/quoridor/guide"><BookOpen size={34} /><div>
           <span>THE QUORIDOR HANDBOOK</span><h3>先读路，再启程。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small /></aside></div>
+      </aside></div>
       <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
         onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
         onSubmit={() => void find()} /></div>

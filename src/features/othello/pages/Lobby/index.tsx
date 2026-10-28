@@ -15,7 +15,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createOthelloRoom, lookupOthelloRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
-import { Brand, Disc, OthelloStillLife } from '../../components/Artwork';
+import { Disc, OthelloStillLife } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { OthelloLoading } from '../../components/LoadingState';
 import { useOthelloLobby } from '../../hooks/useOthelloLobby';
@@ -176,7 +176,7 @@ export default function Lobby() {
           onSubmit={() => void find()} />
         <Link className={styles.guide} to="/game/othello/guide"><BookOpen size={34} /><div>
           <span>THE OTHELLO HANDBOOK</span><h3>每一次翻转，都有章法。</h3><b>开始了解 <ArrowRight size={14} /></b></div></Link>
-        <Brand small /></aside></div>
+      </aside></div>
       <div className={styles.mobileJoin}><JoinCard code={code} pending={action.pending}
         onChange={value => { setCode(value); setFoundRoom(undefined); action.reset(); }}
         onSubmit={() => void find()} /></div>

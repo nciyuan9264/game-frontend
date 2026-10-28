@@ -1059,6 +1059,11 @@
   .fs-asset-cards, .fs-asset-cheques { grid-template-columns: repeat(3, 1fr); }
 }
 
+@media (min-width: 768px) {
+  .fs-profile-page .fs-profile-layout { margin-bottom: 17px; }
+  .fs-profile-page .fs-about-entry { margin-top: auto; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .forsale-root *, .forsale-root *::before, .forsale-root *::after {
     scroll-behavior: auto !important; animation: none !important; transition: none !important;
