@@ -53,7 +53,7 @@ export function PlayerAvatar({
 }
 
 function Brand() {
-  return <><LoveLetterMark size={36} /><span><b>掌心密信</b>
+  return <><LoveLetterMark size={36} /><span className={styles.brandText}><b>掌心密信</b>
     <small>PALM LETTER · THE QUIET COURT</small></span></>;
 }
 

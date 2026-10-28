@@ -252,6 +252,17 @@ test('Love Letter public pages follow the shared responsive frame', async ({
     await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /分享游戏/ })).toBeVisible();
     if (viewport.width <= 390) {
+      const brand = page.getByRole('link', { name: '掌心密信游戏大厅' });
+      const logoBox = await brand.locator('> span').first().boundingBox();
+      const iconBox = await brand.locator('> span').first().locator('svg').boundingBox();
+      expect(logoBox).not.toBeNull();
+      expect(iconBox).not.toBeNull();
+      expect(Math.abs(
+        logoBox!.x + logoBox!.width / 2 - (iconBox!.x + iconBox!.width / 2),
+      )).toBeLessThanOrEqual(1);
+      expect(Math.abs(
+        logoBox!.y + logoBox!.height / 2 - (iconBox!.y + iconBox!.height / 2),
+      )).toBeLessThanOrEqual(1);
       const heroBox = await hero.boundingBox();
       expect(heroBox).not.toBeNull();
       expect(heroBox!.height).toBeGreaterThanOrEqual(225);
