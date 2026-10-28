@@ -25,7 +25,7 @@ export const roleName = (role: Role) =>
 export const pad = (value: number) => String(value).padStart(2, '0');
 
 export function Brand({ small = false }: { small?: boolean }) {
-  return <div className={`brand ${small ? 'brand-small' : ''}`}>
+  return <div className={`brand ${small ? 'brand-small' : ''}`} data-game-brand>
     <span className="brand-mark"><Route size={21} /></span>
     <span><b>FUGITIVE</b><small>逃 亡 者</small></span>
   </div>;

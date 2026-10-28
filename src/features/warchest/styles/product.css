@@ -223,6 +223,10 @@
 .warchest-root .replay-controls span { min-width: 70px; text-align: center; font-size: 11px; }
 @keyframes warchest-load { 0% { transform: scaleX(0); } 55% { transform: scaleX(1); } 100% { transform: translateX(100%); } }
 @media (max-width: 760px) {
+  .warchest-root [data-game-brand] { gap: 8px !important; }
+  .warchest-root .sidebar { display: none; }
+  .warchest-root .app-top { margin-left: 0; }
+  .warchest-root .page { margin-left: 0; }
   .warchest-root .mobile-bottom nav a { gap: 4px; }
   .warchest-root .mobile-bottom nav a span { font-size: 10px; }
   .warchest-root .rank-row { grid-template-columns: 42px 1fr 58px 58px; gap: 7px; }
@@ -343,10 +347,15 @@
   .warchest-root .battle-timer { min-width: 44px; font-size: 10px; }
   .warchest-root .warchest-lineup .lineup-cards > div > .troop-art { height: 176px; width: 118px; }
   .warchest-root .warchest-lineup .lineup-cards > div > .coin { top: 149px; }
-  .warchest-root .room-heading { flex-direction: column; align-items: stretch; gap: 12px; }
+  .warchest-root [data-game-room-heading] { flex-direction: column; align-items: stretch; gap: 16px; margin: 0 2px 17px; }
   .warchest-root .room-heading-identity { gap: 10px; }
-  .warchest-root .room-back-button { width: 34px; height: 34px; }
+  .warchest-root .room-back-button { width: 36px; height: 36px; }
+  .warchest-root [data-game-room-heading-copy] { display: flex; min-width: 0; flex: 1; justify-content: center; flex-direction: column; gap: 4px; }
+  .warchest-root [data-game-room-heading-kicker],
+  .warchest-root [data-game-room-heading-kicker] > .eyebrow { font-size: 6px !important; line-height: 1.5 !important; }
+  .warchest-root [data-game-room-heading-title] { min-width: 0; gap: 10px; margin: 0; overflow: hidden; font-size: 21px; line-height: 1.35; white-space: nowrap; }
+  .warchest-root [data-game-room-heading-meta] { display: none; }
   .warchest-root .room-heading-actions { width: 100%; gap: 8px; }
-  .warchest-root .room-heading-actions .button { flex: 1; min-height: 35px; padding: 0 10px; gap: 5px; font-size: 10px; }
+  .warchest-root .room-heading-actions .button { display: inline-flex !important; flex: 1; min-height: 35px; padding: 0 10px; gap: 5px; font-size: 10px; }
   .warchest-root .room-heading-actions .button > svg { width: 14px; height: 14px; }
 }

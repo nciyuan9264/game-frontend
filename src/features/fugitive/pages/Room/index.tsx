@@ -1,5 +1,6 @@
 import { useMemo, useState } from 'react';
 import {
+  ArrowLeft,
   ArrowRight,
   Check,
   Clock3,
@@ -80,12 +81,19 @@ export function Room({
   };
 
   return <main className="page-content waiting-page framework-waiting">
-    <div className="waiting-room-heading">
-      <Eyebrow>BEFORE THE CHASE</Eyebrow>
-      <h1>{roomName}<span className="pill">准备中</span></h1>
-      <p>房间号 <b>{data.roomID}</b><span>·</span>
-        {data.visibility === 'private' ? '私密房间' : '公开房间'}</p>
-      <div className="waiting-header-actions">
+    <div className="waiting-room-heading" data-game-room-heading>
+      <div className="waiting-heading-identity" data-game-room-heading-identity>
+        <button className="icon-button waiting-back-button" data-game-room-heading-back
+          type="button" aria-label="离开当前房间" onClick={onLeave}>
+          <ArrowLeft size={19} /></button>
+        <div data-game-room-heading-copy>
+          <span data-game-room-heading-kicker><Eyebrow>BEFORE THE CHASE</Eyebrow></span>
+          <h1 data-game-room-heading-title>{roomName}<span className="pill">准备中</span></h1>
+          <p data-game-room-heading-meta>房间号 <b>{data.roomID}</b><span>·</span>
+            {data.visibility === 'private' ? '私密房间' : '公开房间'}</p>
+        </div>
+      </div>
+      <div className="waiting-header-actions" data-game-room-heading-actions>
         {owner && <button className="button secondary" type="button" onClick={openSettings}>
           <Settings2 size={17} />房间设置
         </button>}

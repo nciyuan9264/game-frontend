@@ -82,15 +82,15 @@ export function Room({
   };
 
   return <div className={styles.page}>
-    <header className={styles.heading}>
-      <div className={styles.headingIdentity}>
-        <button type="button" className={styles.backButton}
+    <header className={styles.heading} data-game-room-heading>
+      <div className={styles.headingIdentity} data-game-room-heading-identity>
+        <button type="button" className={styles.backButton} data-game-room-heading-back
           aria-label="离开当前房间" onClick={onLeave}>
           <ArrowLeft size={19} /></button>
-        <div><small>A TABLE FOR TWO · 房间号</small>
-          <h1>{data.roomID}<span>准备中</span></h1></div>
+        <div data-game-room-heading-copy><small data-game-room-heading-kicker>A TABLE FOR TWO · 房间号</small>
+          <h1 data-game-room-heading-title>{data.roomID}<span>准备中</span></h1></div>
       </div>
-      <div>{owner && <ActionButton onClick={roomProps.onSettings}>
+      <div data-game-room-heading-actions>{owner && <ActionButton onClick={roomProps.onSettings}>
         <Info size={15} />棋室设置
       </ActionButton>}
         <ActionButton variant="primary" onClick={roomProps.onInvite}>

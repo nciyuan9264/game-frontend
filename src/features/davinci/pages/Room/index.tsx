@@ -82,22 +82,23 @@ export function Room({
   };
 
   return <div className={styles.page}>
-    <header className={styles.heading}>
-      <div className={styles.headingIdentity}>
+    <header className={styles.heading} data-game-room-heading>
+      <div className={styles.headingIdentity} data-game-room-heading-identity>
         <button
           type="button"
           className={styles.backButton}
+          data-game-room-heading-back
           aria-label="离开当前房间"
           onClick={onLeave}
         >
           <ArrowLeft size={19} />
         </button>
-        <div>
-          <small>CIPHER ROOM · 房间号</small>
-          <h1>{data.roomID}<span>准备中</span></h1>
+        <div data-game-room-heading-copy>
+          <small data-game-room-heading-kicker>CIPHER ROOM · 房间号</small>
+          <h1 data-game-room-heading-title>{data.roomID}<span>准备中</span></h1>
         </div>
       </div>
-      <div>
+      <div data-game-room-heading-actions>
         {owner && <ActionButton onClick={() => {
           setVisibility(data.visibility);
           setPanel('settings');

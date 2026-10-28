@@ -76,12 +76,14 @@ export function AppShell({
   title,
   profile,
   room = false,
+  showRoomBack = room,
   compactMobileFooter = false,
 }: {
   children: ReactNode;
   title: string;
   profile?: AuthProfile;
   room?: boolean;
+  showRoomBack?: boolean;
   compactMobileFooter?: boolean;
 }) {
   const navigate = useNavigate();
@@ -117,8 +119,9 @@ export function AppShell({
         </aside>}
         <div className="topbar">
           <header className="app-header">
-            {room && <button className="icon-button" type="button" aria-label="返回大厅"
-              onClick={() => navigate('/game/fugitive')}><ArrowLeft size={20} /></button>}
+            {showRoomBack && <button className="icon-button" type="button"
+              aria-label="返回大厅" onClick={() => navigate('/game/fugitive')}>
+              <ArrowLeft size={20} /></button>}
             <Brand /><span className="header-line" /><span className="breadcrumb">{title}</span>
             <span className="spacer" /><span className="local-label"><i />在线</span>
             {!room && <button className="icon-button platform-home" type="button"

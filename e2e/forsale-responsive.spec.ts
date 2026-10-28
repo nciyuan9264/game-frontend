@@ -330,10 +330,10 @@ test('For Sale mobile room follows the Acquire preparation layout',
         seatHeight: box?.height ?? 0,
       };
     });
-    expect(geometry.brandGap).toBe('14px');
+    expect(geometry.brandGap).toBe('8px');
     expect(geometry.columns).toBe(2);
     expect(geometry.headingGap).toBeLessThanOrEqual(4);
-    expect(geometry.markMarginRight).toBe('2px');
+    expect(geometry.markMarginRight).toBe('0px');
     expect(geometry.paddingLeft).toBe('10px');
     expect(geometry.paddingRight).toBe('10px');
     expect(geometry.seatWidth).toBeGreaterThan(160);

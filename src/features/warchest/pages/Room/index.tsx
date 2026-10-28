@@ -106,15 +106,15 @@ export function Room({
     ? playerDisplayName(data.players[draft.currentPickerID], draft.currentPickerID)
     : '下一位指挥官';
 
-  return <main className="page room-page"><div className="section-heading room-heading">
-    <div className="room-heading-identity"><button className="room-back-button" type="button"
-      aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button><div>
-      <Eyebrow>RAISE YOUR BANNER</Eyebrow><h1>{displayName}<span className="status-tag"><i />备战中</span></h1>
-      <div className="room-id"><span>房间号 <b>{data.roomID}</b></span>
+  return <main className="page room-page"><div className="section-heading room-heading" data-game-room-heading>
+    <div className="room-heading-identity" data-game-room-heading-identity><button className="room-back-button" data-game-room-heading-back type="button"
+      aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button>
+      <div data-game-room-heading-copy><span data-game-room-heading-kicker><Eyebrow>RAISE YOUR BANNER</Eyebrow></span><h1 data-game-room-heading-title>{displayName}<span className="status-tag"><i />备战中</span></h1>
+      <div className="room-id" data-game-room-heading-meta><span>房间号 <b>{data.roomID}</b></span>
         <button className="icon-button" type="button" aria-label="复制房间号"
           onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={14} /></button>
         <span>· {data.visibility === 'private' ? '私密房间' : '公开房间'} · 90 秒行动</span></div></div></div>
-    <div className="room-heading-actions">{owner && <button className="button secondary" type="button" onClick={() => {
+    <div className="room-heading-actions" data-game-room-heading-actions>{owner && <button className="button secondary" type="button" onClick={() => {
       setName(displayName); setVisibility(data.visibility); setPanel('settings');
     }}><Settings2 size={16} />房间设置</button>}
       <button className="button primary" type="button" onClick={() => { setCopyMessage(''); setPanel('invite'); }}>
@@ -196,6 +196,7 @@ export function Room({
       <h2>{players.length < 2 ? '沉着就位，准备出征。' : setup.complete ? '知己知彼，落子有方。' : '八兵公开，依序选将。'}</h2>
       <div className="room-rule-emblem"><Flag size={31} /><div><strong>6</strong><span>个据点，即刻获胜</span></div></div>
       <dl><div><dt>对局模式</dt><dd>双人完整基础版</dd></div>
+        <div><dt>房间范围</dt><dd>{data.visibility === 'private' ? '私密房间' : '公开房间'}</dd></div>
         <div><dt>编成方式</dt><dd>{setupModeName(setup.mode)}</dd></div>
         <div><dt>思考时间</dt><dd>固定 90 秒</dd></div>
         <div><dt>初始先手</dt><dd>{setup.initialPlayerID ? playerDisplayName(data.players[setup.initialPlayerID]) : '编成后确定'}</dd></div>

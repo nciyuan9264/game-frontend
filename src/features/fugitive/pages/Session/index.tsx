@@ -89,7 +89,7 @@ function Session({ roomID }: { roomID: string }) {
         onLeave={leave.confirm} />
     </AppShell>}
     {roomID && !connection.fatal && snapshot?.type === 'MATCH_SYNC'
-      && <AppShell room title="准备房间" profile={profile}>
+      && <AppShell room showRoomBack={false} title="准备房间" profile={profile}>
         {session.feedback && <div className="toast" role="alert">{session.feedback}</div>}
         {connectionNotice && <div className="toast" role="status">{connectionNotice}</div>}
         <Room session={session} data={snapshot} room={target.data.room}

@@ -65,12 +65,12 @@ export const Room = ({
     }
   };
 
-  return <div className="fs-room-page"><header className="fs-room-heading">
-    <div><button type="button" aria-label="离开当前房间" onClick={onLeave}>
-      <ArrowLeft size={19} /></button><span><small>THE SUNDAY AUCTION · 房间号</small>
-      <h1>{data.roomID}<em>准备中</em></h1><p>{
+  return <div className="fs-room-page"><header className="fs-room-heading" data-game-room-heading>
+    <div data-game-room-heading-identity><button type="button" data-game-room-heading-back aria-label="离开当前房间" onClick={onLeave}>
+      <ArrowLeft size={19} /></button><span data-game-room-heading-copy><small data-game-room-heading-kicker>THE SUNDAY AUCTION · 房间号</small>
+      <h1 data-game-room-heading-title>{data.roomID}<em>准备中</em></h1><p data-game-room-heading-meta>{
         data.visibility === 'private' ? '私密拍卖桌' : '公开拍卖桌'} · 新版经典规则</p>
-    </span></div><nav>{owner && <ActionButton onClick={() => {
+    </span></div><nav data-game-room-heading-actions>{owner && <ActionButton onClick={() => {
       setVisibility(data.visibility);
       setPanel('settings');
     }}><Settings2 size={16} />房间设置</ActionButton>}

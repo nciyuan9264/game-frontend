@@ -1061,8 +1061,8 @@
 }
 
 @media (max-width: 767px) {
-  .fs-brand { gap: 14px; }
-  .fs-brand .fs-mark { flex: 0 0 auto; margin-right: 2px; }
+  .fs-brand { gap: 8px; }
+  .fs-brand .fs-mark { flex: 0 0 auto; margin-right: 0; }
   .fs-room-page { padding-bottom: calc(126px + env(safe-area-inset-bottom)); }
   .fs-room-heading { align-items: stretch; gap: 12px; margin-bottom: 11px; }
   .fs-room-heading > div { min-width: 0; }

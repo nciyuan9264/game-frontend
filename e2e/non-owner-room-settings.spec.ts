@@ -36,6 +36,13 @@ const games = [
   { game: 'hive', maxPlayers: 2 },
 ] as const;
 
+async function expectVisibleRoomPrivacy(page: Page) {
+  const privacy = page.getByText(/私密房间|私密棋室|凭房间号加入/);
+  await expect.poll(async () => privacy.evaluateAll(elements =>
+    elements.some(element => element instanceof HTMLElement
+      && element.offsetParent !== null))).toBe(true);
+}
+
 function warChestSetup() {
   return {
     warchest: {
@@ -136,8 +143,7 @@ for (const config of games) {
       await expect(page.getByRole('button', {
         name: /房间设置|房间信息|棋室设置|棋室信息/,
       })).toHaveCount(0);
-      await expect(page.getByText(/私密房间|私密棋室|凭房间号加入/).first())
-        .toBeVisible();
+      await expectVisibleRoomPrivacy(page);
     });
 
   test(`${config.game} keeps room settings available to the owner`,

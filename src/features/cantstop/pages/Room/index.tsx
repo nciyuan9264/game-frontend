@@ -57,13 +57,13 @@ export function Room({
   };
 
   return <div className="cs-room-page">
-    <header className="cs-room-heading"><div>
-      <button type="button" aria-label="离开当前房间" onClick={onLeave}>
+    <header className="cs-room-heading" data-game-room-heading><div data-game-room-heading-identity>
+      <button type="button" data-game-room-heading-back aria-label="离开当前房间" onClick={onLeave}>
         <ArrowLeft size={19} /></button>
-      <span><small>THE PLAYFUL TABLE · 房间号</small>
-        <h1>{data.roomID}<em>准备中</em></h1>
-        <p>{data.visibility === 'private' ? '私密牌桌' : '公开牌桌'} · 经典登山规则</p></span>
-    </div><nav>{owner && <ActionButton onClick={() => {
+      <span data-game-room-heading-copy><small data-game-room-heading-kicker>THE PLAYFUL TABLE · 房间号</small>
+        <h1 data-game-room-heading-title>{data.roomID}<em>准备中</em></h1>
+        <p data-game-room-heading-meta>{data.visibility === 'private' ? '私密牌桌' : '公开牌桌'} · 经典登山规则</p></span>
+    </div><nav data-game-room-heading-actions>{owner && <ActionButton onClick={() => {
       setVisibility(data.visibility);
       setPanel('settings');
     }}><Settings2 size={16} />房间设置</ActionButton>}

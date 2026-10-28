@@ -160,10 +160,11 @@ export function GameAppShell({
     ].filter(Boolean).join(' ')}>
       {!hideHeader && <header className={classes.header}>
         {inMatch
-          ? <span className={classes.brand}>{renderBrand()}</span>
+          ? <span className={classes.brand} data-game-brand>{renderBrand()}</span>
           : <Link
             to={basePath}
             className={classes.brandLink ?? classes.brand}
+            data-game-brand
             aria-label={labels.home}
           >{renderBrand()}</Link>}
         <span className={classes.divider} />

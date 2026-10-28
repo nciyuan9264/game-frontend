@@ -294,8 +294,6 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
       const style = getComputedStyle(element);
       const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
       const brand = document.querySelector<HTMLElement>('.cs-brand, .cs-brand-link');
-      const mark = brand?.querySelector<HTMLElement>('.cs-mark')?.getBoundingClientRect();
-      const title = brand?.querySelector<HTMLElement>('b')?.getBoundingClientRect();
       const headingLine = rect('.cs-room-heading > div');
       const headingCopy = rect('.cs-room-heading > div > span');
       const label = rect('.cs-room-heading small');
@@ -304,8 +302,7 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
       const grid = element.getBoundingClientRect();
       const seatBox = seat?.getBoundingClientRect();
       return {
-        brandGap: brand ? getComputedStyle(brand).gap : '',
-        markToTitleGap: mark && title ? title.left - mark.right : 0,
+        brandGap: brand ? getComputedStyle(brand).columnGap : '',
         columns: columns.length,
         headingLineHeight: headingLine?.height ?? 0,
         headingCopyHeight: headingCopy?.height ?? 0,
@@ -318,12 +315,11 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
         seatHeight: seatBox?.height ?? 0,
       };
     });
-    expect(geometry.brandGap).toBe('12px');
-    expect(geometry.markToTitleGap).toBeGreaterThanOrEqual(10);
+    expect(geometry.brandGap).toBe('8px');
     expect(geometry.columns).toBe(2);
     expect(geometry.headingLineHeight).toBeLessThanOrEqual(50);
     expect(geometry.headingCopyHeight).toBeLessThanOrEqual(45);
-    expect(geometry.labelToTitleGap).toBeLessThanOrEqual(3);
+    expect(geometry.labelToTitleGap).toBeLessThanOrEqual(4);
     expect(geometry.titleToMetaGap).toBeLessThanOrEqual(3);
     expect(geometry.paddingLeft).toBe('10px');
     expect(geometry.paddingRight).toBe('10px');

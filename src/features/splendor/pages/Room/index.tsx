@@ -37,9 +37,9 @@ export function Room({ session, data, onLeave }: {
   const close = () => setPanel(undefined);
 
   return <div className={styles.page}>
-    <header className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开房间" onClick={onLeave}><ArrowLeft size={18} /></button>
-      <span><small>JEWEL SALON · 房间号</small><h1>{data.roomID}<em>准备中</em></h1></span></div>
-      <div>{owner && <ActionButton onClick={() => { setVisibility(data.visibility); setPanel('settings'); }}><Settings2 size={15} />房间设置</ActionButton>}
+    <header className={styles.heading} data-game-room-heading><div className={styles.headingIdentity} data-game-room-heading-identity><button type="button" className={styles.backButton} data-game-room-heading-back aria-label="离开房间" onClick={onLeave}><ArrowLeft size={18} /></button>
+      <span data-game-room-heading-copy><small data-game-room-heading-kicker>JEWEL SALON · 房间号</small><h1 data-game-room-heading-title>{data.roomID}<em>准备中</em></h1></span></div>
+      <div data-game-room-heading-actions>{owner && <ActionButton onClick={() => { setVisibility(data.visibility); setPanel('settings'); }}><Settings2 size={15} />房间设置</ActionButton>}
         <ActionButton variant="primary" onClick={() => { setCopyMessage(''); setPanel('invite'); }}><UserPlus size={15} />邀请好友</ActionButton></div></header>
     <div className={styles.roomLayout}><section className={styles.tablePanel}>
       <header className={styles.tableTitle}><span><Users size={16} />经典对局<i />{players.length} / {data.maxPlayers} 人</span>

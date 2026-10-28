@@ -1476,6 +1476,9 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
 .learning-card>svg{color:#8ca274}
 
 .waiting-room-heading{margin-bottom:18px}
+.waiting-heading-identity{display:flex;min-width:0;align-items:center;gap:15px}
+.waiting-heading-identity>div{min-width:0}
+.waiting-back-button{flex:0 0 auto}
 .waiting-room-heading h1{display:flex;align-items:center;gap:9px;font-size:27px;margin:9px 0}
 .waiting-room-heading p{display:flex;gap:9px;color:var(--muted);font-size:12px}
 .waiting-room-heading p b{color:#d8c29a;font-family:var(--mono);letter-spacing:2px}
@@ -1663,12 +1666,18 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .framework-lobby .mobile-lobby-join .lobby-join-card input{font-size:12px}
  .framework-lobby .mobile-lobby-join .lobby-join-card form button{width:42px}
  .framework-waiting{padding-bottom:215px}
- .waiting-room-heading>.eyebrow{font-size:8px}
- .waiting-room-heading h1{font-size:23px;line-height:1.4;margin:8px 0 9px;flex-wrap:wrap;gap:8px}
+ [data-game-brand]{gap:8px}
+ [data-game-room-heading]{display:flex;align-items:stretch;flex-direction:column;gap:16px;margin:0 2px 17px}
+ [data-game-room-heading-identity]{gap:10px}
+ [data-game-room-heading-back]{width:36px;min-width:36px;height:36px;min-height:36px}
+ [data-game-room-heading-copy]{display:flex;min-width:0;flex:1;justify-content:center;flex-direction:column;gap:4px}
+ [data-game-room-heading-kicker],[data-game-room-heading-kicker]>.eyebrow{font-size:6px!important;line-height:1.5!important}
+ [data-game-room-heading-title]{min-width:0;gap:10px!important;margin:0!important;font-size:21px!important;line-height:1.35!important;overflow:hidden;white-space:nowrap;flex-wrap:nowrap}
+ [data-game-room-heading-meta]{display:none!important}
+ [data-game-room-heading-actions]{display:flex;width:100%;gap:8px;margin:0}
+ [data-game-room-heading-actions]>.button{display:inline-flex!important;min-width:0;min-height:35px;flex:1;gap:5px;padding:0 10px;font-size:10px}
+ [data-game-room-heading-actions]>.button>svg{width:13px;height:13px}
  .waiting-room-heading h1>.pill{font-size:9px}
- .waiting-room-heading p{font-size:11px}
- .waiting-header-actions{margin-top:17px}
- .waiting-header-actions .button{font-size:12px}
  .room-seats-panel{padding:13px 12px}
  .room-seats-panel .eyebrow{font-size:8px;letter-spacing:1px}
  .room-seats-panel>.section-title>span{font-size:10px}

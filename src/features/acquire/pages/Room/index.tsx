@@ -41,8 +41,8 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
   const targetName = playerName(target, data.players);
   const hint = (children: ReactNode) => <div className={styles.dialogHint}><ShieldCheck size={16} /><span>{children}</span></div>;
   return <>
-    <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}<span>准备中</span></h1></div></div>
-      <div>{owner && <ActionButton onClick={props.onSettings}><Settings2 size={16} />房间设置</ActionButton>}
+    <div className={styles.heading} data-game-room-heading><div className={styles.headingIdentity} data-game-room-heading-identity><button type="button" className={styles.backButton} data-game-room-heading-back aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button><div data-game-room-heading-copy><small data-game-room-heading-kicker>CLASSIC TABLE · 房间号</small><h1 data-game-room-heading-title>{data.roomID}<span>准备中</span></h1></div></div>
+      <div data-game-room-heading-actions>{owner && <ActionButton onClick={props.onSettings}><Settings2 size={16} />房间设置</ActionButton>}
         <ActionButton variant="primary" onClick={props.onInvite}><UserPlus size={16} />邀请好友</ActionButton></div></div>
     {isMobile ? <RoomMobile {...props} /> : <RoomDesktop {...props} />}
     {panel === 'invite' && <ResponsiveDialog title="给朋友，留一个好位置。" eyebrow="BETTER AROUND ONE TABLE" onClose={close}
