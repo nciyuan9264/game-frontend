@@ -1,5 +1,28 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
+const roomID = 'cantstop_vfw7hms8fza5';
+const matchID = `${roomID}-r1`;
+const human = {
+  userID: 'cantstop-mobile',
+  playerID: 'cantstop-mobile',
+  displayName: 'N次元',
+  avatar: '',
+  seatIndex: 0,
+  online: true,
+  ai: false,
+  ready: true,
+};
+const ai = {
+  userID: '',
+  playerID: 'ai_2',
+  displayName: '阿橙',
+  avatar: '',
+  seatIndex: 1,
+  online: true,
+  ai: true,
+  ready: true,
+};
+
 async function mockPublic(page: Page) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
@@ -22,6 +45,60 @@ async function mockPublic(page: Page) {
       data: { totalGames: 6, wins: 2, winRate: 0.333, avgScore: 2.4 },
     },
   }));
+}
+
+function matchSnapshot() {
+  return {
+    schemaVersion: 2,
+    type: 'MATCH_SYNC',
+    roomID,
+    matchID,
+    seq: '5',
+    ownerID: human.playerID,
+    status: 'match',
+    playerID: human.playerID,
+    visibility: 'public',
+    maxPlayers: 4,
+    players: {
+      [human.playerID]: human,
+      [ai.playerID]: ai,
+    },
+    playerOrder: [human.playerID, ai.playerID],
+  };
+}
+
+async function mockMatchRoom(page: Page) {
+  await mockPublic(page);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        roomID,
+        gameType: 'cantstop',
+        status: 'match',
+        visibility: 'public',
+        ownerUserID: human.userID,
+        ownerPlayerID: human.playerID,
+        maxPlayers: 4,
+        playerCount: 2,
+        currentMatchID: matchID,
+        currentMatchStatus: 'preparing',
+        nextRoundNo: 1,
+        createdAt: '2026-10-28T00:00:00Z',
+        updatedAt: '2026-10-28T00:00:00Z',
+        displayName: '再高一点',
+        turnTimeoutSeconds: 60,
+        players: [human, ai],
+        metrics: {
+          cantstop: { maxClaimedColumns: 0, progressCurrent: 0, progressTotal: 3 },
+        },
+      },
+    },
+  }));
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify(matchSnapshot()));
+  });
 }
 
 const expectNoOverflow = async (page: Page) => {
@@ -75,4 +152,60 @@ test('Cant Stop mobile lobby uses the Acquire scale and spacing',
     );
     await expectNoOverflow(page);
     await capture(page, info, 'lobby-mobile');
+  });
+
+test('Cant Stop mobile room follows the Acquire preparation layout',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await mockMatchRoom(page);
+    await page.goto(`/game/cantstop/match?roomID=${roomID}`);
+    await expect(page.locator('.cs-room-page')).toBeVisible();
+    await expect(page.getByRole('heading', { name: roomID })).toBeVisible();
+    await expect(page.locator('.cs-seat')).toHaveCount(4);
+
+    const geometry = await page.locator('.cs-seat-grid').evaluate(element => {
+      const rect = (selector: string) =>
+        document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
+      const seat = element.querySelector<HTMLElement>('.cs-seat');
+      const style = getComputedStyle(element);
+      const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
+      const brand = document.querySelector<HTMLElement>('.cs-brand, .cs-brand-link');
+      const mark = brand?.querySelector<HTMLElement>('.cs-mark')?.getBoundingClientRect();
+      const title = brand?.querySelector<HTMLElement>('b')?.getBoundingClientRect();
+      const headingLine = rect('.cs-room-heading > div');
+      const headingCopy = rect('.cs-room-heading > div > span');
+      const label = rect('.cs-room-heading small');
+      const roomName = rect('.cs-room-heading h1');
+      const roomMeta = rect('.cs-room-heading p');
+      const grid = element.getBoundingClientRect();
+      const seatBox = seat?.getBoundingClientRect();
+      return {
+        brandGap: brand ? getComputedStyle(brand).gap : '',
+        markToTitleGap: mark && title ? title.left - mark.right : 0,
+        columns: columns.length,
+        headingLineHeight: headingLine?.height ?? 0,
+        headingCopyHeight: headingCopy?.height ?? 0,
+        labelToTitleGap: label && roomName ? roomName.top - label.bottom : 0,
+        titleToMetaGap: roomName && roomMeta ? roomMeta.top - roomName.bottom : 0,
+        paddingLeft: style.paddingLeft,
+        paddingRight: style.paddingRight,
+        seatInset: seatBox ? seatBox.left - grid.left : 0,
+        seatWidth: seatBox?.width ?? 0,
+        seatHeight: seatBox?.height ?? 0,
+      };
+    });
+    expect(geometry.brandGap).toBe('12px');
+    expect(geometry.markToTitleGap).toBeGreaterThanOrEqual(10);
+    expect(geometry.columns).toBe(2);
+    expect(geometry.headingLineHeight).toBeLessThanOrEqual(50);
+    expect(geometry.headingCopyHeight).toBeLessThanOrEqual(45);
+    expect(geometry.labelToTitleGap).toBeLessThanOrEqual(3);
+    expect(geometry.titleToMetaGap).toBeLessThanOrEqual(3);
+    expect(geometry.paddingLeft).toBe('10px');
+    expect(geometry.paddingRight).toBe('10px');
+    expect(geometry.seatInset).toBe(10);
+    expect(geometry.seatWidth).toBeGreaterThan(160);
+    expect(geometry.seatHeight).toBeLessThanOrEqual(140);
+    await expectNoOverflow(page);
+    await capture(page, info, 'room-mobile');
   });

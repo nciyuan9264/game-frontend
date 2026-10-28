@@ -90,6 +90,7 @@ const classes = {
   railBottom: 'cs-rail-bottom',
   main: 'cs-main',
   header: 'cs-header',
+  brand: 'cs-brand',
   brandLink: 'cs-brand-link',
   divider: 'cs-divider',
   breadcrumb: 'cs-breadcrumb',
