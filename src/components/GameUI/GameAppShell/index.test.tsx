@@ -58,6 +58,9 @@ describe('GameAppShell', () => {
     expect(screen.getByText('排行榜')).toBeTruthy();
     expect(screen.getByText('CONTENT')).toBeTruthy();
     expect(screen.getByText('FEEDBACK')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell="app"]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-header]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-content]')).toBeTruthy();
   });
 
   it('supports match and hidden shell modes', () => {
@@ -70,6 +73,7 @@ describe('GameAppShell', () => {
     );
     expect(container.querySelector('aside')).toBeNull();
     expect(container.querySelector('header')).toBeNull();
+    expect(container.querySelector('[data-game-shell="match"]')).toBeTruthy();
     expect(screen.queryByRole('navigation', { name: '测试手机导航' })).toBeNull();
     expect(screen.getByText('GAME')).toBeTruthy();
   });

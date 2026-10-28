@@ -1,6 +1,6 @@
 .page {
-  max-width: 1180px;
-  margin: 0 auto;
+  width: 100%;
+  margin: 0;
   --game-primary: #e2915d;
   --game-primary-gradient: linear-gradient(120deg,#f0aa76,#e2915d);
   --game-primary-border: #efb07e;
@@ -521,8 +521,8 @@
 }
 
 .guideLayout {
-  max-width: 1120px;
-  margin: 24px auto 0;
+  width: 100%;
+  margin: 24px 0 0;
 }
 
 .guideAside {
@@ -801,9 +801,8 @@
 
   .guideLayout {
     display: grid;
-    grid-template-columns: minmax(340px,430px) minmax(0,650px);
+    grid-template-columns: minmax(340px,430px) minmax(0,1fr);
     align-items: stretch;
-    justify-content: center;
     gap: 26px;
   }
 

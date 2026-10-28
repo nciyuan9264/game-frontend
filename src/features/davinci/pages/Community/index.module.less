@@ -44,7 +44,7 @@
   .active { color: #dfc28a; border-color: var(--game-accent); }
 }
 .guideHint { display: flex; align-items: center; gap: 8px; margin-bottom: 20px; color: #8f9991; font-size: 11px; }
-.profileLayout { display: grid; grid-template-columns: 380px minmax(0,680px); align-items: start; justify-content: center; gap: 28px; margin-top: 30px; }
+.profileLayout { display: grid; grid-template-columns: 380px minmax(0,1fr); align-items: start; gap: 28px; margin-top: 30px; }
 .profileDisplay { display: flex; min-width: 0; padding: 29px 25px 23px; flex-direction: column; border: 1px solid #626a5d6b; border-radius: 8px;
   background: radial-gradient(ellipse at 50% 0,#aa9a6b17,transparent 68%),#151916; box-shadow: inset 0 1px #f4e8c00a,0 12px 32px #0003;
 }
@@ -78,7 +78,7 @@
 }
 .win { color: #bde1ca; background: #47735a66; }
 .loss { color: #edb0a8; background: #77494066; }
-.aboutEntry { display: flex; align-items: center; gap: 12px; width: min(1088px,100%); min-height: 58px; margin: 22px auto 0; padding: 10px 4px; border: 0; border-top: 1px solid #3d48416e; color: #aeb7b0; background: transparent; text-align: left;
+.aboutEntry { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 58px; margin: 22px 0 0; padding: 10px 4px; border: 0; border-top: 1px solid #3d48416e; color: #aeb7b0; background: transparent; text-align: left;
   > span:nth-child(2) { min-width: 0; } > svg:last-child { margin-left: auto; color: #6f7d74; }
   b, small { display: block; } b { color: #d1d5cf; font-size: 11px; font-weight: 500; } small { margin-top: 3px; color: #7f8982; font-size: 9px; }
 }
@@ -96,7 +96,7 @@
 .aboutLegal { margin-top: 17px; color: #7f8982; font-size: 9px; line-height: 1.8; }
 
 @media (min-width: 768px) {
-  .guideLayout { max-width: 1040px; }
+  .guideLayout { width: 100%; }
   .tileDemo { min-height: 520px; }
   .guidePanel { min-height: 520px; }
   .profilePage { display: flex; height: calc(100dvh - 116px); min-height: 560px; flex-direction: column; }
@@ -105,7 +105,7 @@
   .profileHistory { min-height: 0; overflow-y: auto; }
 }
 @media (min-width: 1200px) {
-  .guideLayout { max-width: 1120px; }
+  .guideLayout { width: 100%; }
   .tileDemo { min-height: 560px; }
   .guidePanel { min-height: 560px; }
 }

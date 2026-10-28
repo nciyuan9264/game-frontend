@@ -636,7 +636,7 @@
   backdrop-filter: blur(12px); }
 
 /* Community */
-.fs-community { max-width: 1120px; margin: auto; padding-bottom: 30px; }
+.fs-community { width: 100%; margin: 0; padding-bottom: 30px; }
 .fs-community-heading { display: flex; align-items: center; justify-content: space-between;
   gap: 15px; margin-bottom: 20px; }
 .fs-community-heading h1 { margin-top: 7px; font-size: 24px; font-weight: 500; }

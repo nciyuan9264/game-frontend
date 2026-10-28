@@ -122,7 +122,7 @@ export function GameAppShell({
   const showRail = !hideRail && (!inMatch || showRailInMatch);
   const fallbackProfile = profile ?? { name: '玩家' };
 
-  return <div className={shellClassName}>
+  return <div className={shellClassName} data-game-shell={inMatch ? 'match' : 'app'}>
     {showRail && <aside className={classes.rail}>
       {inMatch
         ? <span className={classes.monogram}>{renderMark()}</span>
@@ -158,7 +158,7 @@ export function GameAppShell({
       classes.main,
       compactMobileFooter ? layoutStyles.compactMobileShell : '',
     ].filter(Boolean).join(' ')}>
-      {!hideHeader && <header className={classes.header}>
+      {!hideHeader && <header className={classes.header} data-game-shell-header>
         {inMatch
           ? <span className={classes.brand} data-game-brand>{renderBrand()}</span>
           : <Link
@@ -196,7 +196,7 @@ export function GameAppShell({
       <main className={[
         classes.content,
         compactMobileFooter ? layoutStyles.compactMobileFooter : '',
-      ].filter(Boolean).join(' ')}>{children}</main>
+      ].filter(Boolean).join(' ')} data-game-shell-content>{children}</main>
     </div>
     {!inMatch && <nav className={classes.mobileNav} aria-label={labels.mobileNavigation}>
       {navigation.map(item => <NavLink

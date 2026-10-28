@@ -16,6 +16,17 @@
 }
 
 @media (min-width: 768px) {
+  [data-game-shell='app'] [data-game-shell-header],
+  [data-game-shell='app'] [data-game-shell-content] {
+    box-sizing: border-box;
+    width: 100%;
+    max-width: 1700px;
+    margin-right: auto;
+    margin-left: auto;
+    padding-right: 32px;
+    padding-left: 32px;
+  }
+
   header [data-game-brand] > :first-child:not(:only-child),
   header [data-game-brand] > :only-child > :first-child:not(:only-child) {
     display: none;
@@ -40,6 +51,14 @@
       flex: 1;
       flex-direction: column;
     }
+  }
+}
+
+@media (min-width: 768px) and (max-width: 1199px) {
+  [data-game-shell='app'] [data-game-shell-header],
+  [data-game-shell='app'] [data-game-shell-content] {
+    padding-right: 22px;
+    padding-left: 22px;
   }
 }
 
