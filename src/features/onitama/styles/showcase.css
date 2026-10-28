@@ -637,7 +637,7 @@
 
   @media (max-width: 759px) {
     .button { min-height: 44px; }
-    .game-header { height: 52px; gap: 3px; padding: 0 10px; }
+    .game-header { height: var(--game-mobile-header-height, 57px); gap: 3px; padding: 0 10px; }
     .game-header .brand { margin: 0 2px; }
     .game-header-title { padding: 0 3px; }
     .game-header-title strong { font-size: 11px; }

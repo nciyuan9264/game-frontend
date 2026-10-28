@@ -142,7 +142,7 @@
 }
 @media (max-width:767px) {
   .play { padding-bottom:calc(72px + env(safe-area-inset-bottom)); }
-  .topbar { height:50px; gap:8px; padding:0 9px;
+  .topbar { height:var(--game-mobile-header-height,57px); gap:8px; padding:0 9px;
     > button:not([data-game-action-button]) { width:31px; height:36px; }
     > span:nth-of-type(1) { display:none; }
     .divider,.room small { display:none; }

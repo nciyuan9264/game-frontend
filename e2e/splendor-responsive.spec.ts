@@ -170,6 +170,7 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
   const mobileBank = page.getByTestId('splendor-mobile-bank');
 
   await expect(market).toBeVisible();
+  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
   await expect(nobleTiles).toHaveCount(5);
   await expect(boardCards).toHaveCount(12);
 
@@ -283,6 +284,7 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
 
   const results = page.getByTestId('splendor-results');
   await expect(results).toBeVisible();
+  await expect(results.locator('> header')).toHaveCSS('height', '57px');
   await expect(results.getByRole('button', { name: '返回大厅' })).toHaveCount(0);
   await expect(results.getByText('结算结果来自本局服务端快照')).toHaveCount(0);
   await expect(results.getByRole('button', { name: '查看终局牌面' })).toBeVisible();
@@ -307,6 +309,7 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
 
   await results.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByTestId('splendor-market')).toBeVisible();
+  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
   const topbarStatus = page.getByTestId('splendor-topbar-status');
   const resultsButton = topbarStatus.getByRole('button', { name: '查看结算' });
   await expect(resultsButton).toBeVisible();

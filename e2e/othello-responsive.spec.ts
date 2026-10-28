@@ -207,7 +207,7 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   await expect.poll(() => board.evaluate(element =>
     getComputedStyle(element).colorScheme)).toBe('light only');
   const topbarBox = await page.locator('header').first().boundingBox();
-  expect(topbarBox?.height).toBe(50);
+  expect(topbarBox?.height).toBe(57);
   await page.getByRole('button', { name: 'D3，可落子，翻转 1 枚' }).click();
   await expect.poll(() => commands.some(command =>
     command.includes('"game_place_disc"')

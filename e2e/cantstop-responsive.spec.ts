@@ -337,6 +337,7 @@ test('Cant Stop mobile choose phase keeps pairing controls visible',
     await page.goto(`/game/cantstop/match?roomID=${roomID}`);
 
     await expect(page.getByTestId('cantstop-play')).toBeVisible();
+    await expect(page.locator('.cs-game-header')).toHaveCSS('height', '57px');
     await expect(page.locator('.cs-dice-tray')).toBeVisible();
     await expect(page.locator('.cs-pairings button')).toHaveCount(2);
     await expect(page.getByRole('button', { name: '配对 1：7 和 3' })).toBeVisible();

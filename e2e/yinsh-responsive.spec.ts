@@ -191,7 +191,7 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   expect(Math.abs((opponentBox?.width ?? 0) - (selfBox?.width ?? 0)))
     .toBeLessThanOrEqual(1);
   const topbarBox = await page.locator('header').first().boundingBox();
-  expect(topbarBox?.height).toBe(50);
+  expect(topbarBox?.height).toBe(57);
   const dockAction = page.getByTestId('yinsh-mobile-dock')
     .getByRole('button', { name: '按坐标选择圆环' });
   await expect(dockAction).toHaveCSS('background-color', 'rgb(121, 68, 83)');

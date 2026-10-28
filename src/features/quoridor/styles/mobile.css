@@ -1,6 +1,6 @@
 @scope (.quoridor-root) {
 @media (max-width: 760px) {
-  .playing-page .top-shell { height: 52px; }
+  .playing-page .top-shell { height: var(--game-mobile-header-height, 57px); }
 }
 /* Mobile v1.1: touch first, with unchanged system-shell components. */
 .phone-wall-bar { display: none; }
@@ -171,7 +171,12 @@
     min-height: calc(66px + env(safe-area-inset-bottom));
     padding: 10px 17px calc(11px + env(safe-area-inset-bottom));
   }
-  :scope.q-app.playing-page .app-header { width: 100%; min-width: 0; overflow: hidden; }
+  :scope.q-app.playing-page .app-header {
+    width: 100%;
+    min-width: 0;
+    height: var(--game-mobile-header-height, 57px);
+    overflow: hidden;
+  }
   :scope.q-app.playing-page .app-header > .header-context {
     display: flex;
     min-width: 0;

@@ -394,6 +394,7 @@ test('War Chest mobile battle submits only the service action ID', async ({ page
   await page.goto(`/game/warchest/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('warchest-board')).toBeVisible();
+  await expect(page.locator('.battle-header')).toHaveCSS('height', '57px');
   await expect(page.getByTestId('warchest-turn-status')).toHaveText(/轮到你行动/);
   const mobileBoardBox = await page.getByTestId('warchest-board').boundingBox();
   expect(mobileBoardBox?.width).toBeGreaterThan(340);
@@ -438,6 +439,7 @@ test('War Chest final board keeps history and results without the live menu', as
   })).toBeVisible();
   await page.getByRole('button', { name: '回到棋盘' }).click();
 
+  await expect(page.locator('.battle-header')).toHaveCSS('height', '57px');
   await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await page.getByRole('button', { name: '打开战报' }).click();

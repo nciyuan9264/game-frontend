@@ -320,6 +320,8 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
 
   const board = page.getByRole('group', { name: 'Quoridor 九乘九棋盘' });
   await expect(board).toBeVisible();
+  await expect(page.locator('.playing-page > .top-shell > .app-header'))
+    .toHaveCSS('height', '57px');
   await expect(board.getByTestId(/^cell-/)).toHaveCount(81);
   const actionButton = page.getByRole('button', { name: '当前行动状态' });
   await expect(actionButton).toBeDisabled();
@@ -374,6 +376,8 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看棋盘' }).click();
+  await expect(page.locator('.playing-page > .top-shell > .app-header'))
+    .toHaveCSS('height', '57px');
   await expect(page.getByRole('group', {
     name: 'Quoridor 九乘九棋盘',
   })).toBeVisible();

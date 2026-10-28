@@ -348,6 +348,7 @@ test('For Sale mobile auction keeps cards and actions usable',
     const commands = await mockSession(page, 3);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.getByTestId('forsale-play')).toBeVisible();
+    await expect(page.locator('.fs-game-header')).toHaveCSS('min-height', '57px');
     await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
     await expect(page.getByLabel('总出价金币')).toHaveValue('3');
     await page.getByRole('button', { name: '退出本轮' }).click();

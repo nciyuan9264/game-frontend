@@ -347,6 +347,7 @@ test('Hive mobile submits only service-provided placement and movement', async (
 
   const board = page.getByRole('group', { name: '无边界六边形棋盘' });
   await expect(board).toBeVisible();
+  await expect(page.locator('.hive-game-header')).toHaveCSS('height', '57px');
   expect((await board.boundingBox())?.width).toBeGreaterThanOrEqual(360);
   await page.getByTestId('cell--2,1').click();
   await expect(page.getByRole('button', { name: '确认部署' })).toBeEnabled();

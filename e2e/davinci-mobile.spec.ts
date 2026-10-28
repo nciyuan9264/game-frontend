@@ -256,6 +256,7 @@ test('DaVinci final board can reopen the results panel on mobile', async ({ page
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();
   await page.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
+  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
   await expectNoHorizontalOverflow(page);
   await page.setViewportSize({ width: 356, height: 783 });
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
@@ -270,6 +271,7 @@ test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
   await expect(page.getByText('确认初始密码')).toBeVisible();
+  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
   await expect(page.getByRole('button', { name: /确认牌序/ })).toBeEnabled();
   const canvas = page.locator('canvas');
   await expect(canvas).toBeVisible();

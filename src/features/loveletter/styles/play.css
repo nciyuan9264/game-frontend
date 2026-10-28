@@ -20,3 +20,4 @@
 @media(max-width:767px) and (min-height:760px){
  .loveletter-root .ll-hand-cards{min-height:270px;align-items:center}
 }
+@media(max-width:767px){.loveletter-root .ll-results>header{height:var(--game-mobile-header-height,57px)}}

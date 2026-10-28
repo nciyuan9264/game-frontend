@@ -22,7 +22,7 @@ const ai = {
   ready: true,
 };
 
-function gameSnapshot() {
+function gameSnapshot(status = 'play') {
   return {
     schemaVersion: 2,
     type: 'ROOM_SYNC',
@@ -66,7 +66,7 @@ function gameSnapshot() {
         },
         roomData: {
           currentPlayer: human.playerID,
-          gameStatus: 'play',
+          gameStatus: status,
           roundNo: 2,
           goal: 6,
           deckCount: 12,
@@ -321,6 +321,7 @@ test('Love Letter mobile submits guard target and guess atomically', async ({
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('loveletter-play')).toBeVisible();
+  await expect(page.locator('.ll-game-header')).toHaveCSS('height', '57px');
   const identityPortraitLocator = page.locator(
     '.ll-hand > header > .ll-portrait',
   );
@@ -354,4 +355,13 @@ test('Love Letter mobile submits guard target and guess atomically', async ({
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-play');
   expect(pageErrors).toEqual([]);
+});
+
+test('Love Letter mobile results keep the shared topbar height', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('end'));
+  await page.goto(`/game/loveletter/match?roomID=${roomID}`);
+
+  await expect(page.locator('.ll-results')).toBeVisible();
+  await expect(page.locator('.ll-results > header')).toHaveCSS('height', '57px');
 });

@@ -384,6 +384,7 @@ test('Onitama confirms a service-provided move before submitting', async ({
 
   const board = page.getByRole('grid', { name: '御神乐棋 5 乘 5 棋盘' });
   await expect(board).toBeVisible();
+  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
   await expect(board.getByRole('gridcell')).toHaveCount(25);
   await expect.poll(() => board.evaluate(element => {
     const grid = getComputedStyle(element);
@@ -432,6 +433,7 @@ test('Onitama results return to a compact final board', async ({
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看终局棋盘' }).click();
+  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
   await expect(page.getByRole('grid', {
     name: '御神乐棋 5 乘 5 棋盘',
   })).toBeVisible();

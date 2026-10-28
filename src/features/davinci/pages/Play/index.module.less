@@ -57,8 +57,8 @@
 @keyframes pulse { 50% { opacity: .4; } }
 
 @media (max-width: 767px) {
-  .play { grid-template-rows: 56px 38px minmax(0,1fr) 31px; }
-  .initializing { grid-template-rows: 56px 38px minmax(0,1fr) 48px; }
+  .play { grid-template-rows: var(--game-mobile-header-height,57px) 38px minmax(0,1fr) 31px; }
+  .initializing { grid-template-rows: var(--game-mobile-header-height,57px) 38px minmax(0,1fr) 48px; }
   .topbar { grid-template-columns: 115px minmax(0,1fr) 85px; gap: 7px; padding: 0 8px; }
   .roomTools { gap: 6px; > button { width: 31px; height: 31px; } }
   .phase { gap: 6px; strong { font-size: 11px; } small { font-size: 7px; } }
@@ -81,8 +81,8 @@
   .rules > div { grid-template-columns: 1fr; }
 }
 @media (orientation: landscape) and (max-height: 500px) {
-  .play { grid-template-rows: 45px 30px minmax(0,1fr) 26px; }
-  .initializing { grid-template-rows: 45px 30px minmax(0,1fr) 42px; }
+  .play { grid-template-rows: var(--game-mobile-header-height,57px) 30px minmax(0,1fr) 26px; }
+  .initializing { grid-template-rows: var(--game-mobile-header-height,57px) 30px minmax(0,1fr) 42px; }
   .topbar { grid-template-columns: 140px minmax(0,1fr) 90px; }
   .roomTools > button, .ruleButton, .timer { height: 28px; }
   .phase small { display: none; }
