@@ -82,6 +82,80 @@ describe('for sale protocol', () => {
     expect(room.roomData.transitionTimeoutMs).toBe(8000);
   });
 
+  it('parses the production lowercase forsale room view while waiting for game ready', () => {
+    const room = parseServerMessage(JSON.stringify({
+      schemaVersion: 2,
+      type: 'ROOM_SYNC',
+      roomID: 'sale-room',
+      matchID: 'sale-room-r1',
+      seq: '4',
+      view: {
+        forsale: {
+          playerId: '7',
+          ownerID: '7',
+          visibility: 'public',
+          playerData: {
+            '7': {
+              seatIndex: 0,
+              bid: 0,
+              passed: false,
+              propertyCount: 0,
+              chequeCount: 0,
+              locked: false,
+              coins: 28,
+              properties: null,
+              cheques: null,
+            },
+            ai_2: {
+              seatIndex: 1,
+              bid: 0,
+              passed: false,
+              propertyCount: 0,
+              chequeCount: 0,
+              locked: false,
+            },
+          },
+          roomData: {
+            gameStatus: 'waiting',
+            round: 1,
+            totalRounds: 8,
+            propertyMarket: [12, 28, 29],
+            chequeMarket: null,
+            highestBid: 0,
+            currentPlayer: '7',
+            starterPlayer: '7',
+            lockedCount: 0,
+            purchases: [],
+            sales: [],
+            actionLog: null,
+            players: {
+              '7': { ...player, ready: false },
+              ai_2: {
+                userID: '',
+                playerID: 'ai_2',
+                displayName: '阿橙',
+                avatar: '',
+                seatIndex: 1,
+                online: true,
+                ai: true,
+                ready: true,
+              },
+            },
+            playerOrder: ['7', 'ai_2'],
+          },
+          result: {},
+        },
+      },
+    }));
+
+    expect(room?.type).toBe('ROOM_SYNC');
+    if (room?.type !== 'ROOM_SYNC') throw new Error('missing room snapshot');
+    expect(room.roomData.gameStatus).toBe('waiting');
+    expect(room.playerData['7'].properties).toEqual([]);
+    expect(room.roomData.actionLog).toEqual([]);
+    expect(room.roomData.chequeMarket).toEqual([]);
+  });
+
   it('serializes every for sale command into the camel-case union', () => {
     expect(createClientCommand(
       'forsale', 'm1', 'c1', 'game_bid', { amount: 7 },

@@ -134,7 +134,11 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
       playerOrder: envelope.playerOrder,
     };
   }
-  const view = envelope.view.forSale;
+  const view = envelope.view.forSale
+    ?? ((envelope.view as unknown) as Record<
+      string,
+      ForSaleRoomView | undefined
+    >).forsale;
   if (!view) return;
   return {
     ...common,
