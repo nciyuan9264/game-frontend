@@ -542,7 +542,7 @@ export function Play({
     </Dialog>}
     {!ended && ui.panel === 'menu' && <Dialog title="落步之外。"
       eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
-      <div className="menu">
+      <div className="menu-list" data-testid="quoridor-game-menu">
         <button type="button" onClick={() => ui.setPanel('activity')}>
           <History size={21} /><span><b>行棋记录</b>
             <small>查看本局每一次移动与放墙</small></span>
