@@ -201,7 +201,7 @@ export function Play({
   );
   const ownHand = data.roomData.hands[view];
   const opponentHand = data.roomData.hands[opponent];
-  const [, phaseDescription] = phaseCopy(data);
+  const [phaseTitle, phaseDescription] = phaseCopy(data);
 
   const commit = () => {
     if (!interactive || !ui.selectedCard) return;
@@ -405,9 +405,12 @@ export function Play({
 
       <main className="board-column">
         <PlayerStrip data={data} side={opponent} view={view} />
-        <div className="board-meta">
-          <span><i className="status-dot" />{phaseCopy(data)[0]}</span>
-          <span>第 {data.roomData.moveLog.length + 1} 步 <em>·</em> 5 × 5</span>
+        <div className={`board-meta ${myTurn ? 'is-your-turn' : ''}`}
+          data-testid="onitama-turn-status-desktop" role="status" aria-live="polite">
+          <span><i className={`side-dot ${activeSide}`} /><small>当前回合</small>
+            <strong>{phaseTitle}</strong></span>
+          <span>{sideName(activeSide)} <em>·</em>
+            第 {data.roomData.moveLog.length + 1} 步 <em>·</em> 5 × 5</span>
         </div>
         {board()}
         <div className="board-legend">
@@ -479,9 +482,13 @@ export function Play({
           : ui.selectedCard && (pendingMove || noMoves)
             ? `${CARDS[ui.selectedCard].name} → ${CARDS[data.roomData.transitCardID].name}`
             : '走棋后换入'}</small></div>
-      <div className="mobile-turn"><span><i className={`side-dot ${view}`} />
-        <strong>{phaseCopy(data)[0]}</strong>
-        <small>第 {data.roomData.moveLog.length + 1} 步</small></span>
+      <div className={`mobile-turn ${myTurn ? 'is-your-turn' : ''}`}
+        data-testid="onitama-turn-status-mobile" role="status" aria-live="polite">
+        <span><i className={`side-dot ${activeSide}`} /><span className="mobile-turn-copy">
+          <small>当前回合 · {sideName(activeSide)} · 第 {
+            data.roomData.moveLog.length + 1
+          } 步</small>
+          <strong>{phaseTitle}</strong></span></span>
         <button type="button" className="text-button"
           onClick={() => ui.inspectCard(ui.selectedCard ?? ownHand[0])}>
           向上为前方<ArrowUp size={12} /></button></div>

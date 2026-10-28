@@ -123,7 +123,7 @@ export function Board({
             'board-cell',
             (row + column) % 2 ? 'shade' : '',
             temple ? `temple ${row === 0 ? 'red' : 'blue'}` : '',
-            piece?.id === selectedPiece ? 'chosen' : '',
+            selectedPiece && piece?.id === selectedPiece ? 'chosen' : '',
             move ? 'legal' : '',
             pending ? 'pending' : '',
             move?.winning ? 'winning' : '',

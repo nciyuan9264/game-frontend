@@ -386,6 +386,9 @@ test('Onitama confirms a service-provided move before submitting', async ({
   await expect(board).toBeVisible();
   await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
   await expect(board.getByRole('gridcell')).toHaveCount(25);
+  const turnStatus = page.getByTestId('onitama-turn-status-mobile');
+  await expect(turnStatus).toContainText('当前回合 · 蓝方 · 第 1 步');
+  await expect(turnStatus).toContainText('轮到你了');
   await expect.poll(() => board.evaluate(element => {
     const grid = getComputedStyle(element);
     const cell = getComputedStyle(element.querySelector('[role="gridcell"]')!);
@@ -413,9 +416,10 @@ test('Onitama confirms a service-provided move before submitting', async ({
     && command.includes('"pieceID":"blue-master"')
     && command.includes('"row":2')
     && command.includes('"column":2'))).toBe(true);
-  await expect(page.locator('strong:visible', {
-    hasText: '松风 正在思考',
-  })).toBeVisible();
+  await expect(turnStatus).toContainText('当前回合 · 红方 · 第 2 步');
+  await expect(turnStatus).toContainText('松风 正在思考');
+  await expect(board.locator('.board-cell.chosen')).toHaveCount(0);
+  await expect(board.locator('.board-cell').first()).toHaveCSS('opacity', '1');
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-game');
   expect(pageErrors).toEqual([]);
@@ -459,6 +463,9 @@ test('Onitama desktop keeps cards, board, and journal visible', async ({
   await expect(page.getByRole('heading', { name: '对手的招式' })).toBeVisible();
   await expect(page.getByRole('heading', { name: '你的招式' })).toBeVisible();
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
+  const turnStatus = page.getByTestId('onitama-turn-status-desktop');
+  await expect(turnStatus).toContainText('当前回合');
+  await expect(turnStatus).toContainText('轮到你了');
   await expectNoOverflow(page);
   await capture(page, testInfo, 'game-1440x900');
 });
