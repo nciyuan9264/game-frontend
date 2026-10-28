@@ -11,13 +11,16 @@ import {
   Route,
   X,
 } from 'lucide-react';
+import hero from '../assets/hero.webp';
+import people from '../assets/people.webp';
+import scenes from '../assets/scenes.webp';
 import { DECK_SOURCE_PAGE } from '../model/deck';
 import type { Card, Role } from '../model/types';
 
 export const ART = {
-  hero: 'https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/ff3c115f3fd61a4ca2ec4c415d748e87d6930984e6d2ed4878157b5d387b70c3.webp',
-  scenes: 'https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/de49b943ca6b19142d1b803bcb1f9a523b68332eb6f53ae350efc71db74ed9de.webp',
-  people: 'https://cdn-tos-cn.bytedance.net/obj/tiktok-web-ai-cn/fd29d16b16cb252ced810f35d192b0557fb81d556bef3905109fff9974e0d92a.webp',
+  hero,
+  scenes,
+  people,
 };
 
 export const roleName = (role: Role) =>

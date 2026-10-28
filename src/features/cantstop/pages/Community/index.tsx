@@ -17,6 +17,7 @@ import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
 import { useInfiniteLoad } from '@/features/game-core/hooks/useInfiniteLoad';
 import type { LeaderboardSortDim, CantStopLeaderboardEntry } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
+import mascot from '../../assets/mascot.jpg';
 import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
 import { NumberCard } from '../../components/Card';
 import { Dialog } from '../../components/Dialog';
@@ -24,7 +25,6 @@ import { CantStopLoading } from '../../components/LoadingState';
 import { columnHeight } from '../../model/board';
 
 const isRankEntry = (entry: CantStopLeaderboardEntry | { totalGames: number }): entry is CantStopLeaderboardEntry => 'winRate' in entry;
-const mascot = 'https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=realistic%20tabletop%20scene%20with%20a%20mountain%20trail%20board%20game%2C%20four%20dice%2C%20small%20flags%2C%20camping%20gear%2C%20warm%20daylight%2C%20suitable%20for%20a%20board%20game%20website%2C%20no%20text&image_size=square_hd';
 
 export function Rankings() {
   const profile = useAsyncResource(getProfile);
@@ -51,7 +51,9 @@ export function Rankings() {
         const mine = String(entry.userID) === String(profile.data?.id);
         return <div className={`cs-rank-row ${mine ? 'self' : ''}`} key={entry.userID}>
           <span>{index === 0 ? <Trophy size={20} /> : String(index + 1).padStart(2, '0')}</span>
-          <span><PlayerAvatar name={entry.displayName} size={36} /><b>{entry.displayName}</b>{mine && <em>你</em>}</span>
+          <span><PlayerAvatar name={entry.displayName}
+            avatar={mine ? profile.data?.avatar : undefined} size={36} />
+            <b>{entry.displayName}</b>{mine && <em>你</em>}</span>
           <span>{entry.wins}<small> / {entry.totalGames}</small></span><strong>{(entry.winRate * 100).toFixed(1)}%</strong></div>;
       })}
       {!leaderboard.loading && !leaderboard.error && !leaderboard.entries.length && <div className="cs-empty"><Trophy size={30} />

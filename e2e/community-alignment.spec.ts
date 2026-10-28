@@ -456,6 +456,9 @@ for (const item of communityCases) {
     await expect(about).toBeVisible();
     await expect(page.getByText('PLAYER ID · mobile-profile')).toBeVisible();
     await expect(page.getByRole('link', { name: /编辑资料/ })).toBeVisible();
+    if (item.gameType === 'fugitive') {
+      await expect(page.getByText('显示偏好', { exact: true })).toHaveCount(0);
+    }
 
     await expect.poll(async () => {
       await navigation.evaluate(element => {
@@ -495,7 +498,19 @@ test('fugitive rankings and guide use the Acquire content hierarchy', async ({ p
   expect(rankHeroBox).toMatchObject({ x: 14, y: 72, width: 362, height: 166 });
   expect(rankPanelBox).toMatchObject({ x: 14, width: 362 });
   expect(rankPanelBox?.y).toBe((rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 18);
-  await expect(page.getByRole('combobox', { name: '排行榜身份' })).toBeVisible();
+  const roleSelect = page.getByRole('combobox', { name: '排行榜身份' });
+  await expect(roleSelect).toBeVisible();
+  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
+  await roleSelect.click();
+  await expect(roleSelect).toHaveAttribute('aria-expanded', 'true');
+  await page.getByRole('option', { name: '逃亡榜' }).click();
+  await expect(roleSelect).toContainText('逃亡榜');
+  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
+  await roleSelect.press('ArrowDown');
+  await roleSelect.press('ArrowDown');
+  await roleSelect.press('Enter');
+  await expect(roleSelect).toContainText('追捕榜');
+  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
 
   await page.goto('/game/fugitive/guide', { waitUntil: 'domcontentloaded' });
   const guideSummary = page.getByTestId('fugitive-guide-summary');

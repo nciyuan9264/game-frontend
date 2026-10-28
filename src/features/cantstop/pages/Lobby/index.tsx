@@ -25,6 +25,7 @@ import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
+import mascot from '../../assets/mascot.jpg';
 import { createCantStopRoom, lookupCantStopRoom } from '../../api/room';
 import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
 import { NumberCard } from '../../components/Card';
@@ -42,7 +43,6 @@ import type {
 } from '../../model/types';
 
 const loadStats = () => getMyStats('cantstop');
-const mascot = 'https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=realistic%20tabletop%20scene%20with%20a%20mountain%20trail%20board%20game%2C%20four%20dice%2C%20small%20flags%2C%20camping%20gear%2C%20warm%20daylight%2C%20suitable%20for%20a%20board%20game%20website%2C%20no%20text&image_size=square_hd';
 const filters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'all', label: '全部房间' },
   { value: 'joinable', label: '可加入' },

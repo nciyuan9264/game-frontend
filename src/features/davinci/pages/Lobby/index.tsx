@@ -14,6 +14,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
+import hero from '../../assets/hero.jpg';
 import { createDavinciRoom } from '../../api/room';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { DavinciLoading } from '../../components/LoadingState';
@@ -23,7 +24,6 @@ import type { DavinciRoom, LobbyFilter } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
-const HERO_IMAGE = 'https://copilot-cn.bytedance.net/api/ide/v1/text_to_image?prompt=cinematic%20overhead%20photograph%20of%20a%20premium%20black%20and%20ivory%20Da%20Vinci%20Code%20deduction%20card%20game%20on%20a%20dark%20walnut%20table%2C%20ordered%20number%20tiles%2C%20subtle%20brass%20details%2C%20soft%20directional%20studio%20light%2C%20realistic%20materials%2C%20clear%20game%20pieces%2C%20no%20text%2C%20no%20people%2C%20professional%20editorial%20product%20photography&image_size=landscape_16_9';
 const loadStats = () => getMyStats('davinci');
 const cipherFacts = [
   ['0-11', '数字升序', Hash],
@@ -101,7 +101,7 @@ export default function Lobby() {
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <DavinciLoading description="正在同步密码桌与在线玩家" /> : <div className={styles.page}>
       <section className={styles.hero}>
-        <img className={heroReady ? styles.heroImageReady : ''} src={HERO_IMAGE} alt="黑白密码牌桌面"
+        <img className={heroReady ? styles.heroImageReady : ''} src={hero} alt="黑白密码牌桌面"
           onLoad={event => {
             const image = event.currentTarget;
             setHeroReady(image.naturalWidth > image.naturalHeight * 1.25);

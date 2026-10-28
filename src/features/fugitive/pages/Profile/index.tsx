@@ -2,7 +2,6 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import {
   ArrowRight,
-  Check,
   ChevronRight,
   Footprints,
   Info,
@@ -10,7 +9,6 @@ import {
   Mail,
   Pencil,
   Route,
-  Settings2,
   Shield,
 } from 'lucide-react';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
@@ -32,7 +30,6 @@ import {
   Scene,
   roleName,
 } from '../../components/Visual';
-import { useFugitivePreferences } from '../../hooks/useFugitivePreferences';
 import type { Role } from '../../model/types';
 
 const gameRole = (value?: string): Role =>
@@ -42,9 +39,8 @@ export default function Profile() {
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('fugitive');
   const history = useGameHistory({ gameType: 'fugitive', pageSize: 20 });
-  const preferences = useFugitivePreferences();
   const logout = useGameLogout();
-  const [panel, setPanel] = useState<'preferences' | 'logout' | 'record' | 'about'>();
+  const [panel, setPanel] = useState<'logout' | 'record' | 'about'>();
   const [record, setRecord] = useState<Game>();
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
@@ -79,9 +75,6 @@ export default function Profile() {
               <span><b>{total ? Math.round((stats.data?.winRate ?? 0) * 100) : 0}%</b>胜率</span></div>
             <div className="profile-actions"><a href="https://auth.gamebus.online/profile">
               <Pencil size={14} />编辑资料</a>
-              <button className="text-button" type="button"
-                onClick={() => setPanel('preferences')}>
-                <Settings2 size={15} />显示偏好</button>
               <button className="text-button" type="button"
                 onClick={() => setPanel('logout')}><LogOut size={14} />退出登录</button></div>
           </section>
@@ -140,26 +133,6 @@ export default function Profile() {
       <ProjectContact gameName="Fugitive"
         avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }} className="contact-monogram" />}
         classes={{ intro: 'project-contact-intro', links: 'project-contact-links', legal: 'project-contact-legal' }} />
-    </Modal>}
-
-    {panel === 'preferences' && <Modal title="让行动更顺手。"
-      kicker="DISPLAY PREFERENCES" onClose={() => setPanel(undefined)}
-      footer={<button className="button primary full" type="button"
-        onClick={() => setPanel(undefined)}>完成<Check size={16} /></button>}>
-      <div className="preference-row"><div><h3>更清晰的文字</h3>
-        <p>提高辅助文字对比度，牌桌同步生效。</p></div>
-        <button type="button" role="switch" aria-label="更清晰的文字"
-          aria-checked={preferences.contrast}
-          className={`switch ${preferences.contrast ? 'on' : ''}`}
-          onClick={() => preferences.setContrast(!preferences.contrast)}><span /></button>
-      </div>
-      <div className="preference-row"><div><h3>减少动效</h3>
-        <p>关闭卡牌位移和装饰动画。</p></div>
-        <button type="button" role="switch" aria-label="减少动效"
-          aria-checked={preferences.reduced}
-          className={`switch ${preferences.reduced ? 'on' : ''}`}
-          onClick={() => preferences.setReduced(!preferences.reduced)}><span /></button>
-      </div>
     </Modal>}
 
     {panel === 'logout' && <Modal title="离开当前账号？" kicker="SIGN OUT"

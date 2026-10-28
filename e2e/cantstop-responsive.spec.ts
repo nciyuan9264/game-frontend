@@ -2,6 +2,7 @@ import { expect, test, type Page, type TestInfo } from '@playwright/test';
 
 const roomID = 'cantstop_vfw7hms8fza5';
 const matchID = `${roomID}-r1`;
+const avatarURL = 'https://cdn.example.com/cantstop-avatar.png';
 const human = {
   userID: 'cantstop-mobile',
   playerID: 'cantstop-mobile',
@@ -31,9 +32,16 @@ async function mockPublic(page: Page) {
       data: {
         user_id: 'cantstop-mobile',
         display_name: '登山玩家',
-        avatar: '',
+        avatar: avatarURL,
       },
     },
+  }));
+  await page.route(avatarURL, route => route.fulfill({
+    contentType: 'image/png',
+    body: Buffer.from(
+      'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mNk+A8AAQUBAScY42YAAAAASUVORK5CYII=',
+      'base64',
+    ),
   }));
   await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
     json: { status_code: 0, message: 'ok', data: { rooms: [] } },
@@ -43,6 +51,23 @@ async function mockPublic(page: Page) {
       status_code: 0,
       message: 'ok',
       data: { totalGames: 6, wins: 2, winRate: 0.333, avgScore: 2.4 },
+    },
+  }));
+  await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        gameType: 'cantstop',
+        entries: [{
+          userID: human.userID,
+          playerID: human.playerID,
+          displayName: human.displayName,
+          totalGames: 1,
+          metric: { cantstop: { wins: 0, winRate: 0 } },
+        }],
+        page: { limit: 20, offset: 0, hasMore: false, total: 1 },
+      },
     },
   }));
 }
@@ -329,6 +354,17 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
   });
+
+test('Cant Stop leaderboard shows the current user avatar', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockPublic(page);
+  await page.goto('/game/cantstop/rankings');
+
+  const mine = page.locator('.cs-rank-row.self');
+  await expect(mine).toBeVisible();
+  await expect(mine.locator('.cs-avatar img')).toHaveAttribute('src', avatarURL);
+  await expect(mine.locator('.cs-avatar img')).toBeVisible();
+});
 
 test('Cant Stop mobile choose phase keeps pairing controls visible',
   async ({ page }, info) => {

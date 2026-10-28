@@ -1,7 +1,13 @@
-import { useState } from 'react';
+import {
+  useEffect,
+  useId,
+  useRef,
+  useState,
+} from 'react';
 import {
   ArrowLeft,
   Check,
+  ChevronDown,
   Footprints,
   Shield,
   Trophy,
@@ -29,6 +35,107 @@ const roleOptions = [
   { value: 'fugitive', label: '逃亡榜' },
   { value: 'marshal', label: '追捕榜' },
 ] as const;
+
+function RankingRoleSelect({
+  value,
+  onChange,
+}: {
+  value: RankingRole;
+  onChange: (value: RankingRole) => void;
+}) {
+  const [open, setOpen] = useState(false);
+  const [activeIndex, setActiveIndex] = useState(0);
+  const rootRef = useRef<HTMLDivElement>(null);
+  const triggerRef = useRef<HTMLButtonElement>(null);
+  const listboxId = useId();
+  const selectedIndex = roleOptions.findIndex(option => option.value === value);
+  const selectedOption = roleOptions[selectedIndex] ?? roleOptions[0];
+
+  useEffect(() => {
+    if (!open) return;
+
+    const closeOnOutsidePointer = (event: PointerEvent) => {
+      if (!rootRef.current?.contains(event.target as Node)) setOpen(false);
+    };
+    document.addEventListener('pointerdown', closeOnOutsidePointer);
+    return () => document.removeEventListener('pointerdown', closeOnOutsidePointer);
+  }, [open]);
+
+  const openListbox = () => {
+    setActiveIndex(selectedIndex);
+    setOpen(true);
+  };
+
+  const selectOption = (nextValue: RankingRole) => {
+    onChange(nextValue);
+    setOpen(false);
+    triggerRef.current?.focus();
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent<HTMLButtonElement>) => {
+    if (event.key === 'Escape' && open) {
+      event.preventDefault();
+      setOpen(false);
+      return;
+    }
+
+    if (event.key === 'ArrowDown' || event.key === 'ArrowUp') {
+      event.preventDefault();
+      if (!open) {
+        openListbox();
+        return;
+      }
+      const direction = event.key === 'ArrowDown' ? 1 : -1;
+      setActiveIndex(current =>
+        (current + direction + roleOptions.length) % roleOptions.length);
+      return;
+    }
+
+    if (open && (event.key === 'Home' || event.key === 'End')) {
+      event.preventDefault();
+      setActiveIndex(event.key === 'Home' ? 0 : roleOptions.length - 1);
+      return;
+    }
+
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      if (open) selectOption(roleOptions[activeIndex].value);
+      else openListbox();
+    }
+  };
+
+  return <div className={styles.roleSelect} ref={rootRef}
+    onBlur={event => {
+      if (!event.currentTarget.contains(event.relatedTarget as Node)) setOpen(false);
+    }}>
+    <button ref={triggerRef} type="button" role="combobox"
+      className={`${styles.roleSelectTrigger} ${open ? styles.roleSelectOpen : ''}`}
+      aria-label="排行榜身份" aria-expanded={open}
+      aria-controls={listboxId}
+      aria-activedescendant={open ? `${listboxId}-${activeIndex}` : undefined}
+      onClick={() => open ? setOpen(false) : openListbox()}
+      onKeyDown={handleKeyDown}>
+      <span>{selectedOption.label}</span>
+      <ChevronDown size={15} aria-hidden="true" />
+    </button>
+    {open && <ul id={listboxId} className={styles.roleSelectMenu}
+      role="listbox" aria-label="排行榜身份选项">
+      {roleOptions.map((option, index) =>
+        <li key={option.value}>
+          <button id={`${listboxId}-${index}`} type="button" role="option"
+            className={styles.roleSelectOption}
+            aria-selected={option.value === value}
+            data-active={index === activeIndex}
+            tabIndex={-1}
+            onPointerMove={() => setActiveIndex(index)}
+            onClick={() => selectOption(option.value)}>
+            <span>{option.label}</span>
+            {option.value === value && <Check size={12} aria-hidden="true" />}
+          </button>
+        </li>)}
+    </ul>}
+  </div>;
+}
 
 function RankAvatar({
   name,
@@ -97,16 +204,9 @@ export default function Rankings() {
               { value: 'winRate', label: '战绩榜' },
               { value: 'games', label: '场次榜' },
             ]} />
-          <label className={styles.roleFilter}>
-            <span className="sr-only">排行榜身份</span>
-            {role === 'all' ? <Trophy size={14} />
-              : role === 'fugitive' ? <Footprints size={14} /> : <Shield size={14} />}
-            <select aria-label="排行榜身份" value={role}
-              onChange={event => setRole(event.target.value as RankingRole)}>
-              {roleOptions.map(option => <option key={option.value}
-                value={option.value}>{option.label}</option>)}
-            </select>
-          </label>
+          <div className={styles.roleFilter}>
+            <RankingRoleSelect value={role} onChange={setRole} />
+          </div>
         </div>
 
         <div className={`${styles.rankRow} ${styles.rankHead}`}>
