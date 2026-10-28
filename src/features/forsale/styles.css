@@ -346,7 +346,7 @@
   border-radius: 6px; background: white; text-align: center; font-size: 18px; }
 .fs-invite small { display: block; margin-top: 12px; color: var(--fs-muted); font-size: 9px; }
 .fs-start-dialog > div { display: flex; justify-content: center; gap: 13px; }
-.fs-start-dialog > div span { display: flex; align-items: center; flex-direction: column; gap: 5px; }
+.fs-start-dialog > div > span { display: flex; align-items: center; flex-direction: column; gap: 5px; }
 .fs-start-dialog > div b { font-size: 9px; }
 .fs-start-dialog > div small { color: #6f865f; font-size: 7px; }
 .fs-start-dialog dl { display: grid; grid-template-columns: repeat(3, 1fr); margin: 20px 0;

@@ -225,7 +225,10 @@ async function mockSession(
   return commands;
 }
 
-async function mockMatchRoom(page: Page) {
+async function mockMatchRoom(
+  page: Page,
+  roomPlayers = [players[0]],
+) {
   await mockProfile(page);
   await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route =>
     route.fulfill({
@@ -240,13 +243,13 @@ async function mockMatchRoom(page: Page) {
           ownerUserID: '110',
           ownerPlayerID: '110',
           maxPlayers: 6,
-          playerCount: 1,
+          playerCount: roomPlayers.length,
           currentMatchID: matchID,
           currentMatchStatus: 'preparing',
           nextRoundNo: 1,
           createdAt: '2026-10-27T00:00:00Z',
           updatedAt: '2026-10-27T00:00:00Z',
-          players: [players[0]],
+          players: roomPlayers,
           metrics: { forSale: { progressCurrent: 0, progressTotal: 16 } },
         },
       },
@@ -261,10 +264,13 @@ async function mockMatchRoom(page: Page) {
       ownerID: '110',
       status: 'match',
       playerID: '110',
-      players: { [players[0].playerID]: players[0] },
+      players: Object.fromEntries(roomPlayers.map(player => [
+        player.playerID,
+        player,
+      ])),
       visibility: 'public',
       maxPlayers: 6,
-      playerOrder: [players[0].playerID],
+      playerOrder: roomPlayers.map(player => player.playerID),
     }));
   });
 }
@@ -341,6 +347,40 @@ test('For Sale mobile room follows the Acquire preparation layout',
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
   });
+
+test('For Sale start dialog centers AI avatar icons', async ({ page }, info) => {
+  await page.setViewportSize({ width: 718, height: 780 });
+  await mockMatchRoom(page, players);
+  await page.goto(`/game/forsale/match?roomID=${roomID}`);
+  await page.getByRole('button', { name: '开始拍卖' }).click();
+
+  const dialog = page.getByRole('dialog', { name: '合伙人齐了，开场吧。' });
+  await expect(dialog).toBeVisible();
+  const offsets = await dialog.locator('.fs-avatar').evaluateAll(avatars =>
+    avatars.slice(1).map(avatar => {
+      const icon = avatar.querySelector('svg');
+      const avatarBox = avatar.getBoundingClientRect();
+      const iconBox = icon?.getBoundingClientRect();
+      return iconBox
+        ? {
+            x: Math.abs(
+              avatarBox.left + avatarBox.width / 2
+              - iconBox.left - iconBox.width / 2,
+            ),
+            y: Math.abs(
+              avatarBox.top + avatarBox.height / 2
+              - iconBox.top - iconBox.height / 2,
+            ),
+          }
+        : { x: Number.POSITIVE_INFINITY, y: Number.POSITIVE_INFINITY };
+    }));
+  expect(offsets).toHaveLength(2);
+  for (const offset of offsets) {
+    expect(offset.x).toBeLessThanOrEqual(1);
+    expect(offset.y).toBeLessThanOrEqual(1);
+  }
+  await capture(page, info, 'start-dialog-718x780');
+});
 
 test('For Sale mobile auction keeps cards and actions usable',
   async ({ page }, info) => {

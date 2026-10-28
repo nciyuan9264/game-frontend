@@ -434,6 +434,11 @@ test('Onitama results return to a compact final board', async ({
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expect(page.locator('.result-art')).toHaveCount(0);
+  await expect(page.locator('.result-copy')).toHaveCSS('text-align', 'center');
+  await expect.poll(() => page.locator('.result-seal').evaluate(element => {
+    const box = element.getBoundingClientRect();
+    return Math.abs(box.left + box.width / 2 - window.innerWidth / 2);
+  })).toBeLessThanOrEqual(1);
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看终局棋盘' }).click();

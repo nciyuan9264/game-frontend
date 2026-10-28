@@ -722,10 +722,11 @@
     .result-topline { padding-bottom: 16px; }
     .result-topline > span:last-child { max-width: 150px; text-align: right; }
     .result-composition { display: block; padding-top: 28px; }
-    .result-copy { padding: 0; }
-    .result-seal { width: 64px; height: 64px; margin: 0 0 27px 4px; }
+    .result-copy { display: flex; align-items: center; flex-direction: column; padding: 0; text-align: center; }
+    .result-seal { width: 64px; height: 64px; margin: 0 0 27px; }
     .result-seal svg { width: 38px; height: 38px; }
     .result-copy h1 { margin: 10px 0 16px; font-size: 32px; line-height: 1.45; }
+    .winner-line { justify-content: center; }
     .winner-line strong { font-size: 13px; }
     .result-description { max-width: 280px; font-size: 10px; }
     .result-stats { width: 100%; max-width: none; margin: 23px 0 19px; padding: 16px 0; }
