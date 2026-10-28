@@ -105,7 +105,9 @@ export const Play = ({
     <header className="fs-game-header"><button type="button"
       aria-label="离开对局" onClick={onLeave}><ArrowLeft size={19} /></button>
       <div><small>THE SUNDAY AUCTION · 房间号</small>
-        <h1>{data.roomID}<span>·</span>{data.roomData.playerOrder.length} 人经典局</h1></div>
+        <h1><span className="fs-game-room-id">{data.roomID}</span><span>·</span>
+          <span>{data.roomData.playerOrder.length} 人
+            <span className="fs-game-mode">经典局</span></span></h1></div>
       <span className="fs-phase-chip">{phase === 'auction' || phase === 'buyResult'
         || phase === 'bridge' ? '01 竞价购房' : '02 暗牌出售'}</span>
       {countdown && <b className="fs-timer">{countdown}</b>}

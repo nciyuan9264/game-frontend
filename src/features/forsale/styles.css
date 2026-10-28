@@ -400,6 +400,8 @@
   border: 0; background: transparent; }
 .fs-game-header > div small { color: var(--fs-muted); font-size: 6px; letter-spacing: 1.4px; }
 .fs-game-header h1 { display: flex; gap: 7px; margin-top: 4px; font-size: 15px; font-weight: 500; }
+.fs-game-room-id { min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.fs-game-mode { margin-left: 4px; }
 .fs-phase-chip { margin-left: auto; padding: 5px 8px; border-radius: 4px; background: #e8ecdf;
   color: #657b58; font-size: 9px; }
 .fs-timer { min-width: 37px; color: var(--fs-orange); font-size: 12px; text-align: center; }
@@ -899,11 +901,14 @@
   .fs-ready-dock > button:nth-last-child(2) { flex: 1; }
   .fs-start-dialog dl { gap: 5px; padding: 12px 5px; }
   .fs-game-header { min-height: 57px; padding: 6px 10px; gap: 5px; }
+  .fs-game-header > div { min-width: 0; flex: 1; }
   .fs-game-header > div small { display: none; }
-  .fs-game-header h1 { max-width: 155px; overflow: hidden; font-size: 11px; white-space: nowrap;
-    text-overflow: ellipsis; }
+  .fs-game-header h1 { min-width: 0; max-width: 100%; font-size: 11px; white-space: nowrap; }
+  .fs-game-header h1 > span:not(.fs-game-room-id) { flex: 0 0 auto; }
+  .fs-game-mode { display: none; }
   .fs-phase-chip { display: none; }
-  .fs-game-header > button { width: 29px; }
+  .fs-game-header > button { width: 29px; flex: 0 0 29px; }
+  .fs-timer { flex: 0 0 auto; }
   .fs-phase-bar { padding: 10px 12px; }
   .fs-phase-bar span { font-size: 8px; }
   .fs-table-layout { display: block; padding: 0 8px 190px; }

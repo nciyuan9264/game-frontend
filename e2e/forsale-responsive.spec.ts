@@ -5,7 +5,7 @@ import {
   type TestInfo,
 } from '@playwright/test';
 
-const roomID = 'forsale_layout';
+const roomID = 'forsale_kq1n52s1wwnm';
 const matchID = `${roomID}-r1`;
 const players = [
   {
@@ -384,11 +384,28 @@ test('For Sale start dialog centers AI avatar icons', async ({ page }, info) => 
 
 test('For Sale mobile auction keeps cards and actions usable',
   async ({ page }, info) => {
-    await page.setViewportSize({ width: 390, height: 844 });
+    await page.setViewportSize({ width: 358, height: 784 });
     const commands = await mockSession(page, 3);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.getByTestId('forsale-play')).toBeVisible();
     await expect(page.locator('.fs-game-header')).toHaveCSS('min-height', '57px');
+    const headerGeometry = await page.locator('.fs-game-header').evaluate(header => {
+      const box = header.getBoundingClientRect();
+      const identity = header.querySelector<HTMLElement>(':scope > div')
+        ?.getBoundingClientRect();
+      const timer = header.querySelector<HTMLElement>('.fs-timer')
+        ?.getBoundingClientRect();
+      const buttons = header.querySelectorAll<HTMLElement>(':scope > button');
+      const menu = buttons.item(buttons.length - 1).getBoundingClientRect();
+      return {
+        menuRightInset: box.right - menu.right,
+        identityToTimerGap: identity && timer ? timer.left - identity.right : 0,
+        menuWidth: menu.width,
+      };
+    });
+    expect(headerGeometry.menuRightInset).toBe(10);
+    expect(headerGeometry.identityToTimerGap).toBeGreaterThanOrEqual(5);
+    expect(headerGeometry.menuWidth).toBe(29);
     await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
     await expect(page.getByLabel('总出价金币')).toHaveValue('3');
     await page.getByRole('button', { name: '退出本轮' }).click();
