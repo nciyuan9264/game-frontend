@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom/client';
 import { BrowserRouter } from 'react-router-dom';
 import { RenderRoutes } from './route/render-routes';
 import { initApi } from './api';
+import './styles/fonts.css';
 import './index.css';
 
 initApi();

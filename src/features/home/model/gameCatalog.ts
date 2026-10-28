@@ -109,10 +109,10 @@ export const gameCatalog = [
     rankingsRoute: '/game/davinci/rankings',
     cta: '进入达芬奇大厅',
     footer: 'Cipher Deduction Table',
-    players: '2-4 人',
+    players: '2 人',
     duration: '10-20 分钟',
     difficulty: '轻量',
-    categories: ['deduction', 'multiplayer'],
+    categories: ['deduction', 'twoPlayer'],
     tags: ['隐藏信息', '逻辑推理', '心理博弈'],
     theme: {
       primary: '#f59e0b',

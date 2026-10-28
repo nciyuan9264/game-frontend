@@ -1,5 +1,5 @@
 @scope (.quoridor-root) {
-:scope{font-family:Inter,"Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
+:scope{font-family:Inter,"Noto Sans SC Variable","Noto Sans SC",-apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif}
 /* PC v1.1. The independently published Mobile project is intentionally unchanged. */
 .header-storage{display:flex;align-items:center;gap:7px;position:relative;min-height:34px;padding:0 10px;border:1px solid #ded1be;border-radius:5px;font-size:11px;color:#846d51;white-space:nowrap;background:#f6f0e4}
 .header-storage.has-save{border-color:#cbd4b6;background:#eef1e5;color:#75815e}
