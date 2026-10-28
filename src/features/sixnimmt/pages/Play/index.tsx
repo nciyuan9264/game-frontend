@@ -316,7 +316,8 @@ export function Play({
     </header>
 
     {session.feedback && <div className="sn-game-toast" role="alert">{session.feedback}</div>}
-    {phase === 'end' && reviewing && <button className="sn-review-banner"
+    {(phase === 'roundEnd' || phase === 'end') && reviewing
+      && <button className="sn-review-banner"
       type="button" onClick={() => setReviewing(false)}>
       正在查看终局牌桌 · 返回结算<ArrowRight size={14} /></button>}
 

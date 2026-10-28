@@ -153,3 +153,20 @@ test('Six Nimmt mobile results keep the shared topbar height', async ({ page }) 
   await expect(page.locator('.sn-results')).toBeVisible();
   await expect(page.locator('.sn-results > header')).toHaveCSS('height', '57px');
 });
+
+test('Six Nimmt round results can return from the final table', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('roundEnd'));
+  await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
+
+  await expect(page.locator('.sn-results')).toBeVisible();
+  await page.getByRole('button', { name: '查看终局牌桌' }).click();
+  await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
+
+  const returnToResults = page.getByRole('button', {
+    name: /正在查看终局牌桌 · 返回结算/,
+  });
+  await expect(returnToResults).toBeVisible();
+  await returnToResults.click();
+  await expect(page.locator('.sn-results')).toBeVisible();
+});
