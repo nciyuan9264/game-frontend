@@ -1,0 +1,153 @@
+@media (max-width: 767px) {
+  .cs-action-side {
+    display: block;
+    margin-top: 10px;
+  }
+
+  .cs-action-side > .cs-decision-panel {
+    display: flex;
+    min-height: 0;
+    border-radius: 9px;
+    padding: 12px;
+    background: #fcf9ed;
+  }
+
+  .cs-action-side > .cs-event-panel {
+    display: none;
+  }
+
+  .cs-decision-panel header {
+    margin-bottom: 9px;
+  }
+
+  .cs-decision-panel h2 {
+    margin: 4px 0;
+    color: #7b5940;
+    font-size: 14px;
+    line-height: 1.45;
+  }
+
+  .cs-decision-panel p {
+    font-size: 8px;
+    line-height: 1.6;
+  }
+
+  .cs-decision-panel > [data-game-action-button],
+  .cs-decision-actions,
+  .cs-turn-ended [data-game-action-button] {
+    display: none;
+  }
+
+  .cs-dice-tray {
+    margin-bottom: 10px;
+    border-radius: 6px;
+    padding: 9px 8px 7px;
+  }
+
+  .cs-dice-tray > div {
+    gap: 9px;
+  }
+
+  .cs-dice-tray > div > span {
+    gap: 5px;
+  }
+
+  .cs-dice-tray p {
+    margin-top: 6px;
+    font-size: 7px !important;
+    line-height: 1.4;
+  }
+
+  .cs-die {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+  }
+
+  .cs-die svg {
+    width: 26px;
+    height: 26px;
+  }
+
+  .cs-three-runners {
+    margin: 8px 0 4px;
+    font-size: 18px;
+  }
+
+  .cs-pairings {
+    gap: 7px;
+    margin-bottom: 0;
+  }
+
+  .cs-pairings button {
+    min-height: 50px;
+    gap: 8px;
+    border-radius: 6px;
+    padding: 7px 9px;
+  }
+
+  .cs-pairings button > small {
+    margin-top: 3px;
+    font-size: 7px;
+  }
+
+  .cs-pairings button > div {
+    min-width: 63px;
+    max-width: 90px;
+    gap: 4px;
+  }
+
+  .cs-pairings b {
+    font-size: 18px;
+  }
+
+  .cs-pairings em {
+    font-size: 7px;
+  }
+
+  .cs-pairings strong {
+    justify-content: flex-end;
+    gap: 6px;
+    font-size: 8px;
+    text-align: right;
+    white-space: normal;
+  }
+
+  .cs-pairings strong i {
+    width: 13px;
+    height: 13px;
+    flex: none;
+  }
+
+  .cs-risk-card {
+    gap: 7px;
+    margin-bottom: 0;
+    border-radius: 6px;
+    padding: 10px;
+  }
+
+  .cs-risk-card > b {
+    font-size: 18px;
+  }
+
+  .cs-risk-card > p {
+    font-size: 8px;
+    line-height: 1.6;
+  }
+
+  .cs-risk-card > div {
+    padding-top: 8px;
+  }
+
+  .cs-turn-ended {
+    gap: 9px;
+  }
+
+  .cs-turn-ended p {
+    font-size: 9px;
+  }
+
+  .cs-waiting {
+    min-height: 115px;
+  }
+}

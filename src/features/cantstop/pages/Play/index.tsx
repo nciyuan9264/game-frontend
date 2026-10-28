@@ -330,9 +330,16 @@ function RunnerSlots({ data }: { data: GameSnapshot }) {
     })}</div>;
 }
 
-function ActivityStrip({ data }: { data: GameSnapshot }) {
+function ActivityStrip({
+  data,
+  onOpen,
+}: {
+  data: GameSnapshot;
+  onOpen: () => void;
+}) {
   const last = data.roomData.lastAction;
-  return <button className="cs-activity" type="button">
+  return <button className="cs-activity" type="button"
+    aria-label="查看最近记录" onClick={onOpen}>
     <History size={15} /><span>{last
       ? actionSummary(last, id => playerName(id, data.roomData.players))
       : '牌桌刚刚开始，等待第一掷。'}</span>
@@ -415,7 +422,7 @@ export function Play({
       <div className="cs-under-board"><RunnerSlots data={data} />
         <span>{isChoosing(data) ? '选择配对后，棋盘会预览落点'
           : isDeciding(data) ? `当前行动：${activeName}` : '服务端权威同步中'}</span></div>
-      <ActivityStrip data={data} />
+      <ActivityStrip data={data} onOpen={() => setPanel('log')} />
     </section>
     <aside className="cs-action-side">
       <DecisionPanel data={data} enabled={enabled}

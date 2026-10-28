@@ -101,6 +101,130 @@ async function mockMatchRoom(page: Page) {
   });
 }
 
+function gameSnapshot() {
+  const lastAction = {
+    id: 1,
+    kind: 'roll',
+    playerID: human.playerID,
+    dice: [5, 2, 2, 1],
+    columns: [],
+    gain: 0,
+    turnNumber: 1,
+    rollNumber: 1,
+    automatic: false,
+    summary: '',
+  };
+  return {
+    schemaVersion: 2,
+    type: 'ROOM_SYNC',
+    roomID,
+    matchID,
+    seq: '12',
+    view: {
+      cantstop: {
+        playerId: human.playerID,
+        ownerID: human.playerID,
+        visibility: 'private',
+        playerData: {
+          [human.playerID]: {
+            savedProgress: {},
+            claimedColumns: [],
+            savedStepCount: 0,
+            busts: 0,
+          },
+          [ai.playerID]: {
+            savedProgress: {},
+            claimedColumns: [],
+            savedStepCount: 0,
+            busts: 0,
+          },
+        },
+        roomData: {
+          gameStatus: 'choose',
+          currentPlayer: human.playerID,
+          nextPlayer: ai.playerID,
+          turnNumber: 1,
+          rollNumber: 1,
+          dice: [5, 2, 2, 1],
+          pairingOptions: [
+            {
+              actionID: 'pair-7-3',
+              pairingIndex: 0,
+              variantIndex: 0,
+              sums: [7, 3],
+              diceIndexes: [0, 1, 2, 3],
+              advances: { 7: 1, 3: 1 },
+              runnerPositions: { 7: 1, 3: 1 },
+              stepCount: 2,
+            },
+            {
+              actionID: 'pair-6-4',
+              pairingIndex: 1,
+              variantIndex: 0,
+              sums: [6, 4],
+              diceIndexes: [0, 3, 1, 2],
+              advances: { 6: 1, 4: 1 },
+              runnerPositions: { 6: 1, 4: 1 },
+              stepCount: 2,
+            },
+          ],
+          runners: {},
+          claimedBy: {},
+          activityLog: [lastAction],
+          lastAction,
+          bustRisk: 0.18,
+          turnGain: 0,
+          lostGain: 0,
+          turnDeadline: new Date(Date.now() + 60_000).toISOString(),
+          turnTimeoutMs: '60000',
+          players: {
+            [human.playerID]: human,
+            [ai.playerID]: ai,
+          },
+          playerOrder: [human.playerID, ai.playerID],
+        },
+      },
+    },
+  };
+}
+
+async function mockGameSession(page: Page) {
+  const commands: string[] = [];
+  await mockPublic(page);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        roomID,
+        gameType: 'cantstop',
+        status: 'playing',
+        visibility: 'private',
+        ownerUserID: human.userID,
+        ownerPlayerID: human.playerID,
+        maxPlayers: 4,
+        playerCount: 2,
+        currentMatchID: matchID,
+        currentMatchStatus: 'running',
+        nextRoundNo: 1,
+        createdAt: '2026-10-28T00:00:00Z',
+        updatedAt: '2026-10-28T00:00:00Z',
+        displayName: '再高一点',
+        turnTimeoutSeconds: 60,
+        players: [human, ai],
+        metrics: {
+          cantstop: { maxClaimedColumns: 0, progressCurrent: 0, progressTotal: 3 },
+        },
+      },
+    },
+  }));
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify(gameSnapshot()));
+    socket.onMessage(message => commands.push(String(message)));
+  });
+  return commands;
+}
+
 const expectNoOverflow = async (page: Page) => {
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -208,4 +332,32 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
     expect(geometry.seatHeight).toBeLessThanOrEqual(140);
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
+  });
+
+test('Cant Stop mobile choose phase keeps pairing controls visible',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const commands = await mockGameSession(page);
+    await page.goto(`/game/cantstop/match?roomID=${roomID}`);
+
+    await expect(page.getByTestId('cantstop-play')).toBeVisible();
+    await expect(page.locator('.cs-dice-tray')).toBeVisible();
+    await expect(page.locator('.cs-pairings button')).toHaveCount(2);
+    await expect(page.getByRole('button', { name: '配对 1：7 和 3' })).toBeVisible();
+    await expect(page.getByRole('button', { name: '查看最近记录' })).toBeVisible();
+
+    const dockAdvance = page.locator('.cs-mobile-dock')
+      .getByRole('button', { name: /前进/ });
+    await expect(dockAdvance).toBeDisabled();
+    await page.getByRole('button', { name: '配对 1：7 和 3' }).click();
+    await expect(dockAdvance).toBeEnabled();
+    await dockAdvance.click();
+    await expect.poll(() => commands.some(command =>
+      command.includes('"game_advance"')
+      && command.includes('"actionID":"pair-7-3"'))).toBe(true);
+
+    await page.getByRole('button', { name: '查看最近记录' }).click();
+    await expect(page.getByRole('dialog', { name: '回合记录' })).toBeVisible();
+    await expectNoOverflow(page);
+    await capture(page, info, 'choose-mobile');
   });

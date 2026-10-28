@@ -13,6 +13,7 @@ import gameRoot from '@/components/GameUI/styles/root.module.less';
 import '../../styles/root.css';
 import '../../styles/pages.css';
 import '../../styles/play.css';
+import '../../styles/mobile-play.css';
 import '../../styles/mobile-align.css';
 
 type ShellProfile = Pick<AuthProfile, 'name'> & {
