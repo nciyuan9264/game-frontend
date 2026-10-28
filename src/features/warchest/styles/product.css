@@ -330,6 +330,7 @@
     background: transparent;
   }
   .warchest-root .room-toolbar .search-field { width: 100%; height: 39px; }
+  .warchest-root .room-cards { grid-template-columns: 1fr; }
   .warchest-root .room-empty { min-height: 340px; padding: 28px 19px; }
   .warchest-root .lobby-aside { display: none; }
   .warchest-root .mobile-lobby-join { display: block; margin-top: 13px; }

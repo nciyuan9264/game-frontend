@@ -407,6 +407,27 @@ test('War Chest mobile battle submits only the service action ID', async ({ page
   await expectNoOverflow(page);
 });
 
+test('War Chest mobile returns from battle to full-width lobby cards', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockPublicData(page);
+  await mockSession(page);
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  await expect(page.getByTestId('warchest-board')).toBeVisible();
+  await page.getByRole('button', { name: '退出对局' }).click();
+  await page.getByRole('button', { name: '确认离开' }).click();
+
+  await expect(page).toHaveURL(/\/game\/warchest$/);
+  await expect(page.getByText('雾谷前哨')).toBeVisible();
+  const [browserBox, cardBox] = await Promise.all([
+    page.getByTestId('warchest-lobby-browser').boundingBox(),
+    page.locator('.room-card').first().boundingBox(),
+  ]);
+  expect(cardBox?.x).toBe(browserBox?.x);
+  expect(cardBox?.width).toBe(browserBox?.width);
+  await expectNoOverflow(page);
+});
+
 test('War Chest final board keeps history and results without the live menu', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, endedSnapshot());
