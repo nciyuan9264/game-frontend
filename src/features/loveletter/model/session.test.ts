@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { createClientCommand } from '@/features/game-core/model/realtime';
-import { confirmsCommand } from './selectors';
+import { confirmsCommand, publicCardCount } from './selectors';
 import { parseServerMessage, type MatchSnapshot } from './session';
 
 describe('Love Letter realtime model', () => {
@@ -99,6 +99,60 @@ describe('Love Letter realtime model', () => {
     expect(parsed.privateData.hand.map(card => card.cardID)).toEqual(['c1', 'c9']);
     expect(parsed.playerData.p2).not.toHaveProperty('hand');
     expect(parsed.roomData.players.p1.name).toBe('Alice');
+  });
+
+  it('normalizes nullable collection fields in room snapshots', () => {
+    const parsed = parseServerMessage(JSON.stringify({
+      schemaVersion: 2,
+      type: 'ROOM_SYNC',
+      roomID: 'r1',
+      matchID: 'm1',
+      seq: '9',
+      view: {
+        loveletter: {
+          playerId: 'p1',
+          ownerID: 'p1',
+          visibility: 'private',
+          playerData: {
+            p1: { favors: 0, alive: true, protected: false, spyUsed: false, handCount: 1, discards: null },
+            p2: { favors: 0, alive: true, protected: false, spyUsed: false, handCount: 1, discards: null },
+          },
+          privateData: {
+            hand: null,
+            legalCardIDs: null,
+            legalTargets: { c1: null },
+            guardGuessRanks: null,
+          },
+          roomData: {
+            currentPlayer: 'p1',
+            gameStatus: 'draw',
+            roundNo: 1,
+            goal: 6,
+            deckCount: 17,
+            reserveCount: 1,
+            burnCards: null,
+            activityLog: null,
+            players: {
+              p1: { playerID: 'p1', displayName: 'Alice', seatIndex: 0, online: true, ai: false, ready: true },
+              p2: { playerID: 'p2', displayName: 'Bob', seatIndex: 1, online: true, ai: false, ready: true },
+            },
+            playerOrder: null,
+          },
+        },
+      },
+    }));
+
+    expect(parsed?.type).toBe('ROOM_SYNC');
+    if (parsed?.type !== 'ROOM_SYNC') throw new Error('room sync expected');
+    expect(parsed.playerData.p1.discards.slice(-3)).toEqual([]);
+    expect(parsed.privateData.hand).toEqual([]);
+    expect(parsed.privateData.legalCardIDs).toEqual([]);
+    expect(parsed.privateData.legalTargets.c1).toEqual([]);
+    expect(parsed.privateData.guardGuessRanks).toEqual([]);
+    expect(parsed.roomData.burnCards).toEqual([]);
+    expect(parsed.roomData.activityLog).toEqual([]);
+    expect(parsed.roomData.playerOrder).toEqual(['p1', 'p2']);
+    expect(publicCardCount(parsed, 1)).toBe(0);
   });
 
   it('confirms explicit match state changes', () => {
