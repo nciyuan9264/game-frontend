@@ -225,6 +225,50 @@ async function mockSession(
   return commands;
 }
 
+async function mockMatchRoom(page: Page) {
+  await mockProfile(page);
+  await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route =>
+    route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: {
+          roomID,
+          gameType: 'forsale',
+          status: 'match',
+          visibility: 'public',
+          ownerUserID: '110',
+          ownerPlayerID: '110',
+          maxPlayers: 6,
+          playerCount: 1,
+          currentMatchID: matchID,
+          currentMatchStatus: 'preparing',
+          nextRoundNo: 1,
+          createdAt: '2026-10-27T00:00:00Z',
+          updatedAt: '2026-10-27T00:00:00Z',
+          players: [players[0]],
+          metrics: { forSale: { progressCurrent: 0, progressTotal: 16 } },
+        },
+      },
+    }));
+  await page.routeWebSocket('**/ws?**', socket => {
+    socket.send(JSON.stringify({
+      schemaVersion: 2,
+      type: 'MATCH_SYNC',
+      roomID,
+      matchID,
+      seq: '1',
+      ownerID: '110',
+      status: 'match',
+      playerID: '110',
+      players: { [players[0].playerID]: players[0] },
+      visibility: 'public',
+      maxPlayers: 6,
+      playerOrder: [players[0].playerID],
+    }));
+  });
+}
+
 const expectNoOverflow = async (page: Page) => {
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
@@ -256,6 +300,32 @@ test('For Sale public pages follow the Acquire shell at all target widths',
       })).toBeVisible();
       await expectNoOverflow(page);
     }
+  });
+
+test('For Sale mobile room follows the Acquire preparation layout',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await mockMatchRoom(page);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.locator('.fs-room-page')).toBeVisible();
+    await expect(page.locator('.fs-seat')).toHaveCount(6);
+    await expect(page.getByText('公开多人房间')).toBeVisible();
+    const geometry = await page.locator('.fs-seat-grid').evaluate(element => {
+      const seat = element.querySelector<HTMLElement>('.fs-seat');
+      const style = getComputedStyle(element);
+      const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
+      const box = seat?.getBoundingClientRect();
+      return {
+        columns: columns.length,
+        seatWidth: box?.width ?? 0,
+        seatHeight: box?.height ?? 0,
+      };
+    });
+    expect(geometry.columns).toBe(2);
+    expect(geometry.seatWidth).toBeGreaterThan(160);
+    expect(geometry.seatHeight).toBeLessThanOrEqual(140);
+    await expectNoOverflow(page);
+    await capture(page, info, 'room-mobile');
   });
 
 test('For Sale mobile auction keeps cards and actions usable',

@@ -1,5 +1,4 @@
 import {
-  ArrowLeft,
   ArrowRight,
   Eye,
   History,
@@ -101,8 +100,6 @@ export function Results({
             : <ActionButton variant="primary" disabled>
               等待房主再来一局</ActionButton>)}
         </div>
-        {!readOnly && <button type="button" className="text-button"
-          onClick={onViewBoard}><ArrowLeft size={15} />回到终局</button>}
       </section>
 
       {!isMobile && <aside className="result-art">
