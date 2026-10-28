@@ -17,7 +17,7 @@ import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
 import { useInfiniteLoad } from '@/features/game-core/hooks/useInfiniteLoad';
 import type { LeaderboardSortDim, CantStopLeaderboardEntry } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
-import mascot from '../../assets/mascot.jpg';
+import campArt from '../../assets/camp.webp';
 import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
 import { NumberCard } from '../../components/Card';
 import { Dialog } from '../../components/Dialog';
@@ -79,7 +79,7 @@ export function Guide() {
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className="cs-community cs-guide">
     <header className="cs-community-heading"><div><span className="cs-eyebrow">THE RULES, WITHOUT THE RULEBOOK</span>
       <h1>三分钟，读懂这座山。</h1></div></header>
-    <div className="cs-guide-layout"><aside><img src={mascot} alt="抱着数字牌的小牛" />
+    <div className="cs-guide-layout"><aside><img src={campArt} alt="山路、骰子与登顶旗帜" />
       <div><span><Users size={17} />2–4 人</span><span><Clock3 size={17} />约 20 分钟</span><span><Layers3 size={17} />11 条路线</span></div>
     </aside><section>
       <GameTabs ariaLabel="玩法章节" value={guide.index} onChange={guide.select} className="cs-tabs" activeClassName="active"
@@ -112,7 +112,7 @@ export function My() {
     <header className="cs-community-heading"><div><span className="cs-eyebrow">YOUR TABLE STORIES</span>
       <h1>每一桌，都有点小故事。</h1></div></header>
     {loading ? <CantStopLoading title="正在整理你的山路档案。" description="同步身份、战绩与历史对局" /> : <div className="cs-profile-layout">
-      <section className="cs-profile-card cs-profile-detail"><img src={mascot} alt="" />
+      <section className="cs-profile-card cs-profile-detail"><img src={campArt} alt="" />
         <PlayerAvatar name={profile.data?.name || '山路玩家'} avatar={profile.data?.avatar} size={72} />
         <span className="cs-eyebrow">ONLINE CLIMBER</span><h2>{profile.data?.name || '山路玩家'}</h2>
         <p>PLAYER ID · {profile.data?.id ?? '—'}</p><dl>

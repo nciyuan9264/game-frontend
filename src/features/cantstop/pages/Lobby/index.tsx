@@ -25,7 +25,7 @@ import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
-import mascot from '../../assets/mascot.jpg';
+import campArt from '../../assets/camp.webp';
 import { createCantStopRoom, lookupCantStopRoom } from '../../api/room';
 import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
 import { NumberCard } from '../../components/Card';
@@ -220,7 +220,7 @@ export default function Lobby() {
             <ArrowRight size={18} /></button>
         </form></section>
       <Link className="cs-guide-card" to="/game/cantstop/guide">
-        <img src={mascot} alt="抱着数字牌的小牛" />
+        <img src={campArt} alt="山路、骰子与登顶旗帜" />
         <span><BookOpen size={20} /><small>THE RULES, WITHOUT THE RULEBOOK</small>
           <h3>三分钟，读懂这座山。</h3>
           <b>查看玩法 <ArrowRight size={14} /></b></span>

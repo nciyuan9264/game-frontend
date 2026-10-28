@@ -1080,7 +1080,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
           const label = new PIXI.Text({
             text: gameStatus === 'initialize' ? '放\n置' : '放\n回',
             style: {
-              fontFamily: 'Noto Sans SC, Arial, sans-serif',
+              fontFamily: 'Noto Sans SC Variable, Noto Sans SC, Arial, sans-serif',
               fontSize: Math.max(12, Math.floor(buttonH * 0.3)),
               fontWeight: 'bold',
               fill: '#edf8ef',

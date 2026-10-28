@@ -10,7 +10,7 @@
   --blue-light: #e8edf0;
   --gold: #ae9470;
   --wine: #8d4c43;
-  --serif: "Noto Serif CJK SC", "Noto Serif SC", "Songti SC", "STSong", "PingFang SC", "Microsoft YaHei", Georgia, serif;
+  --serif: "Noto Serif CJK SC", "Noto Serif SC Variable", "Noto Serif SC", "Songti SC", "STSong", "PingFang SC", "Microsoft YaHei", Georgia, serif;
 }
 
 @scope (.onitama-root) {
