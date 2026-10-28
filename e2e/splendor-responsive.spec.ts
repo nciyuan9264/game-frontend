@@ -291,6 +291,13 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
   await expect(results.getByRole('button', { name: /再来一局/ })).toBeVisible();
   await expect(page.getByTestId('splendor-results-table')
     .locator('svg.lucide-trophy')).toHaveCount(0);
+  const [tableBox, tieBreakNoteBox] = await Promise.all([
+    page.getByTestId('splendor-results-table').boundingBox(),
+    results.getByText('同分时发展卡更少者优先；仍相同则共享胜利。').boundingBox(),
+  ]);
+  expect(tableBox).not.toBeNull();
+  expect(tieBreakNoteBox).not.toBeNull();
+  expect(tieBreakNoteBox!.y - (tableBox!.y + tableBox!.height)).toBeGreaterThanOrEqual(20);
 
   const headerMetrics = await page.getByTestId('splendor-results-header')
     .locator(':scope > span').evaluateAll(elements => elements.map(element => ({
