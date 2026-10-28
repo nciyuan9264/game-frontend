@@ -8,7 +8,7 @@ export default {
             replace: true,
             mediaQuery: false,
             minPixelValue: 0,
-            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/](?:splendor|othello|yinsh|quoridor|hex|hive|fugitive|warchest|loveletter|sixnimmt|forsale|onitama)[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci|home)|components[\\/]GameUI)[\\/])/,
+            exclude: /(?:(?:^|[\\/])src[\\/]features[\\/](?:splendor|othello|yinsh|quoridor|hex|hive|fugitive|warchest|loveletter|sixnimmt|forsale|onitama|cantstop)[\\/]|[\\/]src[\\/](?:features[\\/](?:acquire|davinci|home)|components[\\/]GameUI)[\\/])/,
         },
     },
 };
