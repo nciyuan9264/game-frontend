@@ -23,6 +23,8 @@ const ai = {
   ready: true,
   gameRole: 'marshal',
 };
+const avatarDataURL = 'data:image/png;base64,'
+  + 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFElEQVR4nGP4z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==';
 
 function gameSnapshot() {
   return {
@@ -221,7 +223,7 @@ async function mockSession(
   });
 }
 
-async function mockLobby(page: Page) {
+async function mockLobby(page: Page, avatar = '') {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -229,7 +231,7 @@ async function mockLobby(page: Page) {
       data: {
         user_id: human.userID,
         display_name: human.displayName,
-        avatar: '',
+        avatar,
       },
     },
   }));
@@ -301,6 +303,36 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(mobileJoin.getByRole('textbox', { name: '查找房间号' }))
     .toHaveAttribute('placeholder', '输入完整房间号');
   await expect(mobileJoin.getByRole('button', { name: '查找房间' })).toBeDisabled();
+  await expectNoDocumentOverflow(page);
+});
+
+test('Fugitive desktop clips the rail profile image inside its avatar', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await mockLobby(page, avatarDataURL);
+  await page.goto('/game/fugitive');
+
+  const railAvatar = page.locator('.rail-avatar');
+  const monogram = railAvatar.locator('.profile-monogram');
+  const image = monogram.locator('img');
+  await expect(image).toBeVisible();
+  await expect(railAvatar).toHaveCSS('overflow', 'hidden');
+
+  const [railBox, monogramBox, imageBox] = await Promise.all([
+    railAvatar.boundingBox(),
+    monogram.boundingBox(),
+    image.boundingBox(),
+  ]);
+  expect(railBox).not.toBeNull();
+  expect(monogramBox).not.toBeNull();
+  expect(imageBox).not.toBeNull();
+  expect(railBox!.width).toBe(32);
+  expect(railBox!.height).toBe(32);
+  for (const box of [monogramBox!, imageBox!]) {
+    expect(box.x).toBeGreaterThanOrEqual(railBox!.x);
+    expect(box.y).toBeGreaterThanOrEqual(railBox!.y);
+    expect(box.x + box.width).toBeLessThanOrEqual(railBox!.x + railBox!.width);
+    expect(box.y + box.height).toBeLessThanOrEqual(railBox!.y + railBox!.height);
+  }
   await expectNoDocumentOverflow(page);
 });
 
