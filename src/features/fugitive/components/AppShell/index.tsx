@@ -5,6 +5,7 @@ import {
   BookOpen,
   Check,
   ChevronDown,
+  Home,
   LayoutGrid,
   Route,
   Settings2,
@@ -120,6 +121,11 @@ export function AppShell({
               onClick={() => navigate('/game/fugitive')}><ArrowLeft size={20} /></button>}
             <Brand /><span className="header-line" /><span className="breadcrumb">{title}</span>
             <span className="spacer" /><span className="local-label"><i />在线</span>
+            {!room && <button className="icon-button platform-home" type="button"
+              aria-label="返回游戏首页" title="返回游戏首页"
+              onClick={() => navigate('/')}>
+              <Home size={18} strokeWidth={1.8} />
+            </button>}
             <button className="header-person" type="button" aria-label="打开追逃档案"
               onClick={() => navigate('/game/fugitive/me')}>
               <ProfileMonogram profile={profile} />

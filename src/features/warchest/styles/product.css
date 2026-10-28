@@ -48,6 +48,13 @@
   height: 2px;
   background: #708e4d;
 }
+.warchest-root .header-home {
+  color: #7c8973;
+  opacity: .8;
+}
+.warchest-root .header-home:hover {
+  opacity: 1;
+}
 .warchest-loading {
   min-height: 420px;
   display: flex;

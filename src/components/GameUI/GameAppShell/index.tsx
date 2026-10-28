@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { Home } from 'lucide-react';
 import { Link, NavLink } from 'react-router-dom';
 import layoutStyles from './index.module.less';
 
@@ -76,6 +77,7 @@ export interface GameAppShellProps {
     mobileNavigation: string;
     profile: string;
     currentPlayer: string;
+    platformHome?: string;
   };
   railAvatarSize?: number;
   headerAvatarSize?: number;
@@ -168,6 +170,14 @@ export function GameAppShell({
         <span className={classes.breadcrumb}>{renderBreadcrumb(title)}</span>
         <div className={classes.tools}>
           {environmentLabel && <span className={classes.environment}><i />{environmentLabel}</span>}
+          {!inMatch && <Link
+            to="/"
+            className={layoutStyles.platformHomeLink}
+            aria-label={labels.platformHome ?? '返回游戏首页'}
+            title={labels.platformHome ?? '返回游戏首页'}
+          >
+            <Home size={18} strokeWidth={1.8} />
+          </Link>}
           {tools}
           {profile && (inMatch
             ? <span className={classes.matchProfile} aria-label={labels.currentPlayer}>{renderAvatar({

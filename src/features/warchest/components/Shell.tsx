@@ -4,6 +4,7 @@ import {
   BookOpen,
   ChevronDown,
   Flag,
+  Home,
   LayoutGrid,
   Settings2,
   Swords,
@@ -62,6 +63,9 @@ export function Shell({
       <Link to="/game/warchest"><Brand /></Link><span className="header-divider" />
       <span className="breadcrumb">{title}</span><div className="header-space" />
       <span className="local-label"><i />服务端权威对局</span>
+      <Link className="header-home icon-button" to="/" aria-label="返回游戏首页" title="返回游戏首页">
+        <Home size={18} strokeWidth={1.8} />
+      </Link>
       <Link className="header-profile" to="/game/warchest/me">
         <span>{initial}</span><b>{profile?.name || '指挥官'}</b><ChevronDown size={13} />
       </Link>

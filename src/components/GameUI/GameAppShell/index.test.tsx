@@ -35,6 +35,7 @@ const baseProps: Omit<GameAppShellProps, 'children' | 'title'> = {
     mobileNavigation: '测试手机导航',
     profile: '个人资料',
     currentPlayer: '当前玩家',
+    platformHome: '返回游戏首页',
   },
 };
 
@@ -51,6 +52,7 @@ describe('GameAppShell', () => {
     expect(activeLinks).toHaveLength(2);
     expect(screen.getByRole('navigation', { name: '测试导航' })).toBeTruthy();
     expect(screen.getByRole('navigation', { name: '测试手机导航' })).toBeTruthy();
+    expect(screen.getByRole('link', { name: '返回游戏首页' }).getAttribute('href')).toBe('/');
     expect(screen.getAllByText('Alice-rail')).toHaveLength(1);
     expect(screen.getByText('Alice-header')).toBeTruthy();
     expect(screen.getByText('排行榜')).toBeTruthy();
