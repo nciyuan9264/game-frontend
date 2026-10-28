@@ -171,10 +171,12 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   const pageErrors: Error[] = [];
   page.on('pageerror', error => pageErrors.push(error));
   await page.setViewportSize({ width: 390, height: 844 });
-  const commands = await mockSession(page);
+  const commands = await mockSession(page, true);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
   const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
+  const turnStatus = page.getByTestId('turn-status');
   await expect(board).toBeVisible();
+  await expect(turnStatus).toHaveCSS('height', '100px');
   await expect.poll(() => board.evaluate(element =>
     getComputedStyle(element).colorScheme)).toBe('light only');
   await expect(page.getByRole('heading', { name: '选择你的下一步' })).toBeVisible();
@@ -221,10 +223,14 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   await page.getByRole('button', { name: '按坐标选择落点' }).click();
   await expect(page.getByRole('heading', { name: '精确选择落点' })).toBeVisible();
   await page.getByRole('button', { name: '预选落点 E7' }).click();
+  await expect(page.getByTestId('motion-status')).toBeVisible();
+  await expect(turnStatus).toHaveCSS('height', '100px');
   await expect.poll(() => commands.some(command =>
     command.includes('"game_move_ring"')
     && command.includes('"from":"E4"')
     && command.includes('"to":"E7"'))).toBe(true);
+  await expect(page.getByTestId('motion-status')).toBeHidden();
+  await expect(turnStatus).toHaveCSS('height', '100px');
   await expect(page.getByRole('button', { name: /确认落子/ })).toHaveCount(0);
   const normalWidth = (await page.getByTestId('yinsh-board').boundingBox())?.width ?? 0;
   await page.getByRole('button', { name: '放大棋盘' }).click();
