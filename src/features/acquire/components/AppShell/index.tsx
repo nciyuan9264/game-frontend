@@ -2,8 +2,8 @@ import type { ReactNode } from 'react';
 import { BookOpen, ChevronRight, LayoutGrid, Trophy, UserRound } from 'lucide-react';
 import { GameAppShell } from '@/components/GameUI/GameAppShell';
 import { GameAvatar } from '@/components/GameUI/GameAvatar';
+import { ClickFeedback } from '@/components/GameUI/ClickFeedback';
 import type { AuthProfile } from '@/features/game-core/api/auth';
-import { ClickFeedback } from '../ClickFeedback';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -84,7 +84,7 @@ export function AppShell({ children, title, profile, inMatch = false, hideRail =
     renderBrand={() => <Brand />}
     renderAvatar={avatarProps => <PlayerAvatar {...avatarProps} />}
     renderBreadcrumb={currentTitle => <><span>ACQUIRE</span><ChevronRight size={12} /><b>{currentTitle}</b></>}
-    renderFeedback={() => <ClickFeedback />}
+    renderFeedback={() => <ClickFeedback playSound={false} />}
     environmentLabel="在线版本"
     labels={{
       home: 'Acquire 游戏大厅',

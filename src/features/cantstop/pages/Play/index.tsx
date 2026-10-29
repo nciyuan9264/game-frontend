@@ -252,7 +252,7 @@ function DecisionPanel({
       <p>本回合最多启用三条路线。掷出后必须选择一个合法配对。</p></header>
     <DiceTray data={data} />
     <div className="cs-three-runners"><span>▲</span><span>▲</span><span>▲</span></div>
-    <ActionButton variant="primary" disabled={!canAct} onClick={onRoll}>
+    <ActionButton variant="primary" disabled={!canAct} data-click-sound="game-confirm" onClick={onRoll}>
       <Dices size={18} />掷出四枚骰子</ActionButton>
   </section>;
   if (phase === 'choose') return <section className="cs-decision-panel phase-choose">
@@ -280,7 +280,7 @@ function DecisionPanel({
     {!data.roomData.pairingOptions.length && <div className="cs-risk-card">
       <TriangleAlert size={18} /><span>没有合法路线，服务端会结算为失手。</span></div>}
     <ActionButton variant="primary" disabled={!canAct || !selectedActionID}
-      onClick={onAdvance}>沿这组前进<ArrowRight size={16} /></ActionButton>
+      data-click-sound="game-place" onClick={onAdvance}>沿这组前进<ArrowRight size={16} /></ActionButton>
   </section>;
   if (phase === 'decide') return <section className="cs-decision-panel phase-decide">
     <header><span className="cs-eyebrow">{selfTurn ? 'PRESS OR STOP' : 'WAITING FOR DECISION'}</span>
@@ -298,9 +298,9 @@ function DecisionPanel({
         <i><em style={{ width: `${risk}%` }} /></i></div>
     </div>
     <div className="cs-decision-actions">
-      <ActionButton variant="primary" disabled={!canAct} onClick={onRoll}>
+      <ActionButton variant="primary" disabled={!canAct} data-click-sound="game-confirm" onClick={onRoll}>
         <Dices size={16} />继续掷骰</ActionButton>
-      <ActionButton disabled={!canAct || gain <= 0} onClick={onBank}>
+      <ActionButton disabled={!canAct || gain <= 0} data-click-sound="game-confirm" onClick={onBank}>
         <ShieldCheck size={16} />{peaks.length ? '收手，锁定山顶' : '收手，保存进度'}</ActionButton>
     </div>
   </section>;
@@ -452,14 +452,17 @@ export function Play({
       <div><b>{statusTitle(data)}</b>
         <small>{isMyTurn(data) ? '轮到你行动' : `等待 ${activeName || '玩家'}`}</small></div>
       {phase === 'roll' && <ActionButton variant="primary"
-        disabled={!enabled || !isMyTurn(data)} onClick={() => session.submit('game_roll_dice')}>
+        disabled={!enabled || !isMyTurn(data)} data-click-sound="game-confirm"
+        onClick={() => session.submit('game_roll_dice')}>
         掷骰<Dices size={15} /></ActionButton>}
       {phase === 'choose' && <ActionButton variant="primary"
         disabled={!enabled || !isMyTurn(data) || !selectedActionID}
-        onClick={submitAdvance}>前进<ArrowRight size={14} /></ActionButton>}
+        data-click-sound="game-place" onClick={submitAdvance}>前进<ArrowRight size={14} /></ActionButton>}
       {phase === 'decide' && <><ActionButton disabled={!enabled || !isMyTurn(data)}
+        data-click-sound="game-confirm"
         onClick={() => session.submit('game_bank')}>收手<ShieldCheck size={14} /></ActionButton>
         <ActionButton variant="primary" disabled={!enabled || !isMyTurn(data)}
+          data-click-sound="game-confirm"
           onClick={() => session.submit('game_roll_dice')}>再掷<Dices size={14} /></ActionButton></>}
       {isTransition(data) && <ActionButton variant="primary" disabled={!enabled}
         onClick={() => session.submit('game_next_turn')}>下一位<ArrowRight size={14} /></ActionButton>}

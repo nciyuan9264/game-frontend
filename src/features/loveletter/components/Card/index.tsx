@@ -71,7 +71,8 @@ export function PlayingCard({
   const className = `ll-playing-card ${selected ? 'selected' : ''} ${compact ? 'compact' : ''}`;
   return onClick
     ? <button type="button" className={className} aria-pressed={selected}
-      disabled={disabled} onClick={onClick} aria-label={label ?? `选择${item.name}`}>
+      disabled={disabled} data-click-sound="game-select"
+      onClick={onClick} aria-label={label ?? `选择${item.name}`}>
       {body}</button>
     : <div className={className} aria-label={`${value} ${item.name}`}>{body}</div>;
 }

@@ -97,6 +97,7 @@ export function MoveCard({
     aria-label={label ?? `查看${card.name}详解`}
     aria-pressed={onClick && !mini ? selected : undefined}
     disabled={disabled}
+    data-click-sound={onClick ? 'game-select' : undefined}
     onClick={onClick}
   >
     <span className="card-heading">

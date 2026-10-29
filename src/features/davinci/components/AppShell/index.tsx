@@ -94,7 +94,7 @@ export function AppShell({
     renderBrand={() => <Brand />}
     renderAvatar={avatarProps => <PlayerAvatar {...avatarProps} />}
     renderBreadcrumb={currentTitle => <><span>DAVINCI</span><ChevronRight size={12} /><b>{currentTitle}</b></>}
-    renderFeedback={() => <ClickFeedback />}
+    renderFeedback={() => <ClickFeedback playSound={false} />}
     environmentLabel="在线版本"
     railAvatarSize={38}
     labels={{

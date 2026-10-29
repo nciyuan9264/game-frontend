@@ -82,6 +82,7 @@ export function CommandAction({
   return <span className={`action-tip-wrap ${active ? 'chosen' : ''}`} data-tip={reason}>
     <motion.button className={`action-button ${active ? 'active' : ''}`} disabled={!enabled}
       type="button" aria-label={`行动：${ACTION_NAMES[action]}`} aria-description={reason}
+      data-click-sound="game-select"
       onClick={() => onChoose(action)} whileHover={enabled ? { y: -2 } : undefined}
       whileTap={enabled ? { scale: .94, y: 1 } : undefined}>
       <Icon size={compact ? 18 : 19} strokeWidth={active ? 2 : 1.7} />
@@ -150,6 +151,7 @@ function CommandCoin({
   const type = coin.type ?? 'royal';
   return <motion.button layout="position" data-hand-slot={index} data-testid={`hand-${index}`}
     type="button" aria-label={`选择${UNITS[type].name}指令 ${index + 1}`} aria-pressed={selected}
+    data-click-sound="game-select"
     className={`hand-coin ${selected && enabled ? 'selected' : ''}`} disabled={!enabled}
     onClick={() => onSelect(coin.id)} initial={{ opacity: 0, y: 12, rotateY: 50 }}
     animate={{ opacity: 1, y: selected && enabled ? -5 : 0, rotateY: 0 }}

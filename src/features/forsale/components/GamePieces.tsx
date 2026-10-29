@@ -66,6 +66,7 @@ export const PropertyCard = ({
   return onClick
     ? <button type="button" className={className} disabled={disabled}
       aria-pressed={selected} aria-label={`选择${value}号房产`}
+      data-click-sound="game-select"
       onClick={onClick}>{body}</button>
     : <div className={className}>{body}</div>;
 };

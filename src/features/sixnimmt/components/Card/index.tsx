@@ -31,6 +31,7 @@ export function NumberCard({
   return onClick
     ? <button type="button" className={className}
       disabled={disabled} aria-pressed={selected}
+      data-click-sound="game-select"
       aria-label={`选择手牌 ${value}`} onClick={onClick}>{body}</button>
     : <span className={className}
       aria-label={`${value}，${points} 牛头`}>{body}</span>;

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import * as PIXI from 'pixi.js';
 import gsap from 'gsap';
+import { playGameSound } from '@/components/GameUI/GameAudio';
 import type { Card, GameStatus } from '@/features/davinci/model/types';
 import { computeInsertIndex } from './layout';
 import styles from './index.module.less';
@@ -68,11 +69,17 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
   }, []);
 
   const dispatchTileClick = useCallback((tileId: string) => {
-    runPointerAction('tile:' + tileId, () => onTileClickRef.current(tileId));
+    runPointerAction('tile:' + tileId, () => {
+      playGameSound('game-select');
+      onTileClickRef.current(tileId);
+    });
   }, [runPointerAction]);
 
   const dispatchSlotSelect = useCallback((index: number, tileId: string) => {
-    runPointerAction('slot:' + index + ':' + tileId, () => onSelectInsertPositionRef.current?.(index, tileId));
+    runPointerAction('slot:' + index + ':' + tileId, () => {
+      playGameSound('game-place');
+      onSelectInsertPositionRef.current?.(index, tileId);
+    });
   }, [runPointerAction]);
 
   const findHitTarget = useCallback((x: number, y: number) => {
@@ -1193,6 +1200,7 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
       ref={containerRef}
       className={styles.canvas}
       id="game-canvas-container"
+      data-click-sound="false"
     />
   );
 });

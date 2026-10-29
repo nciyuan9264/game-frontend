@@ -159,6 +159,7 @@ export function Play({
   const actionButton = <ActionButton
     variant="primary"
     disabled={!actionEnabled}
+    data-click-sound="game-place"
     onClick={mainAction}
   >{actionLabel}{mustPass ? <SkipForward size={17} /> : <ArrowRight size={17} />}</ActionButton>;
 

@@ -228,6 +228,7 @@ export function Board({
             ].filter(Boolean).join(' ')}
             tabIndex={canAct && mode === 'move' && sameCell(cursor, position) ? 0 : -1}
             aria-disabled={!canAct || mode !== 'move' || !allowed}
+            data-click-sound={canAct && mode === 'move' && allowed ? 'game-select' : 'false'}
             aria-label={`格 ${coordinate(position)}${occupant
               ? `，${occupant === 'south' ? '南方' : '北方'}棋子`
               : allowed ? '，可以到达' : ''}`}
@@ -298,6 +299,7 @@ export function Board({
             top: `${(position.row + 1) / BOARD_SIZE * 100}%`,
           }}
           aria-label={`围墙位置 ${coordinate(position)}，${orientation === 'h' ? '横向' : '纵向'}${option?.legal ? '，可以放置' : '，当前不可放置'}`}
+          data-click-sound={option?.legal ? 'game-select' : 'false'}
           onFocus={() => {
             setWallCursor(position);
             onHover?.({ kind: 'wall', wall });

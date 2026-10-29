@@ -507,6 +507,7 @@ export function Play({
         onClick={() => setPanel('choose')}>返回手牌</button>
         <button className="button primary" type="button"
           disabled={!active || !canReach(data, selectedCard.number, sprints)}
+          data-click-sound="game-place"
           onClick={submitMove}>
           {canReach(data, selectedCard.number, sprints)
             ? selectedCard.number === 42 ? '确认逃出城市' : '确认暗置'
@@ -580,6 +581,7 @@ export function Play({
       footer={<><button className="button secondary" type="button"
         onClick={() => setPanel('notebook')}>返回修改</button>
         <button className="button green" type="button" disabled={!active}
+          data-click-sound="game-confirm"
           onClick={submitSearch}>确认搜查<Search size={16} /></button></>}>
       <div className="search-number-chips">{numbers.map(number =>
         <b key={number}>{pad(number)}</b>)}</div>

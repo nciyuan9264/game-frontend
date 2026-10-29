@@ -227,7 +227,7 @@ export const Play = ({
             <ActionButton disabled={!canPass} onClick={() => setPanel('pass')}>
               退出本轮</ActionButton>
             <ActionButton variant="primary" disabled={!interaction.canBid}
-              onClick={interaction.submitBid}><Gavel size={16} />
+              data-click-sound="game-resource" onClick={interaction.submitBid}><Gavel size={16} />
               出价 {interaction.bid} 枚</ActionButton></div>
           <footer>{myTurn ? <>现在退出：拿 <b>{
             data.roomData.propertyMarket[0]} 号</b> · 退 <b>{
@@ -263,6 +263,7 @@ export const Play = ({
               ? `已选 ${interaction.property} 号 · ${propertyName(interaction.property)}`
               : '先选一张房产，再锁定'}</b></span>
             <ActionButton variant="primary" disabled={!interaction.canLock}
+              data-click-sound="game-confirm"
               onClick={interaction.lockSale}>锁定这张房产</ActionButton></footer>
         </section>}
 

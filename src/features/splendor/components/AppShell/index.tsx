@@ -104,7 +104,7 @@ export function AppShell({
     renderBrand={() => <Brand />}
     renderAvatar={avatarProps => <PlayerAvatar {...avatarProps} />}
     profileAccessory={<ChevronDown size={13} />}
-    renderFeedback={() => <ClickFeedback />}
+    renderFeedback={() => <ClickFeedback playSound={false} />}
     showRailInMatch={false}
     showOnlineStatus={false}
     environmentLabel="在线"

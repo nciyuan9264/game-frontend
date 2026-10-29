@@ -117,6 +117,7 @@ export function Board({
             ].filter(Boolean).join(' ')}
             aria-label={label}
             data-testid={`${testPrefix}-${coordinate(index)}`}
+            data-click-sound={move && interactive ? 'game-select' : 'false'}
             tabIndex={interactive && focusIndex === index ? 0 : -1}
             onClick={() => move && interactive && onCell(index)}
             onPointerEnter={event => {

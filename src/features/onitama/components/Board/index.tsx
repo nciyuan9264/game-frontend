@@ -119,6 +119,7 @@ export function Board({
           tabIndex={interactive && order === focusIndex ? 0 : -1}
           aria-label={label}
           disabled={!interactive}
+          data-click-sound={interactive ? 'game-select' : 'false'}
           className={[
             'board-cell',
             (row + column) % 2 ? 'shade' : '',

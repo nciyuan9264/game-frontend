@@ -459,7 +459,7 @@ export function Play({
               : <><i className="status-dot" /><span>{instruction}</span></>}
           </div>
           <button type="button" className="button primary action-submit"
-            disabled={!canCommit} onClick={commit}>
+            disabled={!canCommit} data-click-sound="game-place" onClick={commit}>
             {actionLabelText}<ArrowRight size={17} />
           </button>
         </div>
@@ -503,7 +503,7 @@ export function Play({
             : <><i className="status-dot" /><span>{instruction}</span></>}
         </div>
         <button type="button" className="button primary action-submit"
-          disabled={!canCommit} onClick={commit}>
+          disabled={!canCommit} data-click-sound="game-place" onClick={commit}>
           {actionLabelText}<ArrowRight size={17} />
         </button>
       </div>

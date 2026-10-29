@@ -37,7 +37,7 @@ function explicitSound(target: Element): ClickSound | undefined {
   return value;
 }
 
-function resolveClickSound(target: EventTarget | null): ClickSound | undefined {
+export function resolveClickSound(target: EventTarget | null): ClickSound | undefined {
   if (!(target instanceof Element)) return 'ui-click';
   if (target.closest('[data-click-sound="false"], :disabled, [aria-disabled="true"]')) return undefined;
   const explicit = explicitSound(target);
@@ -45,6 +45,11 @@ function resolveClickSound(target: EventTarget | null): ClickSound | undefined {
   if (target.closest(TAB_SELECTOR)) return 'tab-click';
   if (target.closest(BUTTON_SELECTOR)) return 'button-click';
   return 'ui-click';
+}
+
+export function resolveClickEventSound(event: Event): ClickSound | undefined {
+  if (!(event instanceof MouseEvent) || event.detail === 0 || event.button !== 0) return undefined;
+  return resolveClickSound(event.target);
 }
 
 function createParticles(seed: number): Particle[] {
@@ -87,9 +92,10 @@ export function ClickFeedback({
 
   useEffect(() => {
     const handleClick = (event: Event) => {
-      if (!(event instanceof MouseEvent) || event.detail === 0 || event.button !== 0) return;
+      if (!(event instanceof MouseEvent)) return;
       if (scopeRef && (!(event.target instanceof Node) || !scopeRef.current?.contains(event.target))) return;
-      const sound = resolveClickSound(event.target);
+      const sound = resolveClickEventSound(event);
+      if (!sound) return;
       if (playSound && sound) soundPlayer?.(sound);
       if (sound !== 'ui-click') return;
       if (!scopeRef && event.target instanceof Element && event.target.closest('dialog')) return;

@@ -289,7 +289,7 @@ function ActionPanel({
   if (phase === 'draw') return <><span className="ll-eyebrow">YOUR TURN / 01</span>
     <h2>轮到你，先摸一张。</h2><p>摸一张牌，再从手中的两张里选一张打出。</p>
     <div className="ll-draw-illustration"><CardBack /><Feather /></div>
-    <ActionButton variant="primary" disabled={!enabled} onClick={onDraw}>
+    <ActionButton variant="primary" disabled={!enabled} data-click-sound="game-resource" onClick={onDraw}>
       摸一张牌<Plus size={16} /></ActionButton></>;
   if (phase === 'chancellor') return <><span className="ll-eyebrow">CHANCELLOR</span>
     <h2>留下一封最合适的。</h2><p>大臣的候选牌只对你可见，请在私密面板完成选择。</p></>;
@@ -332,7 +332,7 @@ function ActionPanel({
         : `确认打出「${selectedRole.name}」`
       : ui.requiresTarget && !ui.targetPlayerID ? '请先选择一位有效目标' : '完成所需选择后再确认'}</p>
       <ActionButton variant={selectedRole.rank === 9 ? 'danger' : 'primary'}
-        disabled={!ui.canSubmit || !enabled} onClick={ui.submitCard}>
+        disabled={!ui.canSubmit || !enabled} data-click-sound="game-place" onClick={ui.submitCard}>
         {selectedRole.rank === 9 ? '确认弃掉公主并出局' : `确认打出${selectedRole.name}`}
         <ArrowRight size={15} /></ActionButton></div></>;
 }
