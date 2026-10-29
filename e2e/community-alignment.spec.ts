@@ -229,14 +229,21 @@ for (const item of cases) {
 
       const create = page.getByRole('button', { name: /创建房间|新开一局/ }).first();
       const share = page.getByRole('button', { name: /分享游戏/ }).first();
-      const [createBox, shareBox] = await Promise.all([
+      const description = hero.locator('h1 + p');
+      const [createBox, shareBox, descriptionBox] = await Promise.all([
         create.boundingBox(),
         share.boundingBox(),
+        description.boundingBox(),
       ]);
       expect(createBox).toMatchObject({ width: 129, height: 39 });
       expect(shareBox).toMatchObject({ width: 99, height: 39 });
+      expect((createBox?.x ?? 0) - (heroBox?.x ?? 0)).toBe(21);
+      expect(shareBox?.y).toBe(createBox?.y);
       expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
         - ((createBox?.y ?? 0) + (createBox?.height ?? 0)))
+        .toBe(9);
+      expect((createBox?.y ?? 0)
+        - ((descriptionBox?.y ?? 0) + (descriptionBox?.height ?? 0)))
         .toBeGreaterThanOrEqual(8);
 
       await share.click();
