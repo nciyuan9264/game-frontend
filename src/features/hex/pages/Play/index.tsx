@@ -4,6 +4,7 @@ import {
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { Board } from '../../components/Board';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Stone } from '../../components/Artwork';
@@ -102,7 +103,28 @@ export function Play({
           : isMobile ? '轻点空格预选' : '点击空格直接落子';
 
   return <div className="playing-page" data-testid="game-page">
-    <div className="top-shell"><header className="app-header">
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="返回大厅"
+      kicker={`HEX · 第 ${data.roomData.roundNo} 局`}
+      title={data.roomID}
+      status={!ended && data.roomData.turnDeadline
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : ended ? '已结束' : '--'}
+      actions={<>
+        <button type="button" className="header-help" aria-label="玩法指南"
+          title="玩法指南" onClick={() => ui.setPanel('rules')}>
+          <BookOpen size={19} /><span data-game-mobile-action-label>玩法指南</span></button>
+        {!ended && <button type="button" className="icon-button"
+          aria-label="打开对局菜单" title="打开对局菜单"
+          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>}
+        {ended && <button type="button" className="header-help"
+          aria-label="返回终局结算" title="返回终局结算"
+          onClick={() => ui.setShowResults(true)}>
+          <Trophy size={17} /><span data-game-mobile-action-label>结算</span></button>}
+      </>}
+    />
+    <div className="top-shell" data-game-desktop-topbar><header className="app-header">
       <button className="icon-button back-button" aria-label="返回大厅"
         onClick={onLeave}><ArrowLeft size={20} /></button>
       <div className="header-context match-context"><strong>{data.roomID}</strong>

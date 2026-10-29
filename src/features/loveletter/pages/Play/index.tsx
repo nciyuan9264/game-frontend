@@ -20,6 +20,7 @@ import {
   Shield,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { CardBack, Hearts, PlayingCard, Portrait } from '../../components/Card';
 import { Dialog } from '../../components/Dialog';
 import { useLoveLetterPlayUI } from '../../hooks/useLoveLetterPlayUI';
@@ -97,7 +98,23 @@ export function Play({
   />;
 
   return <div className="ll-play" data-testid="loveletter-play">
-    <header className="ll-game-header">
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker="THE ROSE COURT · 玫瑰庭院"
+      title={`第 ${String(data.roomData.roundNo).padStart(2, '0')} 轮 · ${
+        phase === 'end' ? '终局回看' : '心意未明'}`}
+      status={countdown}
+      actions={<>
+        <button type="button" aria-label="公开记录" title="公开记录"
+          onClick={() => ui.setPanel('log')}><History size={18} /></button>
+        <button type="button" aria-label="角色速查" title="角色速查"
+          onClick={() => ui.setPanel('reference')}><BookOpen size={18} /></button>
+        <button type="button" aria-label="对局菜单" title="对局菜单"
+          onClick={onLeave}><MoreHorizontal size={20} /></button>
+      </>}
+    />
+    <header className="ll-game-header" data-game-desktop-topbar>
       <button type="button" aria-label="离开对局" onClick={onLeave}>
         <ArrowLeft size={20} /></button>
       <div><small>THE ROSE COURT / 玫瑰庭院</small>

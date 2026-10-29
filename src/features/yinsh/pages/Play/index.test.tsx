@@ -90,14 +90,14 @@ describe('YINSH play', () => {
       submit,
     } as unknown as YinshSession;
     const { rerender } = render(<Play session={session} data={snapshot()} onLeave={vi.fn()} />);
-    expect(screen.getByText('30s')).toBeTruthy();
+    expect(screen.getAllByText('30s')).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: '选择白环 E4' }));
     fireEvent.click(screen.getByRole('button', { name: '移动到 E7' }));
     expect(submit).toHaveBeenCalledWith('game_move_ring', { from: 'E4', to: 'E7' });
 
     rerender(<Play session={session} data={snapshot('ai_2')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
-    expect(screen.getByText('--')).toBeTruthy();
+    expect(screen.getAllByText('--').length).toBeGreaterThan(0);
   });
 
   it('submits an exact-coordinate destination without confirmation', () => {
@@ -138,14 +138,14 @@ describe('YINSH play', () => {
     expect(screen.queryByRole('button', { name: /返回大厅/ })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: '回到棋盘' }));
-    expect(screen.getByRole('button', {
+    expect(screen.getAllByRole('button', {
       name: '返回终局结算',
-    })).toBeTruthy();
+    })).toHaveLength(2);
     expect(screen.queryByTestId('yinsh-mobile-dock')).toBeNull();
 
-    fireEvent.click(screen.getByRole('button', {
+    fireEvent.click(screen.getAllByRole('button', {
       name: '返回终局结算',
-    }));
+    })[0]);
     expect(screen.getByRole('button', { name: '回到棋盘' })).toBeTruthy();
   });
 

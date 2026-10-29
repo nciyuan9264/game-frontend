@@ -35,7 +35,7 @@ export function Results({
     : won ? '这一轮，你的信抵达了。' : '心意有归处，下封再相逢。';
 
   return <div className="ll-results">
-    <header><button type="button" aria-label="返回大厅" onClick={onExit}>
+    <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
       <ArrowLeft size={19} /></button>
       <span>ROUND {String(data.roomData.roundNo).padStart(2, '0')}
         {' / '}{final ? 'THE FINAL LETTER' : 'A LETTER DELIVERED'}</span>
@@ -89,6 +89,8 @@ export function Results({
     </div>
     <footer className="ll-result-actions">
       <ActionButton onClick={onExit}><History size={15} />回到大厅</ActionButton>
+      <ActionButton className="ll-mobile-result-review"
+        onClick={onReview}><Eye size={15} />查看终局牌桌</ActionButton>
       {!final && owner && <ActionButton variant="primary" disabled={!enabled}
         onClick={onNextRound}>下一轮，继续传信<ArrowRight size={16} /></ActionButton>}
       {!final && !owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}

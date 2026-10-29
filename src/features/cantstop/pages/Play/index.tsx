@@ -19,6 +19,7 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { CantStopSession } from '../../hooks/useCantStopSession';
@@ -398,7 +399,20 @@ export function Play({
         - (data.roomData.players[b]?.seatIndex ?? 0));
 
   return <div className="cs-play" data-testid="cantstop-play">
-    <header className="cs-game-header">
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开牌桌"
+      kicker={`CAN'T STOP · 第 ${data.roomData.turnNumber || 1} 回合`}
+      title={phase === 'end' ? '终局棋盘' : statusTitle(data)}
+      status={countdown}
+      actions={<>
+        <button type="button" aria-label="规则速览" title="规则速览"
+          onClick={() => setPanel('rules')}><BookOpen size={18} /></button>
+        <button type="button" aria-label="牌桌菜单" title="牌桌菜单"
+          onClick={() => setPanel('routes')}><Settings2 size={18} /></button>
+      </>}
+    />
+    <header className="cs-game-header" data-game-desktop-topbar>
       <button type="button" aria-label="离开牌桌" onClick={onLeave}>
         <ArrowLeft size={20} /></button>
       <div><small>CAN&apos;T STOP · ONLINE TABLE</small>

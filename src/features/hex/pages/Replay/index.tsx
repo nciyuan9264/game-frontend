@@ -7,6 +7,7 @@ import type {
   HexPlayerState, HexReplaySnapshot, HexResult, HexRoomData,
 } from '@/api/generated/game-platform';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { ReplayEventData } from '@/features/game-core/model/history';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
@@ -109,7 +110,14 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const total = replay.totalSnapshots;
 
   return <AppShell inMatch hideHeader title="对局回放" profile={replay.profile}>
-    <div className={styles.page}><header className={styles.heading}>
+    <div className={styles.page}>
+    <GameMobileReplayHeading
+      backTo="/game/hex/me"
+      backLabel="返回战绩"
+      kicker="HEX REPLAY · 房间号"
+      title={replay.detail?.game.roomID ?? '对局回放'}
+    />
+    <header className={styles.heading} data-game-desktop-topbar>
       <Link to="/game/hex/me" aria-label="返回战绩"><ArrowLeft size={18} /></Link>
       <div><small>HEX REPLAY · 房间号</small>
         <h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div><span>只读回放</span>

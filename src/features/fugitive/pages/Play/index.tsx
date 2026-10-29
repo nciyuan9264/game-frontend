@@ -27,6 +27,7 @@ import {
   Target,
   TriangleAlert,
 } from 'lucide-react';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import {
   Brand,
   CardBack,
@@ -276,7 +277,22 @@ export function Play({
   return <div className={`game-app ${isRunner ? 'runner-game' : 'marshal-game'}`}
     data-testid="fugitive-play">
     <div className="game-underlay" aria-hidden={!!panel}>
-      <div className="topbar">
+      <GameMobileTopbar
+        onBack={onLeave}
+        backLabel="离开对局"
+        kicker={`#${data.roomID} · 第 ${pad(data.roomData.roundNo)} 回合`}
+        title={roomName}
+        status={countdown}
+        actions={<>
+          <button className="icon-button" type="button" aria-label="追逐记录"
+            title="追逐记录"
+            onClick={() => setPanel('history')}><History size={19} /></button>
+          <button className="icon-button" type="button" aria-label="对局规则"
+            title="对局规则"
+            onClick={() => setPanel('rules')}><BookOpen size={19} /></button>
+        </>}
+      />
+      <div className="topbar" data-game-desktop-topbar>
         <header className="game-header">
           <button className="icon-button" type="button" aria-label="离开对局"
             onClick={onLeave}><ArrowLeft size={20} /></button>

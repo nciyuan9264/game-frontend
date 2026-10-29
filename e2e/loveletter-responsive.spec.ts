@@ -297,6 +297,10 @@ test('Love Letter mobile room keeps six seats and the ready dock in view', async
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, roomSnapshot());
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   const seats = page.locator('.ll-seat');
   await expect(seats).toHaveCount(6);
   const firstSeat = await seats.first().boundingBox();
@@ -321,7 +325,8 @@ test('Love Letter mobile submits guard target and guess atomically', async ({
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('loveletter-play')).toBeVisible();
-  await expect(page.locator('.ll-game-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.ll-game-header')).toBeHidden();
   const identityPortraitLocator = page.locator(
     '.ll-hand > header > .ll-portrait',
   );
@@ -357,11 +362,16 @@ test('Love Letter mobile submits guard target and guess atomically', async ({
   expect(pageErrors).toEqual([]);
 });
 
-test('Love Letter mobile results keep the shared topbar height', async ({ page }) => {
+test('Love Letter mobile results omit the game topbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, gameSnapshot('end'));
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
 
   await expect(page.locator('.ll-results')).toBeVisible();
-  await expect(page.locator('.ll-results > header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
+  await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
+  await expect(page.locator('.ll-mobile-result-review')).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('[data-game-result-topbar]')).toBeVisible();
+  await expect(page.locator('.ll-mobile-result-review')).toBeHidden();
 });

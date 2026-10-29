@@ -187,6 +187,8 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
     name: '黑白棋棋盘，8 行 8 列。方向键移动，回车落子。',
   });
   await expect(board).toBeVisible();
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   await expect(page.getByRole('heading', { name: '轮到你了' })).toBeVisible();
   await expect(board.locator(':scope > i')).toHaveCount(0);
   await expect.poll(() => page.getByTestId('cell-A1').evaluate(element => ({

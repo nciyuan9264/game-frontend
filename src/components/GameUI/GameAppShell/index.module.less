@@ -63,9 +63,30 @@
 }
 
 @media (max-width: 767px) {
+  [data-game-shell] [data-game-shell-divider],
+  [data-game-shell] [data-game-shell-breadcrumb],
+  [data-game-shell] [data-game-shell-environment] {
+    display: none !important;
+  }
+
+  [data-game-shell='app'] [data-game-shell-tools] > :not([data-game-shell-platform-home]),
+  [data-game-shell='match'] [data-game-shell-tools] {
+    display: none !important;
+  }
+
   .platformHomeLink {
-    width: 31px;
-    height: 31px;
+    width: 40px;
+    height: 40px;
+    align-self: center;
+
+    > svg {
+      width: 21px;
+      height: 21px;
+    }
+  }
+
+  [data-game-shell-profile] {
+    display: none !important;
   }
 
   .compactMobileShell {

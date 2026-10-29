@@ -5,6 +5,7 @@ import {
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { PlayerAvatar } from '../../components/AppShell';
 import { GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
@@ -162,7 +163,27 @@ export function Play({
     selectionLocked={selectionLocked} onToggle={ui.toggleGem} />;
 
   return <div className={styles.play}>
-    <header className={styles.topbar}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={21} /></button>
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker={`SPLENDOR · ${playerIDs.length} 人 · ${roundTitle}`}
+      title={data.roomID}
+      status={data.roomData.gameStatus === 'end'
+        ? '已结束'
+        : data.roomData.turnDeadline && playable && myTurn
+          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+          : '--'}
+      actions={<>
+        <button type="button" aria-label="商会动态" title="商会动态"
+          onClick={() => ui.openPanel('activity')}><History size={18} /></button>
+        <button type="button" aria-label="对局规则" title="对局规则"
+          onClick={() => ui.openPanel('rules')}><BookOpen size={19} /></button>
+        {data.roomData.gameStatus === 'end' && <button type="button"
+          aria-label="查看结算" title="查看结算"
+          onClick={() => setShowResults(true)}><Eye size={16} /></button>}
+      </>}
+    />
+    <header className={styles.topbar} data-game-desktop-topbar><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={21} /></button>
       <div className={styles.brand}><GemIcon color="Red" size={25} /><span><b>SPLENDOR</b><small>璀 璨 宝 石 · 商 会</small></span></div>
       <span className={styles.divider} /><div className={styles.roomName}><strong>{data.roomID}</strong>
         <small>{playerIDs.length} 人 · {roundTitle} · {roundDescription}</small></div>

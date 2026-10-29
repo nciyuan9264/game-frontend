@@ -6,6 +6,7 @@ import { snapshotToWsRoomSyncData } from './snapshotAdapter';
 import EconomyChart from './EconomyChart';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Board } from '../../components/Board';
 import { MarketTable } from '../../components/MarketTable';
 import { AcquireLoading } from '../../components/LoadingState';
@@ -75,7 +76,13 @@ function ReplayContent({ gameID }: { gameID: number }) {
   </AppShell>;
   return <AppShell inMatch title="对局回放" profile={replay.profile} hideHeader hideRail><div
     className={`${styles.page} ${tab === 'economy' ? styles.economyPage : ''}`}>
-    <header className={styles.heading}><div className={styles.headingIdentity}><Link to="/game/acquire/me" className={styles.backButton} aria-label="返回战绩"><ArrowLeft size={19} /></Link><div><small>CLASSIC REPLAY · 房间号</small><h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div></div>
+    <GameMobileReplayHeading
+      backTo="/game/acquire/me"
+      backLabel="返回战绩"
+      kicker="CLASSIC REPLAY · 房间号"
+      title={replay.detail?.game.roomID ?? '对局回放'}
+    />
+    <header className={styles.heading} data-game-desktop-topbar><div className={styles.headingIdentity}><Link to="/game/acquire/me" className={styles.backButton} aria-label="返回战绩"><ArrowLeft size={19} /></Link><div><small>CLASSIC REPLAY · 房间号</small><h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div></div>
       <div className={styles.headingTools}><span className={styles.replayBadge}>只读回放</span></div></header>
     {replay.initialError && <Feedback error>{replay.initialError}<ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
     {replay.initialLoading && <AcquireLoading title="正在重建这座城。" description="正在载入首批快照与时间轴" status="正在准备回放" />}

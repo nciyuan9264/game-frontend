@@ -95,14 +95,14 @@ describe('OTHELLO play', () => {
       submit,
     } as unknown as OthelloSession;
     const { rerender } = render(<Play session={session} data={snapshot()} onLeave={vi.fn()} />);
-    expect(screen.getByText('30s')).toBeTruthy();
+    expect(screen.getAllByText('30s')).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', {
       name: 'D3，可落子，翻转 1 枚',
     }));
     expect(submit).toHaveBeenCalledWith('game_place_disc', { index: 19 });
 
     rerender(<Play session={session} data={snapshot('ai_2')} onLeave={vi.fn()} />);
-    expect(screen.getByText('30s')).toBeTruthy();
+    expect(screen.getAllByText('30s')).toHaveLength(2);
   });
 
   it('submits an explicit pass only in the server pass phase', () => {
@@ -131,9 +131,13 @@ describe('OTHELLO play', () => {
     expect(screen.queryByRole('button', { name: /返回大厅/ })).toBeNull();
 
     fireEvent.click(screen.getByRole('button', { name: '回到棋盘' }));
-    expect(screen.getByRole('button', { name: '返回终局结算' })).toBeTruthy();
+    expect(screen.getAllByRole('button', {
+      name: '返回终局结算',
+    })).toHaveLength(2);
 
-    fireEvent.click(screen.getByRole('button', { name: '返回终局结算' }));
+    fireEvent.click(screen.getAllByRole('button', {
+      name: '返回终局结算',
+    })[0]);
     expect(screen.getByRole('button', { name: '回到棋盘' })).toBeTruthy();
   });
 

@@ -21,6 +21,7 @@ import type {
   QuoridorRoomData,
 } from '@/api/generated/game-platform';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { ReplayEventData } from '@/features/game-core/model/history';
 import { useReplayPanel } from '@/features/game-core/hooks/useReplayPanel';
@@ -161,7 +162,13 @@ function ReplayContent({ gameID }: { gameID: number }) {
 
   return <AppShell inMatch hideHeader title="对局回放" profile={replay.profile}>
     <div className={styles.page}>
-      <header className={styles.heading}>
+      <GameMobileReplayHeading
+        backTo="/game/quoridor/me"
+        backLabel="返回战绩"
+        kicker="QUORIDOR REPLAY · 房间号"
+        title={replay.detail?.game.roomID ?? '对局回放'}
+      />
+      <header className={styles.heading} data-game-desktop-topbar>
         <Link to="/game/quoridor/me" aria-label="返回战绩">
           <ArrowLeft size={18} /></Link>
         <div><small>QUORIDOR REPLAY · 房间号</small>

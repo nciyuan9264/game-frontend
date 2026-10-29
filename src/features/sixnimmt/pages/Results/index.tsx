@@ -46,7 +46,7 @@ export function Results({
   const won = winners.includes(data.playerId);
 
   return <div className="sn-results">
-    <header><button type="button" aria-label="返回大厅" onClick={onExit}>
+    <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
       <ArrowLeft size={19} /></button>
       <span>ROUND {String(data.roomData.roundNo).padStart(2, '0')}
         {' / '}{final ? 'FINAL SCORE' : 'ROUND COMPLETE'}</span>
@@ -101,6 +101,8 @@ export function Results({
 
     <footer className="sn-result-actions">
       <ActionButton onClick={onExit}><History size={15} />回到大厅</ActionButton>
+      <ActionButton className="sn-mobile-result-review"
+        onClick={onReview}><Eye size={15} />查看终局牌桌</ActionButton>
       {!final && owner && <ActionButton variant="primary" disabled={!enabled}
         onClick={onNextRound}>继续下一局<ArrowRight size={16} /></ActionButton>}
       {!final && !owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}

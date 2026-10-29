@@ -284,7 +284,8 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
 
   const results = page.getByTestId('splendor-results');
   await expect(results).toBeVisible();
-  await expect(results.locator('> header')).toHaveCSS('height', '57px');
+  await expect(results.locator('[data-game-result-topbar]')).toBeHidden();
+  await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
   await expect(results.getByRole('button', { name: '返回大厅' })).toHaveCount(0);
   await expect(results.getByText('结算结果来自本局服务端快照')).toHaveCount(0);
   await expect(results.getByRole('button', { name: '查看终局牌面' })).toBeVisible();
@@ -318,13 +319,12 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
 
   await results.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByTestId('splendor-market')).toBeVisible();
-  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
-  const topbarStatus = page.getByTestId('splendor-topbar-status');
-  const resultsButton = topbarStatus.getByRole('button', { name: '查看结算' });
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  await expect(mobileTopbar).toBeVisible();
+  const resultsButton = mobileTopbar.getByRole('button', { name: '查看结算' });
   await expect(resultsButton).toBeVisible();
-  await expect(topbarStatus.getByText('--', { exact: true })).toHaveCount(0);
-  expect(await resultsButton.evaluate(element =>
-    element.parentElement?.getAttribute('data-testid'))).toBe('splendor-topbar-status');
+  await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]'))
+    .toHaveText('已结束');
   await page.screenshot({
     path: testInfo.outputPath('splendor-mobile-board-return.png'),
     fullPage: true,

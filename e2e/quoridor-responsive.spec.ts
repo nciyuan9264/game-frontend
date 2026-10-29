@@ -320,8 +320,8 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
 
   const board = page.getByRole('group', { name: 'Quoridor 九乘九棋盘' });
   await expect(board).toBeVisible();
-  await expect(page.locator('.playing-page > .top-shell > .app-header'))
-    .toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.playing-page > .top-shell > .app-header')).toBeHidden();
   await expect(board.getByTestId(/^cell-/)).toHaveCount(81);
   const dock = page.getByTestId('quoridor-mobile-dock');
   const cancelButton = dock.getByRole('button', { name: '取消选择' });
@@ -338,7 +338,7 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   expect((actionBox?.x ?? 0) - ((cancelBox?.x ?? 0) + (cancelBox?.width ?? 0))).toBe(8);
   await expect(actionButton.locator('svg')).toBeHidden();
   await page.setViewportSize({ width: 360, height: 800 });
-  const topbar = page.locator('.playing-page > .top-shell > .app-header');
+  const topbar = page.locator('[data-game-mobile-topbar]');
   const visibleTopbarBoxes = await topbar.locator(':scope > *').evaluateAll(elements =>
     elements.flatMap(element => {
       const box = element.getBoundingClientRect();
@@ -346,8 +346,6 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
     }));
   expect(visibleTopbarBoxes.every((box, index) =>
     index === 0 || visibleTopbarBoxes[index - 1].right <= box.left)).toBe(true);
-  await expect(topbar.locator('.match-context > small')).toBeHidden();
-  await expect(topbar.locator('.turn-context > small')).toBeHidden();
   await capture(page, testInfo, 'mobile-topbar-360');
   await page.getByRole('button', { name: '打开对局菜单' }).click();
   const gameMenu = page.getByTestId('quoridor-game-menu');
@@ -431,8 +429,8 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看棋盘' }).click();
-  await expect(page.locator('.playing-page > .top-shell > .app-header'))
-    .toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.playing-page > .top-shell > .app-header')).toBeHidden();
   await expect(page.getByRole('group', {
     name: 'Quoridor 九乘九棋盘',
   })).toBeVisible();
@@ -442,7 +440,8 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
   await expect(page.getByRole('button', {
     name: '打开对局菜单',
   })).toHaveCount(0);
-  await expect(page.locator('.match-context')).toHaveCSS('white-space', 'nowrap');
+  await expect(page.locator('[data-game-mobile-topbar-identity] strong'))
+    .toHaveCSS('white-space', 'nowrap');
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-final-board');
 

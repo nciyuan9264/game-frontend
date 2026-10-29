@@ -314,6 +314,10 @@ test('For Sale mobile room follows the Acquire preparation layout',
     await mockMatchRoom(page);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.locator('.fs-room-page')).toBeVisible();
+    await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+    await expect(page.locator('[data-game-brand]')).toBeVisible();
+    await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+    await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
     await expect(page.locator('.fs-seat')).toHaveCount(6);
     await expect(page.getByText('公开多人房间')).toBeVisible();
     const geometry = await page.locator('.fs-seat-grid').evaluate(element => {
@@ -388,14 +392,17 @@ test('For Sale mobile auction keeps cards and actions usable',
     const commands = await mockSession(page, 3);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.getByTestId('forsale-play')).toBeVisible();
-    await expect(page.locator('.fs-game-header')).toHaveCSS('min-height', '57px');
-    const headerGeometry = await page.locator('.fs-game-header').evaluate(header => {
+    await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+    await expect(page.locator('.fs-game-header')).toBeHidden();
+    const headerGeometry = await page.locator('[data-game-mobile-topbar]').evaluate(header => {
       const box = header.getBoundingClientRect();
-      const identity = header.querySelector<HTMLElement>(':scope > div')
+      const identity = header.querySelector<HTMLElement>('[data-game-mobile-topbar-identity]')
         ?.getBoundingClientRect();
-      const timer = header.querySelector<HTMLElement>('.fs-timer')
+      const timer = header.querySelector<HTMLElement>('[data-game-mobile-topbar-status]')
         ?.getBoundingClientRect();
-      const buttons = header.querySelectorAll<HTMLElement>(':scope > button');
+      const buttons = header.querySelectorAll<HTMLElement>(
+        '[data-game-mobile-topbar-actions] > button',
+      );
       const menu = buttons.item(buttons.length - 1).getBoundingClientRect();
       return {
         menuRightInset: box.right - menu.right,
@@ -403,9 +410,9 @@ test('For Sale mobile auction keeps cards and actions usable',
         menuWidth: menu.width,
       };
     });
-    expect(headerGeometry.menuRightInset).toBe(10);
+    expect(headerGeometry.menuRightInset).toBeGreaterThanOrEqual(7);
     expect(headerGeometry.identityToTimerGap).toBeGreaterThanOrEqual(5);
-    expect(headerGeometry.menuWidth).toBe(29);
+    expect(headerGeometry.menuWidth).toBeGreaterThanOrEqual(31);
     await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
     await expect(page.getByLabel('总出价金币')).toHaveValue('3');
     await page.getByRole('button', { name: '退出本轮' }).click();

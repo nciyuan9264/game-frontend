@@ -20,6 +20,7 @@ import {
   Wallet,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import sold from '../assets/sold.webp';
 import {
@@ -102,7 +103,20 @@ export const Play = ({
   const maxBid = (self?.coins ?? 0) + (self?.bid ?? 0);
 
   return <div className="fs-play" data-testid="forsale-play">
-    <header className="fs-game-header"><button type="button"
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker={`THE SUNDAY AUCTION · ${data.roomData.playerOrder.length} 人经典局`}
+      title={data.roomID}
+      status={countdown}
+      actions={<>
+        <button type="button" aria-label="公开记录" title="公开记录"
+          onClick={() => setPanel('log')}><History size={18} /></button>
+        <button type="button" aria-label="对局菜单" title="对局菜单"
+          onClick={() => setPanel('menu')}><MoreHorizontal size={20} /></button>
+      </>}
+    />
+    <header className="fs-game-header" data-game-desktop-topbar><button type="button"
       aria-label="离开对局" onClick={onLeave}><ArrowLeft size={19} /></button>
       <div><small>THE SUNDAY AUCTION · 房间号</small>
         <h1><span className="fs-game-room-id">{data.roomID}</span><span>·</span>

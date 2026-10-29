@@ -76,7 +76,9 @@ describe('Acquire play end transition', () => {
     } as unknown as AcquireInteraction;
 
     const { rerender } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
-    expect(screen.getByRole('timer', { name: '本阶段剩余 30 秒' })).toBeTruthy();
+    expect(screen.getAllByRole('timer', {
+      name: '本阶段剩余 30 秒',
+    })).toHaveLength(2);
 
     active.roomData.currentPlayer = 'guest';
     rerender(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
@@ -90,7 +92,9 @@ describe('Acquire play end transition', () => {
 
     active.tempData.merge_settle_current_player = 'me';
     rerender(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
-    expect(screen.getByRole('timer', { name: '本阶段剩余 30 秒' })).toBeTruthy();
+    expect(screen.getAllByRole('timer', {
+      name: '本阶段剩余 30 秒',
+    })).toHaveLength(2);
   });
 
   it('opens the results page automatically when the server snapshot enters end', () => {
@@ -133,8 +137,9 @@ describe('Acquire play end transition', () => {
     render(<Play data={ended} session={session} interaction={interaction} onLeave={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: '查看终局棋盘' }));
 
-    const resultsButton = screen.getByRole('button', { name: '查看本局结算' });
-    expect(resultsButton).toBeTruthy();
+    const resultsButtons = screen.getAllByRole('button', { name: '查看本局结算' });
+    expect(resultsButtons).toHaveLength(2);
+    const resultsButton = resultsButtons[0];
     fireEvent.click(resultsButton);
     expect(screen.getByRole('heading', { name: '一城落定，好局未完。' })).toBeTruthy();
   });

@@ -29,7 +29,7 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
   const topScore = players[0] ? data.result?.[players[0][0]]?.score ?? data.playerData[players[0][0]]?.score ?? 0 : 0;
 
   return <div className={styles.results} data-testid="splendor-results">
-    <header className={styles.topbar}>
+    <header className={styles.topbar} data-game-result-topbar>
       <span className={styles.brand}><BrandMark size={25} /><span><b>SPLENDOR</b><small>璀 璨 宝 石 · 商 会</small></span></span>
       <span className={styles.spacer} /><em>{readOnly ? '只读回放 · 最终结算' : '对局结算'}</em></header>
     <main className={styles.page}><section className={styles.celebration}><img src={hero} alt="暮色中的文艺复兴宝石商港" />

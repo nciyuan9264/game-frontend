@@ -75,7 +75,7 @@ function Session({ roomID }: { roomID: string }) {
     : session.feedback || nextMatch.error || undefined;
 
   return <>
-    {snapshot?.type === 'MATCH_SYNC' && <Shell title="备战房间" profile={profile}>
+    {snapshot?.type === 'MATCH_SYNC' && <Shell inMatch title="备战房间" profile={profile}>
       {session.feedback && <div className="toast" role="alert">{session.feedback}</div>}
       {connectionNotice && !session.feedback && <Notice>{connectionNotice}</Notice>}
       <Room session={session} data={snapshot} room={target.data.room}

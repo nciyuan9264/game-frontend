@@ -24,6 +24,7 @@ import {
 import type { ReactNode } from 'react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { Board } from '../../components/Board';
 import { PlayerAvatar } from '../../components/AppShell';
 import {
@@ -282,7 +283,31 @@ export function Play({
     data-south={coordinate(data.roomData.pawns.south)}
     data-north={coordinate(data.roomData.pawns.north)}
   >
-    <div className="top-shell">
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="返回大厅"
+      kicker={`QUORIDOR · 第 ${data.roomData.roundNo} 局`}
+      title={data.roomID}
+      status={!ended && data.roomData.turnDeadline
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : ended ? '已结束' : '--'}
+      actions={<>
+        <button type="button" className="icon-button" aria-label="查看行棋记录"
+          title="查看行棋记录" onClick={() => ui.setPanel('activity')}>
+          <History size={20} /></button>
+        <button type="button" className="header-help" aria-label="玩法指南"
+          title="玩法指南" onClick={() => ui.setPanel('rules')}>
+          <BookOpen size={19} /><span data-game-mobile-action-label>玩法指南</span></button>
+        {!ended && <button type="button" className="icon-button"
+          aria-label="打开对局菜单" title="打开对局菜单"
+          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>}
+        {ended && <button type="button" className="header-help"
+          aria-label="返回终局结算" title="返回终局结算"
+          onClick={() => ui.setShowResults(true)}>
+          <Trophy size={17} /><span data-game-mobile-action-label>结算</span></button>}
+      </>}
+    />
+    <div className="top-shell" data-game-desktop-topbar>
       <header className="app-header">
         <button type="button" className="icon-button back-button"
           aria-label="返回大厅" onClick={onLeave}><ArrowLeft size={20} /></button>

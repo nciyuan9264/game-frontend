@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ArrowLeft, Maximize2, Trophy, Wallet } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { Board } from '../../components/Board';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
@@ -94,7 +95,22 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
     </ResponsiveDialog>}</>;
   return <>
     <div ref={mobileFit.containerRef} className={playFitClassName}>
-      <div className={styles.heading}><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
+      <GameMobileTopbar
+        onBack={onLeave}
+        backLabel="离开当前对局"
+        kicker="CLASSIC TABLE · 房间号"
+        title={data.roomID}
+        status={<Deadline deadline={turnDeadline} />}
+        actions={<>
+          <ActionButton aria-label="股价速查" title="股价速查"
+            onClick={() => setPriceTier(0)}><Wallet size={17} />
+            <span data-game-mobile-action-label>股价速查</span></ActionButton>
+          {end && <ActionButton aria-label="查看本局结算" title="查看结算"
+            onClick={() => setPanel('results')}><Trophy size={17} />
+            <span data-game-mobile-action-label>查看结算</span></ActionButton>}
+        </>}
+      />
+      <div className={styles.heading} data-game-desktop-topbar><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
       <div className={styles.headingTools}><Deadline deadline={turnDeadline} /><ActionButton onClick={() => setPriceTier(0)}>股价速查</ActionButton>
       {end && !isMobile && <ActionButton onClick={() => setPanel('results')}>查看结算</ActionButton>}
       {!isMobile && endVoteControl}

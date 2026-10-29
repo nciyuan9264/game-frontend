@@ -176,6 +176,8 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
   const turnStatus = page.getByTestId('turn-status');
   await expect(board).toBeVisible();
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   await expect(turnStatus).toHaveCSS('height', '100px');
   await expect.poll(() => board.evaluate(element =>
     getComputedStyle(element).colorScheme)).toBe('light only');
@@ -192,7 +194,7 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
     .toBeLessThanOrEqual(1);
   expect(Math.abs((opponentBox?.width ?? 0) - (selfBox?.width ?? 0)))
     .toBeLessThanOrEqual(1);
-  const topbarBox = await page.locator('header').first().boundingBox();
+  const topbarBox = await page.locator('[data-game-mobile-topbar]').boundingBox();
   expect(topbarBox?.height).toBe(57);
   const yinshDock = page.getByTestId('yinsh-mobile-dock');
   const dockAction = yinshDock.getByRole('button', { name: '按坐标选择圆环' });
@@ -300,17 +302,17 @@ test('YINSH final result returns through the timer slot', async ({ page }) => {
 
   await page.getByRole('button', { name: '回到棋盘' }).click();
   const button = page.getByRole('button', { name: '返回终局结算' });
-  const content = button.locator('span').first();
+  const icon = button.locator('svg').first();
   await expect(button).toBeVisible();
   await expect(page.getByTestId('yinsh-mobile-dock')).toHaveCount(0);
   await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
-  const [buttonBox, contentBox] = await Promise.all([
+  const [buttonBox, iconBox] = await Promise.all([
     button.boundingBox(),
-    content.boundingBox(),
+    icon.boundingBox(),
   ]);
-  expect(buttonBox?.width).toBeGreaterThanOrEqual(48);
-  expect(contentBox?.x).toBeGreaterThanOrEqual(buttonBox?.x ?? 0);
-  expect((contentBox?.x ?? 0) + (contentBox?.width ?? 0))
+  expect(buttonBox?.width).toBeGreaterThanOrEqual(31);
+  expect(iconBox?.x).toBeGreaterThanOrEqual(buttonBox?.x ?? 0);
+  expect((iconBox?.x ?? 0) + (iconBox?.width ?? 0))
     .toBeLessThanOrEqual((buttonBox?.x ?? 0) + (buttonBox?.width ?? 0));
   await page.getByRole('button', { name: '查看棋谱' }).click();
   await expect(page.getByRole('dialog', { name: '这一局的每一步' })).toBeVisible();

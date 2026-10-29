@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import { ArrowLeft, ChevronLeft, ChevronRight, LockKeyhole } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { SixNimmtSnapshot } from '@/features/game-core/model/history';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
@@ -24,7 +25,14 @@ function ReplayContent({ gameID }: { gameID: number }) {
   };
 
   return <AppShell inMatch hideHeader title="全知回放" profile={replay.profile}>
-    <div className="sn-replay"><header>
+    <div className="sn-replay">
+      <GameMobileReplayHeading
+        backTo="/game/sixnimmt/me"
+        backLabel="返回我的牌局"
+        kicker="OMNISCIENT REPLAY · 房间号"
+        title={replay.detail?.game.roomID ?? '对局回放'}
+      />
+      <header data-game-desktop-topbar>
       <Link to="/game/sixnimmt/me" aria-label="返回我的牌局"><ArrowLeft size={19} /></Link>
       <div><small>OMNISCIENT REPLAY · 房间号</small>
         <h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div>

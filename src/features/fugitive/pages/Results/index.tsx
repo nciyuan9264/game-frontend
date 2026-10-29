@@ -64,7 +64,7 @@ export function Results({
     item.revealed && item.card?.number !== 0).length;
 
   return <div className="game-app result-app">
-    <div className="topbar">
+    <div className="topbar" data-game-result-topbar>
       <header className="game-header result-topbar">
         <button className="icon-button" type="button" aria-label="返回大厅"
           onClick={onExit}><ArrowLeft size={20} /></button>

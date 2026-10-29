@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, CircleHelp, Eye, Hash, ShieldCheck } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { GameCanvas, type GameCanvasHandle } from '../../components/GameCanvas';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
@@ -93,7 +94,27 @@ export function Play({
       : '确认当前初始牌序';
 
   return <div className={`${styles.play} ${initializing ? styles.initializing : ''}`}>
-    <header className={`${styles.topbar} ${data.roomData.gameStatus === 'end' ? styles.endedTopbar : ''}`}>
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker={`ROOM ${data.roomID}`}
+      title={phaseTitle}
+      status={data.roomData.turnDeadline
+        && (initializing || playerTurn) && data.roomData.gameStatus !== 'end'
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : '--'}
+      actions={<>
+        {data.roomData.gameStatus === 'end' && <ActionButton
+          aria-label="打开终局结算" title="查看结算"
+          onClick={() => setShowResults(true)}><Eye size={16} />
+          <span data-game-mobile-action-label>查看结算</span></ActionButton>}
+        <button type="button" className={styles.ruleButton}
+          aria-label="查看游戏规则" title="查看游戏规则"
+          onClick={() => setRulesOpen(true)}><CircleHelp size={18} /></button>
+      </>}
+    />
+    <header className={`${styles.topbar} ${data.roomData.gameStatus === 'end' ? styles.endedTopbar : ''}`}
+      data-game-desktop-topbar>
       <div className={styles.roomTools}><button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={18} /></button>
         <span><small>ROOM</small><b>{data.roomID}</b></span></div>
       <div className={`${styles.phase} ${playerTurn ? styles.myTurn : ''}`} aria-live="polite">

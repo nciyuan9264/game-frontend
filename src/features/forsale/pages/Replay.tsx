@@ -7,6 +7,7 @@ import {
   LockKeyhole,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { ForSaleReplaySnapshot } from '@/api/generated/game-platform';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
@@ -31,7 +32,14 @@ const ReplayContent = ({ gameID }: { gameID: number }) => {
     replay.selectIndex(index);
   };
   return <AppShell inMatch hideHeader title="成交回放" profile={replay.profile}>
-    <div className="fs-replay"><header><Link to="/game/forsale/me"
+    <div className="fs-replay">
+      <GameMobileReplayHeading
+        backTo="/game/forsale/me"
+        backLabel="返回我的对局"
+        kicker="DEAL REPLAY · 房间号"
+        title={replay.detail?.game.roomID ?? '对局回放'}
+      />
+      <header data-game-desktop-topbar><Link to="/game/forsale/me"
       aria-label="返回我的对局"><ArrowLeft size={19} /></Link>
       <div><small>DEAL REPLAY · 房间号</small>
         <h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div>

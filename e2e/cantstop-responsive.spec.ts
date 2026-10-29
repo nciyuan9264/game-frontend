@@ -309,6 +309,10 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
     await mockMatchRoom(page);
     await page.goto(`/game/cantstop/match?roomID=${roomID}`);
     await expect(page.locator('.cs-room-page')).toBeVisible();
+    await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+    await expect(page.locator('[data-game-brand]')).toBeVisible();
+    await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+    await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
     await expect(page.getByRole('heading', { name: roomID })).toBeVisible();
     await expect(page.locator('.cs-seat')).toHaveCount(4);
 
@@ -373,7 +377,8 @@ test('Cant Stop mobile choose phase keeps pairing controls visible',
     await page.goto(`/game/cantstop/match?roomID=${roomID}`);
 
     await expect(page.getByTestId('cantstop-play')).toBeVisible();
-    await expect(page.locator('.cs-game-header')).toHaveCSS('height', '57px');
+    await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+    await expect(page.locator('.cs-game-header')).toBeHidden();
     await expect(page.locator('.cs-dice-tray')).toBeVisible();
     await expect(page.locator('.cs-pairings button')).toHaveCount(2);
     await expect(page.getByRole('button', { name: '配对 1：7 和 3' })).toBeVisible();

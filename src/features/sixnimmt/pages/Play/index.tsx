@@ -17,6 +17,7 @@ import {
   Trophy,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
 import {
   BullScore,
@@ -299,7 +300,22 @@ export function Play({
   };
 
   return <div className="sn-play" data-testid="sixnimmt-play">
-    <header className="sn-game-header">
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker="6 NIMMT! · 经典 66 分制"
+      title={`第 ${data.roomData.roundNo} 局 · 第 ${data.roomData.turnNo} / 10 轮`}
+      status={countdown}
+      actions={<>
+        <button type="button" aria-label="打开记分板" title="打开记分板"
+          onClick={() => setPanel('scores')}><Trophy size={18} /></button>
+        <button type="button" aria-label="玩法速查" title="玩法速查"
+          onClick={() => setPanel('rules')}><BookOpen size={18} /></button>
+        <button type="button" aria-label="对局菜单" title="对局菜单"
+          onClick={onLeave}><MoreHorizontal size={20} /></button>
+      </>}
+    />
+    <header className="sn-game-header" data-game-desktop-topbar>
       <button type="button" aria-label="离开对局" onClick={onLeave}>
         <ArrowLeft size={20} /></button>
       <div><small>A LITTLE BLUFF. A LOT OF FUN.</small>

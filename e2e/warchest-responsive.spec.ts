@@ -279,6 +279,87 @@ async function mockSession(page: Page, initialSnapshot = gameSnapshot()) {
   return commands;
 }
 
+async function mockReplay(page: Page) {
+  await mockProfile(page);
+  const source = gameSnapshot().view.warchest;
+  await page.route('**/pam-api/platform/history/games/99/snapshots?**', route =>
+    route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: {
+          snapshots: [{
+            warchest: {
+              seq: -1,
+              totalEvents: 0,
+              roomData: source.roomData,
+              playersData: source.playerData,
+              privateData: {
+                [human.playerID]: source.privateData,
+                [ai.playerID]: { hand: [], bagCounts: {} },
+              },
+            },
+          }],
+          totalEvents: 0,
+          totalSnapshots: 1,
+          page: {
+            offset: 0,
+            limit: 20,
+            nextOffset: 1,
+            hasMore: false,
+          },
+        },
+      },
+    }));
+  await page.route('**/pam-api/platform/history/games/99?**', route =>
+    route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: {
+          game: {
+            id: 99,
+            roomID,
+            roomDisplayName: '暮色边境',
+            gameType: 'warchest',
+            startedAt: '2026-10-26T00:00:00Z',
+            endedAt: '2026-10-26T00:05:00Z',
+            durationSeconds: 300,
+            maxPlayers: 2,
+            createdAt: '2026-10-26T00:00:00Z',
+            updatedAt: '2026-10-26T00:05:00Z',
+          },
+          players: [
+            {
+              id: 1,
+              gameID: 99,
+              userID: human.userID,
+              playerID: human.playerID,
+              displayName: human.displayName,
+              seatIndex: 0,
+              isAI: false,
+              finalStocks: 0,
+              isWinner: true,
+              createdAt: '2026-10-26T00:00:00Z',
+            },
+            {
+              id: 2,
+              gameID: 99,
+              playerID: ai.playerID,
+              displayName: ai.displayName,
+              seatIndex: 1,
+              isAI: true,
+              finalStocks: 0,
+              isWinner: false,
+              createdAt: '2026-10-26T00:00:00Z',
+            },
+          ],
+          events: [],
+        },
+      },
+    }));
+}
+
 function matchSnapshot() {
   return {
     schemaVersion: 2,
@@ -379,6 +460,27 @@ test('War Chest public pages render the responsive showcase shell', async ({ pag
   await expectNoOverflow(page);
 });
 
+test('War Chest replay uses an in-flow mobile heading and keeps desktop battle chrome', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockReplay(page);
+  await page.goto('/game/warchest/replay/99');
+
+  const mobileHeading = page.locator('[data-game-mobile-replay-heading]');
+  await expect(mobileHeading).toBeVisible();
+  await expect(mobileHeading.getByRole('link', { name: '返回战绩' })).toBeVisible();
+  await expect(mobileHeading).toHaveCSS('position', 'static');
+  await expect(page.locator('.battle-header')).toBeHidden();
+  await expect(page.locator('.warchest-replay-back')).toBeHidden();
+  await expect(page.getByTestId('warchest-replay-panel')).toBeVisible();
+
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(mobileHeading).toBeHidden();
+  await expect(page.locator('.battle-header')).toBeVisible();
+  await expect(page.locator('.warchest-replay-back')).toBeVisible();
+});
+
 test('War Chest desktop keeps primary actions, profile images, and footer content separated', async ({ page }) => {
   await page.setViewportSize({ width: 1440, height: 876 });
   await mockPublicData(page);
@@ -439,6 +541,10 @@ test('War Chest preparation room exposes all authoritative setup modes', async (
   const commands = await mockPreparation(page);
   await page.goto(`/game/warchest/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   await expect(page.getByRole('heading', { name: /雾谷前哨/ })).toBeVisible();
   await expect(page.locator('.seat-card')).toHaveCount(2);
   await expect(page.getByRole('button', { name: /首局推荐/ })).toBeVisible();
@@ -461,7 +567,8 @@ test('War Chest mobile battle submits only the service action ID', async ({ page
   await page.goto(`/game/warchest/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('warchest-board')).toBeVisible();
-  await expect(page.locator('.battle-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.battle-header')).toBeHidden();
   await expect(page.getByTestId('warchest-turn-status')).toHaveText(/轮到你行动/);
   const mobileBoardBox = await page.getByTestId('warchest-board').boundingBox();
   expect(mobileBoardBox?.width).toBeGreaterThan(340);
@@ -506,7 +613,8 @@ test('War Chest final board keeps history and results without the live menu', as
   })).toBeVisible();
   await page.getByRole('button', { name: '回到棋盘' }).click();
 
-  await expect(page.locator('.battle-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.battle-header')).toBeHidden();
   await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await page.getByRole('button', { name: '打开战报' }).click();

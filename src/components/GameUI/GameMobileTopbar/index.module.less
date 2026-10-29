@@ -1,0 +1,149 @@
+.topbar,
+.replayHeading {
+  display: none !important;
+}
+
+@media (max-width: 767px) {
+  :global([data-game-desktop-topbar]) {
+    display: none !important;
+  }
+
+  .topbar,
+  .replayHeading {
+    box-sizing: border-box;
+    width: 100%;
+    min-width: 0;
+    height: var(--game-mobile-header-height, 57px);
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid rgb(127 127 127 / 18%);
+    padding: 0 10px;
+    color: inherit;
+  }
+
+  .topbar {
+    display: flex !important;
+  }
+
+  .replayHeading {
+    display: flex !important;
+    position: static;
+    margin: 0 0 8px;
+  }
+
+  .back {
+    display: grid;
+    box-sizing: border-box;
+    width: 38px;
+    height: 38px;
+    min-width: 38px;
+    flex: 0 0 38px;
+    place-items: center;
+    border: 1px solid rgb(127 127 127 / 24%);
+    border-radius: 6px;
+    padding: 0;
+    background: rgb(127 127 127 / 5%);
+    color: inherit;
+  }
+
+  .identity {
+    min-width: 0;
+    flex: 1;
+
+    > small,
+    > strong {
+      display: block;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+
+    > small {
+      margin-bottom: 2px;
+      opacity: .62;
+      font-size: 7px;
+      font-weight: 500;
+      line-height: 1.2;
+      letter-spacing: 0;
+    }
+
+    > strong {
+      font-size: 14px;
+      font-weight: 650;
+      line-height: 1.25;
+      letter-spacing: 0;
+    }
+  }
+
+  .status,
+  .actions {
+    display: flex;
+    min-width: 0;
+    flex: 0 0 auto;
+    align-items: center;
+    gap: 5px;
+  }
+
+  .status {
+    max-width: 88px;
+    overflow: hidden;
+    font-size: 10px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .actions {
+    > button,
+    > a {
+      display: inline-grid;
+      box-sizing: border-box;
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      place-items: center;
+      overflow: hidden;
+      border-radius: 6px;
+      padding: 0;
+
+    }
+
+    :global([data-game-mobile-action-label]) {
+      display: none;
+    }
+
+    svg {
+      flex: 0 0 auto;
+    }
+  }
+}
+
+@media (max-width: 359px) {
+  .topbar,
+  .replayHeading {
+    gap: 5px;
+    padding-right: 7px;
+    padding-left: 7px;
+  }
+
+  .back {
+    width: 34px;
+    height: 34px;
+    min-width: 34px;
+    flex-basis: 34px;
+  }
+
+  .status {
+    max-width: 70px;
+  }
+
+  .actions {
+    gap: 3px;
+
+    > button,
+    > a {
+      width: 31px;
+      height: 31px;
+      min-width: 31px;
+    }
+  }
+}

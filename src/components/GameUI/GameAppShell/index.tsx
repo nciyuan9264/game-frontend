@@ -167,13 +167,17 @@ export function GameAppShell({
             data-game-brand
             aria-label={labels.home}
           >{renderBrand()}</Link>}
-        <span className={classes.divider} />
-        <span className={classes.breadcrumb}>{renderBreadcrumb(title)}</span>
-        <div className={classes.tools}>
-          {environmentLabel && <span className={classes.environment}><i />{environmentLabel}</span>}
+        <span className={classes.divider} data-game-shell-divider />
+        <span className={classes.breadcrumb} data-game-shell-breadcrumb>
+          {renderBreadcrumb(title)}
+        </span>
+        <div className={classes.tools} data-game-shell-tools>
+          {environmentLabel && <span className={classes.environment}
+            data-game-shell-environment><i />{environmentLabel}</span>}
           {!inMatch && <Link
             to="/"
             className={layoutStyles.platformHomeLink}
+            data-game-shell-platform-home
             aria-label={labels.platformHome ?? '返回游戏首页'}
             title={labels.platformHome ?? '返回游戏首页'}
           >
@@ -181,12 +185,14 @@ export function GameAppShell({
           </Link>}
           {tools}
           {profile && (inMatch
-            ? <span className={classes.matchProfile} aria-label={labels.currentPlayer}>{renderAvatar({
+            ? <span className={classes.matchProfile} data-game-shell-profile
+              aria-label={labels.currentPlayer}>{renderAvatar({
               ...profile,
               size: headerAvatarSize,
               location: 'header',
             })}</span>
-            : <Link to={`${basePath}/me`} className={classes.profile}>{renderAvatar({
+            : <Link to={`${basePath}/me`} className={classes.profile}
+              data-game-shell-profile>{renderAvatar({
               ...profile,
               size: headerAvatarSize,
               location: 'header',

@@ -53,6 +53,12 @@ describe('GameAppShell', () => {
     expect(screen.getByRole('navigation', { name: '测试导航' })).toBeTruthy();
     expect(screen.getByRole('navigation', { name: '测试手机导航' })).toBeTruthy();
     expect(screen.getByRole('link', { name: '返回游戏首页' }).getAttribute('href')).toBe('/');
+    expect(container.querySelector('[data-game-shell-platform-home]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-profile]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-divider]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-breadcrumb]')?.textContent).toContain('排行榜');
+    expect(container.querySelector('[data-game-shell-environment]')?.textContent).toContain('在线');
+    expect(container.querySelector('[data-game-shell-tools]')).toBeTruthy();
     expect(screen.getAllByText('Alice-rail')).toHaveLength(1);
     expect(screen.getByText('Alice-header')).toBeTruthy();
     expect(screen.getByText('排行榜')).toBeTruthy();
@@ -76,6 +82,20 @@ describe('GameAppShell', () => {
     expect(container.querySelector('[data-game-shell="match"]')).toBeTruthy();
     expect(screen.queryByRole('navigation', { name: '测试手机导航' })).toBeNull();
     expect(screen.getByText('GAME')).toBeTruthy();
+  });
+
+  it('keeps match shell branding semantic without platform navigation', () => {
+    const { container } = render(
+      <MemoryRouter>
+        <GameAppShell {...baseProps} inMatch hideRail title="准备房间">
+          <span>ROOM</span>
+        </GameAppShell>
+      </MemoryRouter>
+    );
+    expect(container.querySelector('[data-game-shell="match"]')).toBeTruthy();
+    expect(container.querySelector('[data-game-brand]')?.textContent).toContain('BRAND');
+    expect(container.querySelector('[data-game-shell-platform-home]')).toBeNull();
+    expect(container.querySelector('[data-game-shell-profile]')).toBeTruthy();
   });
 
   it('adds explicit compact mobile footer classes to the shell and content area', () => {

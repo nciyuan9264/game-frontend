@@ -220,6 +220,10 @@ test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
   const commands = await mockSession(page, matchSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   const heading = page.getByRole('heading', { name: new RegExp(roomID) });
   await expect(heading).toBeVisible();
   await expect(page.getByRole('button', { name: '房间设置' })).toBeVisible();
@@ -270,8 +274,9 @@ test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }
   await mockSession(page, initializationSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
-  await expect(page.getByText('确认初始密码')).toBeVisible();
-  await expect(page.locator('header').first()).toHaveCSS('height', '57px');
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  await expect(mobileTopbar.getByText('确认初始密码')).toBeVisible();
+  await expect(mobileTopbar).toHaveCSS('height', '57px');
   await expect(page.getByRole('button', { name: /确认牌序/ })).toBeEnabled();
   const canvas = page.locator('canvas');
   await expect(canvas).toBeVisible();

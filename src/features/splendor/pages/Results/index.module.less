@@ -46,6 +46,7 @@
 @media (max-width:1150px) and (min-width:768px) { .page { gap:23px; padding-inline:23px; } .row { grid-template-columns:minmax(0,1fr) 61px 53px 57px; padding-inline:12px; } }
 @media (max-width:767px) {
   .topbar { height:var(--game-mobile-header-height,57px); gap:10px; padding:0 14px; >em { padding:5px 7px; font-size:9px; white-space:nowrap; } }
+  .topbar[data-game-result-topbar] { display:none; }
   .brand { gap:7px; b { font-size:17px; letter-spacing:2px; } small { margin-top:4px; font-size:5px; } }
   .page { display:flex; flex-direction:column; gap:16px; padding:15px 14px 112px; }
   .celebration { min-height:0; height:160px; border-radius:6px;

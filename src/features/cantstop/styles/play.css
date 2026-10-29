@@ -12,7 +12,8 @@
 @media(max-height:810px) and (max-width:767px){.cs-play{padding-top:0}.cs-game-layout{margin-top:4px}.cs-players-row{margin-bottom:6px}.cs-player-chip{min-height:44px}.cs-route-board>header{height:23px;padding-top:7px}.cs-columns{height:178px}.cs-column-cells{gap:2px;padding-bottom:3px}.cs-step{height:8px}.cs-summit{height:14px}.cs-column>b{height:18px;font-size:11px}.cs-route-board>footer{height:22px}.cs-under-board{min-height:26px}}
 
 @media(max-width:767px){
-  .cs-results{padding:0 14px calc(25px + env(safe-area-inset-bottom))}
+  .cs-results{padding:14px 14px calc(25px + env(safe-area-inset-bottom))}
+  .cs-results>[data-game-result-topbar]{display:none}
   .cs-results>header{height:57px}
   .cs-results>header>button:first-child{display:flex}
   .cs-result-hero{margin-top:4px}

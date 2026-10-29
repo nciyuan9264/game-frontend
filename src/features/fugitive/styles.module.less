@@ -887,9 +887,11 @@ body{font-size:14px}
 .brand b{font-size:21px}
 .brand small{font-size:9px}
 .header-line,.breadcrumb,.local-label{display:none}
-.header-person{border:0;padding:0;margin-left:0;min-width:44px;min-height:44px}
-.header-person>b,.header-person>svg{display:none}
-.header-person>span{height:29px;width:29px}
+.header-person{display:none}
+[data-game-shell-header] .platform-home.icon-button{box-sizing:border-box;width:40px;height:40px;min-width:40px;min-height:40px;padding:0}
+[data-game-shell-header] .platform-home>svg{width:21px;height:21px}
+[data-game-shell='match'] [data-game-shell-platform-home],
+[data-game-shell='match'] [data-game-shell-header]>.icon-button:first-child{display:none}
 .icon-button{min-width:40px;min-height:40px}
 .button{min-height:44px;font-size:12px;padding:0 14px}
 .text-button{min-height:40px;font-size:11px}
@@ -1752,6 +1754,7 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .watch-action-note small{font-size:9px;color:#95ac87;grid-column:2}
  .game-app .draw-toast{bottom:216px}
  .result-page{padding-top:15px}
+ [data-game-result-topbar]{display:none}
  .result-page .result-art{height:96px}
  .result-title h1{font-size:26px}
  .result-summary{padding:14px}
@@ -1762,4 +1765,8 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .result-topbar>.pill{font-size:9px}
 }
 }
+}
+
+@media(max-width:767px){
+ .fugitiveRoot :global([data-game-result-topbar]){display:none}
 }

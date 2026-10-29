@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { Board } from '../../components/Board';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Brand, Disc } from '../../components/Artwork';
@@ -187,7 +188,26 @@ export function Play({
   }
 
   return <div className={styles.play}>
-    <header className={styles.topbar}>
+    <GameMobileTopbar
+      onBack={onLeave}
+      backLabel="离开对局"
+      kicker={`OTHELLO · 第 ${data.roomData.roundNo} 局`}
+      title={data.roomID}
+      status={!ended && data.roomData.turnDeadline
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : ended ? '已结束' : '--'}
+      actions={<>
+        <button type="button" aria-label="查看棋谱" title="查看棋谱"
+          onClick={() => ui.setPanel('activity')}><History size={18} /></button>
+        <button type="button" aria-label="玩法指南" title="玩法指南"
+          onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
+        {!ended && <button type="button" aria-label="打开对局菜单" title="打开对局菜单"
+          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
+        {ended && <button type="button" aria-label="返回终局结算" title="返回终局结算"
+          onClick={() => ui.setShowResults(true)}><Trophy size={17} /></button>}
+      </>}
+    />
+    <header className={styles.topbar} data-game-desktop-topbar>
       <button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={20} /></button>
       <Brand /><span className={styles.divider} />
       <div className={styles.room}><strong>{data.roomID}</strong>

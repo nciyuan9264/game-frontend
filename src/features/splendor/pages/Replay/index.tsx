@@ -5,6 +5,7 @@ import {
   Layers, Trophy,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import { REPLAY_PAGE_SIZE, useProgressiveReplay } from '@/hooks/useProgressiveReplay';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
@@ -125,7 +126,13 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const viewerState = data?.playerData[data.playerId];
   const viewerDiscounts = discounts(viewerState);
   return <AppShell inMatch hideHeader title="对局回放" profile={replay.profile}><div className={styles.page}>
-    <header className={styles.heading}><Link to="/game/splendor/me" aria-label="返回战绩"><ArrowLeft size={18} /></Link>
+    <GameMobileReplayHeading
+      backTo="/game/splendor/me"
+      backLabel="返回战绩"
+      kicker="JEWEL REPLAY · 房间号"
+      title={replay.detail?.game.roomID ?? '对局回放'}
+    />
+    <header className={styles.heading} data-game-desktop-topbar><Link to="/game/splendor/me" aria-label="返回战绩"><ArrowLeft size={18} /></Link>
       <div><small>JEWEL REPLAY · 房间号</small><h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div>
       <span>只读回放</span></header>
     {replay.initialLoading && <SplendorLoading title="正在重新陈列珠宝。" description="载入回放快照与时间轴" />}

@@ -4,6 +4,7 @@ import {
   ArrowLeft, BookOpen, ChevronLeft, ChevronRight, LockKeyhole,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import type { LoveLetterSnapshot } from '@/features/game-core/model/history';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
@@ -26,7 +27,14 @@ function ReplayContent({ gameID }: { gameID: number }) {
   };
 
   return <AppShell inMatch hideHeader title="全知回放" profile={replay.profile}>
-    <div className="ll-replay"><header><Link to="/game/loveletter/me" aria-label="返回我的信件">
+    <div className="ll-replay">
+      <GameMobileReplayHeading
+        backTo="/game/loveletter/me"
+        backLabel="返回我的信件"
+        kicker="OMNISCIENT REPLAY · 房间号"
+        title={replay.detail?.game.roomID ?? '对局回放'}
+      />
+      <header data-game-desktop-topbar><Link to="/game/loveletter/me" aria-label="返回我的信件">
       <ArrowLeft size={19} /></Link><div><small>OMNISCIENT REPLAY · 房间号</small>
         <h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div>
       <span><LockKeyhole size={13} />参赛者全知回放</span></header>

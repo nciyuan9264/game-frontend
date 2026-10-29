@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import { AnimatePresence, MotionConfig, motion } from 'motion/react';
 import {
   ArrowLeft,
@@ -20,6 +20,7 @@ import {
   X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
+import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import {
   ACTION_NAMES,
   UNITS,
@@ -65,6 +66,7 @@ interface Props {
   onRematch?: () => void;
   rematchPending?: boolean;
   revealHands?: boolean;
+  mobileHeading?: ReactNode;
 }
 
 const actionPath = (plan: Plan, candidates: Plan[]) => {
@@ -99,6 +101,7 @@ export function Battle({
   onRematch,
   rematchPending = false,
   revealHands = false,
+  mobileHeading,
 }: Props) {
   const self = game.players[game.selfSide];
   const opponentSide = (1 - game.selfSide) as Side;
@@ -241,7 +244,28 @@ export function Battle({
     <div className={`warchest-root battle-app ${myTurn ? 'is-your-turn' : ''}`}
       data-testid="warchest-battle" data-round={game.round} data-phase={game.phase}>
       <div className="battle-atmosphere" aria-hidden="true" />
-      <header className="battle-header"><button className="icon-button back-lobby" type="button"
+      {mobileHeading ?? <GameMobileTopbar
+        onBack={() => onLeave?.()}
+        backLabel="退出对局"
+        kicker={`房间 ${roomID} · ROUND ${game.round}`}
+        title={roomName}
+        status={!end && game.turnDeadline
+          ? <TurnCountdown bare secondsOnly deadline={game.turnDeadline} />
+          : end ? '已结束' : '--'}
+        actions={<>
+          <button className="icon-button" type="button" aria-label="查看对局规则"
+            title="查看对局规则"
+            onClick={() => setPanel('rules')}><BookOpen size={19} /></button>
+          {end
+            ? <button className="icon-button" type="button" aria-label="打开终局结算"
+              title="打开终局结算"
+              onClick={() => setPanel('result')}><Trophy size={19} /></button>
+            : <button className="icon-button" type="button" aria-label="打开对局菜单"
+              title="打开对局菜单"
+              onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>}
+        </>}
+      />}
+      <header className="battle-header" data-game-desktop-topbar><button className="icon-button back-lobby" type="button"
         aria-label="退出对局" onClick={onLeave}><ArrowLeft size={20} /></button><Brand />
         <div className="battle-room"><span /><b>{roomName}</b><small>房间 {roomID}</small></div>
         <div className="header-space" /><span className="local-label"><i />服务端权威 · 90 秒</span>

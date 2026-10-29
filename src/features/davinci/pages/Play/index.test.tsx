@@ -68,11 +68,11 @@ describe('DaVinci turn countdown', () => {
     } as unknown as DavinciSession;
 
     const { rerender } = render(<Play session={session} data={snapshot('me')} onLeave={vi.fn()} />);
-    expect(screen.getByText('30s')).toBeTruthy();
+    expect(screen.getAllByText('30s')).toHaveLength(2);
 
     rerender(<Play session={session} data={snapshot('guest')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
-    expect(screen.getByText('--')).toBeTruthy();
+    expect(screen.getAllByText('--').length).toBeGreaterThan(0);
   });
 
   it('shows the shared initialization timer and requires a no-Joker confirmation', () => {
@@ -86,7 +86,7 @@ describe('DaVinci turn countdown', () => {
     } as unknown as DavinciSession;
 
     const { rerender } = render(<Play session={session} data={initializationSnapshot()} onLeave={vi.fn()} />);
-    expect(screen.getByText('15s')).toBeTruthy();
+    expect(screen.getAllByText('15s')).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: /确认牌序/ }));
     expect(submit).toHaveBeenCalledWith('game_initialize_hand', { jokerPlacements: [] });
 

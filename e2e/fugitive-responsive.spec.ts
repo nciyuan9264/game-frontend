@@ -345,6 +345,10 @@ for (const viewport of [
     await mockSession(page, roomSnapshot(), 'match');
     await page.goto(`/game/fugitive/match?roomID=${roomID}`);
 
+    await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+    await expect(page.locator('[data-game-brand]')).toBeVisible();
+    await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+    await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
     const seats = page.getByTestId('fugitive-room-seat');
     await expect(seats).toHaveCount(2);
     const first = await seats.nth(0).boundingBox();
@@ -371,6 +375,8 @@ test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
   await mockSession(page);
   await page.goto(`/game/fugitive/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   await expect(page.getByTestId('fugitive-route')).toBeVisible();
   await expect(page.getByTestId('fugitive-mobile-dock')).toBeVisible();
   await expect(page.locator('.mobile-system')).toHaveCount(0);
@@ -389,6 +395,8 @@ test('Fugitive mobile result and final board controls stay aligned', async ({ pa
   await mockSession(page, endedSnapshot());
   await page.goto(`/game/fugitive/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
+  await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
   const review = page.getByRole('button', { name: '查看终局牌桌' });
   await expect(review).toBeVisible();
   const reviewLayout = await review.evaluate(element => {
@@ -406,7 +414,8 @@ test('Fugitive mobile result and final board controls stay aligned', async ({ pa
   expect(reviewLayout.rightInset).toBeGreaterThan(50);
 
   await review.click();
-  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   const settlement = page.getByTestId('fugitive-mobile-dock')
     .getByRole('button', { name: /查看结算/ });
   const settlementBox = await settlement.boundingBox();

@@ -54,16 +54,19 @@ export function Shell({
   children,
   title,
   profile,
+  inMatch = false,
   compactMobileFooter = false,
 }: {
   children: ReactNode;
   title: string;
   profile?: Pick<AuthProfile, 'name' | 'avatar'>;
+  inMatch?: boolean;
   compactMobileFooter?: boolean;
 }) {
   const location = useLocation();
   const profileName = profile?.name || '指挥官';
-  return <div className={`warchest-root app-shell ${compactMobileFooter ? 'compact-mobile-footer' : ''}`}>
+  return <div className={`warchest-root app-shell ${compactMobileFooter ? 'compact-mobile-footer' : ''}`}
+    data-game-shell={inMatch ? 'match' : 'app'}>
     <aside className="sidebar">
       <Link className="side-emblem" aria-label="战争之匣首页" to="/game/warchest">
         <Crest size={43} />
@@ -83,14 +86,15 @@ export function Shell({
         </Link>
       </div>
     </aside>
-    <div className="app-top"><header className="app-header">
+    <div className="app-top"><header className="app-header" data-game-shell-header>
       <Link to="/game/warchest"><Brand /></Link><span className="header-divider" />
       <span className="breadcrumb">{title}</span><div className="header-space" />
       <span className="local-label"><i />服务端权威对局</span>
-      <Link className="header-home icon-button" to="/" aria-label="返回游戏首页" title="返回游戏首页">
+      <Link className="header-home icon-button" to="/" data-game-shell-platform-home
+        aria-label="返回游戏首页" title="返回游戏首页">
         <Home size={18} strokeWidth={1.8} />
       </Link>
-      <Link className="header-profile" to="/game/warchest/me">
+      <Link className="header-profile" to="/game/warchest/me" data-game-shell-profile>
         <PlayerAvatar name={profileName} avatar={profile?.avatar} size={31} />
         <b>{profileName}</b><ChevronDown size={13} />
       </Link>

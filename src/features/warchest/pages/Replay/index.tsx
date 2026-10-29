@@ -8,6 +8,7 @@ import {
   History,
 } from 'lucide-react';
 import type { WarChestReplaySnapshot } from '@/api/generated/game-platform';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
 import { Shell, Loading, Notice } from '../../components/Shell';
 import { replaySource, toBattleGame } from '../../selectors';
@@ -40,8 +41,15 @@ function ReplayContent({ gameID }: { gameID: number }) {
   return <div className="warchest-replay-root"><Battle game={game}
     roomID={replay.detail?.game.roomID ?? ''}
     roomName={replay.detail?.game.roomDisplayName || '全知对局回放'}
-    interactive={false} revealHands />
+    interactive={false} revealHands
+    mobileHeading={<GameMobileReplayHeading
+      backTo="/game/warchest/me"
+      backLabel="返回战绩"
+      kicker="WAR CHEST REPLAY · 房间号"
+      title={replay.detail?.game.roomID ?? '对局回放'}
+    />} />
     <Link className="warchest-replay-back" to="/game/warchest/me"
+      data-game-desktop-topbar
       aria-label="返回战绩"><ArrowLeft size={17} />返回战绩</Link>
     <section className="warchest-root replay-dock" data-testid="warchest-replay-panel">
       <header><History size={15} /><strong>{event

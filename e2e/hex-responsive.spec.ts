@@ -257,6 +257,10 @@ test('Hex room exposes the fixed online rules', async ({ page }) => {
   await mockSession(page, roomSnapshot());
   await page.goto(`/game/hex/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   await expect(page.getByTestId('hex-room-table')).toBeVisible();
   await expect(page.getByTestId('hex-room-seat')).toHaveCount(2);
   await expect(page.getByTestId('hex-room-table')
@@ -278,8 +282,8 @@ test('Hex mobile preselects and confirms an authoritative legal move', async ({
     name: '十一乘十一连边棋棋盘，陶红连接南北，湖绿连接东西',
   });
   await expect(board).toBeVisible();
-  await expect(page.locator('.playing-page > .top-shell .app-header'))
-    .toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.playing-page > .top-shell .app-header')).toBeHidden();
   await expect(board.locator('[data-cell]')).toHaveCount(121);
   await page.getByTestId('cell-E5').click();
   await expect(page.getByRole('button', { name: /确认落子 E5/ })).toBeEnabled();

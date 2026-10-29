@@ -116,6 +116,10 @@ test('Six Nimmt mobile room keeps ten seats and ready dock in view', async ({ pa
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, roomSnapshot());
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   await expect(page.locator('.sn-seat')).toHaveCount(10);
   const dock = await page.locator('.sn-ready-dock').boundingBox();
   expect(dock).not.toBeNull();
@@ -132,7 +136,8 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   const commands = await mockSession(page);
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
   await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
-  await expect(page.locator('.sn-game-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.sn-game-header')).toBeHidden();
   await page.getByRole('button', { name: '选择手牌 55' }).click();
   await page.getByRole('button', { name: /锁定 55/ }).click();
   await expect.poll(() => commands.filter(command => command.includes('"game_lock_card"')).length).toBe(1);
@@ -145,13 +150,18 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   expect(pageErrors).toEqual([]);
 });
 
-test('Six Nimmt mobile results keep the shared topbar height', async ({ page }) => {
+test('Six Nimmt mobile results omit the game topbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, gameSnapshot('end'));
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
 
   await expect(page.locator('.sn-results')).toBeVisible();
-  await expect(page.locator('.sn-results > header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
+  await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
+  await expect(page.locator('.sn-mobile-result-review')).toBeVisible();
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await expect(page.locator('[data-game-result-topbar]')).toBeVisible();
+  await expect(page.locator('.sn-mobile-result-review')).toBeHidden();
 });
 
 test('Six Nimmt round results can return from the final table', async ({ page }) => {

@@ -346,7 +346,7 @@ test('Onitama public pages stay stable across target viewports', async ({
     await page.goto('/game/onitama');
     await expect(page.getByTestId('onitama-lobby-hero')).toBeVisible();
     await expect(page.getByTestId('onitama-lobby-facts')
-      .locator(':scope > span')).toHaveCount(4);
+      .locator(':scope > span')).toHaveCount(3);
     await expectNoOverflow(page);
     await capture(page, testInfo, `lobby-${viewport.width}x${viewport.height}`);
 
@@ -362,6 +362,10 @@ test('Onitama room keeps two explicit seats on mobile', async ({ page }) => {
   await mockRoom(page);
   await page.goto(`/game/onitama/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-game-shell-header]')).toBeVisible();
+  await expect(page.locator('[data-game-brand]')).toBeVisible();
+  await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
+  await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
   const seats = page.getByTestId('onitama-room-seat');
   await expect(seats).toHaveCount(2);
   const boxes = await seats.evaluateAll(elements => elements.map(element => {
@@ -384,7 +388,8 @@ test('Onitama confirms a service-provided move before submitting', async ({
 
   const board = page.getByRole('grid', { name: '御神乐棋 5 乘 5 棋盘' });
   await expect(board).toBeVisible();
-  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.game-header')).toBeHidden();
   await expect(board.getByRole('gridcell')).toHaveCount(25);
   const turnStatus = page.getByTestId('onitama-turn-status-mobile');
   await expect(turnStatus).toContainText('当前回合 · 蓝方 · 第 1 步');
@@ -442,7 +447,8 @@ test('Onitama results return to a compact final board', async ({
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看终局棋盘' }).click();
-  await expect(page.locator('.game-header')).toHaveCSS('height', '57px');
+  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  await expect(page.locator('.game-header')).toBeHidden();
   await expect(page.getByRole('grid', {
     name: '御神乐棋 5 乘 5 棋盘',
   })).toBeVisible();

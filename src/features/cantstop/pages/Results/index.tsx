@@ -39,7 +39,7 @@ export function Results({
         - (data.roomData.players[b]?.seatIndex ?? 0));
 
   return <div className="cs-results">
-    <header><button type="button" aria-label="返回大厅" onClick={onExit}>
+    <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
       <ArrowLeft size={19} /></button>
       <span>FINAL SUMMIT · TURN {data.result?.turnCount ?? data.roomData.turnNumber}</span>
       <button type="button" onClick={onReview}>

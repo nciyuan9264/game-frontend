@@ -94,6 +94,7 @@ export function AppShell({
   return <FugitiveRoot className={preferences.className}>
     <div className={`app ${room ? 'waiting-app' : ''}`}>
       <div className={`app-underlay ${compactMobileFooter ? 'compact-mobile-footer' : ''}`}
+        data-game-shell={room ? 'match' : 'app'}
         aria-hidden={preferencesOpen}>
         {!room && <aside className="side-nav">
           <NavLink className="rail-logo" to="/game/fugitive" aria-label="Fugitive 大厅">
@@ -118,18 +119,21 @@ export function AppShell({
           </div>
         </aside>}
         <div className="topbar">
-          <header className="app-header">
+          <header className="app-header" data-game-shell-header>
             {showRoomBack && <button className="icon-button" type="button"
               aria-label="返回大厅" onClick={() => navigate('/game/fugitive')}>
               <ArrowLeft size={20} /></button>}
-            <Brand /><span className="header-line" /><span className="breadcrumb">{title}</span>
+            <span><Brand /></span><span className="header-line" />
+            <span className="breadcrumb">{title}</span>
             <span className="spacer" /><span className="local-label"><i />在线</span>
             {!room && <button className="icon-button platform-home" type="button"
+              data-game-shell-platform-home
               aria-label="返回游戏首页" title="返回游戏首页"
               onClick={() => navigate('/')}>
               <Home size={18} strokeWidth={1.8} />
             </button>}
-            <button className="header-person" type="button" aria-label="打开追逃档案"
+            <button className="header-person" type="button" data-game-shell-profile
+              aria-label="打开追逃档案"
               onClick={() => navigate('/game/fugitive/me')}>
               <ProfileMonogram profile={profile} />
               <b>{profile?.name || '城市追踪者'}</b><ChevronDown size={14} />

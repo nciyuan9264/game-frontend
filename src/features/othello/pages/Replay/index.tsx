@@ -12,6 +12,7 @@ import {
   ChevronUp,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { Feedback } from '@/components/GameUI/Panel';
 import { REPLAY_PAGE_SIZE, useProgressiveReplay } from '@/hooks/useProgressiveReplay';
 import { useReplayPanel } from '@/features/game-core/hooks/useReplayPanel';
@@ -171,7 +172,13 @@ function ReplayContent({ gameID }: { gameID: number }) {
   />;
   return <AppShell inMatch hideHeader title="对局回放" profile={replay.profile}>
     <div className={styles.page}>
-      <header className={styles.heading}>
+      <GameMobileReplayHeading
+        backTo="/game/othello/me"
+        backLabel="返回战绩"
+        kicker="OTHELLO REPLAY · 房间号"
+        title={replay.detail?.game.roomID ?? '对局回放'}
+      />
+      <header className={styles.heading} data-game-desktop-topbar>
         <Link to="/game/othello/me" aria-label="返回战绩"><ArrowLeft size={18} /></Link>
         <div><small>OTHELLO REPLAY · 房间号</small>
           <h1>{replay.detail?.game.roomID ?? '对局回放'}</h1></div>
