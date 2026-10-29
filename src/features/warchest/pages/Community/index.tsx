@@ -33,7 +33,12 @@ import type {
   WarChestLeaderboardEntry,
 } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
-import { Shell, Loading, Notice } from '../../components/Shell';
+import {
+  Shell,
+  Loading,
+  Notice,
+  PlayerAvatar,
+} from '../../components/Shell';
 import {
   UNIT_IDS,
   UNITS,
@@ -211,7 +216,9 @@ export function My() {
     <div className="page-title"><div><Eyebrow>YOUR CAMPAIGN JOURNAL</Eyebrow>
       <h1>每一步，都留下回响。</h1><p>真实战绩、终局控制数与全知逐步回放。</p></div></div>
     {loading ? <Loading text="正在整理你的战场纪事。" /> : <div className="records-layout">
-      <aside className="profile-card"><Eyebrow>THE COMMANDER</Eyebrow><Crest size={112} />
+      <aside className="profile-card"><Eyebrow>THE COMMANDER</Eyebrow>
+        <PlayerAvatar className="profile-avatar" name={profile.data?.name || '指挥官'}
+          avatar={profile.data?.avatar} size={112} />
         <h2>{profile.data?.name || '指挥官'}</h2>
         <p className="profile-id">PLAYER ID · {profile.data?.id ?? '—'}</p>
         <div className="profile-email"><Mail size={14} />{profile.data?.email || '邮箱未绑定'}</div>

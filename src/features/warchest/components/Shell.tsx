@@ -6,9 +6,9 @@ import {
   Flag,
   Home,
   LayoutGrid,
-  Settings2,
   Swords,
 } from 'lucide-react';
+import { GameAvatar } from '@/components/GameUI/GameAvatar';
 import type { AuthProfile } from '@/features/game-core/api/auth';
 import { Brand, Crest } from '../visuals';
 import '../styles/base.css';
@@ -29,6 +29,27 @@ const isActive = (pathname: string, path: string) =>
     ? pathname === path
     : pathname.startsWith(path);
 
+export function PlayerAvatar({
+  name,
+  avatar,
+  size = 36,
+  className = '',
+}: {
+  name: string;
+  avatar?: string;
+  size?: number;
+  className?: string;
+}) {
+  const initial = Array.from(name.trim() || '将').slice(0, 1).join('');
+  return <GameAvatar
+    className={`crest user-avatar ${className}`.trim()}
+    name={name}
+    avatar={avatar}
+    size={size}
+    renderFallback={() => initial}
+  />;
+}
+
 export function Shell({
   children,
   title,
@@ -41,7 +62,7 @@ export function Shell({
   compactMobileFooter?: boolean;
 }) {
   const location = useLocation();
-  const initial = Array.from(profile?.name?.trim() || '将').slice(0, 1).join('');
+  const profileName = profile?.name || '指挥官';
   return <div className={`warchest-root app-shell ${compactMobileFooter ? 'compact-mobile-footer' : ''}`}>
     <aside className="sidebar">
       <Link className="side-emblem" aria-label="战争之匣首页" to="/game/warchest">
@@ -56,7 +77,10 @@ export function Shell({
         </Link>;
       })}</nav>
       <div className="side-tail"><span className="vertical-word">THE ART OF COMMAND</span>
-        <Settings2 size={20} /><Link className="my-crest" to="/game/warchest/me">{initial}</Link>
+        <Link className="my-profile-link" to="/game/warchest/me" aria-label="我的战绩">
+          <PlayerAvatar className="my-crest" name={profileName}
+            avatar={profile?.avatar} size={33} />
+        </Link>
       </div>
     </aside>
     <div className="app-top"><header className="app-header">
@@ -67,7 +91,8 @@ export function Shell({
         <Home size={18} strokeWidth={1.8} />
       </Link>
       <Link className="header-profile" to="/game/warchest/me">
-        <span>{initial}</span><b>{profile?.name || '指挥官'}</b><ChevronDown size={13} />
+        <PlayerAvatar name={profileName} avatar={profile?.avatar} size={31} />
+        <b>{profileName}</b><ChevronDown size={13} />
       </Link>
     </header></div>
     {children}

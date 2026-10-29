@@ -29,7 +29,12 @@ import { WARCHEST_PUBLIC_URL, roomEntry } from '../../adapters';
 import { useWarChestLobby } from '../../hooks/useWarChestLobby';
 import type { LobbyFilter, Visibility, WarChestRoom } from '../../types';
 import { HERO, Crest, Eyebrow, Modal, UnitGlyph } from '../../visuals';
-import { Shell, Loading, Notice } from '../../components/Shell';
+import {
+  Shell,
+  Loading,
+  Notice,
+  PlayerAvatar,
+} from '../../components/Shell';
 import type { UnitId } from '../../model';
 
 interface Draft {
@@ -196,7 +201,8 @@ export default function Lobby() {
             <button className="button secondary" type="button"
               onClick={() => { lobby.setQuery(''); lobby.setFilter('all'); }}>清空筛选</button></div>}</div>
       </section><aside className="lobby-aside" data-testid="warchest-lobby-aside"><section className="commander-card">
-        <div className="commander-top"><Crest size={44} /><div><small>你的指挥官手册</small>
+        <div className="commander-top"><PlayerAvatar
+          name={profile.data?.name || '指挥官'} avatar={profile.data?.avatar} size={44} /><div><small>你的指挥官手册</small>
           <h3>{profile.data?.name || '指挥官'}</h3></div></div>
         <div className="commander-stats"><div><b>{stats.data?.totalGames ?? '—'}</b><span>完成对局</span></div>
           <div><b>{stats.data?.wins ?? '—'}</b><span>胜局</span></div>

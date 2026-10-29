@@ -2,6 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 
 const roomID = 'warchest_layout';
 const matchID = `${roomID}-r1`;
+const profileAvatar = 'data:image/png;base64,'
+  + 'iVBORw0KGgoAAAANSUhEUgAAAAIAAAACCAIAAAD91JpzAAAAFElEQVR4nGP4z8DAwMDAxMDAwMDAAAANHQEDasKb6QAAAABJRU5ErkJggg==';
 const human = {
   userID: '110',
   playerID: '110',
@@ -164,7 +166,11 @@ async function mockProfile(page: Page) {
     json: {
       status_code: 0,
       message: 'ok',
-      data: { user_id: human.userID, display_name: human.displayName, avatar: '' },
+      data: {
+        user_id: human.userID,
+        display_name: human.displayName,
+        avatar: profileAvatar,
+      },
     },
   }));
 }
@@ -209,6 +215,13 @@ async function mockPublicData(page: Page) {
       status_code: 0,
       message: 'ok',
       data: { totalGames: 12, wins: 7, winRate: 7 / 12, avgScore: 4.3 },
+    },
+  }));
+  await page.route('**/pam-api/platform/history/games?**', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: { games: [], total: 0 },
     },
   }));
   await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
@@ -363,6 +376,60 @@ test('War Chest public pages render the responsive showcase shell', async ({ pag
   await page.goto('/game/warchest/rankings');
   await expect(page.getByRole('heading', { name: '每一次调遣，都留下判断。' })).toBeHidden();
   await expect(page.getByRole('tablist', { name: '排行榜模式' })).toBeVisible();
+  await expectNoOverflow(page);
+});
+
+test('War Chest desktop keeps primary actions, profile images, and footer content separated', async ({ page }) => {
+  await page.setViewportSize({ width: 1440, height: 876 });
+  await mockPublicData(page);
+  await page.goto('/game/warchest');
+
+  const hero = page.getByTestId('warchest-lobby-hero');
+  const createButton = hero.getByRole('button', { name: /创建房间/ });
+  const [heroBox, createBox] = await Promise.all([
+    hero.boundingBox(),
+    createButton.boundingBox(),
+  ]);
+  expect(createBox!.y + createBox!.height).toBeLessThanOrEqual(
+    heroBox!.y + heroBox!.height,
+  );
+  await expect(page.locator('.sidebar .lucide-settings-2')).toHaveCount(0);
+  await expect(page.locator('.side-tail .user-avatar img')).toHaveAttribute(
+    'src',
+    profileAvatar,
+  );
+  await expect(page.locator('.header-profile .user-avatar img')).toHaveAttribute(
+    'src',
+    profileAvatar,
+  );
+  await expect.poll(() => page.locator('.header-profile .user-avatar').evaluate(
+    element => {
+      const avatar = element.getBoundingClientRect();
+      const image = element.querySelector('img')!.getBoundingClientRect();
+      return {
+        width: Math.round(image.width),
+        height: Math.round(image.height),
+        avatarWidth: Math.round(avatar.width),
+        avatarHeight: Math.round(avatar.height),
+      };
+    },
+  )).toEqual({
+    width: 29,
+    height: 29,
+    avatarWidth: 31,
+    avatarHeight: 31,
+  });
+
+  await page.goto('/game/warchest/me');
+  await expect(page.locator('.profile-card .user-avatar img')).toHaveAttribute(
+    'src',
+    profileAvatar,
+  );
+  const [aboutBox, footerBox] = await Promise.all([
+    page.getByTestId('warchest-about-entry').boundingBox(),
+    page.locator('.app-footer').boundingBox(),
+  ]);
+  expect(aboutBox!.y + aboutBox!.height).toBeLessThanOrEqual(footerBox!.y);
   await expectNoOverflow(page);
 });
 
