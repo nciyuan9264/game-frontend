@@ -235,6 +235,9 @@ for (const item of cases) {
       ]);
       expect(createBox).toMatchObject({ width: 129, height: 39 });
       expect(shareBox).toMatchObject({ width: 99, height: 39 });
+      expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
+        - ((createBox?.y ?? 0) + (createBox?.height ?? 0)))
+        .toBeGreaterThanOrEqual(8);
 
       await share.click();
       await expect(page.getByRole('dialog').getByText('游戏地址')).toBeVisible();
@@ -253,6 +256,42 @@ for (const item of cases) {
       await expectNoOverflow(page);
     });
 }
+
+test('Acquire mobile lobby preserves the canonical hero composition',
+  async ({ page }) => {
+    await mockData(page, 'acquire');
+    await page.goto('/game/acquire', { waitUntil: 'domcontentloaded' });
+
+    const hero = page.locator('[data-game-mobile-lobby-hero]');
+    const eyebrow = hero.locator('span').first();
+    const title = hero.getByRole('heading', { name: /落下一块地/ });
+    const description = hero.getByText(/开一张桌，邀请朋友/);
+    const media = hero.getByRole('img');
+
+    const [eyebrowBox, titleBox, descriptionBox, mediaStyle, eyebrowStyle] =
+      await Promise.all([
+        eyebrow.boundingBox(),
+        title.boundingBox(),
+        description.boundingBox(),
+        media.evaluate(image => {
+          const style = getComputedStyle(image);
+          return {
+            objectPosition: style.objectPosition,
+            opacity: style.opacity,
+          };
+        }),
+        eyebrow.evaluate(element => ({
+          display: getComputedStyle(element).display,
+          lineWidth: getComputedStyle(element, '::before').width,
+        })),
+      ]);
+
+    expect(eyebrowBox).toMatchObject({ width: 320, height: 9 });
+    expect(titleBox).toMatchObject({ width: 320, height: 76.65625 });
+    expect(descriptionBox?.width).toBe(225);
+    expect(mediaStyle).toEqual({ objectPosition: '63% 51%', opacity: '0.78' });
+    expect(eyebrowStyle).toEqual({ display: 'flex', lineWidth: '21px' });
+  });
 
 for (const item of cases) {
   test(`${item.gameType} mobile room card binds the real owner`,

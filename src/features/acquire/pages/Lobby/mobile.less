@@ -1,4 +1,14 @@
 @media (max-width: @acq-mobile-max) {
+  .mobileLobby {
+    --game-public-hero-media-position: 63% 51%;
+    --game-public-hero-media-opacity: .78;
+    --game-public-hero-shade: linear-gradient(90deg,#10242aed 0%,#10242abd 39%,#10242a10 100%),linear-gradient(0deg,#10242a96,transparent 65%);
+    --game-public-hero-secondary-border: #61716c7a;
+    --game-public-hero-secondary-bg: #142a3299;
+    --game-public-hero-secondary-text: #c1ceca;
+    --game-public-hero-secondary-backdrop: blur(5px);
+    --game-public-browser-eyebrow: #728d9c;
+  }
   .hero { height: 227px; border-radius: 9px;
     > img { width: 100%; object-position: 63% 51%; opacity: .78; }
     &::after { background: linear-gradient(90deg,#10242aed 0%,#10242abd 39%,#10242a10 100%),linear-gradient(0deg,#10242a96,transparent 65%); }

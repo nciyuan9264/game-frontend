@@ -12,6 +12,7 @@ import styles from './index.module.less';
 export function LobbyMobile(props: LobbyViewProps) {
   const { lobby } = props;
   return <GameMobileLobby
+    className={styles.mobileLobby}
     eyebrow="YOUR NEXT CITY STARTS HERE"
     title={<>落下一块地，<br />下一座城属于你。</>}
     description="开一张桌，邀请朋友。从第一块地开始，经营你们的城市。"

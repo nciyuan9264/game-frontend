@@ -9,6 +9,7 @@ import {
 } from 'lucide-react';
 import { ActionButton } from '../ActionButton';
 import { GameTabs } from '../GameTabs';
+import { Eyebrow } from '../Panel';
 import type { GamePublicFact } from './types';
 import styles from './index.module.less';
 
@@ -80,7 +81,7 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
     <section className={styles.lobbyHero} data-game-mobile-lobby-hero>
       <div className={styles.heroMedia}>{media}</div>
       <div className={styles.heroShade} />
-      <div className={styles.heroCopy}><small>{eyebrow}</small><h1>{title}</h1>
+      <div className={styles.heroCopy}><Eyebrow>{eyebrow}</Eyebrow><h1>{title}</h1>
         <p>{description}</p><div className={styles.heroActions}>
           <ActionButton variant="primary" onClick={onCreate}>
             <Plus size={17} />创建房间<ArrowRight size={16} />
@@ -97,7 +98,7 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
         <b>{fact.value}</b><small>{fact.label}</small></span>)}
     </div>}
     <section className={styles.lobbyBrowser} data-game-mobile-lobby-browser>
-      <header><div><small>{browserEyebrow}</small><h2>{browserTitle}</h2></div>
+      <header><div><Eyebrow>{browserEyebrow}</Eyebrow><h2>{browserTitle}</h2></div>
         <span>{roomCount}</span></header>
       <div className={styles.lobbyFilters}>
         <GameTabs items={filters} value={filter} onChange={onFilterChange}
