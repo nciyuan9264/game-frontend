@@ -156,7 +156,18 @@ async function readChromeGeometry(page: Page) {
     const buttons = actions
       ? [...actions.querySelectorAll<HTMLElement>(':scope > button')]
       : [];
+    const stage = document.querySelector<HTMLElement>(
+      '[data-game-mobile-room-stage]',
+    );
+    const media = document.querySelector<HTMLElement>(
+      '[data-game-mobile-room-media]',
+    );
+    const seats = document.querySelector<HTMLElement>(
+      '[data-game-mobile-room-seats]',
+    );
     const headingStyle = heading ? getComputedStyle(heading) : undefined;
+    const stageBox = stage?.getBoundingClientRect();
+    const seatsBox = seats?.getBoundingClientRect();
     return {
       brandGap: brand ? getComputedStyle(brand).columnGap : '',
       heading: heading?.getBoundingClientRect().toJSON(),
@@ -174,6 +185,8 @@ async function readChromeGeometry(page: Page) {
       back: back?.getBoundingClientRect().toJSON(),
       actionsGap: actions ? getComputedStyle(actions).columnGap : '',
       buttonHeights: buttons.map(button => button.getBoundingClientRect().height),
+      mediaPosition: media ? getComputedStyle(media).position : '',
+      seatOffset: stageBox && seatsBox ? seatsBox.y - stageBox.y : -1,
       metaVisible: !!document.querySelector<HTMLElement>(
         '[data-game-room-heading-meta]',
       )?.offsetParent,
@@ -209,5 +222,8 @@ for (const config of games) {
       expect(geometry.heading?.height ?? 0).toBeLessThanOrEqual(104);
       expect(geometry.heading?.x ?? 100).toBeLessThanOrEqual(20);
       expect(geometry.heading?.width ?? 0).toBeGreaterThanOrEqual(350);
+      if (geometry.mediaPosition) expect(geometry.mediaPosition).toBe('absolute');
+      expect(geometry.seatOffset).toBeGreaterThanOrEqual(0);
+      expect(geometry.seatOffset).toBeLessThanOrEqual(24);
     });
 }

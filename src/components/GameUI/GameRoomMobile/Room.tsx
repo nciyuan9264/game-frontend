@@ -133,7 +133,9 @@ export function GameMobileRoom({
             <Check size={11} />入座</span><i /><span className={styles.active}>
               02 准备</span><i /><span>03 开局</span></div>
         </header>
-        <div className={styles.tableStage}>{media}
+        <div className={styles.tableStage} data-game-mobile-room-stage>
+          {media && <div className={styles.tableMedia}
+            data-game-mobile-room-media>{media}</div>}
           <GameMobileSeatGrid seats={seats} owner={owner} enabled={enabled}
             dense={denseSeats} renderAvatar={renderAvatar}
             renderDecoration={renderSeatDecoration}

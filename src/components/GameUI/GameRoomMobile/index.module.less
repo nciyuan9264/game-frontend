@@ -59,9 +59,13 @@
     background: var(--game-room-stage, var(--game-bg, #173236));
     &::before { position: absolute; inset: 0; z-index: -1;
       background-image: radial-gradient(#c3d5b117 .6px,transparent .6px);
-      background-size: 5px 5px; content: ''; }
-    > img { position: absolute; inset: 0; z-index: -1; width: 100%; height: 100%;
-      object-fit: cover; opacity: .12; } }
+      background-size: 5px 5px; content: ''; } }
+  .tableMedia { position: absolute; inset: 0; z-index: 0; overflow: hidden;
+    pointer-events: none;
+    > img { width: 100%; height: 100%; object-fit: cover; opacity: .12; }
+    > svg { position: absolute; top: 18px; left: 18px; width: 72px; height: 72px;
+      color: var(--game-accent, #c4b38a); opacity: .14; }
+    > span { position: absolute; top: 18px; left: 18px; opacity: .14; } }
   .seatGrid { position: relative; z-index: 1; display: grid;
     grid-template-columns: repeat(2,minmax(0,1fr)); gap: 12px; }
   .seat { position: relative; display: flex; width: 100%; height: 128px;
