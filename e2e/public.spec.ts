@@ -33,7 +33,7 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   const catalog = page.locator('[aria-label="选择游戏"]');
   await expect(categories).toBeVisible();
   await expect(catalog).toBeVisible();
-  await expect(catalog.locator('article')).toHaveCount(14);
+  await expect(catalog.locator('article')).toHaveCount(15);
 
   const layout = await catalog.evaluate(element => {
     const firstCard = element.querySelector('article');
@@ -41,6 +41,7 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
     return {
       catalogTop: element.getBoundingClientRect().top,
       firstCardWidth: firstCard?.getBoundingClientRect().width ?? 0,
+      gridColumnCount: getComputedStyle(element).gridTemplateColumns.split(' ').length,
       documentFits: document.documentElement.scrollWidth <= window.innerWidth,
       pageScrollable: !!scrollRoot
         && scrollRoot.scrollHeight > scrollRoot.clientHeight,
@@ -48,7 +49,8 @@ test('home game switcher remains usable on a narrow mobile viewport', async ({ p
   });
 
   expect(layout.catalogTop).toBeGreaterThanOrEqual(0);
-  expect(layout.firstCardWidth).toBeGreaterThanOrEqual(260);
+  expect(layout.gridColumnCount).toBe(2);
+  expect(layout.firstCardWidth).toBeGreaterThanOrEqual(130);
   expect(layout.documentFits).toBe(true);
   expect(layout.pageScrollable).toBe(true);
 

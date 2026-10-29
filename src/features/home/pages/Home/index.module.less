@@ -16,7 +16,39 @@
   background:
     linear-gradient(180deg, rgba(10, 15, 22, 0.96), rgba(13, 20, 34, 0.98) 46%, #111827),
     linear-gradient(135deg, rgba(255, 255, 255, 0.06), transparent 42%);
-  font-family: Inter, 'Noto Sans SC Variable', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-family: 'DM Sans Variable', 'DM Sans', 'Noto Sans SC Variable', 'Noto Sans SC', 'PingFang SC', 'Microsoft YaHei', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  font-optical-sizing: auto;
+  -webkit-font-smoothing: antialiased;
+  scrollbar-color: rgba(148, 163, 184, 0.38) transparent;
+  scrollbar-width: thin;
+
+  &::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+
+  &::-webkit-scrollbar-track,
+  &::-webkit-scrollbar-corner {
+    background: transparent;
+  }
+
+  &::-webkit-scrollbar-thumb {
+    min-height: 72px;
+    border: 3px solid transparent;
+    border-radius: 999px;
+    background: rgba(148, 163, 184, 0.36);
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:hover {
+    background: rgba(148, 163, 184, 0.58);
+    background-clip: padding-box;
+  }
+
+  &::-webkit-scrollbar-thumb:active {
+    background: color-mix(in srgb, var(--accent-primary) 62%, #94a3b8);
+    background-clip: padding-box;
+  }
 }
 
 .backgroundDecor {
@@ -791,6 +823,64 @@
     background: var(--accent-primary);
     cursor: pointer;
     font-weight: 900;
+  }
+}
+
+@media (min-width: 981px) {
+  .heroCopy h1 {
+    font-weight: 760;
+  }
+
+  .brandRow {
+    font-weight: 600;
+
+    b {
+      font-weight: 600;
+    }
+  }
+
+  .heroMetrics {
+    strong {
+      font-weight: 650;
+    }
+
+    small {
+      font-weight: 450;
+    }
+  }
+
+  .featuredInfo h2,
+  .libraryHeader h2,
+  .cardTitleRow h3 {
+    font-weight: 650;
+  }
+
+  .featuredBadge,
+  .featuredEyebrow,
+  .libraryHeader p,
+  .cardTitleRow p {
+    font-weight: 650;
+  }
+
+  .featuredTags span,
+  .featuredFeatures span,
+  .categoryBar button,
+  .cardPreview b,
+  .cardTitleRow > span {
+    font-weight: 550;
+  }
+
+  .categoryBar .activeCategory,
+  .primaryBtn,
+  .secondaryBtn,
+  .cardActions button,
+  .emptyState button {
+    font-weight: 600;
+  }
+
+  .cardTags span,
+  .cardMeta {
+    font-weight: 500;
   }
 }
 
