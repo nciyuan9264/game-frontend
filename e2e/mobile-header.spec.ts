@@ -261,3 +261,15 @@ test('acquire live play swaps only the mobile topbar structure', async ({ page }
   await expect(mobileTopbar).toBeHidden();
   await expect(desktopTopbar).toBeVisible();
 });
+
+test('davinci mobile cipher facts use the full strip width', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockHeaderData(page);
+  await page.goto('/game/davinci');
+
+  const facts = page.getByLabel('达芬奇密码规则要点').locator(':scope > div');
+  await expect(facts).toHaveCSS('justify-content', 'space-between');
+  await expect(facts.locator(':scope > button')).toHaveCount(4);
+  await expect.poll(() => facts.evaluate(element =>
+    element.scrollWidth <= element.clientWidth)).toBe(true);
+});

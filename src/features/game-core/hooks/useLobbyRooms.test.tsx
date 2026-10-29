@@ -50,6 +50,35 @@ describe('useLobbyRooms', () => {
     expect(hook.result.current.error).toBe('offline');
   });
 
+  it('does not restart an active request when presentation callbacks change', async () => {
+    let resolveRequest: (rooms: readonly LobbyRoomLike[]) => void = () => undefined;
+    const loadRooms = vi.fn((signal: AbortSignal) => new Promise<readonly LobbyRoomLike[]>(
+      resolve => {
+        resolveRequest = resolve;
+        signal.addEventListener('abort', () => resolve([]));
+      }
+    ));
+    const hook = renderHook(({ prefix }: { prefix: string }) => useLobbyRooms({
+      loadRooms,
+      getOwnerName: value => `${prefix}${ownerName(value)}`,
+      mapError: reason => ({
+        message: reason instanceof Error ? reason.message : `${prefix} failed`,
+      }),
+    }), { initialProps: { prefix: 'first' } });
+
+    await act(async () => undefined);
+    const signal = loadRooms.mock.calls[0][0];
+    hook.rerender({ prefix: 'second' });
+
+    expect(loadRooms).toHaveBeenCalledTimes(1);
+    expect(signal.aborted).toBe(false);
+
+    await act(async () => {
+      resolveRequest([room]);
+    });
+    expect(hook.result.current.rooms).toEqual([room]);
+  });
+
   it('pauses while hidden and refreshes immediately after visibility returns', async () => {
     Object.defineProperty(document, 'hidden', { configurable: true, value: true });
     const loadRooms = vi.fn().mockResolvedValue([room]);

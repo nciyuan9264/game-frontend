@@ -41,6 +41,8 @@ export function useLobbyRooms<TRoom extends LobbyRoomLike>({
   const [filter, setFilter] = useState<LobbyFilter>('all');
   const refreshRef = useRef<() => void>(() => undefined);
   const sequenceRef = useRef(0);
+  const mapErrorRef = useRef(mapError);
+  mapErrorRef.current = mapError;
 
   useEffect(() => {
     let stopped = false;
@@ -66,7 +68,7 @@ export function useLobbyRooms<TRoom extends LobbyRoomLike>({
         setErrorCode('');
       } catch (reason) {
         if (stopped || requestID !== sequenceRef.current) return;
-        const mapped = mapError(reason, controller.signal.aborted);
+        const mapped = mapErrorRef.current(reason, controller.signal.aborted);
         setError(mapped.message);
         setErrorCode(mapped.code ?? '');
       } finally {
@@ -94,7 +96,7 @@ export function useLobbyRooms<TRoom extends LobbyRoomLike>({
       clearTimeout(pollTimer);
       document.removeEventListener('visibilitychange', onVisibilityChange);
     };
-  }, [getOwnerName, loadRooms, mapError, pollIntervalMs, timeoutMs]);
+  }, [loadRooms, pollIntervalMs, timeoutMs]);
 
   const refresh = useCallback(() => refreshRef.current(), []);
   const filteredRooms = useMemo(
