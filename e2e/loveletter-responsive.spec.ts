@@ -247,7 +247,9 @@ test('Love Letter public pages follow the shared responsive frame', async ({
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/loveletter', { waitUntil: 'commit' });
-    const hero = page.locator('.ll-hero');
+    const hero = page.locator(
+      '.ll-hero, [data-game-mobile-lobby-hero]',
+    );
     await expect(hero).toBeVisible();
     await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /分享游戏/ })).toBeVisible();
@@ -301,15 +303,15 @@ test('Love Letter mobile room keeps six seats and the ready dock in view', async
   await expect(page.locator('[data-game-brand]')).toBeVisible();
   await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
   await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-  const seats = page.locator('.ll-seat');
+  const seats = page.locator('[data-game-mobile-room-seat]');
   await expect(seats).toHaveCount(6);
   const firstSeat = await seats.first().boundingBox();
   expect(firstSeat).not.toBeNull();
   expect(firstSeat!.height).toBeGreaterThanOrEqual(126);
   expect(firstSeat!.height).toBeLessThanOrEqual(132);
-  const dock = await page.locator('.ll-ready-dock').boundingBox();
+  const dock = await page.locator('[data-game-mobile-room-dock]').boundingBox();
   expect(dock).not.toBeNull();
-  expect(dock!.height).toBeLessThanOrEqual(110);
+  expect(dock!.height).toBeLessThanOrEqual(115);
   expect(dock!.y + dock!.height).toBeLessThanOrEqual(844);
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-room');

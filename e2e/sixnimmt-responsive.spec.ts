@@ -90,7 +90,9 @@ test('Six Nimmt public pages follow the shared responsive frame', async ({ page 
   for (const viewport of [{ width: 1440, height: 900 }, { width: 390, height: 844 }, { width: 360, height: 800 }]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/sixnimmt', { waitUntil: 'commit' });
-    const hero = page.locator('.sn-hero');
+    const hero = page.locator(
+      '.sn-hero, [data-game-mobile-lobby-hero]',
+    );
     await expect(hero).toBeVisible();
     await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /分享游戏/ })).toBeVisible();
@@ -120,8 +122,8 @@ test('Six Nimmt mobile room keeps ten seats and ready dock in view', async ({ pa
   await expect(page.locator('[data-game-brand]')).toBeVisible();
   await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
   await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-  await expect(page.locator('.sn-seat')).toHaveCount(10);
-  const dock = await page.locator('.sn-ready-dock').boundingBox();
+  await expect(page.locator('[data-game-mobile-room-seat]')).toHaveCount(10);
+  const dock = await page.locator('[data-game-mobile-room-dock]').boundingBox();
   expect(dock).not.toBeNull();
   expect(dock!.height).toBeLessThanOrEqual(115);
   expect(dock!.y + dock!.height).toBeLessThanOrEqual(844);
