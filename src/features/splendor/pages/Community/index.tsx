@@ -148,6 +148,7 @@ export function Guide() {
   if (isMobile) {
     return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
       <GameMobileGuide
+        visualFill
         visual={<Artwork index={[0, 6, 4, 8][step]} />}
         facts={[
           { icon: <Users />, value: '2–4', label: '人' },

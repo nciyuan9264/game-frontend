@@ -45,6 +45,7 @@ const navigation = [
 ] as const;
 
 export const fugitiveThemeClassName = styles.fugitiveRoot;
+export const fugitiveDialogThemeClassName = styles.fugitiveDialogTheme;
 
 export function FugitiveRoot({
   children,

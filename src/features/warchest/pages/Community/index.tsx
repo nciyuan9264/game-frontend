@@ -145,6 +145,7 @@ export function Guide() {
   if (isMobile) {
     return <Shell title="玩法指南" profile={profile.data} compactMobileFooter>
       <main className="page"><GameMobileGuide
+        visualFill
         visual={<TroopArt type={(['sword', 'light', 'ensign', 'cavalry'] as UnitId[])[
           guide.index
         ]} />}

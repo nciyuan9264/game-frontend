@@ -26,6 +26,8 @@
   transform:scale(1.25);
   > span { width:32px; height:32px; }
 }
+.mobileBoardVisual { display:grid; width:120px; height:120px; place-items:center;
+  :global(.small-board) { flex:none; transform:scale(.52); } }
 .openingLine { display:grid; grid-template-columns:repeat(2,32px); gap:5px; padding:13px; border:7px solid #55715d; background:#658270; }
 .passLine { gap:24px; color:#a1815d; }
 .victoryLine {

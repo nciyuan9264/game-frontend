@@ -48,6 +48,13 @@ const rankGames = new Set<GameType>([
   'forsale',
 ]);
 
+const guideFillGames = new Set<GameType>([
+  'davinci',
+  'splendor',
+  'fugitive',
+  'warchest',
+]);
+
 function metric(gameType: GameType, index: number) {
   if (rankGames.has(gameType)) {
     return { rank: { avgRank: 1 + index / 10 } };
@@ -269,10 +276,56 @@ for (const item of cases) {
 
       await create.click();
       const createDialog = page.getByRole('dialog');
-      await expect(createDialog.getByRole('button', { name: /公开房间/ }))
-        .toBeVisible();
-      await expect(createDialog.getByRole('button', { name: /私密房间/ }))
-        .toBeVisible();
+      const publicChoice = createDialog.getByRole('button', {
+        name: /公开房间/,
+      });
+      const privateChoice = createDialog.getByRole('button', {
+        name: /私密房间/,
+      });
+      await expect(publicChoice).toBeVisible();
+      await expect(privateChoice).toBeVisible();
+      const [dialogBox, publicBox, privateBox, choiceStyle] = await Promise.all([
+        createDialog.boundingBox(),
+        publicChoice.boundingBox(),
+        privateChoice.boundingBox(),
+        publicChoice.evaluate(element => {
+          const style = getComputedStyle(element);
+          const group = getComputedStyle(element.parentElement!);
+          return {
+            background: style.backgroundColor,
+            borderStyle: style.borderStyle,
+            borderWidth: style.borderWidth,
+            columns: group.gridTemplateColumns.split(' ').filter(Boolean).length,
+            display: group.display,
+          };
+        }),
+      ]);
+      expect(dialogBox).toMatchObject({ x: 0, width: 390 });
+      expect(Math.abs(
+        Math.round((dialogBox?.y ?? 0) + (dialogBox?.height ?? 0)) - 844,
+      )).toBeLessThanOrEqual(4);
+      expect(dialogBox?.height ?? 800).toBeLessThan(800);
+      expect(publicBox?.height ?? 0).toBeGreaterThanOrEqual(110);
+      expect(Math.abs(
+        (privateBox?.height ?? 0) - (publicBox?.height ?? 0),
+      )).toBeLessThanOrEqual(.1);
+      expect(Math.abs(
+        (privateBox?.y ?? 0) - (publicBox?.y ?? 0),
+      )).toBeLessThanOrEqual(.1);
+      expect(choiceStyle).toEqual({
+        background: expect.not.stringMatching(/^rgba\(0, 0, 0, 0\)$/),
+        borderStyle: 'solid',
+        borderWidth: '1px',
+        columns: 2,
+        display: 'grid',
+      });
+      const factList = createDialog.locator('dl').first();
+      if (await factList.count()) {
+        await expect(factList).toHaveCSS('display', 'grid');
+        expect(await factList.evaluate(element =>
+          getComputedStyle(element).gridTemplateColumns
+            .split(' ').filter(Boolean).length)).toBe(2);
+      }
       await createDialog.getByRole('button', { name: '取消', exact: true }).click();
       await expectNoOverflow(page);
     });
@@ -366,20 +419,51 @@ for (const item of cases) {
         waitUntil: 'domcontentloaded',
       });
       const guideVisual = page.locator('[data-game-mobile-guide-visual]');
+      const guideMedia = page.locator('[data-game-mobile-guide-media]');
       const guidePanel = page.locator('[data-game-mobile-guide-panel]');
       await expect(page.locator('[data-game-public-mobile="guide"]'))
         .toBeVisible();
       await expect(page.getByRole('tablist', { name: '玩法章节' }))
         .toBeVisible();
-      const [visualBox, panelBox] = await Promise.all([
+      const [visualBox, mediaBox, panelBox, mediaGeometry] = await Promise.all([
         guideVisual.boundingBox(),
+        guideMedia.boundingBox(),
         guidePanel.boundingBox(),
+        guideMedia.evaluate(element => {
+          const forcedNonImageFill = [...element.children]
+            .filter(child => child.tagName !== 'IMG')
+            .some(child => {
+              const media = element.getBoundingClientRect();
+              const box = child.getBoundingClientRect();
+              const style = getComputedStyle(child);
+              return Math.abs(child.clientWidth - media.width) <= 1
+                && Math.abs(child.clientHeight - media.height) <= 1
+                && style.width === `${media.width}px`
+                && style.height === `${media.height}px`
+                && Math.abs(box.width - media.width) <= 1
+                && Math.abs(box.height - media.height) <= 1;
+            });
+          return {
+            forcedNonImageFill,
+            overflow: getComputedStyle(element).overflow,
+            visibleChildren: [...element.children].filter(child => {
+              const box = child.getBoundingClientRect();
+              return box.width > 0 && box.height > 0;
+            }).length,
+          };
+        }),
       ]);
       expect(visualBox?.width).toBe(362);
+      expect(mediaBox).toMatchObject({ width: 360, height: 120 });
       expect(panelBox?.width).toBe(362);
       expect(panelBox?.y).toBe(
         (visualBox?.y ?? 0) + (visualBox?.height ?? 0) + 8,
       );
+      expect(mediaGeometry.overflow).toBe('hidden');
+      expect(mediaGeometry.visibleChildren).toBeGreaterThan(0);
+      if (!guideFillGames.has(item.gameType)) {
+        expect(mediaGeometry.forcedNonImageFill).toBe(false);
+      }
 
       await page.goto(`/game/${item.gameType}/me`, {
         waitUntil: 'domcontentloaded',
@@ -424,6 +508,34 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
 
     const profile = page.locator('[data-game-public-mobile="profile"]');
     const about = page.locator('[data-game-mobile-about-entry]');
+    const aboutDialogMetrics = () => page.getByRole('dialog').evaluate(dialog => {
+      const header = dialog.querySelector('header');
+      const body = header?.nextElementSibling;
+      const footer = body?.nextElementSibling;
+      const intro = body?.children[0];
+      const links = body?.children[1];
+      const legal = body?.children[2];
+      const height = (target: Element | null | undefined) =>
+        target?.getBoundingClientRect().height ?? 0;
+      const fontSize = (target: Element | null | undefined) =>
+        target ? getComputedStyle(target).fontSize : '';
+      return {
+        dialogHeight: height(dialog),
+        headerHeight: height(header),
+        bodyHeight: height(body),
+        introHeight: height(intro),
+        footerHeight: height(footer),
+        eyebrow: fontSize(header?.querySelector('small')),
+        title: fontSize(header?.querySelector('h2')),
+        introEyebrow: fontSize(intro?.querySelector('small')),
+        author: fontSize(intro?.querySelector('h3')),
+        description: fontSize(intro?.querySelector('p')),
+        linkTitle: fontSize(links?.querySelector('b')),
+        linkDetail: fontSize(links?.querySelector('small')),
+        legal: fontSize(legal),
+        footerButton: fontSize(footer?.querySelector('button')),
+      };
+    });
     const profileTypography = () => profile.evaluate(element => {
       const [card, history, aboutEntry] = Array.from(element.children);
       const identity = card.children[0];
@@ -456,6 +568,12 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
     const acquireTypography = await profileTypography();
     const acquireHistoryHeight = await profile.locator(':scope > section')
       .nth(1).evaluate(element => element.getBoundingClientRect().height);
+    await about.click();
+    await expect(page.getByRole('dialog', {
+      name: '关于 Acquire Online',
+    })).toBeVisible();
+    const acquireAboutDialog = await aboutDialogMetrics();
+    await page.getByRole('button', { name: '知道了' }).click();
 
     await page.goto('/game/fugitive/me', { waitUntil: 'domcontentloaded' });
     const navigation = page.getByRole('navigation', {
@@ -477,6 +595,55 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
     expect(profileBox).toMatchObject({ x: 14, width: 362 });
     expect((profileBox?.y ?? 0) + (profileBox?.height ?? 0))
       .toBe(navigationBox?.y);
+    expect((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0))
+      .toBe(navigationBox?.y);
+
+    await about.click();
+    await expect(page.getByRole('dialog', {
+      name: '关于 Fugitive Online',
+    })).toBeVisible();
+    expect(await aboutDialogMetrics()).toEqual(acquireAboutDialog);
+  });
+
+test('War Chest mobile public shell keeps the shared dark palette and frame',
+  async ({ page }) => {
+    await mockData(page, 'warchest');
+    for (const suffix of ['', '/rankings', '/guide', '/me']) {
+      await page.goto(`/game/warchest${suffix}`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const palette = await page.locator('.warchest-root.app-shell')
+        .evaluate(element => {
+          const shell = getComputedStyle(element);
+          const header = getComputedStyle(
+            element.querySelector<HTMLElement>('[data-game-shell-header]')!,
+          );
+          const content = getComputedStyle(
+            element.querySelector<HTMLElement>('.page')!,
+          );
+          return {
+            background: shell.backgroundColor,
+            color: shell.color,
+            headerBackground: header.backgroundColor,
+            contentPaddingLeft: content.paddingLeft,
+            contentPaddingTop: content.paddingTop,
+          };
+        });
+      expect(palette).toEqual({
+        background: 'rgb(11, 24, 32)',
+        color: 'rgb(236, 232, 220)',
+        headerBackground: 'rgb(13, 28, 36)',
+        contentPaddingLeft: '14px',
+        contentPaddingTop: '15px',
+      });
+    }
+
+    const [aboutBox, navigationBox] = await Promise.all([
+      page.locator('[data-game-mobile-about-entry]').boundingBox(),
+      page.getByRole('navigation', {
+        name: '战争之匣手机导航',
+      }).boundingBox(),
+    ]);
     expect((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0))
       .toBe(navigationBox?.y);
   });

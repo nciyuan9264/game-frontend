@@ -54,7 +54,7 @@
   .cs-join-card input{border:0;padding:0 10px;background:transparent;font-size:12px}
   .cs-join-card button{width:42px;border-radius:0}
 
-  .cs-room-page{padding-bottom:calc(131px + env(safe-area-inset-bottom))}
+  .cs-room-page{padding-bottom:0}
   .cs-room-heading{gap:12px;margin:0 2px 14px}
   .cs-room-heading>div{min-width:0;align-items:center;gap:10px}
   .cs-room-heading>div>span{min-width:0;flex:1}

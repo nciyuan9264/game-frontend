@@ -79,6 +79,147 @@
   }
 }
 
+@media (max-width: 767px) {
+  .warchest-root:not(.battle-app) {
+    --paper: #0b1820;
+    --surface: #132831;
+    --ink: #ece8dc;
+    --green: #d0b979;
+    --deep: #0d2028;
+    --gold: #d0b979;
+    --muted: #8fa6ad;
+    --line: #304650;
+    --red: #bd765f;
+    --game-bg: var(--paper);
+    --game-panel: var(--surface);
+    --game-raised: #19323a;
+    --game-line: var(--line);
+    --game-accent: var(--gold);
+    --game-primary: var(--gold);
+    --game-primary-gradient: linear-gradient(120deg,#e6ca91,#caa96d);
+    --game-primary-border: #e6ca91;
+    --game-primary-text: #292319;
+    --game-text: var(--ink);
+    --game-muted: var(--muted);
+    --game-success: #9dbc99;
+    --game-danger: #dc9180;
+    --game-button-bg: #1a3039;
+    --game-button-border: #3b535d;
+    --game-button-text: #dce5e2;
+    --game-panel-gradient: linear-gradient(145deg,#173039,#10242d);
+    --game-eyebrow: #c7b77f;
+    --game-dialog-bg: #132831;
+    --game-dialog-footer-bg: #0d2028;
+    --game-dialog-border: #3c535d;
+    --game-dialog-line: #304650;
+    --game-dialog-close-bg: #1a3039;
+    --game-dialog-close-border: #3b535d;
+    --game-dialog-close-text: #9eb3b8;
+    --game-dialog-backdrop: #020a0ebd;
+    --game-dialog-handle: #6e85884d;
+    color-scheme: dark;
+  }
+
+  .warchest-root.app-shell {
+    min-height: 100dvh;
+    background: var(--game-bg);
+    color: var(--game-text);
+  }
+
+  .warchest-root .app-top,
+  .warchest-root .app-header {
+    background: #0d1c24;
+    border-color: var(--game-line);
+  }
+
+  .warchest-root .app-header {
+    height: 57px;
+    padding: 0 15px;
+  }
+
+  .warchest-root .brand strong { color: var(--game-text); }
+  .warchest-root .brand div > span { color: var(--game-muted); }
+  .warchest-root .brand > .crest {
+    background: #193039;
+    color: var(--game-accent);
+  }
+  .warchest-root .header-home { color: var(--game-muted); }
+
+  .warchest-root .page {
+    padding: 15px 14px calc(87px + env(safe-area-inset-bottom));
+  }
+
+  .warchest-root[data-game-shell='match'] .page {
+    padding: 13px 8px;
+  }
+
+  .warchest-root .mobile-bottom {
+    border-color: var(--game-line);
+    background: #0d1c24f5;
+  }
+
+  .warchest-root .mobile-bottom nav {
+    height: 66px;
+    padding: 7px 8px calc(8px + env(safe-area-inset-bottom));
+  }
+
+  .warchest-root .mobile-bottom nav a {
+    width: auto;
+    min-height: 46px;
+    flex: 1;
+    color: var(--game-muted);
+  }
+
+  .warchest-root .mobile-bottom nav a.active { color: var(--game-accent); }
+  .warchest-root .mobile-bottom nav a.active::before {
+    top: -7px;
+    background: var(--game-accent);
+  }
+
+  .warchest-root.compact-mobile-footer.app-shell {
+    display: flex;
+    min-height: 100dvh;
+    flex-direction: column;
+  }
+
+  .warchest-root.compact-mobile-footer.app-shell > .page {
+    display: flex;
+    min-height: calc(100dvh - 57px);
+    flex: 1;
+    flex-direction: column;
+    padding-bottom: calc(66px + env(safe-area-inset-bottom));
+  }
+
+  .warchest-root.compact-mobile-footer.app-shell
+  > .page > [data-game-public-mobile='profile'] {
+    flex: 1;
+  }
+
+  .warchest-root .warchest-setup {
+    border-color: var(--game-line);
+  }
+
+  .warchest-root .roster-presets,
+  .warchest-root .draft-status {
+    border-color: var(--game-line);
+    background: var(--game-raised);
+  }
+
+  .warchest-root .roster-presets button { color: var(--game-muted); }
+  .warchest-root .roster-presets button.active {
+    border-color: #6f8061;
+    background: #203a35;
+    color: var(--game-text);
+  }
+
+  .warchest-root .roster-intro,
+  .warchest-root .draft-status small,
+  .warchest-root .opponent-lineup,
+  .warchest-root .opponent-lineup span {
+    color: var(--game-muted);
+  }
+}
+
 .warchest-root .user-avatar {
   overflow: hidden;
   border: 1px solid #c6cdb8;

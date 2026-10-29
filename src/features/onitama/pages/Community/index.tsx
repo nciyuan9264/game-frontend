@@ -136,7 +136,9 @@ export function Guide() {
   const [catalogOpen, setCatalogOpen] = useState(false);
   const current = guide.current;
   const visual = <>
-    {guide.index === 0 && <Board pieces={guidePieces} view="blue" small />}
+    {guide.index === 0 && <div className={styles.mobileBoardVisual}>
+      <Board pieces={guidePieces} view="blue" small />
+    </div>}
     {guide.index === 1 && <div className={styles.flipLine}>
       <MoveCard id="tiger" side="blue" mini />
       <Repeat2 size={27} />

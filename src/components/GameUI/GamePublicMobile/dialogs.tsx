@@ -68,7 +68,7 @@ export function GameMobileCreateRoomDialog({
           {visibility === value && <Check size={14} />}
         </button>)}
       </div>
-      {facts}
+      {facts && <div className={styles.createFacts}>{facts}</div>}
       <div className={styles.dialogHint}><ShieldCheck size={15} />
         <span>{hint}</span></div>
       {error}

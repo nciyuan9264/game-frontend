@@ -7,6 +7,7 @@ import styles from './index.module.less';
 
 export interface GameMobileGuideProps {
   visual: ReactNode;
+  visualFill?: boolean;
   facts: readonly GamePublicFact[];
   tabs: readonly { value: number; label: ReactNode }[];
   index: number;
@@ -24,6 +25,7 @@ export interface GameMobileGuideProps {
 
 export function GameMobileGuide({
   visual,
+  visualFill,
   facts,
   tabs,
   index,
@@ -41,7 +43,9 @@ export function GameMobileGuide({
   return <div className={`${styles.mobileOnly} ${styles.guide}`}
     data-game-public-mobile="guide">
     <aside className={styles.guideVisual} data-game-mobile-guide-visual>
-      <div>{visual}</div><div className={styles.guideFacts}>
+      <div className={`${styles.guideMedia} ${
+        visualFill ? styles.guideMediaFill : ''}`}
+      data-game-mobile-guide-media>{visual}</div><div className={styles.guideFacts}>
         {facts.map((fact, factIndex) => <span key={factIndex}>{fact.icon}
           <b>{fact.value}</b><small>{fact.label}</small></span>)}
       </div>

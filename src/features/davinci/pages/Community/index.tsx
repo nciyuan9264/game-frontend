@@ -134,6 +134,7 @@ export function Guide() {
   if (isMobile) {
     return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
       <GameMobileGuide
+        visualFill
         visual={<div className={styles.tileDemo}><div>
           <span className={styles.blackTile}>3</span>
           <span className={styles.whiteTile}>3</span>

@@ -545,8 +545,9 @@ test('War Chest preparation room exposes all authoritative setup modes', async (
   await expect(page.locator('[data-game-brand]')).toBeVisible();
   await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
   await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-  await expect(page.getByRole('heading', { name: /雾谷前哨/ })).toBeVisible();
-  await expect(page.locator('.seat-card')).toHaveCount(2);
+  await expect(page.getByRole('heading', { name: new RegExp(roomID) }))
+    .toBeVisible();
+  await expect(page.locator('[data-game-mobile-room-seat]')).toHaveCount(2);
   await expect(page.getByRole('button', { name: /首局推荐/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /随机编成/ })).toBeVisible();
   const draftButton = page.getByRole('button', { name: /官方轮抽/ });
@@ -595,8 +596,8 @@ test('War Chest mobile returns from battle to full-width lobby cards', async ({ 
   await expect(page).toHaveURL(/\/game\/warchest$/);
   await expect(page.getByText('雾谷前哨')).toBeVisible();
   const [browserBox, cardBox] = await Promise.all([
-    page.getByTestId('warchest-lobby-browser').boundingBox(),
-    page.locator('.room-card').first().boundingBox(),
+    page.locator('[data-game-mobile-lobby-browser]').boundingBox(),
+    page.locator('[data-game-mobile-room-card]').first().boundingBox(),
   ]);
   expect(cardBox?.x).toBe(browserBox?.x);
   expect(cardBox?.width).toBe(browserBox?.width);

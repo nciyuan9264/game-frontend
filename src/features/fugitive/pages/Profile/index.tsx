@@ -25,7 +25,7 @@ import type { Game } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   AppShell,
-  fugitiveThemeClassName,
+  fugitiveDialogThemeClassName,
   ProfileMonogram,
 } from '../../components/AppShell';
 import { FugitiveLoading } from '../../components/LoadingState';
@@ -121,7 +121,7 @@ export default function Profile() {
       {panel === 'about' && <GameMobileAboutDialog gameName="Fugitive"
         avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }}
           className="contact-monogram" />}
-        themeClassName={fugitiveThemeClassName}
+        themeClassName={fugitiveDialogThemeClassName}
         onClose={() => setPanel(undefined)} />}
       {panel === 'logout' && <Modal title="离开当前账号？" kicker="SIGN OUT"
         onClose={() => setPanel(undefined)}

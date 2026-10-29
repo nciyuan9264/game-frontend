@@ -120,6 +120,7 @@ export default function Guide() {
   if (isMobile) {
     return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
       <main className="page-content"><GameMobileGuide
+        visualFill
         visual={<GuideVisual step={guide.index} />}
         facts={[
           { icon: <Users />, value: '2', label: '人' },

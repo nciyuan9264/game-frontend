@@ -268,36 +268,34 @@ test('Cant Stop mobile lobby uses the Acquire scale and spacing',
     const geometry = await page.evaluate(() => {
       const rect = (selector: string) =>
         document.querySelector(selector)?.getBoundingClientRect();
+      const heroMedia = document.querySelector(
+        '[data-game-mobile-lobby-hero] img',
+      );
       return {
         contentPaddingLeft: getComputedStyle(document.querySelector('.cs-content')!)
           .paddingLeft,
-        heroArt: rect('.cs-hero-art'),
-        hero: rect('.cs-hero'),
-        heroHeight: rect('.cs-hero')?.height ?? 0,
-        facts: rect('.cs-facts'),
-        factsHeight: rect('.cs-facts')?.height ?? 0,
-        browser: rect('.cs-room-browser'),
-        search: rect('.cs-room-tools label'),
-        heading: rect('.cs-room-browser h2'),
-        empty: rect('.cs-empty'),
-        emptyHeight: rect('.cs-empty')?.height ?? 0,
-        joinTop: rect('.cs-join-card')?.top ?? 0,
+        heroMedia: heroMedia?.getBoundingClientRect(),
+        hero: rect('[data-game-mobile-lobby-hero]'),
+        facts: rect('[data-game-mobile-lobby-facts]'),
+        browser: rect('[data-game-mobile-lobby-browser]'),
+        join: rect('[data-game-mobile-lobby-join]'),
         navTop: rect('.cs-mobile-nav')?.top ?? window.innerHeight,
       };
     });
     expect(geometry.contentPaddingLeft).toBe('14px');
-    expect(geometry.heroArt?.width ?? 0).toBeGreaterThan(190);
-    expect(geometry.heroArt?.height ?? 0).toBeGreaterThan(190);
+    expect(geometry.heroMedia).toMatchObject({
+      x: 15,
+      y: 73,
+      width: 360,
+      height: 225,
+    });
     expect(geometry.hero).toMatchObject({ x: 14, y: 72, width: 362, height: 227 });
     expect(geometry.facts).toMatchObject({ x: 14, y: 299, width: 362, height: 63 });
     expect(geometry.browser).toMatchObject({ x: 14, y: 381, width: 362 });
-    expect(geometry.search).toMatchObject({ x: 14, width: 362, height: 39 });
-    expect(geometry.heading).toMatchObject({ y: 395.59375, height: 25.59375 });
-    expect(geometry.heroHeight).toBe(227);
-    expect(geometry.factsHeight).toBe(63);
-    expect(geometry.emptyHeight).toBe(340);
-    expect(geometry.joinTop).toBeGreaterThanOrEqual(
-      (geometry.empty?.y ?? 0) + (geometry.empty?.height ?? 0) + 12,
+    expect(geometry.join?.x).toBe(14);
+    expect(geometry.join?.width).toBe(362);
+    expect(geometry.join?.y ?? 0).toBeGreaterThan(
+      (geometry.browser?.y ?? 0) + (geometry.browser?.height ?? 0),
     );
     await expectNoOverflow(page);
     await capture(page, info, 'lobby-mobile');
@@ -314,47 +312,49 @@ test('Cant Stop mobile room follows the Acquire preparation layout',
     await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
     await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
     await expect(page.getByRole('heading', { name: roomID })).toBeVisible();
-    await expect(page.locator('.cs-seat')).toHaveCount(4);
+    await expect(page.locator('[data-game-mobile-room-seat]')).toHaveCount(4);
 
-    const geometry = await page.locator('.cs-seat-grid').evaluate(element => {
-      const rect = (selector: string) =>
-        document.querySelector<HTMLElement>(selector)?.getBoundingClientRect();
-      const seat = element.querySelector<HTMLElement>('.cs-seat');
+    const geometry = await page.locator('[data-game-mobile-room-seats]')
+      .evaluate(element => {
+      const seat = element.querySelector<HTMLElement>(
+        '[data-game-mobile-room-seat]',
+      );
       const style = getComputedStyle(element);
       const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
       const brand = document.querySelector<HTMLElement>('.cs-brand, .cs-brand-link');
-      const headingLine = rect('.cs-room-heading > div');
-      const headingCopy = rect('.cs-room-heading > div > span');
-      const label = rect('.cs-room-heading small');
-      const roomName = rect('.cs-room-heading h1');
-      const roomMeta = rect('.cs-room-heading p');
-      const grid = element.getBoundingClientRect();
       const seatBox = seat?.getBoundingClientRect();
+      const content = document.querySelector<HTMLElement>('.cs-content');
+      const room = document.querySelector<HTMLElement>('[data-game-room-mobile]');
+      const heading = document.querySelector<HTMLElement>(
+        '[data-game-room-heading]',
+      );
+      const table = document.querySelector<HTMLElement>(
+        '[data-game-mobile-room-table]',
+      );
+      const dock = document.querySelector<HTMLElement>(
+        '[data-game-mobile-room-dock]',
+      );
       return {
         brandGap: brand ? getComputedStyle(brand).columnGap : '',
         columns: columns.length,
-        headingLineHeight: headingLine?.height ?? 0,
-        headingCopyHeight: headingCopy?.height ?? 0,
-        labelToTitleGap: label && roomName ? roomName.top - label.bottom : 0,
-        titleToMetaGap: roomName && roomMeta ? roomMeta.top - roomName.bottom : 0,
-        paddingLeft: style.paddingLeft,
-        paddingRight: style.paddingRight,
-        seatInset: seatBox ? seatBox.left - grid.left : 0,
+        contentPaddingLeft: content ? getComputedStyle(content).paddingLeft : '',
+        room: room?.getBoundingClientRect(),
+        heading: heading?.getBoundingClientRect(),
+        table: table?.getBoundingClientRect(),
+        dock: dock?.getBoundingClientRect(),
         seatWidth: seatBox?.width ?? 0,
         seatHeight: seatBox?.height ?? 0,
       };
     });
     expect(geometry.brandGap).toBe('8px');
     expect(geometry.columns).toBe(2);
-    expect(geometry.headingLineHeight).toBeLessThanOrEqual(50);
-    expect(geometry.headingCopyHeight).toBeLessThanOrEqual(45);
-    expect(geometry.labelToTitleGap).toBeLessThanOrEqual(4);
-    expect(geometry.titleToMetaGap).toBeLessThanOrEqual(3);
-    expect(geometry.paddingLeft).toBe('10px');
-    expect(geometry.paddingRight).toBe('10px');
-    expect(geometry.seatInset).toBe(10);
+    expect(geometry.contentPaddingLeft).toBe('8px');
+    expect(geometry.room).toMatchObject({ x: 8, width: 374 });
+    expect(geometry.heading).toMatchObject({ x: 10, width: 370 });
+    expect(geometry.table).toMatchObject({ x: 10, width: 370 });
+    expect(geometry.dock).toMatchObject({ x: 0, width: 390 });
     expect(geometry.seatWidth).toBeGreaterThan(160);
-    expect(geometry.seatHeight).toBeLessThanOrEqual(140);
+    expect(geometry.seatHeight).toBe(128);
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
   });
@@ -364,10 +364,11 @@ test('Cant Stop leaderboard shows the current user avatar', async ({ page }) => 
   await mockPublic(page);
   await page.goto('/game/cantstop/rankings');
 
-  const mine = page.locator('.cs-rank-row.self');
-  await expect(mine).toBeVisible();
-  await expect(mine.locator('.cs-avatar img')).toHaveAttribute('src', avatarURL);
-  await expect(mine.locator('.cs-avatar img')).toBeVisible();
+  const rankings = page.locator('[data-game-mobile-rank-panel]');
+  await expect(rankings.getByText(human.displayName)).toBeVisible();
+  const avatar = rankings.locator(`img[src="${avatarURL}"]`);
+  await expect(avatar).toHaveAttribute('src', avatarURL);
+  await expect(avatar).toBeVisible();
 });
 
 test('Cant Stop mobile choose phase keeps pairing controls visible',
