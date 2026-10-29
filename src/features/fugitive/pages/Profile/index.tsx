@@ -76,7 +76,7 @@ export default function Profile() {
       };
     });
     return <AppShell title="我的档案" profile={profile.data} compactMobileFooter>
-      <main className="page-content">{loading
+      <main className="page-content profile-page">{loading
         ? <FugitiveLoading title="正在整理你的追逃档案。"
           description="同步身份、角色战绩与历史对局" />
         : <GameMobileProfile

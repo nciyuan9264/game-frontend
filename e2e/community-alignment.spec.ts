@@ -229,14 +229,28 @@ for (const item of cases) {
 
       const create = page.getByRole('button', { name: /创建房间|新开一局/ }).first();
       const share = page.getByRole('button', { name: /分享游戏/ }).first();
+      const heroTitle = hero.locator('h1');
       const description = hero.locator('h1 + p');
-      const [createBox, shareBox, descriptionBox] = await Promise.all([
+      const [createBox, shareBox, descriptionBox, heroColors] = await Promise.all([
         create.boundingBox(),
         share.boundingBox(),
         description.boundingBox(),
+        hero.evaluate(element => {
+          const title = element.querySelector('h1');
+          const copy = element.querySelector('h1 + p');
+          return {
+            title: title ? getComputedStyle(title).color : '',
+            description: copy ? getComputedStyle(copy).color : '',
+          };
+        }),
       ]);
+      await expect(heroTitle).toBeVisible();
       expect(createBox).toMatchObject({ width: 129, height: 39 });
       expect(shareBox).toMatchObject({ width: 99, height: 39 });
+      expect(heroColors).toEqual({
+        title: 'rgb(242, 232, 214)',
+        description: 'rgb(162, 182, 186)',
+      });
       expect((createBox?.x ?? 0) - (heroBox?.x ?? 0)).toBe(21);
       expect(shareBox?.y).toBe(createBox?.y);
       expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
@@ -379,6 +393,54 @@ for (const item of cases) {
       await expectNoOverflow(page);
     });
 }
+
+test('Fugitive mobile profile fills the Acquire content frame',
+  async ({ page }) => {
+    await mockData(page, 'fugitive');
+    await page.route('**/pam-api/platform/history/games?**', route =>
+      route.fulfill({
+        json: {
+          status_code: 0,
+          message: 'ok',
+          data: {
+            games: [0, 1].map(index => ({
+              id: `fugitive-profile-${index}`,
+              roomID: `fugitive-room-${index}`,
+              roomDisplayName: '午夜追缉',
+              startedAt: `2026-10-2${8 - index}T12:20:44Z`,
+              endedAt: `2026-10-2${8 - index}T12:26:44Z`,
+              durationSeconds: 360 + index * 120,
+              players: [{
+                userID: 'mobile-profile',
+                playerID: 'mobile-profile',
+                displayName: '移动端玩家',
+                gameRole: index ? 'marshal' : 'fugitive',
+                isWinner: index === 0,
+              }],
+            })),
+          },
+        },
+      }));
+
+    await page.goto('/game/fugitive/me', { waitUntil: 'domcontentloaded' });
+    const profile = page.locator('[data-game-public-mobile="profile"]');
+    const about = page.locator('[data-game-mobile-about-entry]');
+    const navigation = page.getByRole('navigation', {
+      name: 'Fugitive 手机导航',
+    });
+    await expect(profile).toBeVisible();
+
+    const [profileBox, aboutBox, navigationBox] = await Promise.all([
+      profile.boundingBox(),
+      about.boundingBox(),
+      navigation.boundingBox(),
+    ]);
+    expect(profileBox).toMatchObject({ x: 14, width: 362 });
+    expect((profileBox?.y ?? 0) + (profileBox?.height ?? 0))
+      .toBe(navigationBox?.y);
+    expect((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0))
+      .toBe(navigationBox?.y);
+  });
 
 test('Fugitive preserves role ranking and card library extensions',
   async ({ page }) => {
