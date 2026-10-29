@@ -65,11 +65,17 @@ export default function Profile() {
       const me = game.players?.find(player =>
         String(player.userID) === String(profile.data?.id));
       const role = gameRole(me?.gameRole);
+      const startedAt = new Date(game.startedAt).toLocaleString('zh-CN', {
+        month: '2-digit',
+        day: '2-digit',
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false,
+      });
       return {
         id: String(game.id),
         title: game.roomDisplayName || `房间 ${game.roomID}`,
-        detail: `${roleName(role)} · ${
-          new Date(game.startedAt).toLocaleString('zh-CN')} · ${
+        detail: `${roleName(role)} · ${startedAt} · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
         accessory: me?.isWinner ? '本局获胜' : '未能获胜',
         onClick: () => openRecord(game),
@@ -92,7 +98,7 @@ export default function Profile() {
             { label: '胜率', value: `${total
               ? Math.round((stats.data?.winRate ?? 0) * 100) : 0}%` },
           ]}
-          historyTitle={`追逃档案 · 逃亡 ${fugitiveGames} / 追捕 ${marshalGames}`}
+          historyTitle="追逃档案"
           historyItems={historyItems}
           emptyHistory={<div className="empty-state profile-empty">
             <Route size={38} /><h3>城市还在等你的第一步。</h3>
@@ -105,6 +111,8 @@ export default function Profile() {
             disabled={history.loading} onClick={history.loadMore}>
             {history.loading ? '载入中…' : '加载更多对局'}
           </button>}
+          historyStatus={history.games.length && !history.hasMore
+            ? '已经到底了' : undefined}
           logoutPending={logout.pending}
           logoutError={logout.error}
           onLogout={() => setPanel('logout')}

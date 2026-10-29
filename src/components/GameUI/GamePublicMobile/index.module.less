@@ -163,31 +163,32 @@
     border: 1px solid var(--game-public-line, var(--game-line, #3b515c));
     border-radius: 10px; background: var(--game-panel, #172a34); }
   .profileCard { padding: 24px 19px 20px; }
-  .profileIdentity { display: flex; min-width: 0; align-items: center; gap: 14px; margin-bottom: 28px;
+  .profile .profileIdentity { display: flex; min-width: 0; align-items: center; gap: 14px; margin-bottom: 28px;
     > span:first-child { width: 60px !important; height: 60px !important; flex: 0 0 auto; }
     > div { min-width: 0; }
     small { color: var(--game-eyebrow, #c7b77f); font-size: 7px; letter-spacing: .12em; }
-    h1 { margin: 7px 0; font-size: 26px; line-height: 1.2; overflow-wrap: anywhere; }
+    h1 { margin: 7px 0; font-size: 26px; line-height: 1.2; letter-spacing: 0; overflow-wrap: anywhere; }
     span { color: var(--game-muted, #a6bbb7); font-size: 9px; } }
   .profileEmail { display: flex; min-height: 39px; align-items: center; gap: 10px; padding: 0 12px;
     border: 1px solid var(--game-public-line, var(--game-line, #37564c70));
     border-radius: 7px; color: var(--game-muted, #a8bdb8); font-size: 11px; overflow-wrap: anywhere; }
-  .profileStats { display: flex; margin-top: 19px; padding-top: 20px;
+  .profile .profileStats { display: flex; margin-top: 19px; padding-top: 20px;
     border-top: 1px solid var(--game-public-line, var(--game-line, #5c726240)); text-align: center;
     span { min-width: 0; flex: 1; padding: 0 5px; }
     span + span { border-left: 1px solid var(--game-public-line, var(--game-line, #5865524d)); }
     b { display: block; color: var(--game-text, #f0e7cf); font-size: 22px; overflow-wrap: anywhere; }
     small { display: block; margin-top: 8px; color: var(--game-muted, #9eb2ad); font-size: 9px; } }
-  .profileManage { display: flex; align-items: center; justify-content: flex-end; gap: 18px;
+  .profile .profileManage { display: flex; align-items: center; justify-content: flex-end; gap: 18px;
     margin-top: 14px; padding-top: 11px;
     border-top: 1px solid var(--game-public-line, var(--game-line, #5c726240));
     a, button { display: inline-flex; min-height: 24px; align-items: center; gap: 7px;
       padding: 0; border: 0; background: transparent; color: var(--game-muted, #aebfb9); font-size: 11px; }
+    button { line-height: 1.4; }
     a { color: var(--game-accent, #d0b77c); } }
   .profileError { margin-top: 10px; color: var(--game-danger, #edafa3); font-size: 10px; }
-  .profileHistory { max-height: min(460px,55dvh); margin-top: 19px; padding: 23px 19px;
+  .profile .profileHistory { max-height: min(460px,55dvh); margin-top: 19px; padding: 23px 19px;
     overflow-y: auto; border-radius: 9px;
-    h2 { margin-bottom: 16px; font-size: 18px; }
+    h2 { margin: 0 0 16px; font-size: 18px; line-height: 1.4; letter-spacing: 0; }
     > div { display: grid; }
     a, button { display: flex; min-height: 64px; align-items: center; justify-content: space-between;
       gap: 12px; padding: 11px 0; border: 0;
@@ -197,10 +198,16 @@
     b, small { display: block; }
     b { font-size: 12px; overflow-wrap: anywhere; }
     small { margin-top: 5px; color: var(--game-muted, #91a7b3); font-size: 9px; line-height: 1.7; } }
-  .aboutEntry { display: flex; width: 100%; min-height: 55px; align-items: center; gap: 12px;
+  .historyAccessory { flex: 0 0 auto; font-size: 13px; line-height: 1.5;
+    text-align: right; white-space: nowrap; }
+  .historyStatus { display: flex; min-height: 44px; align-items: center;
+    justify-content: center; gap: 10px; margin-top: 14px;
+    color: var(--game-muted, #91a7b3); font-size: 11px; }
+  .profile .aboutEntry { display: flex; width: 100%; min-height: 55px; align-items: center; gap: 12px;
     margin-top: auto; padding: 9px 3px; border: 0;
     border-top: 1px solid var(--game-public-line, var(--game-line, #38505778));
-    background: transparent; color: var(--game-muted, #a8bdbe); text-align: left;
+    background: transparent; color: var(--game-muted, #a8bdbe); font-size: 13px;
+    line-height: 1.4; text-align: left;
     > span:first-child { display: grid; width: 29px; height: 29px; flex: 0 0 auto;
       place-items: center; border: 1px solid var(--game-public-line, var(--game-line, #536b6273));
       border-radius: 50%; color: var(--game-accent, #c2ad7b); }

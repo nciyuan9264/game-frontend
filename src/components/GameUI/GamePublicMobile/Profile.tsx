@@ -19,6 +19,7 @@ export interface GameMobileProfileProps {
   historyItems: readonly GameMobileHistoryItem[];
   emptyHistory?: ReactNode;
   historyFooter?: ReactNode;
+  historyStatus?: ReactNode;
   logoutPending?: boolean;
   logoutError?: ReactNode;
   onLogout: () => void;
@@ -36,6 +37,7 @@ export function GameMobileProfile({
   historyItems,
   emptyHistory,
   historyFooter,
+  historyStatus,
   logoutPending,
   logoutError,
   onLogout,
@@ -65,13 +67,16 @@ export function GameMobileProfile({
       {historyItems.length
         ? <div>{historyItems.map(item => {
           const content = <><span><b>{item.title}</b><small>{item.detail}</small>
-          </span>{item.accessory}</>;
+          </span>{item.accessory != null && <span
+            className={styles.historyAccessory}>{item.accessory}</span>}</>;
           if (item.href) return <Link key={item.id} to={item.href}>{content}</Link>;
           return <button key={item.id} type="button" onClick={item.onClick}
             disabled={!item.onClick}>{content}</button>;
         })}</div>
         : emptyHistory}
       {historyFooter}
+      {historyStatus && <footer className={styles.historyStatus}>
+        {historyStatus}</footer>}
     </section>
     <button type="button" className={styles.aboutEntry}
       data-game-mobile-about-entry onClick={onAbout}>

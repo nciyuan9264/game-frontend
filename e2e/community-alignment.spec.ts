@@ -394,7 +394,7 @@ for (const item of cases) {
     });
 }
 
-test('Fugitive mobile profile fills the Acquire content frame',
+test('Fugitive mobile profile matches the Acquire frame and typography',
   async ({ page }) => {
     await mockData(page, 'fugitive');
     await page.route('**/pam-api/platform/history/games?**', route =>
@@ -422,13 +422,52 @@ test('Fugitive mobile profile fills the Acquire content frame',
         },
       }));
 
-    await page.goto('/game/fugitive/me', { waitUntil: 'domcontentloaded' });
     const profile = page.locator('[data-game-public-mobile="profile"]');
     const about = page.locator('[data-game-mobile-about-entry]');
+    const profileTypography = () => profile.evaluate(element => {
+      const [card, history, aboutEntry] = Array.from(element.children);
+      const identity = card.children[0];
+      const stats = card.children[2];
+      const manage = card.children[3];
+      const row = history.querySelector('a, button');
+      const rowContent = row?.querySelector('span');
+      const fontSize = (target: Element | null | undefined) =>
+        target ? getComputedStyle(target).fontSize : '';
+      return {
+        eyebrow: fontSize(identity.querySelector('small')),
+        name: fontSize(identity.querySelector('h1')),
+        playerID: fontSize(identity.querySelector('span')),
+        email: fontSize(card.children[1]),
+        statValue: fontSize(stats.querySelector('b')),
+        statLabel: fontSize(stats.querySelector('small')),
+        edit: fontSize(manage.querySelector('a')),
+        logout: fontSize(manage.querySelector('button')),
+        historyTitle: fontSize(history.querySelector('h2')),
+        historyRow: fontSize(row),
+        historyName: fontSize(rowContent?.querySelector('b')),
+        historyDetail: fontSize(rowContent?.querySelector('small')),
+        aboutTitle: fontSize(aboutEntry.querySelector('b')),
+        aboutDetail: fontSize(aboutEntry.querySelector('small')),
+      };
+    });
+
+    await page.goto('/game/acquire/me', { waitUntil: 'domcontentloaded' });
+    await expect(profile).toBeVisible();
+    const acquireTypography = await profileTypography();
+    const acquireHistoryHeight = await profile.locator(':scope > section')
+      .nth(1).evaluate(element => element.getBoundingClientRect().height);
+
+    await page.goto('/game/fugitive/me', { waitUntil: 'domcontentloaded' });
     const navigation = page.getByRole('navigation', {
       name: 'Fugitive 手机导航',
     });
     await expect(profile).toBeVisible();
+    await expect(page.getByRole('heading', { name: '追逃档案' })).toBeVisible();
+    await expect(page.getByText('已经到底了')).toBeVisible();
+    expect(await profileTypography()).toEqual(acquireTypography);
+    await expect.poll(() => profile.locator(':scope > section').nth(1)
+      .evaluate(element => element.getBoundingClientRect().height))
+      .toBe(acquireHistoryHeight);
 
     const [profileBox, aboutBox, navigationBox] = await Promise.all([
       profile.boundingBox(),
