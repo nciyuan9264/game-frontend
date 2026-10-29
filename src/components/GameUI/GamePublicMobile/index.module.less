@@ -130,8 +130,12 @@
     border-radius: 9px; background: var(--game-panel, #172d35); }
   .guideMedia { position: relative; display: grid; height: 120px; overflow: hidden;
     place-items: center;
-    > img { width: 100%; height: 100%; object-fit: cover; } }
-  .guideMediaFill > :not(img) { width: 100%; height: 100%; }
+    &.guideMedia > img { position: absolute; inset: 0; display: block;
+      width: 100% !important; max-width: none; height: 100% !important;
+      object-fit: cover; } }
+  .guideMediaFill.guideMediaFill > :not(img) {
+    width: 100% !important; min-width: 0 !important;
+    height: 100% !important; min-height: 0 !important; }
   .guideFacts { display: flex; justify-content: space-around; gap: 9px; padding: 17px 10px;
     border-top: 1px solid var(--game-public-line, var(--game-line, #52665d80));
     span { display: flex; min-width: 0; align-items: center; gap: 6px;

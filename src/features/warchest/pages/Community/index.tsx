@@ -145,10 +145,10 @@ export function Guide() {
   if (isMobile) {
     return <Shell title="玩法指南" profile={profile.data} compactMobileFooter>
       <main className="page"><GameMobileGuide
-        visualFill
-        visual={<TroopArt type={(['sword', 'light', 'ensign', 'cavalry'] as UnitId[])[
-          guide.index
-        ]} />}
+        visual={<div className="mobile-guide-unit"><TroopArt
+          type={(['sword', 'light', 'ensign', 'cavalry'] as UnitId[])[
+            guide.index
+          ]} /></div>}
         facts={[
           { icon: <Users />, value: '2', label: '位指挥官' },
           { icon: <Clock3 />, value: '90', label: '秒行动' },

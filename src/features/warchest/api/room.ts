@@ -5,17 +5,13 @@ import {
 } from '@/features/game-core/api/room';
 import type { Visibility, WarChestRoom } from '../types';
 
-export interface CreateWarChestRoomInput {
-  displayName: string;
-  visibility: Visibility;
-}
-
 export async function createWarChestRoom(
-  input: CreateWarChestRoomInput,
+  visibility: Visibility,
   signal?: AbortSignal,
 ): Promise<{ roomID: string }> {
   return createGameRoom('warchest', {
-    ...input,
+    displayName: '雾谷前哨',
+    visibility,
     maxPlayers: 2,
     turnTimeoutSeconds: 90,
   }, { signal, authFailure: 'redirect' });

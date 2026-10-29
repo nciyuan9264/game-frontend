@@ -45,11 +45,10 @@ import {
 import type { UnitId } from '../../model';
 
 interface Draft {
-  name: string;
   visibility: Visibility;
 }
 
-const defaultDraft: Draft = { name: '雾谷前哨', visibility: 'public' };
+const defaultDraft: Draft = { visibility: 'public' };
 const filters: Array<{ value: LobbyFilter; label: string }> = [
   { value: 'all', label: '全部房间' },
   { value: 'joinable', label: '可加入' },
@@ -137,13 +136,9 @@ export default function Lobby() {
     }
   };
   const create = async () => {
-    const displayName = draft.name.trim();
-    if (!displayName) return;
     try {
-      const room = await action.run(signal => createWarChestRoom({
-        displayName,
-        visibility: draft.visibility,
-      }, signal));
+      const room = await action.run(signal =>
+        createWarChestRoom(draft.visibility, signal));
       navigate(`/game/warchest/match?roomID=${encodeURIComponent(room.roomID)}`);
     } catch { /* Shared action owns the error. */ }
   };
@@ -237,26 +232,16 @@ export default function Lobby() {
       {panel === 'create' && <GameMobileCreateRoomDialog
         title="为下一场交锋，升起战旗。"
         eyebrow="CREATE A ROOM"
-        description="为战场命名，并选择其他指挥官如何找到它。"
+        description="选择其他指挥官如何找到这片战场。"
         visibility={draft.visibility}
         onVisibilityChange={visibility =>
           setDraft(current => ({ ...current, visibility }))}
-        fields={<><label className="field-label" htmlFor="warchest-mobile-name">
-          房间名称 <small>{draft.name.length}/18</small>
-        </label><input id="warchest-mobile-name" className="input full"
-          maxLength={18} placeholder="为这片战场命名" value={draft.name}
-          onChange={event => setDraft(current => ({
-            ...current,
-            name: event.target.value,
-          }))} /></>}
-        facts={<div className="segmented">
-          <button className="active" type="button">双人完整基础版</button>
-          <button disabled type="button">固定 90 秒</button>
-        </div>}
+        facts={<dl><div><dt>对局模式</dt><dd>双人完整基础版</dd></div>
+          <div><dt>行动时限</dt><dd>固定 90 秒</dd></div></dl>}
         hint="进入房间后选择推荐、随机或官方轮抽编成。"
         error={action.error && <Notice error>{action.error}</Notice>}
         pending={action.pending}
-        disabled={!profile.data || !draft.name.trim()}
+        disabled={!profile.data}
         themeClassName="warchest-root"
         onClose={close} onSubmit={() => void create()} />}
       {panel === 'share' && <GameMobileShareDialog gameName="War Chest"
@@ -339,14 +324,9 @@ export default function Lobby() {
     {panel === 'create' && <Modal title="为下一场交锋，升起战旗。" eyebrow="CREATE A ROOM"
       onClose={close} footer={<><button className="button secondary" type="button"
         disabled={action.pending} onClick={close}>取消</button><button className="button primary"
-          type="button" disabled={action.pending || !draft.name.trim()} onClick={() => void create()}>
+          type="button" disabled={action.pending} onClick={() => void create()}>
           创建并入座 <ArrowRight size={17} /></button></>}>
-      <label className="field-label" htmlFor="warchest-room-name">房间名称
-        <small>{draft.name.length}/18</small></label>
-      <input id="warchest-room-name" className="input full" maxLength={18}
-        placeholder="为这片战场命名" value={draft.name}
-        onChange={event => setDraft(current => ({ ...current, name: event.target.value }))} />
-      {!draft.name.trim() && <p className="field-error">请先填写房间名称。</p>}
+      <p className="dialog-intro">选择其他指挥官如何找到这片战场。</p>
       <div className="field-label">房间可见性</div><div className="privacy-options">
         {([{ id: 'public', title: '公开房间', text: '展示在在线大厅', icon: Globe2 },
           { id: 'private', title: '私密房间', text: '仅通过房间号进入', icon: LockKeyhole }] as const)

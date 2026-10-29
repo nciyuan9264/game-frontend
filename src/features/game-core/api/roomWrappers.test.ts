@@ -167,7 +167,7 @@ describe('game room API wrappers', () => {
 
   it('injects War Chest fixed seats, timeout, and metadata', () => {
     const signal = new AbortController().signal;
-    createWarChestRoom({ displayName: '雾谷前哨', visibility: 'private' }, signal);
+    createWarChestRoom('private', signal);
     listWarChestRooms(signal);
     lookupWarChestRoom('room-5', signal);
 

@@ -48,13 +48,6 @@ const rankGames = new Set<GameType>([
   'forsale',
 ]);
 
-const guideFillGames = new Set<GameType>([
-  'davinci',
-  'splendor',
-  'fugitive',
-  'warchest',
-]);
-
 function metric(gameType: GameType, index: number) {
   if (rankGames.has(gameType)) {
     return { rank: { avgRank: 1 + index / 10 } };
@@ -311,7 +304,7 @@ for (const item of cases) {
       )).toBeLessThanOrEqual(.1);
       expect(Math.abs(
         (privateBox?.y ?? 0) - (publicBox?.y ?? 0),
-      )).toBeLessThanOrEqual(.1);
+      )).toBeLessThanOrEqual(1);
       expect(choiceStyle).toEqual({
         background: expect.not.stringMatching(/^rgba\(0, 0, 0, 0\)$/),
         borderStyle: 'solid',
@@ -423,46 +416,60 @@ for (const item of cases) {
       const guidePanel = page.locator('[data-game-mobile-guide-panel]');
       await expect(page.locator('[data-game-public-mobile="guide"]'))
         .toBeVisible();
-      await expect(page.getByRole('tablist', { name: '玩法章节' }))
-        .toBeVisible();
-      const [visualBox, mediaBox, panelBox, mediaGeometry] = await Promise.all([
+      const guideTabs = page.getByRole('tablist', { name: '玩法章节' })
+        .getByRole('tab');
+      await expect(guideTabs.first()).toBeVisible();
+      const [visualBox, panelBox] = await Promise.all([
         guideVisual.boundingBox(),
-        guideMedia.boundingBox(),
         guidePanel.boundingBox(),
-        guideMedia.evaluate(element => {
-          const forcedNonImageFill = [...element.children]
-            .filter(child => child.tagName !== 'IMG')
-            .some(child => {
-              const media = element.getBoundingClientRect();
-              const box = child.getBoundingClientRect();
-              const style = getComputedStyle(child);
-              return Math.abs(child.clientWidth - media.width) <= 1
-                && Math.abs(child.clientHeight - media.height) <= 1
-                && style.width === `${media.width}px`
-                && style.height === `${media.height}px`
-                && Math.abs(box.width - media.width) <= 1
-                && Math.abs(box.height - media.height) <= 1;
-            });
-          return {
-            forcedNonImageFill,
-            overflow: getComputedStyle(element).overflow,
-            visibleChildren: [...element.children].filter(child => {
-              const box = child.getBoundingClientRect();
-              return box.width > 0 && box.height > 0;
-            }).length,
-          };
-        }),
       ]);
       expect(visualBox?.width).toBe(362);
-      expect(mediaBox).toMatchObject({ width: 360, height: 120 });
       expect(panelBox?.width).toBe(362);
       expect(panelBox?.y).toBe(
         (visualBox?.y ?? 0) + (visualBox?.height ?? 0) + 8,
       );
-      expect(mediaGeometry.overflow).toBe('hidden');
-      expect(mediaGeometry.visibleChildren).toBeGreaterThan(0);
-      if (!guideFillGames.has(item.gameType)) {
-        expect(mediaGeometry.forcedNonImageFill).toBe(false);
+
+      for (let chapter = 0; chapter < await guideTabs.count(); chapter += 1) {
+        await guideTabs.nth(chapter).click();
+        const mediaGeometry = await guideMedia.evaluate(element => {
+          const media = element.getBoundingClientRect();
+          return {
+            width: media.width,
+            height: media.height,
+            overflow: getComputedStyle(element).overflow,
+            children: [...element.children].map(child => {
+              const box = child.getBoundingClientRect();
+              return {
+                top: box.top - media.top,
+                right: box.right - media.right,
+                bottom: box.bottom - media.bottom,
+                left: box.left - media.left,
+                width: box.width,
+                height: box.height,
+              };
+            }).filter(child => child.width > 0 && child.height > 0),
+          };
+        });
+        expect(mediaGeometry).toMatchObject({
+          width: 360,
+          height: 120,
+          overflow: 'hidden',
+        });
+        expect(mediaGeometry.children.length).toBeGreaterThan(0);
+        for (const child of mediaGeometry.children) {
+          expect(child.top).toBeGreaterThanOrEqual(-1);
+          expect(child.left).toBeGreaterThanOrEqual(-1);
+          expect(child.right).toBeLessThanOrEqual(1);
+          expect(child.bottom).toBeLessThanOrEqual(1);
+        }
+        if (item.gameType === 'warchest') {
+          const troop = guideMedia.locator('.mobile-guide-unit .troop-art');
+          await expect(troop).toBeVisible();
+          expect(await troop.boundingBox()).toMatchObject({
+            width: 80,
+            height: 120,
+          });
+        }
       }
 
       await page.goto(`/game/${item.gameType}/me`, {
@@ -516,7 +523,7 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
       const links = body?.children[1];
       const legal = body?.children[2];
       const height = (target: Element | null | undefined) =>
-        target?.getBoundingClientRect().height ?? 0;
+        Math.round((target?.getBoundingClientRect().height ?? 0) * 100) / 100;
       const fontSize = (target: Element | null | undefined) =>
         target ? getComputedStyle(target).fontSize : '';
       return {

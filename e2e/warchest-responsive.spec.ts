@@ -444,6 +444,28 @@ test('War Chest public pages render the responsive showcase shell', async ({ pag
   await expectNoOverflow(page);
   await page.screenshot({ path: 'test-results/warchest-lobby-mobile.png' });
 
+  await page.getByRole('button', { name: /创建房间/ }).click();
+  const createDialog = page.getByRole('dialog', {
+    name: '为下一场交锋，升起战旗。',
+  });
+  await expect(createDialog).toBeVisible();
+  await expect(createDialog.getByRole('textbox')).toHaveCount(0);
+  await expect(createDialog.getByText('双人完整基础版')).toBeVisible();
+  await expect(createDialog.getByText('固定 90 秒')).toBeVisible();
+  expect(await createDialog.evaluate(element => {
+    const choice = element.querySelector<HTMLElement>(
+      'button[aria-pressed="true"]',
+    );
+    return {
+      dialog: getComputedStyle(element).backgroundColor,
+      choice: choice ? getComputedStyle(choice).backgroundColor : '',
+    };
+  })).toEqual({
+    dialog: 'rgb(19, 40, 49)',
+    choice: 'rgb(25, 50, 58)',
+  });
+  await createDialog.getByRole('button', { name: '取消' }).click();
+
   await page.goto('/game/warchest/army');
   await expect(page.getByRole('heading', { name: '各有所长，合而为军。' })).toBeVisible();
   await expect(page.locator('.library-card')).toHaveCount(16);

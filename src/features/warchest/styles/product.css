@@ -218,6 +218,22 @@
   .warchest-root .opponent-lineup span {
     color: var(--game-muted);
   }
+
+  .warchest-root .mobile-guide-unit {
+    display: grid;
+    width: 100%;
+    height: 120px;
+    place-items: center;
+    overflow: hidden;
+    background: #efe7d7;
+  }
+
+  .warchest-root .mobile-guide-unit .troop-art {
+    width: 80px;
+    height: 120px;
+    flex: none;
+    aspect-ratio: auto;
+  }
 }
 
 .warchest-root .user-avatar {
