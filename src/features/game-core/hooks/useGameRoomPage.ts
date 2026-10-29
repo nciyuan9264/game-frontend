@@ -1,0 +1,110 @@
+import { useCallback, useMemo, useState } from 'react';
+import { useClipboardCopy } from './useClipboardCopy';
+
+export type GameRoomPanel = 'invite' | 'settings' | 'remove' | 'start';
+
+export interface GameRoomPlayerLike {
+  playerID?: string;
+  seatIndex?: number;
+  online: boolean;
+  ai: boolean;
+  ready: boolean;
+}
+
+interface UseGameRoomPageOptions<TPlayer extends GameRoomPlayerLike> {
+  roomID: string;
+  inviteURL: string;
+  visibility: 'public' | 'private';
+  ownerID: string;
+  playerID: string;
+  players: Record<string, TPlayer>;
+}
+
+export function orderGameRoomSeats<TPlayer extends GameRoomPlayerLike>(
+  players: Record<string, TPlayer>,
+  playerOrder: readonly string[],
+  seatCount: number,
+) {
+  const orderedIDs = [
+    ...playerOrder.filter(id => players[id]),
+    ...Object.keys(players).filter(id => !playerOrder.includes(id)),
+  ];
+  const seats = Array<string | undefined>(seatCount).fill(undefined);
+  const unassigned: string[] = [];
+
+  orderedIDs.forEach(id => {
+    const seatIndex = players[id].seatIndex;
+    if (
+      typeof seatIndex === 'number'
+      && Number.isInteger(seatIndex)
+      && seatIndex >= 0
+      && seatIndex < seatCount
+      && !seats[seatIndex]
+    ) {
+      seats[seatIndex] = id;
+    } else {
+      unassigned.push(id);
+    }
+  });
+  unassigned.forEach(id => {
+    const index = seats.findIndex(seat => !seat);
+    if (index >= 0) seats[index] = id;
+  });
+  return seats;
+}
+
+export function useGameRoomPage<TPlayer extends GameRoomPlayerLike>({
+  roomID,
+  inviteURL,
+  visibility: currentVisibility,
+  ownerID,
+  playerID,
+  players,
+}: UseGameRoomPageOptions<TPlayer>) {
+  const [panel, setPanel] = useState<GameRoomPanel>();
+  const [targetID, setTargetID] = useState('');
+  const [visibility, setVisibility] = useState(currentVisibility);
+  const [copyMessage, setCopyMessage] = useState('');
+  const clipboard = useClipboardCopy();
+  const playerList = useMemo(() => Object.entries(players), [players]);
+  const owner = playerID === ownerID;
+  const readyCount = playerList.filter(([, player]) =>
+    player.ready && (player.online || player.ai)).length;
+
+  const open = useCallback((nextPanel: GameRoomPanel, target = '') => {
+    if (nextPanel === 'settings') setVisibility(currentVisibility);
+    if (nextPanel === 'invite') {
+      clipboard.reset();
+      setCopyMessage('');
+    }
+    setTargetID(target);
+    setPanel(nextPanel);
+  }, [clipboard, currentVisibility]);
+
+  const close = useCallback(() => {
+    setPanel(undefined);
+    setTargetID('');
+  }, []);
+
+  const copy = useCallback(async (value: string, successMessage: string) => {
+    const copied = await clipboard.copy(value);
+    setCopyMessage(copied ? successMessage : '复制未成功，请稍后重试');
+    return copied;
+  }, [clipboard]);
+
+  return {
+    panel,
+    open,
+    close,
+    targetID,
+    visibility,
+    setVisibility,
+    copy,
+    copyMessage,
+    copyRoomID: () => copy(roomID, '房间号已复制'),
+    copyInviteURL: () => copy(inviteURL, '邀请链接已复制'),
+    owner,
+    playerList,
+    readyCount,
+  };
+}

@@ -11,6 +11,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { StandardGameMobileRoomDialogs } from '@/components/GameUI/GameRoomMobile';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { OnitamaSession } from '../../hooks/useOnitamaSession';
@@ -18,6 +19,7 @@ import { useOnitamaViewport } from '../../hooks/useOnitamaViewport';
 import { onitamaRoomInviteURL } from '../../model/adapters';
 import { playerName, type MatchSnapshot } from '../../model/session';
 import type { Visibility } from '../../model/types';
+import rootStyles from '../../styles/root.module.less';
 import { RoomDesktop } from './RoomDesktop';
 import { RoomMobile } from './RoomMobile';
 import styles from './index.module.less';
@@ -80,6 +82,49 @@ export function Room({
       setPanel('settings' as const);
     },
   };
+  if (isMobile) {
+    const renderAvatar = (
+      player: { name: string; avatar?: string; ai: boolean },
+      size: number,
+    ) => <PlayerAvatar name={player.name} avatar={player.avatar}
+      ai={player.ai} size={size} />;
+    return <div className={styles.page}>
+      <RoomMobile {...roomProps} onLeave={onLeave} />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={id => playerName(id, data.players)}
+        renderAvatar={renderAvatar}
+        inviteTitle="给对面留一个位置"
+        settingsHint="开局后不能修改棋室公开范围。"
+        startTitle="迈出这局的第一步？"
+        startFacts={[
+          { label: '棋盘', value: '5 × 5' },
+          { label: '招式', value: '16 取 5' },
+          { label: '回合', value: '60 秒' },
+        ]}
+        startHint="基础版 16 张招式中随机取 5 张，双方各持 2 张，公共牌印记决定先手。擒获宗师或宗师进入对方山门即获胜。"
+        themeClassName={rootStyles.root}
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}
+        onSaveSettings={() => {
+          if (session.submit('room_update_settings', { visibility })) close();
+        }}
+        onConfirmRemove={() => {
+          if (session.submit('match_remove_player', { playerID: target })) close();
+        }}
+        onConfirmStart={() => {
+          if (session.submit('match_begin')) close();
+        }}
+        onClose={close}
+      />
+    </div>;
+  }
 
   return <div className={styles.page}>
     <header className={styles.heading} data-game-room-heading><div className={styles.headingIdentity} data-game-room-heading-identity>
@@ -91,9 +136,7 @@ export function Room({
         棋室设置</ActionButton>}
         <ActionButton variant="primary" onClick={roomProps.onInvite}>
           <UserPlus size={15} />邀请对手</ActionButton></div></header>
-    {isMobile
-      ? <RoomMobile {...roomProps} />
-      : <RoomDesktop {...roomProps} />}
+    <RoomDesktop {...roomProps} />
 
     {panel === 'invite' && <Dialog title="给对面留一个位置"
       eyebrow="INVITE TO THE QUIET ROOM" onClose={close}

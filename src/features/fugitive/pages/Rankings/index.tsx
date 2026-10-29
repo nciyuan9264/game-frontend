@@ -13,8 +13,10 @@ import {
   Trophy,
 } from 'lucide-react';
 import { GameTabs } from '@/components/GameUI/GameTabs';
+import { GameMobileRankings } from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type {
   FugitiveLeaderboardEntry,
   LeaderboardSortDim,
@@ -155,6 +157,7 @@ function RankAvatar({
 }
 
 export default function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [role, setRole] = useState<RankingRole>('all');
   const [mode, setMode] = useState<'winRate' | 'games'>('winRate');
@@ -174,6 +177,51 @@ export default function Rankings() {
   const boardName = roleOptions.find(option => option.value === role)?.label
     ?? '综合榜';
 
+  if (isMobile) {
+    return <AppShell title="排行榜" profile={profile.data} compactMobileFooter>
+      <main className="page-content"><GameMobileRankings
+        eyebrow="FUGITIVE LEADERBOARD"
+        title="城市风云榜"
+        description="用真实胜率衡量稳定发挥，也记录每一次完成的追逐。"
+        modes={[
+          { value: 'winRate', label: '战绩榜' },
+          { value: 'games', label: '场次榜' },
+        ]}
+        mode={mode}
+        onModeChange={setMode}
+        entries={entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: `${Math.round(entry.winRate * 100)}%`,
+          metricLabel: '胜率',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <RankAvatar name={entry.displayName}
+          index={entries.findIndex(item =>
+            String(item.userID) === String(entry.id))} />}
+        controls={<RankingRoleSelect value={role} onChange={setRole} />}
+        state={<>{leaderboard.loading && !entries.length
+          && <div className={styles.rankState} role="status">
+            正在整理城市名册...
+          </div>}
+          {leaderboard.error && !entries.length
+            && <div className={`${styles.rankState} ${styles.rankError}`}
+              role="alert">
+              <span>{leaderboard.error}</span>
+              <button className="button secondary" type="button"
+                onClick={leaderboard.retry}>重试</button>
+            </div>}</>}
+        footer={!!entries.length && leaderboard.hasMore
+          && <div className={styles.rankMore}>
+            <span>已加载 {entries.length} 位玩家</span>
+            <button className="button secondary" type="button"
+              disabled={leaderboard.loading}
+              onClick={leaderboard.loadMore}>加载更多</button>
+          </div>}
+      /></main>
+    </AppShell>;
+  }
   return <AppShell title="排行榜" profile={profile.data} compactMobileFooter>
     <main className={`page-content ${styles.page} ${styles.rankPage}`}>
       <header className={styles.communityHeading}><div>

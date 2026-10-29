@@ -17,9 +17,17 @@ import {
 } from 'lucide-react';
 import { playerDisplayName } from '@/features/game-core/model/room';
 import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
+import {
   fugitiveRoomInviteURL,
 } from '../../model/adapters';
-import { ProfileMonogram } from '../../components/AppShell';
+import {
+  fugitiveThemeClassName,
+  ProfileMonogram,
+} from '../../components/AppShell';
 import type { FugitiveSession } from '../../hooks/useFugitiveSession';
 import type { MatchSnapshot } from '../../model/session';
 import type {
@@ -47,6 +55,7 @@ export function Room({
   room?: FugitiveRoom;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<
     'settings' | 'invite' | 'remove' | 'start'
   >();
@@ -79,6 +88,127 @@ export function Room({
     setVisibility(data.visibility);
     setPanel('settings');
   };
+  const getPlayerName = (playerID: string) =>
+    playerDisplayName(data.players[playerID], playerID);
+  const renderMobileAvatar = (
+    player: { name: string; avatar?: string },
+    _size: number,
+  ) => <ProfileMonogram profile={{
+    name: player.name,
+    avatar: player.avatar,
+  }} className="avatar" />;
+
+  if (isMobile) {
+    const rolePicker = owner
+      ? <div className="waiting-role-picker"><span>你的身份</span>
+        <div>{(['fugitive', 'marshal'] as const).map(role =>
+          <button type="button" key={role} aria-label={`选择${roleName(role)}`}
+            aria-pressed={selfRole === role}
+            className={selfRole === role ? 'selected' : ''}
+            disabled={!enabled}
+            onClick={() => session.submit('match_select_role', { role })}>
+            {role === 'fugitive'
+              ? <Footprints size={15} /> : <Shield size={15} />}
+            {roleName(role)}{selfRole === role && <Check size={13} />}
+          </button>)}</div>
+        <small>切换身份时，另一席自动获得相反身份。</small>
+      </div>
+      : <p className="room-seat-note"><LockKeyhole size={14} />
+        你已加入{roleName(selfRole)}席位；每局身份由房主选择。
+      </p>;
+    return <main className="page-content waiting-page framework-waiting">
+      <StandardGameMobileRoom
+        data={data}
+        enabled={enabled}
+        pending={!!session.pending}
+        getPlayerName={getPlayerName}
+        getPlayerRole={(_id, player, index) => roleName(player.gameRole
+          ?? (index === data.players[data.ownerID]?.seatIndex
+            ? hostRole : otherRole(hostRole)))}
+        renderAvatar={renderMobileAvatar}
+        renderSeatDecoration={(player, index) => {
+          const role = data.players[player.id]?.gameRole
+            ?? (index === data.players[data.ownerID]?.seatIndex
+              ? hostRole : otherRole(hostRole));
+          return role === 'fugitive'
+            ? <Footprints size={18} /> : <Shield size={18} />;
+        }}
+        copy={{
+          kicker: 'BEFORE THE CHASE · 房间号',
+          gameLabel: '二版基础规则',
+          facts: [
+            { icon: <Users />, label: '人数', value: '固定 2 人' },
+            { icon: <Clock3 />, label: '思考时间', value: '120 秒' },
+            { icon: <Shield />, label: '身份', value: roleName(selfRole) },
+          ],
+          summary: [
+            { label: '规则', value: '二版基础 · 固定 2 人' },
+            { label: '身份', value: roleName(selfRole) },
+          ],
+          summaryEyebrow: 'BEFORE THE CHASE',
+          summaryTitle: '为下一场追逐，选好身份。',
+          ownerHint: '手牌、抽牌号码和暗置路线按身份隔离；开局后身份锁定。',
+          memberHint: '你的身份由房主选择。准备后等待房主开始追逐。',
+          readyTitle: '双方已准备，可以开始追逐。',
+          ownerDescription: '你是房主，由你开始这场追逐。',
+          memberReadyDescription: '你已准备，等待房主开始。',
+          memberWaitingDescription: '准备好后，由房主开始对局。',
+        }}
+        extension={rolePicker}
+        onLeave={onLeave}
+        onSettings={openSettings}
+        onInvite={() => {
+          setCopyMessage('');
+          setPanel('invite');
+        }}
+        onAddAI={seatIndex => session.submit(
+          'match_add_ai',
+          typeof seatIndex === 'number' ? { seatIndex } : {},
+        )}
+        onRemove={playerID => {
+          setTarget(playerID);
+          setPanel('remove');
+        }}
+        onReady={() => session.submit('match_ready', {
+          ready: !data.players[data.playerID]?.ready,
+        })}
+        onStart={() => setPanel('start')}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="把下一步，留给朋友。"
+        settingsHint="房间名称固定为“午夜追缉”，每回合固定 120 秒。"
+        startTitle="让追逐开始？"
+        startFacts={[
+          { icon: <Users />, label: '本场人数', value: '2 人' },
+          { icon: <Footprints />, label: '逃亡者', value: '抵达 42' },
+          { icon: <Shield />, label: '追捕者', value: '找出全部' },
+        ]}
+        startHint="逃亡者先放置 1–2 个藏身点，追捕者随后抽取两张线索并开始搜查。"
+        themeClassName={fugitiveThemeClassName}
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}
+        onSaveSettings={() => {
+          if (session.submit('room_update_settings', { visibility })) close();
+        }}
+        onConfirmRemove={() => {
+          if (session.submit('match_remove_player', { playerID: target })) close();
+        }}
+        onConfirmStart={() => {
+          if (session.submit('match_begin')) close();
+        }}
+        onClose={close}
+      />
+    </main>;
+  }
 
   return <main className="page-content waiting-page framework-waiting">
     <div className="waiting-room-heading" data-game-room-heading>

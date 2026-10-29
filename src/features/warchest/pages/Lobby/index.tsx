@@ -18,10 +18,17 @@ import {
   X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { createWarChestRoom, lookupWarChestRoom } from '../../api/room';
@@ -111,6 +118,7 @@ function JoinCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useWarChestLobby();
   const profile = useAsyncResource(getProfile);
@@ -157,6 +165,116 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: WarChestRoom) => {
+    const entry = roomEntry(room, { userID });
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={room.displayName || '战争之匣'}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待加入' : '对局中'}
+      meta={room.status === 'match'
+        ? `完整基础版 · ${room.turnTimeoutSeconds ?? 90} 秒行动`
+        : `领先方已控制 ${room.maxControlledLocations ?? 0} 处`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <Shell title="游戏大厅" profile={profile.data}>
+      <main className="page">{initialLoading
+        ? <Loading text="正在同步战场与在线指挥官。" />
+        : <GameMobileLobby
+          eyebrow="THE ART OF COMMAND"
+          title={<>方寸之间，<br />运筹千军。</>}
+          description="从一枚指令，到一场胜局。让每一次调遣，都成为你的远见。"
+          media={<img src={HERO} alt="墨绿色山地与城堡前的骑兵，前景为金属兵种币" />}
+          caption="A QUIET MIND. A DECISIVE MOVE."
+          facts={[
+            { icon: <Users />, value: '2', label: '位指挥官' },
+            { icon: <Clock3 />, value: '90', label: '秒行动' },
+            { icon: <Flag />, value: '6', label: '据点即胜' },
+          ]}
+          browserEyebrow="CHOOSE YOUR BATTLEFIELD"
+          browserTitle="为下一场交锋，入席。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={filters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setDraft(defaultDraft);
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => {
+            shareClipboard.reset();
+            setPanel('share');
+          }}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFoundRoom(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，找到朋友的战场。"
+          error={lobby.error && <Notice error>{lobby.error}
+            <button className="text-button" type="button"
+              onClick={lobby.refresh}>重试</button>
+          </Notice>}
+        />}</main>
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        title="为下一场交锋，升起战旗。"
+        eyebrow="CREATE A ROOM"
+        description="为战场命名，并选择其他指挥官如何找到它。"
+        visibility={draft.visibility}
+        onVisibilityChange={visibility =>
+          setDraft(current => ({ ...current, visibility }))}
+        fields={<><label className="field-label" htmlFor="warchest-mobile-name">
+          房间名称 <small>{draft.name.length}/18</small>
+        </label><input id="warchest-mobile-name" className="input full"
+          maxLength={18} placeholder="为这片战场命名" value={draft.name}
+          onChange={event => setDraft(current => ({
+            ...current,
+            name: event.target.value,
+          }))} /></>}
+        facts={<div className="segmented">
+          <button className="active" type="button">双人完整基础版</button>
+          <button disabled type="button">固定 90 秒</button>
+        </div>}
+        hint="进入房间后选择推荐、随机或官方轮抽编成。"
+        error={action.error && <Notice error>{action.error}</Notice>}
+        pending={action.pending}
+        disabled={!profile.data || !draft.name.trim()}
+        themeClassName="warchest-root"
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="War Chest"
+        url={WARCHEST_PUBLIC_URL} color="#263b30" background="#f1ead8"
+        themeClassName="warchest-root" onClose={close} />}
+      {panel === 'join' && <Modal title="朋友为你留了席位？"
+        eyebrow="JOIN A ROOM" onClose={close}
+        footer={<button className="button primary" type="button"
+          disabled={action.pending || !code.trim()}
+          onClick={() => foundRoom ? enter(foundRoom) : void find()}>
+          {foundRoom ? roomEntry(foundRoom, { userID }).label : '查找房间'}
+          <ArrowRight size={17} />
+        </button>}>
+        {action.error && <Notice error>{action.error}</Notice>}
+        {foundRoom && renderMobileRoom(foundRoom)}
+      </Modal>}
+    </Shell>;
+  }
 
   return <Shell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <Loading text="正在同步战场与在线指挥官。" />

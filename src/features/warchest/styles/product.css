@@ -57,6 +57,12 @@
 }
 
 @media (max-width: 767px) {
+  .warchest-root .mobile-guide-army {
+    display: inline-flex;
+    width: 100%;
+    min-height: 41px;
+    margin-top: 10px;
+  }
   .warchest-root[data-game-shell='match'] [data-game-shell-platform-home] {
     display: none;
   }
@@ -227,6 +233,7 @@
   color: #5b774d;
 }
 .warchest-root .mobile-lobby-join { display: none; }
+.warchest-root .mobile-guide-army { display: none; }
 .warchest-root .rank-row {
   display: grid;
   grid-template-columns: 70px minmax(150px, 1fr) 120px 100px 100px;

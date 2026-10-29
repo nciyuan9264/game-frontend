@@ -8,6 +8,7 @@ import {
   BookOpen,
   Check,
   ChevronRight,
+  Clock3,
   Flag,
   Heart,
   History,
@@ -20,7 +21,14 @@ import {
   ShieldCheck,
   Swords,
   Trophy,
+  Users,
 } from 'lucide-react';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+} from '@/components/GameUI/GamePublicMobile';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -28,6 +36,7 @@ import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboar
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type {
   LeaderboardSortDim,
   WarChestLeaderboardEntry,
@@ -128,10 +137,42 @@ function UnitDialog({ type, onClose }: { type: UnitId; onClose: () => void }) {
 }
 
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const current = guide.current;
+  if (isMobile) {
+    return <Shell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <main className="page"><GameMobileGuide
+        visual={<TroopArt type={(['sword', 'light', 'ensign', 'cavalry'] as UnitId[])[
+          guide.index
+        ]} />}
+        facts={[
+          { icon: <Users />, value: '2', label: '位指挥官' },
+          { icon: <Clock3 />, value: '90', label: '秒行动' },
+          { icon: <Flag />, value: '6', label: '据点即胜' },
+        ]}
+        tabs={guideSteps.map((step, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${step.name}`,
+        }))}
+        index={guide.index}
+        onSelect={guide.select}
+        eyebrow={current.en}
+        title={current.title}
+        description={current.copy}
+        detail={<p>{current.extra}</p>}
+        hint={current.note}
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={() => guide.isLast ? navigate('/game/warchest') : guide.next()}
+        secondaryAction={<Link className="button secondary"
+          to="/game/warchest/army">
+          <Swords size={16} />兵种图鉴
+        </Link>}
+      /></main>
+    </Shell>;
+  }
   return <Shell title="玩法指南" profile={profile.data} compactMobileFooter><main className="page guide-page">
     <div className="page-title"><div><Eyebrow>YOUR FIRST CAMPAIGN</Eyebrow>
       <h1>懂得规则，才懂得破局。</h1><p>四步开始第一场交锋；战场只展示服务端确认的合法行动。</p></div>
@@ -166,16 +207,55 @@ export function Guide() {
     </section></div>
     <div className="guide-source"><ShieldCheck size={16} />
       <span>依据 AEG 基础版规则与兵种卡；完整 16 兵种，双人在线对局。</span><SourceLink /></div>
+    <Link className="button secondary mobile-guide-army" to="/game/warchest/army">
+      <Swords size={16} />兵种图鉴<ArrowRight size={16} />
+    </Link>
   </main></Shell>;
 }
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'winRate' | 'games'>('winRate');
   const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
   const leaderboard = useGameLeaderboard<WarChestLeaderboardEntry>({
     gameType: 'warchest', pageSize: 50, sort,
   });
+  if (isMobile) {
+    return <Shell title="指挥官排行" profile={profile.data}>
+      <main className="page"><GameMobileRankings
+        eyebrow="WAR CHEST LEADERBOARD"
+        title="指挥官排行"
+        description="按胜率或完成场次，看见稳定的指挥官。"
+        modes={[
+          { value: 'winRate', label: '胜率榜' },
+          { value: 'games', label: '场次榜' },
+        ]}
+        mode={mode}
+        onModeChange={setMode}
+        entries={leaderboard.entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: `${Math.round(entry.winRate * 100)}%`,
+          metricLabel: '胜率',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={() => <Crest size={29} />}
+        state={<>{leaderboard.loading && !leaderboard.entries.length
+          && <Loading text="正在整理指挥官名册。" />}
+          {leaderboard.error && <Notice error>{leaderboard.error}
+            <button type="button" className="text-button"
+              onClick={leaderboard.retry}>重试</button>
+          </Notice>}</>}
+        footer={leaderboard.hasMore && <button
+          className="button secondary full" type="button"
+          disabled={leaderboard.loading} onClick={leaderboard.loadMore}>
+          加载更多
+        </button>}
+      /></main>
+    </Shell>;
+  }
   return <Shell title="指挥官排行" profile={profile.data}><main className="page records-page ranking-page">
     <div className="page-title"><div><Eyebrow>THE FIELD COMMANDERS</Eyebrow>
       <h1>每一次调遣，都留下判断。</h1><p>按胜率或完成场次，看见稳定的指挥官。</p></div><Trophy size={41} /></div>
@@ -203,6 +283,7 @@ function ProfileStat({ children }: { children: ReactNode }) {
 }
 
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('warchest');
   const history = useGameHistory({ gameType: 'warchest', pageSize: 20 });
@@ -212,6 +293,70 @@ export function My() {
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
+  if (isMobile) {
+    const historyItems = history.games.map(game => {
+      const me = game.players?.find(player =>
+        String(player.userID) === String(profile.data?.id));
+      return {
+        id: String(game.id),
+        title: game.roomDisplayName || `房间 ${game.roomID}`,
+        detail: `${me?.isWinner ? '胜利' : '失利'} · ${
+          me?.finalScore ?? '—'} / 6 据点 · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: game.endedAt ? '回放' : '进行中',
+        href: game.endedAt ? `/game/warchest/replay/${game.id}` : undefined,
+      };
+    });
+    return <Shell title="我的战绩" profile={profile.data} compactMobileFooter>
+      <main className="page">{loading
+        ? <Loading text="正在整理你的战场纪事。" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name || '指挥官'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="THE COMMANDER"
+          name={profile.data?.name || '指挥官'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '完成对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜局', value: stats.data?.wins ?? 0 },
+            { label: '胜率', value: `${Math.round(
+              (stats.data?.winRate ?? 0) * 100)}%` },
+          ]}
+          historyTitle="战场纪事"
+          historyItems={historyItems}
+          emptyHistory={<Notice>下一页，等待你来书写。
+            <Link className="text-button" to="/game/warchest">
+              开始第一场交锋
+            </Link>
+          </Notice>}
+          historyFooter={history.hasMore && <button
+            className="button secondary full" type="button"
+            disabled={history.loading} onClick={history.loadMore}>
+            加载更多
+          </button>}
+          logoutPending={logout.pending}
+          logoutError={logout.error}
+          onLogout={() => setLogoutOpen(true)}
+          onAbout={() => setAboutOpen(true)}
+        />}</main>
+      {aboutOpen && <GameMobileAboutDialog gameName="War Chest"
+        avatar={<Crest size={58} />}
+        themeClassName="warchest-root"
+        onClose={() => setAboutOpen(false)} />}
+      {logoutOpen && <Modal title="离开当前账号？" eyebrow="SIGN OUT"
+        onClose={() => setLogoutOpen(false)}
+        footer={<><button className="button secondary" type="button"
+          onClick={() => setLogoutOpen(false)}>取消</button>
+          <button className="button primary" type="button"
+            disabled={logout.pending} onClick={() => void logout.run()}>
+            退出登录
+          </button></>}>
+        <p>退出不会删除战绩与回放，下次登录后仍可查看。</p>
+        {logout.error && <Notice error>{logout.error}</Notice>}
+      </Modal>}
+    </Shell>;
+  }
   return <Shell title="我的战绩" profile={profile.data} compactMobileFooter><main className="page records-page profile-page">
     <div className="page-title"><div><Eyebrow>YOUR CAMPAIGN JOURNAL</Eyebrow>
       <h1>每一步，都留下回响。</h1><p>真实战绩、终局控制数与全知逐步回放。</p></div></div>

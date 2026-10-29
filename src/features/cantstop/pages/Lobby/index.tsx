@@ -17,12 +17,19 @@ import {
   X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import campArt from '../../assets/camp.webp';
@@ -109,6 +116,7 @@ function RoomCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useCantStopLobby();
   const profile = useAsyncResource(getProfile);
@@ -152,6 +160,98 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: CantStopRoom) => {
+    const entry = roomEntry(room, identity);
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={`${ownerProfile.name} 的山路牌桌`}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待入席' : '牌局进行中'}
+      meta={room.status === 'match'
+        ? '2–4 人 · 等待开局'
+        : `${room.progressCurrent ?? room.maxClaimedColumns ?? 0} / ${
+          room.progressTotal ?? room.targetColumns ?? 3} 条路线`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      {initialLoading
+        ? <CantStopLoading />
+        : <GameMobileLobby
+          eyebrow="ONE MORE ROLL. ONE MORE SUMMIT."
+          title={<>再高一点，<br />还是见好就收？</>}
+          description="四枚骰子，三位攀登者。率先占领三条路线，就赢下这座山。"
+          media={<img src={campArt} alt="山路、骰子与登顶旗帜" />}
+          caption="THE SUMMIT CLUB"
+          facts={[
+            { icon: <Users />, value: '2–4', label: '人同桌' },
+            { icon: <Layers3 />, value: '11', label: '条路线' },
+            { icon: <Bull />, value: '3', label: '列获胜' },
+          ]}
+          browserEyebrow="PICK YOUR TABLE"
+          browserTitle="找到山路，一起登顶。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={filters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setVisibility('public');
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => setPanel('share')}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFound(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，直接回到那张牌桌。"
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        title="开一张新的山路牌桌"
+        eyebrow="CREATE YOUR TABLE"
+        description="经典规则、4 个固定席位和 60 秒阶段时限均已确定。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="官方基础规则 · 2–4 人 · 公平 AI · 服务端权威骰子"
+        error={action.error && <Feedback error>{action.error}</Feedback>}
+        pending={action.pending} disabled={!profile.data}
+        themeClassName="cantstop-root"
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="CAN'T STOP"
+        url={CANTSTOP_PUBLIC_URL} color="#b95532" background="#f7f5ef"
+        themeClassName="cantstop-root" onClose={close} />}
+      {panel === 'join' && <Dialog title="通过房间号加入"
+        eyebrow="FIND YOUR FRIENDS' TABLE" onClose={close}
+        footer={<ActionButton variant="primary" pending={action.pending}
+          disabled={!code.trim() || !!found && !roomEntry(found, identity).allowed}
+          onClick={() => found ? enter(found) : void find()}>
+          {found ? roomEntry(found, identity).label : '查找房间'}
+          <ArrowRight size={16} />
+        </ActionButton>}>
+        {action.error && <Feedback error>{action.error}</Feedback>}
+        {found && renderMobileRoom(found)}
+      </Dialog>}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <CantStopLoading /> : <div className="cs-lobby">

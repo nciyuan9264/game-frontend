@@ -1,9 +1,15 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Bookmark, ChevronRight, Crown, Gem, Info, Layers,
-  LogOut, Mail, Pencil, ShieldCheck, Trophy,
+  ArrowLeft, ArrowRight, Bookmark, ChevronRight, Clock, Crown, Gem, Info,
+  Layers, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+} from '@/components/GameUI/GamePublicMobile';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
@@ -15,6 +21,7 @@ import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboar
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type {
   LeaderboardEntry,
   LeaderboardSortDim,
@@ -23,6 +30,7 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { Artwork, Eyebrow, GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { SplendorLoading } from '../../components/LoadingState';
+import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -65,6 +73,7 @@ const guideSteps = [
 ] as const;
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'score' | 'games'>('score');
   const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
@@ -75,6 +84,33 @@ export function Rankings() {
   });
   const myIndex = entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
 
+  if (isMobile) {
+    return <AppShell title="收藏家榜" profile={profile.data}>
+      <GameMobileRankings eyebrow="SPLENDOR LEADERBOARD"
+        title="收藏家荣誉榜"
+        description="用平均名次衡量稳定发挥，也记录每一场完成的珠宝展。"
+        modes={[
+          { value: 'score', label: '战绩榜' },
+          { value: 'games', label: '场次榜' },
+        ]}
+        mode={mode} onModeChange={setMode}
+        entries={entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: 'avgRank' in entry ? entry.avgRank.toFixed(2) : '—',
+          metricLabel: '平均名次',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        state={<>{loading && !entries.length
+          && <SplendorLoading title="正在整理皇家名册。" description="载入排行榜记录" />}
+          {error && <Feedback error>{error}
+            <ActionButton onClick={retry}>重试</ActionButton>
+          </Feedback>}</>}
+      />
+    </AppShell>;
+  }
   return <AppShell title="收藏家榜" profile={profile.data}><div className={`${styles.page} ${styles.rankPage}`}>
     <header className={styles.pageTitle}><Eyebrow>THE DISTINGUISHED COLLECTORS</Eyebrow>
       <h1>让每一次远见，都留下声望。</h1><p>在宝石的世界里，稳定的眼光值得被看见。</p></header>
@@ -103,11 +139,37 @@ export function Rankings() {
 }
 
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const step = guide.index;
   const current = guide.current;
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <GameMobileGuide
+        visual={<Artwork index={[0, 6, 4, 8][step]} />}
+        facts={[
+          { icon: <Users />, value: '2–4', label: '人' },
+          { icon: <Clock />, value: '约 30', label: '分钟' },
+          { icon: <Crown />, value: '15', label: '声望终局' },
+        ]}
+        tabs={guideSteps.map((_item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${
+            ['拿取宝石', '购买发展卡', '公开预留', '贵族与终局'][index]}`,
+        }))}
+        index={step} onSelect={guide.select}
+        eyebrow={current.eyebrow}
+        title={current.title}
+        description={current.paragraphs[0]}
+        points={current.paragraphs.slice(1)}
+        hint={current.callout}
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={() => guide.isLast ? navigate('/game/splendor') : guide.next()}
+      />
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.pageTitle}><Eyebrow>YOUR FIRST GEM</Eyebrow>
       <h1>简单的规则，长远的眼光。</h1><p>每回合做一件事，让每张卡都成为下一次机会。</p></header>
@@ -150,6 +212,7 @@ function PlusMark() {
 }
 
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('splendor');
   const {
@@ -167,6 +230,61 @@ export function My() {
   };
   const firstLoading = profile.loading && !profile.data || stats.loading && !stats.data || loading && !games.length;
 
+  if (isMobile) {
+    const historyItems = games.map(game => {
+      const me = game.players?.find(player =>
+        String(player.userID) === String(profile.data?.id));
+      return {
+        id: String(game.id),
+        title: `房间 ${game.roomID}`,
+        detail: `${new Date(game.startedAt).toLocaleString('zh-CN')} · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: me?.isWinner ? '本局获胜' : game.endedAt ? '已结束' : '进行中',
+        href: game.endedAt ? `/game/splendor/replay/${game.id}` : undefined,
+      };
+    });
+    return <AppShell title="我的收藏" profile={profile.data} compactMobileFooter>
+      {firstLoading
+        ? <SplendorLoading title="正在整理你的收藏档案。"
+          description="同步身份、战绩与对局记录" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name ?? '玩家'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="THE GEM COLLECTOR"
+          name={profile.data?.name || '玩家'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜场', value: stats.data?.wins ?? 0 },
+            { label: '平均声望', value: (stats.data?.avgScore ?? 0).toFixed(1) },
+          ]}
+          historyTitle="过去的精彩"
+          historyItems={historyItems}
+          emptyHistory={<Feedback>还没有对局记录。
+            <Link to="/game/splendor">去大厅开一桌</Link>
+          </Feedback>}
+          historyFooter={hasMore && <ActionButton pending={loading}
+            onClick={loadMore}>加载更多</ActionButton>}
+          logoutPending={logoutAction.pending}
+          logoutError={logoutAction.error}
+          onLogout={() => setPanel('logout')}
+          onAbout={() => setPanel('about')}
+        />}
+      {panel === 'about' && <GameMobileAboutDialog gameName="Splendor"
+        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        themeClassName={rootStyles.root}
+        onClose={() => setPanel(undefined)} />}
+      {panel === 'logout' && <Dialog title="退出当前收藏家账号？"
+        eyebrow="UNTIL NEXT TIME" onClose={() => setPanel(undefined)}
+        footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
+          <ActionButton variant="danger" pending={logoutAction.pending}
+            onClick={() => void doLogout()}>确认退出</ActionButton></>}>
+        <p className={styles.logoutCopy}>退出后将返回登录页。</p>
+        {logoutAction.error && <Feedback error>{logoutAction.error}</Feedback>}
+      </Dialog>}
+    </AppShell>;
+  }
   return <AppShell title="我的收藏" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.pageTitle}><Eyebrow>YOUR COLLECTOR'S JOURNEY</Eyebrow>
       <h1>你的眼光，值得珍藏。</h1><p>每一局都是新的旅程，每一步都有自己的印记。</p></header>

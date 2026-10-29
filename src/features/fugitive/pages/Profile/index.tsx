@@ -12,14 +12,20 @@ import {
   Shield,
 } from 'lucide-react';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
+import {
+  GameMobileAboutDialog,
+  GameMobileProfile,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type { Game } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   AppShell,
+  fugitiveThemeClassName,
   ProfileMonogram,
 } from '../../components/AppShell';
 import { FugitiveLoading } from '../../components/LoadingState';
@@ -36,6 +42,7 @@ const gameRole = (value?: string): Role =>
   value === 'marshal' ? 'marshal' : 'fugitive';
 
 export default function Profile() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('fugitive');
   const history = useGameHistory({ gameType: 'fugitive', pageSize: 20 });
@@ -53,6 +60,99 @@ export default function Profile() {
     setRecord(game);
     setPanel('record');
   };
+  if (isMobile) {
+    const historyItems = history.games.map(game => {
+      const me = game.players?.find(player =>
+        String(player.userID) === String(profile.data?.id));
+      const role = gameRole(me?.gameRole);
+      return {
+        id: String(game.id),
+        title: game.roomDisplayName || `房间 ${game.roomID}`,
+        detail: `${roleName(role)} · ${
+          new Date(game.startedAt).toLocaleString('zh-CN')} · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: me?.isWinner ? '本局获胜' : '未能获胜',
+        onClick: () => openRecord(game),
+      };
+    });
+    return <AppShell title="我的档案" profile={profile.data} compactMobileFooter>
+      <main className="page-content">{loading
+        ? <FugitiveLoading title="正在整理你的追逃档案。"
+          description="同步身份、角色战绩与历史对局" />
+        : <GameMobileProfile
+          avatar={<ProfileMonogram profile={profile.data}
+            className="profile-monogram" />}
+          eyebrow="ONLINE FIELD AGENT"
+          name={profile.data?.name || '城市追踪者'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '完成对局', value: total },
+            { label: '获胜', value: wins },
+            { label: '胜率', value: `${total
+              ? Math.round((stats.data?.winRate ?? 0) * 100) : 0}%` },
+          ]}
+          historyTitle={`追逃档案 · 逃亡 ${fugitiveGames} / 追捕 ${marshalGames}`}
+          historyItems={historyItems}
+          emptyHistory={<div className="empty-state profile-empty">
+            <Route size={38} /><h3>城市还在等你的第一步。</h3>
+            <Link className="button primary" to="/game/fugitive">
+              开始第一场追逐
+            </Link>
+          </div>}
+          historyFooter={history.hasMore && <button
+            className="button secondary full" type="button"
+            disabled={history.loading} onClick={history.loadMore}>
+            {history.loading ? '载入中…' : '加载更多对局'}
+          </button>}
+          logoutPending={logout.pending}
+          logoutError={logout.error}
+          onLogout={() => setPanel('logout')}
+          onAbout={() => setPanel('about')}
+        />}</main>
+      {panel === 'about' && <GameMobileAboutDialog gameName="Fugitive"
+        avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }}
+          className="contact-monogram" />}
+        themeClassName={fugitiveThemeClassName}
+        onClose={() => setPanel(undefined)} />}
+      {panel === 'logout' && <Modal title="离开当前账号？" kicker="SIGN OUT"
+        onClose={() => setPanel(undefined)}
+        footer={<><button className="button secondary" type="button"
+          onClick={() => setPanel(undefined)}>取消</button>
+          <button className="button primary" type="button"
+            disabled={logout.pending} onClick={() => void logout.run()}>
+            {logout.pending ? '正在退出…' : '退出登录'}
+          </button></>}>
+        <p>退出不会删除线上战绩与历史记录，下次登录后仍可查看。</p>
+      </Modal>}
+      {panel === 'record' && record && <Modal
+        title={record.roomDisplayName || '追逃记录'}
+        kicker="YOUR COMPLETED CHASE" onClose={() => setPanel(undefined)}
+        footer={<button className="button secondary full" type="button"
+          onClick={() => setPanel(undefined)}>返回档案</button>}>
+        {(() => {
+          const me = record.players?.find(player =>
+            String(player.userID) === String(profile.data?.id));
+          const role = gameRole(me?.gameRole);
+          return <><div className="record-detail-heading">
+            <Eyebrow>{new Date(record.startedAt).toLocaleString('zh-CN')}</Eyebrow>
+            <h3>{record.roomDisplayName || `房间 ${record.roomID}`}</h3>
+            <span className={`pill ${me?.isWinner ? 'won' : ''}`}>
+              {me?.isWinner ? '本局获胜' : '未能获胜'}
+            </span>
+          </div><dl className="record-detail-list">
+            <div><dt>你的身份</dt><dd>{roleName(role)}</dd></div>
+            <div><dt>对局时长</dt><dd>{
+              Math.max(0, Math.round(record.durationSeconds / 60))} 分钟</dd></div>
+            <div><dt>结束原因</dt><dd>{record.endReason || '正常结算'}</dd></div>
+            <div><dt>房间号</dt><dd>{record.roomID}</dd></div>
+          </dl><p className="notice">
+            Fugitive 首发只保存结算与历史摘要，不提供正式回放入口。
+          </p></>;
+        })()}
+      </Modal>}
+    </AppShell>;
+  }
 
   return <AppShell title="我的档案" profile={profile.data} compactMobileFooter>
     {loading

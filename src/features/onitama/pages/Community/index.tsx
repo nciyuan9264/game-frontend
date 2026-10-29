@@ -1,9 +1,15 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, ChevronRight, Flag, Grid3X3, History,
-  Info, LogOut, Mail, Pencil, Repeat2, ShieldCheck, Swords, Trophy,
+  ArrowLeft, ArrowRight, ChevronRight, Clock, Flag, Grid3X3, History,
+  Info, LogOut, Mail, Pencil, Repeat2, ShieldCheck, Swords, Trophy, Users,
 } from 'lucide-react';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+} from '@/components/GameUI/GamePublicMobile';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
@@ -12,6 +18,7 @@ import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboar
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type {
   LeaderboardSortDim,
   OnitamaLeaderboardEntry,
@@ -26,6 +33,7 @@ import { OnitamaLoading } from '../../components/LoadingState';
 import { MoveCard } from '../../components/MoveCard';
 import { CARD_CATALOG } from '../../model/cards';
 import type { Piece } from '../../model/types';
+import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -58,6 +66,7 @@ function Eyebrow({ children }: { children: ReactNode }) {
 }
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'winRate' | 'games'>('winRate');
   const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
@@ -68,6 +77,37 @@ export function Rankings() {
   });
   const myIndex = leaderboard.entries.findIndex(entry =>
     String(entry.userID) === String(profile.data?.id));
+  if (isMobile) {
+    return <AppShell title="棋手排行" profile={profile.data}>
+      <GameMobileRankings eyebrow="ONITAMA LEADERBOARD"
+        title="ONITAMA 棋手榜"
+        description="按胜率或完成场次，看见稳定的棋手。"
+        modes={[
+          { value: 'winRate', label: '胜率榜' },
+          { value: 'games', label: '场次榜' },
+        ]}
+        mode={mode} onModeChange={setMode}
+        entries={leaderboard.entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: `${Math.round(entry.winRate * 100)}%`,
+          metricLabel: '胜率',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        state={<>{leaderboard.loading && !leaderboard.entries.length
+          && <OnitamaLoading title="正在整理棋手名册。" description="载入排行榜记录" />}
+          {leaderboard.error && <Feedback error>{leaderboard.error}
+            <ActionButton onClick={leaderboard.retry}>重试</ActionButton>
+          </Feedback>}</>}
+        footer={leaderboard.hasMore && <ActionButton
+          pending={leaderboard.loading} onClick={leaderboard.loadMore}>
+          加载更多
+        </ActionButton>}
+      />
+    </AppShell>;
+  }
   return <AppShell title="棋手排行" profile={profile.data}><div className={styles.page}>
     <header className={styles.title}><Eyebrow>THE QUIET MASTERS</Eyebrow>
       <h1>每一条路，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
@@ -88,11 +128,63 @@ export function Rankings() {
 }
 
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const [flipped, setFlipped] = useState(false);
+  const [catalogOpen, setCatalogOpen] = useState(false);
   const current = guide.current;
+  const visual = <>
+    {guide.index === 0 && <Board pieces={guidePieces} view="blue" small />}
+    {guide.index === 1 && <div className={styles.flipLine}>
+      <MoveCard id="tiger" side="blue" mini />
+      <Repeat2 size={27} />
+      <MoveCard id="crab" side="blue" mini /></div>}
+    {guide.index === 2 && <div className={styles.passLine}>
+      <Swords size={30} /><Pawn side="red" kind="master" />
+      <Torii size={34} /></div>}
+    {guide.index === 3 && <div className={styles.victoryLine}>
+      <Grid3X3 size={32} /><ShieldCheck size={30} /><Flag size={30} /></div>}
+  </>;
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <GameMobileGuide
+        visual={visual}
+        facts={[
+          { icon: <Users />, value: '2', label: '人' },
+          { icon: <Clock />, value: '约 15', label: '分钟' },
+          { icon: <Grid3X3 />, value: '5 × 5', label: '棋盘' },
+        ]}
+        tabs={guideSteps.map((step, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${step.name}`,
+        }))}
+        index={guide.index} onSelect={guide.select}
+        eyebrow="THE ONITAMA HANDBOOK"
+        title={current.title} description={current.copy}
+        hint={current.note}
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={() => guide.isLast ? navigate('/game/onitama') : guide.next()}
+        secondaryAction={<ActionButton onClick={() => setCatalogOpen(true)}>
+          移动卡速查
+        </ActionButton>}
+      />
+      {catalogOpen && <Dialog title="基础版十六式"
+        eyebrow="THE SIXTEEN SPIRITS" onClose={() => setCatalogOpen(false)}
+        footer={<><ActionButton onClick={() => setFlipped(value => !value)}>
+          <Repeat2 size={15} />{flipped ? '切回己方方向' : '查看对手方向'}
+        </ActionButton><ActionButton onClick={() => setCatalogOpen(false)}>
+          关闭
+        </ActionButton></>}>
+        <section className={styles.cardLibrary}>
+          <p>黑格是棋子起点，亮格是可落位置。方向图表达实际走法。</p>
+          <div>{CARD_CATALOG.map(card => <MoveCard key={card.id}
+            id={card.id} side={card.mark} flipped={flipped} mini />)}</div>
+        </section>
+      </Dialog>}
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.title}><Eyebrow>THE ONITAMA HANDBOOK</Eyebrow>
       <h1>用三分钟，读懂一局。</h1><p>四章认识棋盘、招式流转、两条胜路与边界。</p></header>
@@ -136,6 +228,7 @@ export function Guide() {
 }
 
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('onitama');
   const history = useGameHistory({ gameType: 'onitama', pageSize: 20 });
@@ -145,6 +238,59 @@ export function My() {
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
+  if (isMobile) {
+    const historyItems = history.games.map(game => {
+      const me = game.players?.find(player =>
+        String(player.userID) === String(profile.data?.id));
+      return {
+        id: String(game.id),
+        title: `房间 ${game.roomID}`,
+        detail: `${new Date(game.startedAt).toLocaleString('zh-CN')} · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: me?.isWinner ? '胜' : '负',
+        href: game.endedAt ? `/game/onitama/replay/${game.id}` : undefined,
+      };
+    });
+    return <AppShell title="我的棋谱" profile={profile.data} compactMobileFooter>
+      {loading
+        ? <OnitamaLoading title="正在整理你的棋谱。" description="同步身份、战绩与历史" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name ?? '棋手'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="THE ONITAMA PLAYER"
+          name={profile.data?.name || '棋手'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜场', value: stats.data?.wins ?? 0 },
+            { label: '胜率', value: `${Math.round((stats.data?.winRate ?? 0) * 100)}%` },
+          ]}
+          historyTitle="过去的棋局"
+          historyItems={historyItems}
+          emptyHistory={<Feedback>还没有对局记录。
+            <Link to="/game/onitama">去大厅开始第一局</Link>
+          </Feedback>}
+          historyFooter={history.hasMore && <ActionButton
+            pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}
+          logoutPending={logout.pending} logoutError={logout.error}
+          onLogout={() => setLogoutOpen(true)}
+          onAbout={() => setAboutOpen(true)}
+        />}
+      {aboutOpen && <GameMobileAboutDialog gameName="Onitama"
+        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        themeClassName={rootStyles.root}
+        onClose={() => setAboutOpen(false)} />}
+      {logoutOpen && <Dialog title="离开当前账号？" eyebrow="SIGN OUT"
+        onClose={() => setLogoutOpen(false)}
+        footer={<><ActionButton onClick={() => setLogoutOpen(false)}>取消</ActionButton>
+          <ActionButton variant="danger" pending={logout.pending}
+            onClick={() => void logout.run()}>退出登录</ActionButton></>}>
+        <p className={styles.dialogText}>退出不会删除棋谱与战绩，下次登录后仍可查看。</p>
+        {logout.error && <Feedback error>{logout.error}</Feedback>}
+      </Dialog>}
+    </AppShell>;
+  }
   return <AppShell title="我的棋谱" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.title}><Eyebrow>YOUR QUIET JOURNEY</Eyebrow>
       <h1>你的每一步，都值得回看。</h1><p>真实战绩、棋局结果与逐步回放。</p></header>

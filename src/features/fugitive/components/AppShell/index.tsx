@@ -44,6 +44,8 @@ const navigation = [
   },
 ] as const;
 
+export const fugitiveThemeClassName = styles.fugitiveRoot;
+
 export function FugitiveRoot({
   children,
   className = '',

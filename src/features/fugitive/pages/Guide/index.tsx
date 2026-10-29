@@ -11,8 +11,11 @@ import {
   Users,
 } from 'lucide-react';
 import { GameTabs } from '@/components/GameUI/GameTabs';
+import { GameMobileGuide } from '@/components/GameUI/GamePublicMobile';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { AppShell } from '../../components/AppShell';
 import { Scene } from '../../components/Visual';
@@ -101,6 +104,7 @@ function GuideVisual({ step }: { step: number }) {
 }
 
 export default function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
@@ -113,6 +117,35 @@ export default function Guide() {
     guide.next();
   };
 
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <main className="page-content"><GameMobileGuide
+        visual={<GuideVisual step={guide.index} />}
+        facts={[
+          { icon: <Users />, value: '2', label: '人' },
+          { icon: <Clock />, value: '15–30', label: '分钟' },
+          { icon: <Layers />, value: '43', label: '张地点牌' },
+        ]}
+        tabs={guideSteps.map((item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+        }))}
+        index={guide.index}
+        onSelect={guide.select}
+        eyebrow={step.eyebrow}
+        title={step.title}
+        description={step.text}
+        points={step.points}
+        hint={<><b>{step.hintTitle}</b> {step.hint}</>}
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={handlePrimaryAction}
+        secondaryAction={<ActionButton
+          onClick={() => navigate('/game/fugitive/cards')}>
+          <Layers size={15} />牌库速查
+        </ActionButton>}
+      /></main>
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
     <main className={`page-content guide-page ${styles.page} ${styles.guidePage}`}>
       <header className={styles.guideHeading}><small>LEARN THE ESCAPE ROUTE</small>

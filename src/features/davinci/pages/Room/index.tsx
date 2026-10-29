@@ -5,14 +5,22 @@ import {
   Check,
   Copy,
   Globe,
+  KeyRound,
+  ListOrdered,
   Lock,
   Plus,
   Settings2,
   ShieldCheck,
+  Timer,
   UserPlus,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { PlayerAvatar } from '../../components/AppShell';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
 import { davinciRoomInviteURL } from '../../model/adapters';
@@ -36,6 +44,7 @@ export function Room({
   data: MatchSnapshot;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<
     'invite' | 'settings' | 'remove' | 'start'
   >();
@@ -80,6 +89,102 @@ export function Room({
       setPanel('invite');
     },
   };
+  const getPlayerName = (playerID: string) =>
+    playerName(playerID, data.players);
+  const renderMobileAvatar = (
+    player: {
+      name: string;
+      avatar?: string;
+      ai: boolean;
+    },
+    size: number,
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar}
+    ai={player.ai} size={size} />;
+  const saveSettings = () => {
+    if (session.submit('room_update_settings', { visibility })) close();
+  };
+  const confirmRemove = () => {
+    if (session.submit('match_remove_player', { playerID: target })) close();
+  };
+  const confirmStart = () => {
+    if (session.submit('match_begin')) close();
+  };
+
+  if (isMobile) {
+    return <div className={styles.page}>
+      <StandardGameMobileRoom
+        data={data}
+        enabled={enabled}
+        pending={!!session.pending}
+        getPlayerName={getPlayerName}
+        getPlayerRole={(playerID, player) => playerID === data.ownerID
+          ? '房主'
+          : player.ai ? 'AI 对手' : '挑战者'}
+        renderAvatar={renderMobileAvatar}
+        copy={{
+          kicker: 'CIPHER ROOM · 房间号',
+          gameLabel: '经典解码',
+          facts: [
+            { icon: <ListOrdered />, label: '初始牌', value: '5 张' },
+            { icon: <Timer />, label: '阶段', value: '20–60 秒' },
+            { icon: <ShieldCheck />, label: '规则', value: '服务端验证' },
+          ],
+          summary: [
+            { label: '玩法', value: '经典解码' },
+            { label: '已入座', value: `${players.length} / 2 人` },
+          ],
+          summaryEyebrow: 'BEFORE THE FIRST GUESS',
+          summaryTitle: '人齐了，就开场。',
+          ownerHint: '邀请朋友入座，或添加自动准备的人机棋手，由你开启对局。',
+          memberHint: '准备好后等待房主开局。只有房主可以管理席位。',
+          readyTitle: '双方就绪，密码对决即将开始。',
+          ownerDescription: '你是房主，由你开启这场密码对决。',
+          memberReadyDescription: '你已准备，等待房主开始。',
+          memberWaitingDescription: '准备好后告诉房主你已就绪。',
+        }}
+        media={<div className={styles.cipherPattern} aria-hidden="true" />}
+        onLeave={onLeave}
+        onSettings={() => {
+          setVisibility(data.visibility);
+          setPanel('settings');
+        }}
+        onInvite={roomProps.onInvite}
+        onAddAI={roomProps.onAddAI}
+        onRemove={roomProps.onRemove}
+        onReady={roomProps.onReady}
+        onStart={roomProps.onStart}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="给朋友留一个密码席位"
+        settingsHint={visibility === 'private'
+          ? '私密房间不会向其他玩家公开展示。'
+          : '公开房间可以从大厅、房间号或邀请链接加入。'}
+        startTitle="开始这场密码对决？"
+        startFacts={[
+          { icon: <KeyRound />, label: '手牌', value: '5 张' },
+          { icon: <Timer />, label: '阶段', value: '20–60 秒' },
+          { icon: <ShieldCheck />, label: '人数', value: '固定 2 人' },
+        ]}
+        startHint="开局后每位玩家获得 5 张密码牌。先揭开对手全部牌的一方获胜。"
+        themeClassName={rootStyles.root}
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}
+        onSaveSettings={saveSettings}
+        onConfirmRemove={confirmRemove}
+        onConfirmStart={confirmStart}
+        onClose={close}
+      />
+    </div>;
+  }
 
   return <div className={styles.page}>
     <header className={styles.heading} data-game-room-heading>

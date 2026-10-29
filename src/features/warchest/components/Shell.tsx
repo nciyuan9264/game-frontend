@@ -7,6 +7,8 @@ import {
   Home,
   LayoutGrid,
   Swords,
+  Trophy,
+  UserRound,
 } from 'lucide-react';
 import { GameAvatar } from '@/components/GameUI/GameAvatar';
 import type { AuthProfile } from '@/features/game-core/api/auth';
@@ -17,11 +19,18 @@ import '../styles/complete-base.css';
 import '../styles/battle-motion.css';
 import '../styles/product.css';
 
-const navigation = [
+const desktopNavigation = [
   { path: '/game/warchest', label: '游戏大厅', short: '大厅', icon: LayoutGrid },
   { path: '/game/warchest/army', label: '兵种图鉴', short: '兵种', icon: Swords },
   { path: '/game/warchest/guide', label: '玩法指南', short: '玩法', icon: BookOpen },
   { path: '/game/warchest/me', label: '我的战绩', short: '战绩', icon: Flag },
+] as const;
+
+const mobileNavigation = [
+  { path: '/game/warchest', label: '游戏大厅', short: '大厅', icon: LayoutGrid },
+  { path: '/game/warchest/rankings', label: '指挥官排行', short: '排行', icon: Trophy },
+  { path: '/game/warchest/guide', label: '玩法指南', short: '玩法', icon: BookOpen },
+  { path: '/game/warchest/me', label: '我的战绩', short: '我的', icon: UserRound },
 ] as const;
 
 const isActive = (pathname: string, path: string) =>
@@ -71,7 +80,7 @@ export function Shell({
       <Link className="side-emblem" aria-label="战争之匣首页" to="/game/warchest">
         <Crest size={43} />
       </Link>
-      <nav aria-label="战争之匣导航">{navigation.map(item => {
+      <nav aria-label="战争之匣导航">{desktopNavigation.map(item => {
         const Icon = item.icon;
         return <Link key={item.path} to={item.path}
           aria-current={isActive(location.pathname, item.path) ? 'page' : undefined}
@@ -102,7 +111,7 @@ export function Shell({
     {children}
     <footer className="app-footer"><span>WAR CHEST <i> / </i> 静默行军</span>
       <span>以谋略，见胜负。</span><small>双人完整基础版 · 在线权威规则</small></footer>
-    <div className="mobile-bottom"><nav aria-label="战争之匣手机导航">{navigation.map(item => {
+    <div className="mobile-bottom"><nav aria-label="战争之匣手机导航">{mobileNavigation.map(item => {
       const Icon = item.icon;
       return <Link key={item.path} to={item.path}
         aria-current={isActive(location.pathname, item.path) ? 'page' : undefined}

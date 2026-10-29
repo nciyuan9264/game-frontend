@@ -5,12 +5,19 @@ import {
   LockKeyhole, Plus, Search, Share2, ShieldCheck, Users, X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { createHiveRoom, lookupHiveRoom } from '../../api/room';
@@ -21,6 +28,7 @@ import { HiveLoading } from '../../components/LoadingState';
 import { useHiveLobby } from '../../hooks/useHiveLobby';
 import { HIVE_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import type { LobbyFilter, Visibility, HiveRoom } from '../../model/types';
+import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const loadStats = () => getMyStats('hive');
@@ -90,6 +98,7 @@ function JoinCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useHiveLobby();
   const profile = useAsyncResource(getProfile);
@@ -131,6 +140,102 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: HiveRoom) => {
+    const entry = roomEntry(room, identity);
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={`${ownerProfile.name} 的棋室`}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待落座' : '对局中'}
+      meta={room.status === 'match'
+        ? '基础 22 枚 · 正在等待'
+        : `已行动 ${room.turnCount ?? 0} 回合`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="对局大厅" profile={profile.data}>
+      {initialLoading
+        ? <HiveLoading description="正在同步棋室与在线棋手" />
+        : <GameMobileLobby
+          eyebrow="THE QUIET COLLECTION / 06"
+          title={<>一巢相连，<br />每只虫都有路。</>}
+          description="没有棋盘，棋子本身就是边界。围住对方蜂后，赢下这场无边界对决。"
+          media={<HiveStillLife />}
+          caption="HIVE / THE QUIET COLLECTION"
+          facts={[
+            { icon: <Users />, value: '2', label: '位棋手' },
+            { icon: <Layers3 />, value: '11', label: '枚棋子 / 人' },
+            { icon: <Hexagon />, value: '无边界', label: '蜂巢棋盘' },
+          ]}
+          browserEyebrow="TAKE YOUR NEXT STEP"
+          browserTitle="挑一局，慢慢想。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={roomFilters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setVisibility('public');
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => {
+            shareClipboard.reset();
+            setPanel('share');
+          }}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFoundRoom(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，找到朋友的棋室。"
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        title="为两个人，开一局。"
+        eyebrow="A TABLE FOR TWO"
+        description="选择其他棋手如何找到这间棋室。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="身份、部署、移动与蜂巢连通性均由服务端验证。"
+        facts={<dl><div><dt>席位</dt><dd>固定 2 人</dd></div>
+          <div><dt>规则</dt><dd>基础 22 枚</dd></div></dl>}
+        error={action.error && <Feedback error>{action.error}</Feedback>}
+        pending={action.pending} disabled={!profile.data}
+        themeClassName={rootStyles.root}
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="Hive"
+        url={HIVE_PUBLIC_URL} color="#60454b" background="#fffaf3"
+        themeClassName={rootStyles.root} onClose={close} />}
+      {panel === 'join' && <Dialog title="对面已经留好了位置？"
+        eyebrow="ENTER THE QUIET ROOM" onClose={close}
+        footer={<ActionButton variant="primary" pending={action.pending}
+          disabled={!code.trim()}
+          onClick={() => foundRoom ? enter(foundRoom) : void find()}>
+          {foundRoom ? roomEntry(foundRoom, identity).label : '查找棋室'}
+          <ArrowRight size={16} />
+        </ActionButton>}>
+        {action.error && <Feedback error>{action.error}</Feedback>}
+        {foundRoom && renderMobileRoom(foundRoom)}
+      </Dialog>}
+    </AppShell>;
+  }
 
   return <AppShell title="对局大厅" profile={profile.data}>
     {initialLoading ? <HiveLoading description="正在同步棋室与在线棋手" /> : <div className={styles.page}>

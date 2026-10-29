@@ -26,7 +26,8 @@ export function RoomCard({ room, userID, onEnter }: {
   const owner = roomOwnerProfile(room);
   const bots = room.roomPlayer.filter(player => player.ai).length;
   const progress = roomProgress(room);
-  return <article className={styles.card} aria-label={`房间 ${room.roomID}`}>
+  return <article className={styles.card} aria-label={`房间 ${room.roomID}`}
+    data-game-mobile-room-card>
     <div className={styles.heading}>
       <div className={styles.identity}><small>房间号</small><h3>{room.roomID}</h3></div>
       <span className={`${styles.status} ${room.status !== 'match' ? styles.playing : ''}`}>{room.status === 'match' ? '等待入座' : room.status === 'end' ? '已结束' : '对局中'}</span>

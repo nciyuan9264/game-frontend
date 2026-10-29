@@ -9,7 +9,7 @@ import styles from './index.module.less';
 export interface RoomProps {
   data: MatchSnapshot; enabled: boolean; pending: boolean;
   onAddAI: (seatIndex?: number) => void; onRemove: (id: string) => void; onReady: () => void;
-  onStart: () => void; onInvite: () => void; onSettings: () => void;
+  onStart: () => void; onInvite: () => void; onSettings: () => void; onLeave: () => void;
 }
 export function roomReadiness(data: MatchSnapshot) {
   const players = Object.values(data.players);

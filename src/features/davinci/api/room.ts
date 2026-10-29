@@ -1,10 +1,13 @@
 import { createGameRoom, listGameRooms } from '@/features/game-core/api/room';
-import type { DavinciRoom } from '../model/types';
+import type { DavinciRoom, Visibility } from '../model/types';
 
-export async function createDavinciRoom(signal?: AbortSignal): Promise<{ roomID: string }> {
+export async function createDavinciRoom(
+  visibility: Visibility,
+  signal?: AbortSignal,
+): Promise<{ roomID: string }> {
   return createGameRoom(
     'davinci',
-    { visibility: 'private', maxPlayers: 2 },
+    { visibility, maxPlayers: 2 },
     { signal, authFailure: 'redirect' },
   );
 }

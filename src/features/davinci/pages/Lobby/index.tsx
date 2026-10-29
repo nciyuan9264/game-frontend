@@ -4,12 +4,19 @@ import {
   ArrowRight, Check, Copy, Eye, Hash, KeyRound, ListOrdered, Plus, RefreshCw, Search, Share2, ShieldCheck, UserRound,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -20,7 +27,7 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { DavinciLoading } from '../../components/LoadingState';
 import { useDavinciLobby } from '../../hooks/useDavinciLobby';
 import { DAVINCI_PUBLIC_URL, roomEntry } from '../../model/adapters';
-import type { DavinciRoom, LobbyFilter } from '../../model/types';
+import type { DavinciRoom, LobbyFilter, Visibility } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
@@ -67,11 +74,14 @@ function RoomCard({ room, userID, onEnter }: {
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useDavinciLobby();
   const profile = useAsyncResource(getProfile);
   const stats = useAsyncResource(loadStats);
   const [shareOpen, setShareOpen] = useState(false);
+  const [createOpen, setCreateOpen] = useState(false);
+  const [visibility, setVisibility] = useState<Visibility>('public');
   const shareClipboard = useClipboardCopy();
   const [code, setCode] = useState('');
   const [heroReady, setHeroReady] = useState(false);
@@ -85,9 +95,10 @@ export default function Lobby() {
       navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
     }
   };
-  const create = async () => {
+  const create = async (nextVisibility: Visibility) => {
     try {
-      const room = await createAction.run(createDavinciRoom);
+      const room = await createAction.run(signal =>
+        createDavinciRoom(nextVisibility, signal));
       navigate(`/game/davinci/match?roomID=${encodeURIComponent(room.roomID)}`);
     } catch { /* Error state is owned by the shared action hook. */ }
   };
@@ -97,6 +108,80 @@ export default function Lobby() {
     navigate(`/game/davinci/match?roomID=${encodeURIComponent(roomID)}`);
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      {initialLoading
+        ? <DavinciLoading description="正在同步密码桌与在线玩家" />
+        : <GameMobileLobby
+          eyebrow="THE CIPHER TABLE"
+          title="达芬奇密码"
+          description="隐藏你的序列，观察每一次试探，在对手破解之前揭开他的密码。"
+          media={<img src={hero} alt="黑白密码牌桌面" />}
+          caption="OBSERVE · DEDUCE · REVEAL"
+          facts={[
+            { icon: <UserRound />, value: '2', label: '位玩家' },
+            { icon: <Hash />, value: '0–11', label: '数字升序' },
+            { icon: <KeyRound />, value: 'JOKER', label: '万能未知牌' },
+          ]}
+          browserEyebrow="OPEN TABLES"
+          browserTitle="选择一张密码桌"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={roomFilters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={room => {
+            const entry = roomEntry(room, identity);
+            const ownerProfile = roomOwnerProfile(room);
+            return <GameMobileRoomCard key={room.roomID}
+              roomID={room.roomID}
+              title={`${ownerProfile.name} 的密码桌`}
+              ownerName={ownerProfile.name}
+              ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+                avatar={ownerProfile.avatar} size={32} />}
+              playerCount={room.roomPlayer.length}
+              maxPlayers={room.maxPlayers}
+              status={room.status === 'match' ? '等待加入' : '对局中'}
+              meta={room.status === 'match'
+                ? '经典解码 · 尚未开局'
+                : `已抽取 ${26 - (room.boardCardCount ?? 26)} 张`}
+              privateRoom={room.visibility === 'private'}
+              actionLabel={entry.label}
+              actionDisabled={!entry.allowed}
+              onEnter={() => enter(room)}
+            />;
+          }}
+          onCreate={() => {
+            setVisibility('public');
+            createAction.reset();
+            setCreateOpen(true);
+          }}
+          onShare={() => setShareOpen(true)}
+          joinCode={code}
+          onJoinCodeChange={setCode}
+          onJoin={joinByCode}
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {createOpen && <GameMobileCreateRoomDialog
+        description="选择其他玩家如何找到这张密码桌。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="固定双人规则，身份、牌序与全部操作由服务端验证。"
+        error={createError && <Feedback error>{createError}</Feedback>}
+        pending={pending} disabled={!profile.data}
+        themeClassName={rootStyles.root}
+        onClose={() => { if (!pending) setCreateOpen(false); }}
+        onSubmit={() => void create(visibility)} />}
+      {shareOpen && <GameMobileShareDialog gameName="DaVinci Code"
+        url={DAVINCI_PUBLIC_URL} color="#20231f" background="#eee8d8"
+        themeClassName={rootStyles.root}
+        onClose={() => setShareOpen(false)} />}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <DavinciLoading description="正在同步密码桌与在线玩家" /> : <div className={styles.page}>
@@ -113,7 +198,15 @@ export default function Lobby() {
         <div className={styles.heroShade} />
         <div className={styles.heroCopy}><small>THE CIPHER TABLE</small><h1>达芬奇密码</h1>
           <p>隐藏你的序列，观察每一次试探，在对手破解之前揭开他的密码。</p>
-          <div><ActionButton variant="primary" pending={pending} disabled={!profile.data} onClick={() => void create()}>
+          <div><ActionButton variant="primary" pending={!isMobile && pending}
+            disabled={!profile.data} onClick={() => {
+              if (isMobile) {
+                setVisibility('public');
+                setCreateOpen(true);
+              } else {
+                void create('private');
+              }
+            }}>
             <Plus size={17} />创建房间<ArrowRight size={16} /></ActionButton>
             <ActionButton onClick={() => { shareClipboard.reset(); setShareOpen(true); }}><Share2 size={16} />分享游戏</ActionButton></div>
         </div>

@@ -15,6 +15,11 @@ import {
   X,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { sixNimmtRoomInviteURL } from '../../model/adapters';
 import { playerName, type MatchSnapshot } from '../../model/session';
 import type { SixNimmtSession } from '../../hooks/useSixNimmtSession';
@@ -34,6 +39,7 @@ export function Room({
   data: MatchSnapshot;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<Panel>();
   const [target, setTarget] = useState('');
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
@@ -55,6 +61,110 @@ export function Room({
       setCopyMessage('复制未成功，请选中房间号手动复制');
     }
   };
+  const getPlayerName = (playerID: string) =>
+    playerName(playerID, data.players);
+  const renderMobileAvatar = (
+    player: { name: string; avatar?: string; ai: boolean },
+    size: number,
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar}
+    ai={player.ai} size={size} />;
+
+  if (isMobile) {
+    return <div className="sn-room-page">
+      <StandardGameMobileRoom
+        data={data}
+        minPlayers={2}
+        denseSeats
+        enabled={enabled}
+        pending={!!session.pending}
+        getPlayerName={getPlayerName}
+        getPlayerRole={(id, player) => id === data.ownerID
+          ? '房主'
+          : player.ai ? '公平 AI' : '牧场玩家'}
+        renderAvatar={renderMobileAvatar}
+        copy={{
+          kicker: 'THE PLAYFUL TABLE · 房间号',
+          gameLabel: '经典 66 分制',
+          facts: [
+            { icon: <Users />, label: '人数', value: '2–10 人' },
+            { icon: <Bull />, label: '终局阈值', value: '66 牛头' },
+            { icon: <Clock3 />, label: '阶段时限', value: '60 秒' },
+          ],
+          summary: [
+            { label: '规则', value: '经典 66 分制' },
+            { label: '牌组', value: '1–104 · 每人 10 张' },
+            { label: '已入座', value: `${players.length} / 10 人` },
+          ],
+          summaryEyebrow: 'BEFORE THE FIRST CARD',
+          summaryTitle: '伙伴就位，就差你了。',
+          ownerHint: '所有人同时暗选，服务端隔离隐藏选择。邀请朋友或添加公平 AI 后，由你发牌。',
+          memberHint: '准备好后等待房主发牌。其他玩家锁定前看不到你的牌。',
+          readyTitle: '所有在座玩家已准备，可以发牌。',
+          ownerDescription: '你是房主，由你开启这一局。',
+          memberReadyDescription: '你已准备，等待房主发牌。',
+          memberWaitingDescription: '确认准备后，由房主开始对局。',
+        }}
+        media={<Bull size={92} />}
+        onLeave={onLeave}
+        onSettings={() => {
+          setVisibility(data.visibility);
+          setPanel('settings');
+        }}
+        onInvite={() => {
+          setCopyMessage('');
+          setPanel('invite');
+        }}
+        onAddAI={seatIndex => session.submit(
+          'match_add_ai',
+          typeof seatIndex === 'number' ? { seatIndex } : {},
+        )}
+        onRemove={playerID => {
+          setTarget(playerID);
+          setPanel('remove');
+        }}
+        onReady={() => session.submit('match_ready', {
+          ready: !data.players[data.playerID]?.ready,
+        })}
+        onStart={() => setPanel('start')}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="给朋友，留一张牌桌。"
+        settingsHint="经典规则、10 个席位和 60 秒时限固定。"
+        startTitle="现在开始发牌？"
+        startFacts={[
+          { icon: <Users />, label: '本场人数', value: `${players.length} 人` },
+          { icon: <Bull />, label: '终局阈值', value: '66 牛头' },
+          { icon: <Clock3 />, label: '阶段时限', value: '60 秒' },
+        ]}
+        startHint="确认后由服务端洗牌，每人获得 10 张唯一数字牌。"
+        themeClassName="sixnimmt-root"
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(
+          sixNimmtRoomInviteURL(data.roomID),
+          '邀请链接已复制',
+        )}
+        onSaveSettings={() => {
+          if (session.submit('room_update_settings', { visibility })) close();
+        }}
+        onConfirmRemove={() => {
+          if (session.submit('match_remove_player', { playerID: target })) close();
+        }}
+        onConfirmStart={() => {
+          if (session.submit('match_begin')) close();
+        }}
+        onClose={close}
+      />
+    </div>;
+  }
 
   return <div className="sn-room-page">
     <header className="sn-room-heading" data-game-room-heading><div data-game-room-heading-identity>

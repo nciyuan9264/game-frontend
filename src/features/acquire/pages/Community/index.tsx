@@ -2,6 +2,13 @@ import { useCallback, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { ArrowRight, Building2, ChevronRight, Clock, Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
 import { GameTabs } from '@/components/GameUI/GameTabs';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+  type GameMobileHistoryItem,
+} from '@/components/GameUI/GamePublicMobile';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -10,6 +17,7 @@ import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
 import { useInfiniteLoad } from '@/features/game-core/hooks/useInfiniteLoad';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -85,6 +93,7 @@ function InfiniteFooter({ loading, error, hasMore, retry, anchorRef }: {
 }
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAcquireResource(getProfile);
   const [mode, setMode] = useState<'score' | 'games'>('score');
   const sentinelRef = useRef<HTMLDivElement>(null);
@@ -104,6 +113,33 @@ export function Rankings() {
   useInfiniteLoad(sentinelRef, entries.length > 0 && hasMore && !loading && !error, loadMore);
   const sorted = entries;
   const myIndex = sorted.findIndex(entry => String(entry.userID) === String(profile.data?.id));
+  if (isMobile) {
+    return <AppShell title="排行榜" profile={profile.data}>
+      <GameMobileRankings eyebrow="ACQUIRE LEADERBOARD"
+        title="城市合伙人榜"
+        description="用平均名次衡量稳定发挥，也记录每一张完成的桌。"
+        modes={[{ value: 'score', label: '战绩榜' }, { value: 'games', label: '场次榜' }]}
+        mode={mode} onModeChange={setMode}
+        entries={sorted.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: 'avgRank' in entry ? entry.avgRank.toFixed(2) : '—',
+          metricLabel: '平均名次',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        state={<Status resource={{
+          loading: loading && !entries.length,
+          error: error && !entries.length ? error : '',
+          retry,
+        }} />}
+        footer={!!entries.length && <InfiniteFooter loading={loading}
+          error={error} hasMore={hasMore} retry={retry}
+          anchorRef={sentinelRef} />}
+      />
+    </AppShell>;
+  }
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page + ' ' + styles.rankPage}>
     <header className={styles.communityHeading}><div><small>THE CITY'S FINEST</small><h1>每一局，都算数。</h1></div><span className={styles.outlineTag}>真实对局记录</span></header>
     <section className={styles.rankHero}><Trophy size={39} /><div><small>ACQUIRE LEADERBOARD</small><h2>城市合伙人榜</h2><p>用平均名次衡量稳定发挥，也记录每一张完成的桌。</p></div>
@@ -125,6 +161,7 @@ export function Rankings() {
   </div></AppShell>;
 }
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAcquireResource(getProfile);
   const stats = useGameStats('acquire');
   const {
@@ -144,6 +181,54 @@ export function My() {
   }, [logoutAction]);
   useInfiniteLoad(sentinelRef, games.length > 0 && hasMore && !historyLoading && !historyError, loadNextHistoryPage);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
+  if (isMobile) {
+    const historyItems: GameMobileHistoryItem[] = games.map(game => {
+      const me = game.players?.find(player =>
+        player.userID != null
+        && String(player.userID) === String(profile.data?.id));
+      return {
+        id: String(game.id),
+        title: game.roomID,
+        detail: <>{me?.isWinner ? '本局获胜 · ' : ''}
+          {me?.finalScore != null ? `${money(me.finalScore)} · ` : ''}
+          时长 {Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</>,
+        accessory: game.endedAt ? '回放' : '进行中',
+        href: game.endedAt ? `/game/acquire/replay/${game.id}` : undefined,
+      };
+    });
+    return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter>
+      {loading ? <AcquireLoading title="正在整理你的城市档案。"
+        description="正在同步身份、战绩与对局记录" status="正在读取玩家资料" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name ?? '玩家'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="THE CITY PARTNER"
+          name={profile.data?.name ?? '玩家'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜场', value: stats.data?.wins ?? 0 },
+            { label: '平均资产', value: money(Math.round(stats.data?.avgScore ?? 0)) },
+          ]}
+          historyTitle="对局记录"
+          historyItems={historyItems}
+          emptyHistory={<Feedback>还没有对局记录。
+            <Link className={styles.link} to="/game/acquire">去大厅开一桌</Link>
+          </Feedback>}
+          historyFooter={!!games.length && <InfiniteFooter
+            loading={historyLoading} error={historyError}
+            hasMore={hasMore} retry={retryHistory} anchorRef={sentinelRef} />}
+          logoutPending={logoutAction.pending}
+          logoutError={logoutAction.error}
+          onLogout={() => void handleLogout()}
+          onAbout={() => setAboutOpen(true)}
+        />}
+      {aboutOpen && <GameMobileAboutDialog gameName="Acquire"
+        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        onClose={() => setAboutOpen(false)} />}
+    </AppShell>;
+  }
   return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={styles.page + ' ' + styles.profilePage}>
     <header className={styles.communityHeading}><div><small>YOUR PLAYER IDENTITY</small><h1>让这张筹码，代表你。</h1></div></header>
     {loading ? <AcquireLoading title="正在整理你的城市档案。" description="正在同步身份、战绩与对局记录" status="正在读取玩家资料" />
@@ -176,6 +261,7 @@ export function My() {
   </div></AppShell>;
 }
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAcquireResource(getProfile);
   const [prices, setPrices] = useState(false);
@@ -188,6 +274,34 @@ export function Guide() {
     }
     guide.next();
   };
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <GameMobileGuide
+        visual={<img src={tableArt} alt="Acquire 桌面材质示意" />}
+        facts={[
+          { icon: <Users />, value: '2–6', label: '人' },
+          { icon: <Clock />, value: '45–90', label: '分钟' },
+          { icon: <Building2 />, value: '108', label: '块地' },
+        ]}
+        tabs={guideSteps.map((item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+        }))}
+        index={guide.index}
+        onSelect={guide.select}
+        eyebrow="THE ESSENTIALS"
+        title={step.title}
+        description={step.text}
+        points={step.points}
+        hint="本页遵循当前在线版本。股价、并列分红与超时处理以实际游戏服务为准。"
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={handlePrimaryAction}
+        secondaryAction={<ActionButton onClick={() => setPrices(true)}>
+          股价速查</ActionButton>}
+      />
+      {prices && <StockPrices onClose={() => setPrices(false)} />}
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <div className={styles.guide}>
       <header className={styles.guideHeading}><small>LEARN THE FIRST MOVE</small><h1>先懂一招，再赢一局。</h1></header>

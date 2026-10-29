@@ -4,6 +4,11 @@ import {
   Plus, Settings2, ShieldCheck, Sparkles, UserPlus, Users, X,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { SplendorSession } from '../../hooks/useSplendorSession';
@@ -17,6 +22,7 @@ export function Room({ session, data, onLeave }: {
   data: MatchSnapshot;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<'invite' | 'settings' | 'remove' | 'start'>();
   const [target, setTarget] = useState('');
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
@@ -35,6 +41,109 @@ export function Room({ session, data, onLeave }: {
     catch { setCopyMessage('复制未成功，请稍后重试'); }
   };
   const close = () => setPanel(undefined);
+  const getPlayerName = (playerID: string) =>
+    playerName(playerID, data.players);
+  const renderMobileAvatar = (
+    player: {
+      name: string;
+      avatar?: string;
+      ai: boolean;
+    },
+    size: number,
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar}
+    ai={player.ai} size={size} />;
+  const saveSettings = () => {
+    if (session.submit('room_update_settings', { visibility })) close();
+  };
+  const confirmRemove = () => {
+    if (session.submit('match_remove_player', { playerID: target })) close();
+  };
+  const confirmStart = () => {
+    if (session.submit('match_begin')) close();
+  };
+
+  if (isMobile) {
+    return <div className={styles.page}>
+      <StandardGameMobileRoom
+        data={data}
+        minPlayers={2}
+        enabled={enabled}
+        pending={!!session.pending}
+        getPlayerName={getPlayerName}
+        getPlayerRole={(playerID, player) => playerID === data.ownerID
+          ? '展会主人'
+          : player.ai ? 'AI 收藏家' : '受邀收藏家'}
+        renderAvatar={renderMobileAvatar}
+        copy={{
+          kicker: 'JEWEL SALON · 房间号',
+          gameLabel: '经典对局',
+          facts: [
+            { icon: <Sparkles />, label: '宝石池', value: '5 色 + 黄金' },
+            { icon: <Clock />, label: '回合时限', value: '60 秒' },
+            { icon: <ShieldCheck />, label: '终局', value: '15 声望' },
+          ],
+          summary: [
+            { label: '玩法', value: '经典对局' },
+            { label: '已入座', value: `${players.length} / ${data.maxPlayers} 人` },
+          ],
+          summaryTitle: '人齐了，就揭幕。',
+          ownerHint: '人机添加后自动准备。邀请朋友入座，或直接补上人机，由你开启对局。',
+          memberHint: '准备好后告诉房主。只有房主可以添加人机、管理席位和开始对局。',
+          readyTitle: '收藏家已经就绪，可以揭幕。',
+          ownerDescription: '你是房主，由你开启这场珠宝展。',
+          memberReadyDescription: '你已准备，等待房主开始。',
+          memberWaitingDescription: '确认准备后，房主即可开始。',
+        }}
+        onLeave={onLeave}
+        onSettings={() => {
+          setVisibility(data.visibility);
+          setPanel('settings');
+        }}
+        onInvite={() => {
+          setCopyMessage('');
+          setPanel('invite');
+        }}
+        onAddAI={seatIndex => session.submit(
+          'match_add_ai',
+          typeof seatIndex === 'number' ? { seatIndex } : {},
+        )}
+        onRemove={playerID => {
+          setTarget(playerID);
+          setPanel('remove');
+        }}
+        onReady={() => session.submit('match_ready', {
+          ready: !data.players[data.playerID]?.ready,
+        })}
+        onStart={() => setPanel('start')}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="邀请收藏家入席"
+        settingsHint="开局后不能修改房间设置。"
+        startTitle="让珠宝展正式揭幕？"
+        startFacts={[
+          { icon: <Sparkles />, label: '宝石池', value: '5 色 + 黄金' },
+          { icon: <Clock />, label: '回合时限', value: '60 秒' },
+          { icon: <ShieldCheck />, label: '终局', value: '15 声望' },
+        ]}
+        startHint="每回合选择拿宝石、购买发展卡或预留卡牌。任一玩家达到 15 声望后进入最后一轮。"
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}
+        onSaveSettings={saveSettings}
+        onConfirmRemove={confirmRemove}
+        onConfirmStart={confirmStart}
+        onClose={close}
+      />
+    </div>;
+  }
 
   return <div className={styles.page}>
     <header className={styles.heading} data-game-room-heading><div className={styles.headingIdentity} data-game-room-heading-identity><button type="button" className={styles.backButton} data-game-room-heading-back aria-label="离开房间" onClick={onLeave}><ArrowLeft size={18} /></button>

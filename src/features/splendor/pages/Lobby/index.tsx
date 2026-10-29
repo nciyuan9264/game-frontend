@@ -5,12 +5,19 @@ import {
   Plus, Search, Share2, ShieldCheck, Sparkles, Users, X, Copy,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { GameTabs } from '@/components/GameUI/GameTabs';
@@ -23,6 +30,7 @@ import { SplendorLoading } from '../../components/LoadingState';
 import { useSplendorLobby } from '../../hooks/useSplendorLobby';
 import { SPLENDOR_PUBLIC_URL, roomEntry } from '../../model/adapters';
 import type { LobbyFilter, SplendorRoom, Visibility } from '../../model/types';
+import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const loadStats = () => getMyStats('splendor');
@@ -82,6 +90,7 @@ function JoinCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useSplendorLobby();
   const profile = useAsyncResource(getProfile);
@@ -123,6 +132,100 @@ export default function Lobby() {
     action.reset();
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
+  const renderMobileRoom = (room: SplendorRoom) => {
+    const entry = roomEntry(room, identity);
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={`${ownerProfile.name} 的商会`}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待加入' : '对局中'}
+      meta={room.status === 'match'
+        ? '经典对局 · 收藏家正在等待'
+        : `最高声望 ${room.maxScore ?? 0}`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      {initialLoading
+        ? <SplendorLoading description="正在同步商会与在线收藏家" />
+        : <GameMobileLobby
+          eyebrow="THE ART OF PROSPERITY"
+          title={<>从一颗宝石，<br />到一座商业帝国。</>}
+          description="收集宝石，拓展商路，赢得贵族的青睐。"
+          media={<img src={hero} alt="暮色下的文艺复兴商港与宝石收藏" />}
+          caption="THE GILDED HOUR"
+          facts={[
+            { icon: <Users />, value: '2–4', label: '位收藏家' },
+            { icon: <Clock3 />, value: '60', label: '秒回合' },
+            { icon: <Crown />, value: '15', label: '点声望终局' },
+          ]}
+          browserEyebrow="TAKE YOUR SEAT"
+          browserTitle="好的一局，从入座开始。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={roomFilters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setVisibility('public');
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => {
+            shareClipboard.reset();
+            setPanel('share');
+          }}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFoundRoom(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，找到朋友的商会。"
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        description="选择谁可以找到这间商会。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="经典规则固定，身份与全部操作由服务端验证。"
+        facts={<dl><div><dt>席位数量</dt><dd>固定 4 人</dd></div>
+          <div><dt>回合时限</dt><dd>固定 60 秒</dd></div></dl>}
+        error={error && <Feedback error>{error}</Feedback>}
+        pending={pending} disabled={!profile.data}
+        themeClassName={rootStyles.root}
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="Splendor"
+        url={SPLENDOR_PUBLIC_URL} color="#583b3e" background="#fffaf1"
+        themeClassName={rootStyles.root} onClose={close} />}
+      {panel === 'join' && <Dialog title="朋友已经留好了席位？"
+        eyebrow="AN INVITATION TO THE SALON" onClose={close}
+        footer={<ActionButton variant="primary" pending={pending}
+          disabled={!code.trim()}
+          onClick={() => foundRoom ? enter(foundRoom) : void find()}>
+          {foundRoom ? roomEntry(foundRoom, identity).label : '查找房间'}
+          <ArrowRight size={17} />
+        </ActionButton>}>
+        {error && <Feedback error>{error}</Feedback>}
+        {foundRoom && renderMobileRoom(foundRoom)}
+      </Dialog>}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <SplendorLoading description="正在同步商会与在线收藏家" /> : <div className={styles.page}>

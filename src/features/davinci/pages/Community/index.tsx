@@ -4,6 +4,12 @@ import {
   ArrowRight, BookOpen, Clock, Fingerprint,
   Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -16,6 +22,7 @@ import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboar
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type {
   DavinciLeaderboardEntry,
   LeaderboardEntry,
@@ -57,6 +64,7 @@ const guideSteps = [
 ] as const;
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'wins' | 'games'>('wins');
   const sort: LeaderboardSortDim = mode === 'games' ? 'totalGames' : 'metric';
@@ -68,6 +76,33 @@ export function Rankings() {
   });
   const myIndex = entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
 
+  if (isMobile) {
+    return <AppShell title="排行榜" profile={profile.data}>
+      <GameMobileRankings eyebrow="DAVINCI LEADERBOARD"
+        title="密码破译榜"
+        description="胜率记录判断的准确度，场次记录持续对局的经验。"
+        modes={[
+          { value: 'wins', label: '胜率榜' },
+          { value: 'games', label: '场次榜' },
+        ]}
+        mode={mode} onModeChange={setMode}
+        entries={entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: `${(entry.winRate * 100).toFixed(1)}%`,
+          metricLabel: '胜率',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        state={<>{loading && !entries.length
+          && <DavinciLoading title="正在整理破译记录。" description="读取排行榜" />}
+          {error && <Feedback error>{error}</Feedback>}</>}
+        footer={hasMore && !!entries.length && <ActionButton
+          pending={loading} onClick={loadMore}>加载更多</ActionButton>}
+      />
+    </AppShell>;
+  }
   return <AppShell title="排行榜" profile={profile.data}><div className={styles.page}>
     <header className={styles.heading}><div><small>THE SHARPEST MINDS</small><h1>每一次破解，都留下记录。</h1></div><Trophy size={30} /></header>
     <section className={styles.rankSummary}><div><small>DAVINCI LEADERBOARD</small><h2>密码破译榜</h2><p>胜率记录判断的准确度，场次记录持续对局的经验。</p></div>
@@ -91,10 +126,39 @@ export function Rankings() {
 }
 
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const step = guide.current;
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <GameMobileGuide
+        visual={<div className={styles.tileDemo}><div>
+          <span className={styles.blackTile}>3</span>
+          <span className={styles.whiteTile}>3</span>
+          <span className={styles.blackTile}>7</span>
+          <span className={styles.whiteTile}>—</span>
+        </div></div>}
+        facts={[
+          { icon: <Users />, value: '2', label: '人' },
+          { icon: <Clock />, value: '约 20', label: '分钟' },
+          { icon: <Fingerprint />, value: '26', label: '张牌' },
+        ]}
+        tabs={guideSteps.map((item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+        }))}
+        index={guide.index} onSelect={guide.select}
+        eyebrow="THE ESSENTIALS"
+        title={step.title} description={step.text}
+        points={step.points}
+        hint="在线对局的合法操作与牌序由服务端校验。"
+        primaryLabel={guide.isLast ? '创建房间' : '下一步'}
+        onPrimary={() => guide.isLast ? navigate('/game/davinci') : guide.next()}
+      />
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.guidePage}`}>
     <header className={styles.heading}><div><small>LEARN THE CIPHER</small><h1>四步，读懂一场密码对决。</h1></div><BookOpen size={30} /></header>
     <div className={styles.guideLayout}><aside className={styles.tileDemo}>
@@ -119,6 +183,7 @@ export function Guide() {
 }
 
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('davinci');
   const {
@@ -134,6 +199,51 @@ export function My() {
   };
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || historyLoading && !games.length;
 
+  if (isMobile) {
+    const historyItems = games.map(game => {
+      const me = game.players?.find(player => player.userID != null
+        && String(player.userID) === String(profile.data?.id));
+      const opponent = game.players?.find(player => player.id !== me?.id);
+      return {
+        id: String(game.id),
+        title: opponent?.displayName || '未知对手',
+        detail: `${new Date(game.startedAt).toLocaleString('zh-CN')} · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: me?.isWinner ? '胜' : '负',
+      };
+    });
+    return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter>
+      {loading
+        ? <DavinciLoading title="正在整理你的破译档案。"
+          description="同步身份、战绩与历史对局" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name ?? '玩家'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="THE CODE BREAKER"
+          name={profile.data?.name || '玩家'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜场', value: stats.data?.wins ?? 0 },
+            { label: '胜率', value: `${((stats.data?.winRate ?? 0) * 100).toFixed(0)}%` },
+          ]}
+          historyTitle="最近对局"
+          historyItems={historyItems}
+          emptyHistory={<Feedback>还没有对局记录。
+            <Link to="/game/davinci">去大厅开始第一局</Link>
+          </Feedback>}
+          logoutPending={logoutAction.pending}
+          logoutError={logoutAction.error}
+          onLogout={() => void handleLogout()}
+          onAbout={() => setAboutOpen(true)}
+        />}
+      {aboutOpen && <GameMobileAboutDialog gameName="DaVinci Code"
+        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        themeClassName={rootStyles.root}
+        onClose={() => setAboutOpen(false)} />}
+    </AppShell>;
+  }
   return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
     <header className={styles.heading}><div><small>YOUR CIPHER RECORD</small><h1>身份、判断与每一场对决。</h1></div><UserRoundIcon /></header>
     {loading ? <DavinciLoading title="正在整理你的破译档案。" description="同步身份、战绩与历史对局" /> : <div className={styles.profileLayout}>

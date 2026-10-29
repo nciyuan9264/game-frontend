@@ -84,9 +84,9 @@ describe('game room API wrappers', () => {
     );
   });
 
-  it('injects DaVinci fixed creation and redirect policy', () => {
+  it('injects DaVinci visibility, fixed players, and redirect policy', () => {
     const signal = new AbortController().signal;
-    createDavinciRoom(signal);
+    createDavinciRoom('private', signal);
     listDavinciRooms(signal);
 
     expect(shared.createGameRoom).toHaveBeenCalledWith(

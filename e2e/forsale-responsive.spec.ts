@@ -318,10 +318,12 @@ test('For Sale mobile room follows the Acquire preparation layout',
     await expect(page.locator('[data-game-brand]')).toBeVisible();
     await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
     await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
+    await expect(page.locator('.fs-room-table')).toBeVisible();
     await expect(page.locator('.fs-seat')).toHaveCount(6);
     await expect(page.getByText('公开多人房间')).toBeVisible();
     const geometry = await page.locator('.fs-seat-grid').evaluate(element => {
       const seat = element.querySelector<HTMLElement>('.fs-seat');
+      const stage = element.parentElement;
       const style = getComputedStyle(element);
       const columns = style.gridTemplateColumns.split(' ').filter(Boolean);
       const box = seat?.getBoundingClientRect();
@@ -336,6 +338,8 @@ test('For Sale mobile room follows the Acquire preparation layout',
         markMarginRight: mark ? getComputedStyle(mark).marginRight : '',
         paddingLeft: style.paddingLeft,
         paddingRight: style.paddingRight,
+        stagePaddingLeft: stage ? getComputedStyle(stage).paddingLeft : '',
+        stagePaddingRight: stage ? getComputedStyle(stage).paddingRight : '',
         seatWidth: box?.width ?? 0,
         seatHeight: box?.height ?? 0,
       };
@@ -344,12 +348,47 @@ test('For Sale mobile room follows the Acquire preparation layout',
     expect(geometry.columns).toBe(2);
     expect(geometry.headingGap).toBeLessThanOrEqual(4);
     expect(geometry.markMarginRight).toBe('0px');
-    expect(geometry.paddingLeft).toBe('10px');
-    expect(geometry.paddingRight).toBe('10px');
+    expect(geometry.paddingLeft).toBe('0px');
+    expect(geometry.paddingRight).toBe('0px');
+    expect(geometry.stagePaddingLeft).toBe('15px');
+    expect(geometry.stagePaddingRight).toBe('15px');
     expect(geometry.seatWidth).toBeGreaterThan(160);
     expect(geometry.seatHeight).toBeLessThanOrEqual(140);
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
+  });
+
+test('For Sale desktop room follows the Acquire responsive split',
+  async ({ page }, info) => {
+    await mockMatchRoom(page);
+    for (const viewport of [
+      { width: 1440, height: 900, columns: 2 },
+      { width: 1024, height: 768, columns: 1 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto(`/game/forsale/match?roomID=${roomID}`);
+      await expect(page.locator('.fs-room-table')).toBeVisible();
+      await expect(page.locator('.fs-room-facts')).toBeVisible();
+      const geometry = await page.locator('.fs-room-layout').evaluate(element => {
+        const layout = getComputedStyle(element);
+        const table = element.querySelector<HTMLElement>('.fs-room-table');
+        const facts = element.querySelector<HTMLElement>('.fs-room-facts');
+        const dock = document.querySelector<HTMLElement>('.fs-ready-dock');
+        return {
+          columns: layout.gridTemplateColumns.split(' ').filter(Boolean).length,
+          tableWidth: table?.getBoundingClientRect().width ?? 0,
+          factsWidth: facts?.getBoundingClientRect().width ?? 0,
+          dockPosition: dock ? getComputedStyle(dock).position : '',
+        };
+      });
+      expect(geometry.columns).toBe(viewport.columns);
+      if (viewport.columns === 2) {
+        expect(geometry.tableWidth).toBeGreaterThan(geometry.factsWidth);
+      }
+      expect(geometry.dockPosition).toBe('static');
+      await expectNoOverflow(page);
+      await capture(page, info, `room-${viewport.width}x${viewport.height}`);
+    }
   });
 
 test('For Sale start dialog centers AI avatar icons', async ({ page }, info) => {

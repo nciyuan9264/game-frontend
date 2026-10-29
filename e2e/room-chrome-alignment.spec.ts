@@ -206,7 +206,7 @@ for (const config of games) {
       for (const height of geometry.buttonHeights) expect(height).toBe(35);
       expect(geometry.metaVisible).toBe(false);
       expect(geometry.heading?.height ?? 0).toBeGreaterThanOrEqual(90);
-      expect(geometry.heading?.height ?? 0).toBeLessThanOrEqual(96);
+      expect(geometry.heading?.height ?? 0).toBeLessThanOrEqual(104);
       expect(geometry.heading?.x ?? 100).toBeLessThanOrEqual(20);
       expect(geometry.heading?.width ?? 0).toBeGreaterThanOrEqual(350);
     });

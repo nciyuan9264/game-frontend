@@ -17,6 +17,11 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { playerDisplayName } from '@/features/game-core/model/room';
+import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { warChestRoomInviteURL } from '../../adapters';
 import type { WarChestSession } from '../../hooks/useWarChestSession';
 import type { MatchSnapshot } from '../../session';
@@ -24,6 +29,7 @@ import { matchCanStart, setupModeName } from '../../selectors';
 import type { SetupMode, Visibility, WarChestRoom } from '../../types';
 import { UNITS, type UnitId } from '../../model';
 import { Coin, Crest, Eyebrow, HERO, Modal, TroopArt } from '../../visuals';
+import { PlayerAvatar } from '../../components/Shell';
 
 const modes: Array<{
   id: SetupMode;
@@ -71,6 +77,7 @@ export function Room({
   room?: WarChestRoom;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<'invite' | 'settings' | 'remove' | 'start'>();
   const [target, setTarget] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
@@ -105,6 +112,191 @@ export function Room({
   const draftPickerName = draft?.currentPickerID
     ? playerDisplayName(data.players[draft.currentPickerID], draft.currentPickerID)
     : '下一位指挥官';
+  const getPlayerName = (playerID: string) =>
+    playerDisplayName(data.players[playerID], playerID);
+  const renderMobileAvatar = (
+    player: { name: string; avatar?: string },
+    size: number,
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar} size={size} />;
+
+  if (isMobile) {
+    const setupExtension = players.length === 2
+      ? <div className="warchest-setup"><div className="small-heading">
+        <b>选择本局编成方式</b><span className="status-tag">基础版 16</span>
+      </div>
+        <div className="roster-presets">{modes.map(item =>
+          <button key={item.id} type="button"
+            className={setup.mode === item.id ? 'active' : ''}
+            disabled={!owner || !enabled}
+            onClick={() => session.submit('game_set_setup_mode', {
+              mode: item.id,
+            })}>
+            <item.icon size={14} />{item.title}
+          </button>)}</div>
+        <p className="roster-intro">
+          {modes.find(item => item.id === setup.mode)?.copy}
+        </p>
+        {setup.mode === 'draft' && <section className="warchest-draft">
+          {draft && draftPool.length > 0 ? <>
+            <div className="draft-status"><Swords size={19} /><div>
+              <b>{draft.complete ? '轮抽完成' : `轮到 ${draftPickerName}`}</b>
+              <small>{draft.completedPickCount} / 8 已选择 · 本次连续选择 {
+                draft.currentPickCount} 种</small>
+            </div>{draft.turnDeadline && <span>
+              <Clock3 size={13} />90 秒
+            </span>}</div>
+            <div className="roster-pool">{draftPool.map(value => {
+              const type = isUnitId(value) ? value : undefined;
+              const picked = pickedDraftUnits.includes(value);
+              const available = availableDraftUnits.includes(value);
+              return <button key={value} type="button"
+                className={picked ? 'occupied' : ''}
+                disabled={!enabled || !available
+                  || draft.currentPickerID !== data.playerID || !type}
+                onClick={() => type && session.submit('game_draft_unit', {
+                  unitType: type,
+                })}>
+                <Coin type={type ?? 'royal'} size={34} /><span>
+                  <b>{type ? UNITS[type].name : value}</b>
+                  <small>{picked ? '已被选择'
+                    : available ? '可选择' : '等待轮次'}</small>
+                </span>{picked && <Check size={13} />}
+              </button>;
+            })}</div>
+          </> : <div className="draft-status"><Swords size={19} /><div>
+            <b>正在初始化官方轮抽</b>
+            <small>轮抽池会随服务端确认状态自动出现</small>
+          </div></div>}
+        </section>}
+        {setup.rosters[oakID]?.length > 0 && <Lineup
+          title={`${getPlayerName(oakID)} · 橡木军团`}
+          units={setup.rosters[oakID]} side={0} />}
+        {setup.rosters[falconID]?.length > 0
+          && <div className="opponent-lineup">
+            <b>{getPlayerName(falconID)} · 赤隼军团</b>
+            <div>{setup.rosters[falconID].map(value => {
+              const type = isUnitId(value) ? value : undefined;
+              return <span key={value}>
+                <Coin type={type ?? 'royal'} side={1} size={31} />
+                {type ? UNITS[type].name : value}
+              </span>;
+            })}</div>
+          </div>}
+      </div>
+      : undefined;
+    return <main className="page room-page">
+      <StandardGameMobileRoom
+        data={data}
+        enabled={enabled}
+        pending={!!session.pending}
+        canStart={allReady}
+        getPlayerName={getPlayerName}
+        getPlayerRole={id => `${sideName(id)} · ${
+          id === data.ownerID ? '房主'
+          : data.players[id]?.ai ? '公平 AI' : '挑战者'}`}
+        renderAvatar={renderMobileAvatar}
+        renderSeatDecoration={player =>
+          <Crest side={sideOf(player.id)} size={36} />}
+        copy={{
+          kicker: 'RAISE YOUR BANNER · 房间号',
+          gameLabel: '双人完整基础版',
+          facts: [
+            { icon: <Flag />, label: '获胜目标', value: '6 个据点' },
+            { icon: <Clock3 />, label: '行动', value: '90 秒' },
+            { icon: <Swords />, label: '编成', value: setupModeName(setup.mode) },
+          ],
+          summary: [
+            { label: '对局模式', value: '双人完整基础版' },
+            { label: '编成方式', value: setupModeName(setup.mode) },
+            { label: '初始先手', value: setup.initialPlayerID
+              ? getPlayerName(setup.initialPlayerID) : '编成后确定' },
+          ],
+          summaryEyebrow: 'BEFORE THE FIRST COMMAND',
+          summaryTitle: players.length < 2
+            ? '沉着就位，准备出征。'
+            : setup.complete ? '知己知彼，落子有方。' : '八兵公开，依序选将。',
+          ownerHint: '隐藏手牌、军袋顺序与背面弃币按身份隔离。完成编成并等待双方准备。',
+          memberHint: '完成编成后确认准备，等待房主投入战场。',
+          waitingTitle: players.length < 2
+            ? '邀请另一位指挥官入席。'
+            : !setup.complete ? '先完成本局编成。' : '等待双方准备。',
+          readyTitle: '双方已准备，可以开始交锋。',
+          ownerDescription: '你是房主，由你投入战场。',
+          memberReadyDescription: '你已准备，等待房主开始。',
+          memberWaitingDescription: '完成编成后，告诉房主你已就绪。',
+        }}
+        media={<img src={HERO} alt="" />}
+        extension={setupExtension}
+        onLeave={onLeave}
+        onSettings={() => {
+          setName(displayName);
+          setVisibility(data.visibility);
+          setPanel('settings');
+        }}
+        onInvite={() => {
+          setCopyMessage('');
+          setPanel('invite');
+        }}
+        onAddAI={seatIndex => session.submit(
+          'match_add_ai',
+          typeof seatIndex === 'number' ? { seatIndex } : {},
+        )}
+        onRemove={playerID => {
+          setTarget(playerID);
+          setPanel('remove');
+        }}
+        onReady={() => session.submit('match_ready', {
+          ready: !data.players[data.playerID]?.ready,
+        })}
+        onStart={() => setPanel('start')}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="一场好局，等你入席。"
+        settingsFields={<><label className="field-label"
+          htmlFor="warchest-mobile-settings-name">房间名称</label>
+          <input id="warchest-mobile-settings-name" className="input full"
+            maxLength={18} value={name}
+            onChange={event => setName(event.target.value)} /></>}
+        settingsHint="战争之匣真人行动固定为 90 秒。"
+        startTitle="让第一枚指令落下？"
+        startFacts={[
+          { icon: <Swords />, label: '编成', value: setupModeName(setup.mode) },
+          { icon: <Clock3 />, label: '行动', value: '90 秒' },
+          { icon: <Flag />, label: '获胜', value: '控制 6 处' },
+        ]}
+        startHint="双方军袋将由服务端初始化并自动抽取首轮指令。开局后编成、阵营与先手锁定。"
+        themeClassName="warchest-root"
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}
+        onSaveSettings={() => {
+          if (session.submit('room_update_settings', {
+            visibility,
+            displayName: name.trim(),
+            turnTimeoutSeconds: 90,
+          })) {
+            setDisplayName(name.trim());
+            close();
+          }
+        }}
+        onConfirmRemove={() => {
+          if (session.submit('match_remove_player', { playerID: target })) close();
+        }}
+        onConfirmStart={() => {
+          if (session.submit('match_begin')) close();
+        }}
+        onClose={close}
+      />
+    </main>;
+  }
 
   return <main className="page room-page"><div className="section-heading room-heading" data-game-room-heading>
     <div className="room-heading-identity" data-game-room-heading-identity><button className="room-back-button" data-game-room-heading-back type="button"

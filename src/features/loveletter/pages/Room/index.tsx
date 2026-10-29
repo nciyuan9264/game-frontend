@@ -4,6 +4,11 @@ import {
   Mail, Plus, Settings2, Share2, ShieldCheck, Users, X,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  StandardGameMobileRoom,
+  StandardGameMobileRoomDialogs,
+} from '@/components/GameUI/GameRoomMobile';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { loveLetterRoomInviteURL } from '../../model/adapters';
 import { playerName, type MatchSnapshot } from '../../model/session';
 import type { LoveLetterSession } from '../../hooks/useLoveLetterSession';
@@ -24,6 +29,7 @@ export function Room({
   data: MatchSnapshot;
   onLeave: () => void;
 }) {
+  const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<Panel>();
   const [target, setTarget] = useState('');
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
@@ -46,6 +52,109 @@ export function Room({
       setCopyMessage('复制未成功，请选中房间号手动复制');
     }
   };
+  const getPlayerName = (playerID: string) =>
+    playerName(playerID, data.players);
+  const renderMobileAvatar = (
+    player: { name: string; avatar?: string; ai: boolean },
+    size: number,
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar}
+    ai={player.ai} size={size} />;
+
+  if (isMobile) {
+    return <div className="ll-room-page">
+      <StandardGameMobileRoom
+        data={data}
+        minPlayers={2}
+        enabled={enabled}
+        pending={!!session.pending}
+        getPlayerName={getPlayerName}
+        getPlayerRole={(id, player) => id === data.ownerID
+          ? '房主'
+          : player.ai ? '公平 AI' : '执笔人'}
+        renderAvatar={renderMobileAvatar}
+        copy={{
+          kicker: 'THE ROSE COURT · 房间号',
+          gameLabel: '21 张牌新版',
+          facts: [
+            { icon: <Users />, label: '人数', value: '2–6 人' },
+            { icon: <Heart />, label: '好感目标', value: `${goal} 枚` },
+            { icon: <Clock3 />, label: '阶段时限', value: '60 秒' },
+          ],
+          summary: [
+            { label: '人数', value: '2–6 人' },
+            { label: '本场目标', value: `${goal} 枚好感` },
+            { label: '牌组', value: '21 张 · 十角色' },
+          ],
+          summaryEyebrow: 'BEFORE THE FIRST LETTER',
+          summaryTitle: '人已入席，信待启封。',
+          ownerHint: '实际开局人数决定好感目标。邀请朋友或添加公平 AI 后，由你启封。',
+          memberHint: '准备好后等待房主启封。自己的手牌只对当前席位可见。',
+          readyTitle: '所有在座玩家已准备，可以启封。',
+          ownerDescription: '你是房主，由你开启这一局。',
+          memberReadyDescription: '你已准备，等待房主启封。',
+          memberWaitingDescription: '确认准备后，由房主开始对局。',
+        }}
+        media={<Seal />}
+        onLeave={onLeave}
+        onSettings={() => {
+          setVisibility(data.visibility);
+          setPanel('settings');
+        }}
+        onInvite={() => {
+          setCopyMessage('');
+          setPanel('invite');
+        }}
+        onAddAI={seatIndex => session.submit(
+          'match_add_ai',
+          typeof seatIndex === 'number' ? { seatIndex } : {},
+        )}
+        onRemove={playerID => {
+          setTarget(playerID);
+          setPanel('remove');
+        }}
+        onReady={() => session.submit('match_ready', {
+          ready: !data.players[data.playerID]?.ready,
+        })}
+        onStart={() => setPanel('start')}
+      />
+      <StandardGameMobileRoomDialogs
+        panel={panel}
+        data={data}
+        targetID={target}
+        visibility={visibility}
+        copyMessage={copyMessage}
+        enabled={enabled}
+        getPlayerName={getPlayerName}
+        renderAvatar={renderMobileAvatar}
+        inviteTitle="给朋友，留一封密信。"
+        settingsHint="实际开局人数决定好感目标，开局后不能修改公开范围。"
+        startTitle="让第一封信出发？"
+        startFacts={[
+          { icon: <Users />, label: '本场人数', value: `${players.length} 人` },
+          { icon: <Heart />, label: '好感目标', value: `${goal} 枚` },
+          { icon: <Clock3 />, label: '阶段时限', value: '60 秒' },
+        ]}
+        startHint="确认后由服务端随机首轮先手并完成洗牌。"
+        themeClassName="loveletter-root"
+        onVisibilityChange={setVisibility}
+        onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
+        onCopyInviteURL={() => void copy(
+          loveLetterRoomInviteURL(data.roomID),
+          '邀请链接已复制',
+        )}
+        onSaveSettings={() => {
+          if (session.submit('room_update_settings', { visibility })) close();
+        }}
+        onConfirmRemove={() => {
+          if (session.submit('match_remove_player', { playerID: target })) close();
+        }}
+        onConfirmStart={() => {
+          if (session.submit('match_begin')) close();
+        }}
+        onClose={close}
+      />
+    </div>;
+  }
 
   return <div className="ll-room-page">
     <header className="ll-room-heading" data-game-room-heading><div data-game-room-heading-identity>

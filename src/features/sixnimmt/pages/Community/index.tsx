@@ -5,6 +5,12 @@ import {
   Lightbulb, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameMobileAboutDialog,
+  GameMobileGuide,
+  GameMobileProfile,
+  GameMobileRankings,
+} from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -15,6 +21,7 @@ import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useGuideSteps } from '@/features/game-core/hooks/useGuideSteps';
 import { useInfiniteLoad } from '@/features/game-core/hooks/useInfiniteLoad';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import type { LeaderboardSortDim, SixNimmtLeaderboardEntry } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
@@ -27,6 +34,7 @@ import mascot from '../../assets/mascot.webp';
 const isRankEntry = (entry: SixNimmtLeaderboardEntry | { totalGames: number }): entry is SixNimmtLeaderboardEntry => 'avgRank' in entry;
 
 export function Rankings() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const [mode, setMode] = useState<'rank' | 'games'>('rank');
   const sentinel = useRef<HTMLDivElement>(null);
@@ -34,6 +42,40 @@ export function Rankings() {
   const leaderboard = useGameLeaderboard<SixNimmtLeaderboardEntry>({ gameType: 'sixnimmt', pageSize: 20, sort, isEntry: isRankEntry });
   useInfiniteLoad(sentinel, leaderboard.entries.length > 0 && leaderboard.hasMore && !leaderboard.loading && !leaderboard.error, leaderboard.loadMore);
   const myIndex = leaderboard.entries.findIndex(entry => String(entry.userID) === String(profile.data?.id));
+  if (isMobile) {
+    return <AppShell title="牛头排行" profile={profile.data}>
+      <GameMobileRankings eyebrow="6 NIMMT! LEADERBOARD"
+        title="牧场稳手榜"
+        description="用平均名次衡量稳定发挥，也记录每一场完整的经典 66 分赛。"
+        modes={[
+          { value: 'rank', label: '平均名次' },
+          { value: 'games', label: '完成场次' },
+        ]}
+        mode={mode} onModeChange={setMode}
+        entries={leaderboard.entries.map(entry => ({
+          id: String(entry.userID),
+          displayName: entry.displayName,
+          totalGames: entry.totalGames,
+          metric: entry.avgRank.toFixed(2),
+          metricLabel: '平均名次',
+        }))}
+        currentUserID={String(profile.data?.id ?? '')}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        state={<>{leaderboard.loading && !leaderboard.entries.length
+          && <SixNimmtLoading title="正在整理牧场榜单。"
+            description="同步最新完成对局" />}
+          {leaderboard.error && !leaderboard.entries.length
+            && <Feedback error>{leaderboard.error}
+              <ActionButton onClick={leaderboard.retry}>重试</ActionButton>
+            </Feedback>}</>}
+        footer={<div ref={sentinel} className="sn-infinite">
+          {leaderboard.loading && !!leaderboard.entries.length && '继续加载中…'}
+          {!leaderboard.loading && !leaderboard.hasMore
+            && !!leaderboard.entries.length && '已经到底了'}
+        </div>}
+      />
+    </AppShell>;
+  }
   return <AppShell title="牛头排行" profile={profile.data}><div className="sn-community sn-rankings">
     <header className="sn-community-heading"><div><span className="sn-eyebrow">LESS BULL. MORE GLORY.</span>
       <h1>每一桌，都算数。</h1></div><span>真实完成对局</span></header>
@@ -70,10 +112,55 @@ const guideSteps = [
 ] as const;
 
 export function Guide() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const profile = useAsyncResource(getProfile);
   const guide = useGuideSteps(guideSteps);
   const step = guide.current;
+  const detail = <>
+    {guide.index === 1 && <div className="sn-guide-rows">
+      {[23, 44, 64, 90].map((tail, index) => <span key={tail}
+        className={tail === 64 ? 'right' : ''}>
+        <b>{String.fromCharCode(65 + index)} 行</b>
+        <NumberCard value={tail} compact />
+        <small>{tail < 68 ? `与 68 差 ${68 - tail}` : '不能进入'}</small>
+        {tail === 64 && <Check size={14} />}
+      </span>)}</div>}
+    {guide.index === 2 && <div className="sn-guide-sixth">
+      {[30, 35, 39, 41, 44].map(value =>
+        <NumberCard key={value} value={value} compact />)}
+      <ArrowRight size={20} /><NumberCard value={46} compact />
+      <span><Bull size={20} /><b>收走前五张</b></span>
+    </div>}
+    {guide.index === 3 && <div className="sn-point-guide">
+      {[23, 25, 30, 44, 55].map(value => <span key={value}>
+        <NumberCard value={value} /><b>{bullheads(value)} 牛头</b>
+      </span>)}</div>}
+  </>;
+  if (isMobile) {
+    return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter>
+      <GameMobileGuide
+        visual={<img src={mascot} alt="抱着数字牌的小牛" />}
+        facts={[
+          { icon: <Users />, value: '2–10', label: '人' },
+          { icon: <Clock3 />, value: '约 20', label: '分钟' },
+          { icon: <Layers3 />, value: '104', label: '张牌' },
+        ]}
+        tabs={guideSteps.map((item, index) => ({
+          value: index,
+          label: `${String(index + 1).padStart(2, '0')} ${item.tab}`,
+        }))}
+        index={guide.index} onSelect={guide.select}
+        eyebrow={step.eyebrow}
+        title={step.title} description={step.text}
+        points={step.points}
+        detail={detail}
+        hint="随机、时限、合法操作与最终计分都以服务端权威状态为准。"
+        primaryLabel={guide.isLast ? '创建房间' : '下一章'}
+        onPrimary={() => guide.isLast ? navigate('/game/sixnimmt') : guide.next()}
+      />
+    </AppShell>;
+  }
   return <AppShell title="玩法指南" profile={profile.data} compactMobileFooter><div className="sn-community sn-guide">
     <header className="sn-community-heading"><div><span className="sn-eyebrow">THE RULES, WITHOUT THE RULEBOOK</span>
       <h1>三分钟，读懂这一桌。</h1></div></header>
@@ -99,6 +186,7 @@ export function Guide() {
 }
 
 export function My() {
+  const { isMobile } = useMobileViewport();
   const profile = useAsyncResource(getProfile);
   const stats = useGameStats('sixnimmt');
   const history = useGameHistory({ gameType: 'sixnimmt', pageSize: 20 });
@@ -106,6 +194,62 @@ export function My() {
   const [panel, setPanel] = useState<'logout' | 'about'>();
   const handleLogout = useCallback(async () => { await logout.run(); }, [logout]);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || history.loading && !history.games.length;
+  if (isMobile) {
+    const historyItems = history.games.map(game => {
+      const me = game.players?.find(player =>
+        String(player.userID) === String(profile.data?.id));
+      return {
+        id: String(game.id),
+        title: game.roomDisplayName || `牌桌 ${game.roomID}`,
+        detail: `${me?.isWinner ? '本场获胜' : `最终第 ${me?.finalRank ?? '—'} 名`
+        } · ${me?.finalScore ?? 0} 牛头 · ${
+          Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
+        accessory: game.endedAt ? '回放' : '进行中',
+        href: game.endedAt ? `/game/sixnimmt/replay/${game.id}` : undefined,
+      };
+    });
+    return <AppShell title="我的牌局" profile={profile.data} compactMobileFooter>
+      {loading
+        ? <SixNimmtLoading title="正在整理你的牧场档案。"
+          description="同步身份、战绩与历史对局" />
+        : <GameMobileProfile
+          avatar={<PlayerAvatar name={profile.data?.name || '牧场玩家'}
+            avatar={profile.data?.avatar} size={60} />}
+          eyebrow="ONLINE HERD KEEPER"
+          name={profile.data?.name || '牧场玩家'}
+          playerID={profile.data?.id ?? '—'}
+          email={profile.data?.email}
+          stats={[
+            { label: '完成对局', value: stats.data?.totalGames ?? 0 },
+            { label: '胜场', value: stats.data?.wins ?? 0 },
+            { label: '平均牛头', value: (stats.data?.avgScore ?? 0).toFixed(1) },
+          ]}
+          historyTitle="牌局档案"
+          historyItems={historyItems}
+          emptyHistory={<Feedback>第一桌故事，还没开始。
+            <Link to="/game/sixnimmt">进入大厅</Link>
+          </Feedback>}
+          historyFooter={history.hasMore && <ActionButton
+            disabled={history.loading} onClick={history.loadMore}>
+            {history.loading ? '载入中…' : '加载更多对局'}
+          </ActionButton>}
+          logoutPending={logout.pending} logoutError={logout.error}
+          onLogout={() => setPanel('logout')}
+          onAbout={() => setPanel('about')}
+        />}
+      {panel === 'about' && <GameMobileAboutDialog gameName="6 nimmt!"
+        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
+        themeClassName="sixnimmt-root"
+        onClose={() => setPanel(undefined)} />}
+      {panel === 'logout' && <Dialog title="离开当前账号？"
+        eyebrow="SIGN OUT" onClose={() => setPanel(undefined)}
+        footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
+          <ActionButton variant="danger" pending={logout.pending}
+            onClick={handleLogout}>退出登录</ActionButton></>}>
+        <p>退出不会删除线上战绩与历史回放，下次登录后仍可查看。</p>
+      </Dialog>}
+    </AppShell>;
+  }
   return <AppShell title="我的牌局" profile={profile.data} compactMobileFooter><div className="sn-community sn-profile-page">
     <header className="sn-community-heading"><div><span className="sn-eyebrow">YOUR TABLE STORIES</span>
       <h1>每一桌，都有点小故事。</h1></div></header>

@@ -16,6 +16,12 @@ import {
   Users,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -23,6 +29,7 @@ import { getProfile } from '@/features/game-core/api/auth';
 import { getMyStats } from '@/features/game-core/api/history';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
@@ -86,6 +93,7 @@ const RoomCard = ({
 };
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useForSaleLobby();
   const profile = useAsyncResource(getProfile);
@@ -126,6 +134,100 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: ForSaleRoom) => {
+    const entry = roomEntry(room, { userID });
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={`${ownerProfile.name} 的周末拍卖`}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待入席' : '拍卖进行中'}
+      meta={room.status === 'match'
+        ? '3 人起 · 60 秒操作'
+        : `${room.progressCurrent ?? 0} / ${room.progressTotal ?? '—'} 轮完成`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      {initialLoading
+        ? <ForSaleLoading />
+        : <GameMobileLobby
+          eyebrow="A LITTLE BID. A BIG DEAL."
+          title={<>好房在手，<br />好戏开场。</>}
+          description="从小屋到庄园，眼光比运气更重要。买得聪明，卖得漂亮。"
+          media={<img src={neighborhood} alt="阳光下等待拍卖的周末街区" />}
+          caption="THE SUNDAY AUCTION / ONLINE"
+          facts={[
+            { icon: <Users />, value: '3–6', label: '位玩家' },
+            { icon: <Clock3 />, value: '20–30', label: '分钟' },
+            { icon: <Gavel />, value: '2', label: '个阶段' },
+          ]}
+          browserEyebrow="FIND YOUR TABLE"
+          browserTitle="找到房间，一起开场。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={filters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setVisibility('public');
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => setPanel('share')}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFound(undefined);
+            action.reset();
+          }}
+          onJoin={() => {
+            setPanel('join');
+            void find();
+          }}
+          joinDescription="输入完整房间号，找到朋友的桌。"
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        description="选择房间公开范围；实际开局人数决定金币和轮数。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="3–6 人经典新版 · 60 秒操作时限"
+        error={action.error && <Feedback error>{action.error}</Feedback>}
+        pending={action.pending} disabled={!profile.data}
+        themeClassName="forsale-root"
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="For Sale"
+        url={FORSALE_PUBLIC_URL} color="#294f43" background="#f7f4ec"
+        themeClassName="forsale-root" onClose={close} />}
+      {panel === 'join' && <ResponsiveDialog title="通过房间号加入"
+        eyebrow="FIND YOUR FRIENDS' TABLE" onClose={close}
+        themeClassName="forsale-root"
+        footer={<ActionButton variant="primary" pending={action.pending}
+          disabled={!code.trim() || !!found
+            && !roomEntry(found, { userID }).allowed}
+          onClick={() => found ? enter(found) : void find()}>
+          {found ? roomEntry(found, { userID }).label : '查找房间'}
+          <ArrowRight size={16} />
+        </ActionButton>}>
+        {action.error && <Feedback error>{action.error}</Feedback>}
+        {found && renderMobileRoom(found)}
+      </ResponsiveDialog>}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <ForSaleLoading /> : <div className="fs-lobby">

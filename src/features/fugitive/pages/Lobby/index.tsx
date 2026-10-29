@@ -18,17 +18,28 @@ import {
   X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   createFugitiveRoom,
   lookupFugitiveRoom,
 } from '../../api/room';
-import { AppShell, ProfileMonogram } from '../../components/AppShell';
+import {
+  AppShell,
+  fugitiveThemeClassName,
+  ProfileMonogram,
+} from '../../components/AppShell';
 import { FugitiveLoading } from '../../components/LoadingState';
 import {
   ART,
@@ -127,6 +138,7 @@ function JoinCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useFugitiveLobby();
   const profile = useAsyncResource(getProfile);
@@ -174,6 +186,105 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: FugitiveRoom) => {
+    const entry = roomEntry(room, { userID });
+    const ownerProfile = roomOwnerProfile(room);
+    const ownerRole = roomRole(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={room.displayName || '午夜追缉'}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<ProfileMonogram profile={{
+        name: ownerProfile.name,
+        avatar: ownerProfile.avatar,
+      }} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待加入' : '对局中'}
+      meta={room.status === 'match'
+        ? `等待${roleName(ownerRole === 'fugitive' ? 'marshal' : 'fugitive')
+        } · ${timeoutLabel(room.turnTimeoutSeconds)}`
+        : `最高公开 ${room.highestRevealed ?? 0}`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      <main className="page-content">{initialLoading
+        ? <FugitiveLoading description="正在同步追逃房间与在线玩家" />
+        : <GameMobileLobby
+          eyebrow="A TWO-PLAYER GAME OF CAT & MOUSE"
+          title={<>下一步，<br />让他猜。</>}
+          description="一个制造谜题，一个追寻答案。在这座不眠的城市，谁能走在前面？"
+          media={<img src={ART.hero} alt="午夜城市与高架铁路，追逃主题插画" />}
+          caption="THE MIDNIGHT RUN"
+          facts={[
+            { icon: <Users />, value: '2', label: '位玩家' },
+            { icon: <Clock3 />, value: '10–20', label: '分钟' },
+            { icon: <Layers />, value: '43', label: '张地点牌' },
+          ]}
+          browserEyebrow="TAKE YOUR SIDE"
+          browserTitle="找一个对手，开一场追逐。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={[
+            { value: 'all', label: '全部房间' },
+            { value: 'joinable', label: '可加入' },
+            { value: 'playing', label: '对局中' },
+          ]}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={openCreate}
+          onShare={() => {
+            shareClipboard.reset();
+            setPanel('share');
+          }}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFoundRoom(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，找到朋友的追逐。"
+          error={lobby.error && <p className="notice">{lobby.error}
+            <button className="text-button" type="button"
+              onClick={lobby.refresh}>重试</button>
+          </p>}
+        />}</main>
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        description="选择房间的加入方式，创建后立即进入准备席。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="午夜追缉 · 固定 2 人 · 每回合 120 秒"
+        error={action.error && <p className="field-error"
+          role="alert">{action.error}</p>}
+        pending={action.pending} disabled={!profile.data}
+        themeClassName={fugitiveThemeClassName}
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="Fugitive"
+        url={FUGITIVE_PUBLIC_URL} color="#172c22" background="#eee8d8"
+        themeClassName={fugitiveThemeClassName} onClose={close} />}
+      {panel === 'join' && <Modal title="通过房间号加入"
+        kicker="FIND YOUR FRIENDS' TABLE" onClose={close}
+        footer={<button className="button primary" type="button"
+          disabled={action.pending || !code.trim()
+            || !!foundRoom && !roomEntry(foundRoom, { userID }).allowed}
+          onClick={() => foundRoom ? enter(foundRoom) : void find()}>
+          {foundRoom ? roomEntry(foundRoom, { userID }).label : '查找房间'}
+          <ArrowRight size={16} />
+        </button>}>
+        {action.error && <p className="field-error" role="alert">{action.error}</p>}
+        {foundRoom && renderMobileRoom(foundRoom)}
+      </Modal>}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading

@@ -5,11 +5,18 @@ import {
   Mail, Plus, Search, Share2, ShieldCheck, Users, X,
 } from 'lucide-react';
 import { GameShareContent } from '@/components/GameUI/GameShareContent';
+import {
+  GameMobileCreateRoomDialog,
+  GameMobileLobby,
+  GameMobileRoomCard,
+  GameMobileShareDialog,
+} from '@/components/GameUI/GamePublicMobile';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
+import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { createLoveLetterRoom, lookupLoveLetterRoom } from '../../api/room';
@@ -68,6 +75,7 @@ function RoomCard({
 }
 
 export default function Lobby() {
+  const { isMobile } = useMobileViewport();
   const navigate = useNavigate();
   const lobby = useLoveLetterLobby();
   const profile = useAsyncResource(getProfile);
@@ -110,6 +118,97 @@ export default function Lobby() {
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error
     || profile.loading && !profile.data;
+  const renderMobileRoom = (room: LoveLetterRoom) => {
+    const entry = roomEntry(room, identity);
+    const ownerProfile = roomOwnerProfile(room);
+    return <GameMobileRoomCard key={room.roomID}
+      roomID={room.roomID}
+      title={`${ownerProfile.name} 的玫瑰庭院`}
+      ownerName={ownerProfile.name}
+      ownerAvatar={<PlayerAvatar name={ownerProfile.name}
+        avatar={ownerProfile.avatar} size={32} />}
+      playerCount={room.roomPlayer.length}
+      maxPlayers={room.maxPlayers}
+      status={room.status === 'match' ? '等待入席' : '正在传信'}
+      meta={room.status === 'match'
+        ? '21 张牌新版 · 等待启封'
+        : `第 ${room.currentRound || room.nextRoundNo || 1} 轮`}
+      privateRoom={room.visibility === 'private'}
+      actionLabel={entry.label}
+      actionDisabled={!entry.allowed}
+      onEnter={() => enter(room)}
+    />;
+  };
+
+  if (isMobile) {
+    return <AppShell title="游戏大厅" profile={profile.data}>
+      {initialLoading
+        ? <LoveLetterLoading />
+        : <GameMobileLobby
+          eyebrow="A LETTER. A LITTLE INTRIGUE."
+          title={<>一封密信，<br />几分心计。</>}
+          description="摸一张，打出一张。在猜测与试探之间，让心意抵达终点。"
+          media={<img src={hero} alt="信件、玫瑰与宫廷角色" />}
+          caption="PALM LETTER / THE QUIET COURT"
+          facts={[
+            { icon: <Users />, value: '2–6', label: '位玩家' },
+            { icon: <Mail />, value: '21', label: '张角色牌' },
+            { icon: <Heart />, value: '6 / 5 / 4 / 3', label: '好感目标' },
+          ]}
+          browserEyebrow="FIND YOUR COURT"
+          browserTitle="找到房间，一起传信。"
+          roomCount={`${lobby.rooms.length} 个可见房间`}
+          filters={filters}
+          filter={lobby.filter}
+          onFilterChange={lobby.setFilter}
+          query={lobby.query}
+          onQueryChange={lobby.setQuery}
+          rooms={lobby.filteredRooms}
+          renderRoom={renderMobileRoom}
+          onCreate={() => {
+            setVisibility('public');
+            action.reset();
+            setPanel('create');
+          }}
+          onShare={() => setPanel('share')}
+          joinCode={code}
+          onJoinCodeChange={value => {
+            setCode(value);
+            setFound(undefined);
+            action.reset();
+          }}
+          onJoin={() => void find()}
+          joinDescription="输入完整房间号，找到朋友的庭院。"
+          error={lobby.error && <Feedback error>{lobby.error}
+            <ActionButton onClick={lobby.refresh}>重试</ActionButton>
+          </Feedback>}
+        />}
+      {panel === 'create' && <GameMobileCreateRoomDialog
+        title="开启一封新的密信"
+        eyebrow="CREATE YOUR NEXT COURT"
+        description="选择房间公开范围。实际开局人数决定本场好感目标。"
+        visibility={visibility} onVisibilityChange={setVisibility}
+        hint="21 张牌官方新版 · 2–6 人 · 60 秒阶段时限"
+        error={action.error && <Feedback error>{action.error}</Feedback>}
+        pending={action.pending} disabled={!profile.data}
+        themeClassName="loveletter-root"
+        onClose={close} onSubmit={() => void create()} />}
+      {panel === 'share' && <GameMobileShareDialog gameName="掌心密信"
+        url={LOVELETTER_PUBLIC_URL} color="#793b48" background="#f7f0e5"
+        themeClassName="loveletter-root" onClose={close} />}
+      {panel === 'join' && <Dialog title="通过房间号加入"
+        eyebrow="FIND YOUR FRIENDS' COURT" onClose={close}
+        footer={<ActionButton variant="primary" pending={action.pending}
+          disabled={!code.trim() || !!found && !roomEntry(found, identity).allowed}
+          onClick={() => found ? enter(found) : void find()}>
+          {found ? roomEntry(found, identity).label : '查找房间'}
+          <ArrowRight size={16} />
+        </ActionButton>}>
+        {action.error && <Feedback error>{action.error}</Feedback>}
+        {found && renderMobileRoom(found)}
+      </Dialog>}
+    </AppShell>;
+  }
 
   return <AppShell title="游戏大厅" profile={profile.data}>
     {initialLoading ? <LoveLetterLoading /> : <div className="ll-lobby">

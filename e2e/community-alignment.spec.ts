@@ -7,127 +7,49 @@ type GameType =
   | 'yinsh'
   | 'othello'
   | 'quoridor'
+  | 'hex'
+  | 'onitama'
   | 'hive'
+  | 'loveletter'
+  | 'sixnimmt'
+  | 'cantstop'
+  | 'forsale'
   | 'fugitive'
   | 'warchest';
 
-const lobbyCases: Array<{
+const cases: Array<{
   gameType: GameType;
-  searchPlaceholder: string;
   heading: string;
   mobileNavigation: string;
+  maxPlayers: number;
 }> = [
-  { gameType: 'acquire', searchPlaceholder: '搜索房间号 / 房主', heading: '找到房间，一起开场。', mobileNavigation: 'Acquire 手机导航' },
-  { gameType: 'davinci', searchPlaceholder: '搜索房间号 / 房主', heading: '选择一张密码桌', mobileNavigation: '达芬奇密码手机导航' },
-  { gameType: 'splendor', searchPlaceholder: '搜索房间号 / 房主', heading: '好的一局，从入座开始。', mobileNavigation: '璀璨宝石手机导航' },
-  { gameType: 'yinsh', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'YINSH 手机导航' },
-  { gameType: 'othello', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一局，慢慢想。', mobileNavigation: 'OTHELLO 手机导航' },
-  { gameType: 'quoridor', searchPlaceholder: '搜索房间号 / 房主', heading: '挑一条路，慢慢走。', mobileNavigation: 'QUORIDOR 手机导航' },
-  { gameType: 'hive', searchPlaceholder: '搜索房间号 / 房主', heading: '从一枚棋子，长成一片蜂巢。', mobileNavigation: 'HIVE 手机导航' },
-  { gameType: 'fugitive', searchPlaceholder: '搜索房间号 / 房主', heading: '找一个对手，开一场追逐。', mobileNavigation: 'Fugitive 手机导航' },
-  { gameType: 'warchest', searchPlaceholder: '搜索房间号 / 房主', heading: '为下一场交锋，入席。', mobileNavigation: '战争之匣手机导航' },
+  { gameType: 'acquire', heading: '找到房间，一起开场。', mobileNavigation: 'Acquire 手机导航', maxPlayers: 6 },
+  { gameType: 'davinci', heading: '选择一张密码桌', mobileNavigation: '达芬奇密码手机导航', maxPlayers: 2 },
+  { gameType: 'splendor', heading: '好的一局，从入座开始。', mobileNavigation: '璀璨宝石手机导航', maxPlayers: 4 },
+  { gameType: 'yinsh', heading: '挑一局，慢慢想。', mobileNavigation: 'YINSH 手机导航', maxPlayers: 2 },
+  { gameType: 'othello', heading: '挑一局，慢慢想。', mobileNavigation: 'OTHELLO 手机导航', maxPlayers: 2 },
+  { gameType: 'quoridor', heading: '挑一条路，慢慢走。', mobileNavigation: 'QUORIDOR 手机导航', maxPlayers: 2 },
+  { gameType: 'hex', heading: '挑一条路，慢慢走。', mobileNavigation: 'HEX 手机导航', maxPlayers: 2 },
+  { gameType: 'onitama', heading: '挑一条路，慢慢走。', mobileNavigation: 'ONITAMA 手机导航', maxPlayers: 2 },
+  { gameType: 'hive', heading: '挑一局，慢慢想。', mobileNavigation: 'HIVE 手机导航', maxPlayers: 2 },
+  { gameType: 'loveletter', heading: '找到房间，一起传信。', mobileNavigation: '掌心密信手机导航', maxPlayers: 6 },
+  { gameType: 'sixnimmt', heading: '找到牌桌，一起躲牛。', mobileNavigation: '6 nimmt! 手机导航', maxPlayers: 10 },
+  { gameType: 'cantstop', heading: '找到山路，一起登顶。', mobileNavigation: "CAN'T STOP 手机导航", maxPlayers: 4 },
+  { gameType: 'forsale', heading: '找到房间，一起开场。', mobileNavigation: 'For Sale 手机导航', maxPlayers: 6 },
+  { gameType: 'fugitive', heading: '找一个对手，开一场追逐。', mobileNavigation: 'Fugitive 手机导航', maxPlayers: 2 },
+  { gameType: 'warchest', heading: '为下一场交锋，入席。', mobileNavigation: '战争之匣手机导航', maxPlayers: 2 },
 ];
 
-const acquireAlignedLobbyCases = [
-  { gameType: 'splendor', heading: '好的一局，从入座开始。' },
-  { gameType: 'warchest', heading: '为下一场交锋，入席。' },
-  { gameType: 'fugitive', heading: '找一个对手，开一场追逐。' },
-] as const;
-
-const communityCases: Array<{
-  gameType: GameType;
-  title: {
-    rankings: string;
-    guide: string;
-    profile: string;
-  };
-  mobileNavigation: string;
-}> = [
-  {
-    gameType: 'acquire',
-    title: {
-      rankings: '每一局，都算数。',
-      guide: '先懂一招，再赢一局。',
-      profile: '让这张筹码，代表你。',
-    },
-    mobileNavigation: 'Acquire 手机导航',
-  },
-  {
-    gameType: 'davinci',
-    title: {
-      rankings: '每一次破解，都留下记录。',
-      guide: '四步，读懂一场密码对决。',
-      profile: '身份、判断与每一场对决。',
-    },
-    mobileNavigation: '达芬奇密码手机导航',
-  },
-  {
-    gameType: 'splendor',
-    title: {
-      rankings: '让每一次远见，都留下声望。',
-      guide: '简单的规则，长远的眼光。',
-      profile: '你的眼光，值得珍藏。',
-    },
-    mobileNavigation: '璀璨宝石手机导航',
-  },
-  {
-    gameType: 'yinsh',
-    title: {
-      rankings: '每一次取环，都留下判断。',
-      guide: '简单的规则，安静的较量。',
-      profile: '你的每一步，都值得回看。',
-    },
-    mobileNavigation: 'YINSH 手机导航',
-  },
-  {
-    gameType: 'othello',
-    title: {
-      rankings: '每一次翻转，都留下判断。',
-      guide: '简单的规则，安静的较量。',
-      profile: '你的每一步，都值得回看。',
-    },
-    mobileNavigation: 'OTHELLO 手机导航',
-  },
-  {
-    gameType: 'quoridor',
-    title: {
-      rankings: '每一条路，都留下判断。',
-      guide: '规则很短，路可以很长。',
-      profile: '你的每一步，都值得回看。',
-    },
-    mobileNavigation: 'QUORIDOR 手机导航',
-  },
-  {
-    gameType: 'hive',
-    title: {
-      rankings: '每一条路，都留下判断。',
-      guide: '规则很短，蜂巢没有边界。',
-      profile: '你的每一步，都值得回看。',
-    },
-    mobileNavigation: 'HIVE 手机导航',
-  },
-  {
-    gameType: 'fugitive',
-    title: {
-      rankings: '每一场追逐，都留下痕迹。',
-      guide: '读懂规则，藏好下一步。',
-      profile: '每一场追逐，都有你的痕迹。',
-    },
-    mobileNavigation: 'Fugitive 手机导航',
-  },
-  {
-    gameType: 'warchest',
-    title: {
-      rankings: '每一次调遣，都留下判断。',
-      guide: '懂得规则，才懂得破局。',
-      profile: '每一步，都留下回响。',
-    },
-    mobileNavigation: '战争之匣手机导航',
-  },
-];
+const rankGames = new Set<GameType>([
+  'acquire',
+  'splendor',
+  'loveletter',
+  'sixnimmt',
+  'forsale',
+]);
 
 function metric(gameType: GameType, index: number) {
-  if (gameType === 'acquire' || gameType === 'splendor') {
+  if (rankGames.has(gameType)) {
     return { rank: { avgRank: 1 + index / 10 } };
   }
   return {
@@ -138,7 +60,7 @@ function metric(gameType: GameType, index: number) {
   };
 }
 
-async function mockCommunityData(
+async function mockData(
   page: Page,
   gameType: GameType,
   rooms: Array<Record<string, unknown>> = [],
@@ -199,7 +121,7 @@ const avatarPNG = Buffer.from(
   'base64',
 );
 
-function ownerIdentityRoom(gameType: GameType) {
+function ownerRoom(gameType: GameType, maxPlayers: number) {
   const roomID = `${gameType}_owner_identity`;
   return {
     roomID,
@@ -208,8 +130,7 @@ function ownerIdentityRoom(gameType: GameType) {
     visibility: 'public',
     ownerUserID: '220',
     ownerPlayerID: 'owner-220',
-    maxPlayers: gameType === 'acquire' ? 6
-      : gameType === 'davinci' || gameType === 'splendor' ? 4 : 2,
+    maxPlayers,
     playerCount: 2,
     currentMatchID: `${roomID}-r1`,
     currentMatchStatus: 'preparing',
@@ -219,7 +140,7 @@ function ownerIdentityRoom(gameType: GameType) {
     displayName: gameType === 'fugitive' ? '午夜追缉'
       : gameType === 'warchest' ? '雾谷前哨' : undefined,
     turnTimeoutSeconds: gameType === 'warchest' ? 90
-      : gameType === 'hive' ? 120 : 60,
+      : gameType === 'fugitive' || gameType === 'hive' ? 120 : 60,
     players: [{
       userID: '330',
       playerID: 'guest-330',
@@ -242,25 +163,21 @@ function ownerIdentityRoom(gameType: GameType) {
       gameRole: gameType === 'fugitive' ? 'fugitive' : undefined,
     }],
     metrics: {
-      acquire: { emptyTileCount: 108, progressCurrent: 0, progressTotal: 108 },
-      davinci: { boardCardCount: 26, progressCurrent: 0, progressTotal: 26 },
-      splendor: { maxScore: 0, progressCurrent: 0, progressTotal: 15 },
-      yinsh: { ringsRemoved: 0, progressCurrent: 0, progressTotal: 3 },
-      othello: { occupiedCount: 4, progressCurrent: 0, progressTotal: 60 },
-      fugitive: {
-        highestRevealed: 0,
-        hiddenHideoutCount: 0,
-        progressCurrent: 0,
-        progressTotal: 42,
-      },
-      warchest: { maxControlledLocations: 0, progressCurrent: 0, progressTotal: 6 },
+      acquire: { emptyTileCount: 108 },
+      davinci: { boardCardCount: 26 },
+      splendor: { maxScore: 0 },
+      yinsh: { ringsRemoved: 0 },
+      othello: { occupiedCount: 4 },
       quoridor: { turnCount: 0 },
-      hive: {
-        turnCount: 0,
-        placedPieceCount: 0,
-        progressCurrent: 0,
-        progressTotal: 6,
-      },
+      hex: { turnCount: 0 },
+      onitama: { turnCount: 0 },
+      hive: { turnCount: 0, placedPieceCount: 0 },
+      loveletter: { currentRound: 1 },
+      sixnimmt: { currentRound: 1 },
+      cantstop: { maxClaimedColumns: 0, targetColumns: 3 },
+      forsale: { progressCurrent: 0, progressTotal: 8 },
+      fugitive: { highestRevealed: 0, hiddenHideoutCount: 0 },
+      warchest: { maxControlledLocations: 0 },
     },
   };
 }
@@ -270,318 +187,172 @@ async function expectNoOverflow(page: Page) {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
-async function expectAcquireMobileGeometry(page: Page, mobileNavigation: string) {
+async function expectMobileShell(page: Page, navigationName: string) {
   const banner = page.getByRole('banner');
-  const navigation = page.getByRole('navigation', { name: mobileNavigation });
-  const main = page.getByRole('main').first();
-  const [bannerBox, navigationBox, mainBox, padding] = await Promise.all([
+  const navigation = page.getByRole('navigation', { name: navigationName });
+  const [bannerBox, navigationBox] = await Promise.all([
     banner.boundingBox(),
     navigation.boundingBox(),
-    main.boundingBox(),
-    main.evaluate(element => {
-      const style = getComputedStyle(element);
-      return {
-        left: style.paddingLeft,
-        right: style.paddingRight,
-      };
-    }),
   ]);
   expect(bannerBox).toMatchObject({ width: 390, height: 57 });
   expect(navigationBox).toMatchObject({ y: 778, width: 390, height: 66 });
-  expect(mainBox).toMatchObject({ x: 0, width: 390 });
-  expect(padding).toEqual({ left: '14px', right: '14px' });
 }
 
-for (const item of lobbyCases) {
-  test(`${item.gameType} lobby exposes aligned share and room entry copy`, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await mockCommunityData(page, item.gameType);
-    await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
+test.use({ viewport: { width: 390, height: 844 } });
 
-    await expect(page.getByPlaceholder(item.searchPlaceholder)).toBeVisible();
-    await expectAcquireMobileGeometry(page, item.mobileNavigation);
-    const createButton = page.getByRole('button', { name: /创建房间|新开一局/ }).first();
-    const shareButton = page.getByRole('button', { name: /分享游戏/ }).first();
-    const [createBox, shareBox] = await Promise.all([
-      createButton.boundingBox(),
-      shareButton.boundingBox(),
-    ]);
-    expect(createBox).toMatchObject({ width: 129, height: 39 });
-    expect(shareBox).toMatchObject({ width: 99, height: 39 });
-    expect(createBox?.y).toBe(shareBox?.y);
-    if (item.gameType === 'splendor') {
-      const heroBox = await page.getByTestId('splendor-lobby-hero').boundingBox();
-      expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
-        - ((createBox?.y ?? 0) + (createBox?.height ?? 0))).toBeGreaterThanOrEqual(7);
-    }
-    const heading = page.getByRole('heading', { name: item.heading });
-    await expect(heading).toHaveCSS('font-size', '16px');
-    await expect(heading).toHaveCSS('line-height', '25.6px');
-    await page.getByRole('button', { name: /分享游戏/ }).click();
-    const dialog = page.getByRole('dialog');
-    await expect(dialog.getByText('游戏地址')).toBeVisible();
-    await expect(dialog.getByRole('button', { name: /复制游戏链接/ })).toBeVisible();
-    await dialog.getByRole('button', { name: '关闭', exact: true }).click();
-
-    const directRoomInput = page.locator('input[placeholder="输入完整房间号"]:visible');
-    if (!await directRoomInput.count()) {
-      await page.getByRole('button', { name: /房间号加入/ }).click();
-    }
-    await expect(page.locator('input[placeholder="输入完整房间号"]:visible')).toBeVisible();
-    await expectNoOverflow(page);
-  });
-}
-
-for (const item of acquireAlignedLobbyCases) {
-  test(`${item.gameType} lobby matches the Acquire mobile and desktop structure`, async ({ page }) => {
-    await mockCommunityData(page, item.gameType);
-    const hero = page.getByTestId(`${item.gameType}-lobby-hero`);
-    const facts = page.getByTestId(`${item.gameType}-lobby-facts`);
-    const browser = page.getByTestId(`${item.gameType}-lobby-browser`);
-    const aside = page.getByTestId(`${item.gameType}-lobby-aside`);
-    const mobileJoin = page.getByTestId(`${item.gameType}-lobby-mobile-join`);
-
-    await page.setViewportSize({ width: 390, height: 844 });
-    await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
-    const search = page.getByPlaceholder('搜索房间号 / 房主');
-    const heading = page.getByRole('heading', { name: item.heading });
-    const [heroBox, factsBox, browserBox, joinBox, searchBox, headingBox] = await Promise.all([
-      hero.boundingBox(),
-      facts.boundingBox(),
-      browser.boundingBox(),
-      mobileJoin.boundingBox(),
-      search.locator('..').boundingBox(),
-      heading.boundingBox(),
-    ]);
-    expect(heroBox).toMatchObject({ x: 14, y: 72, width: 362, height: 227 });
-    expect(factsBox).toMatchObject({ x: 14, y: 299, width: 362, height: 63 });
-    expect(browserBox).toMatchObject({ x: 14, y: 381, width: 362 });
-    expect(searchBox).toMatchObject({ x: 14, width: 362, height: 39 });
-    expect(headingBox).toMatchObject({ y: 395, height: 25.59375 });
-    expect(joinBox).toMatchObject({ x: 14, width: 362 });
-    expect(joinBox?.y).toBeGreaterThanOrEqual(
-      (browserBox?.y ?? 0) + (browserBox?.height ?? 0) + 12,
-    );
-    await expect(aside).toBeHidden();
-    await expectNoOverflow(page);
-
-    await page.setViewportSize({ width: 1440, height: 900 });
-    await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
-    const [desktopHeroBox, desktopBrowserBox, desktopAsideBox] = await Promise.all([
-      hero.boundingBox(),
-      browser.boundingBox(),
-      aside.boundingBox(),
-    ]);
-    expect(desktopHeroBox?.height).toBe(252);
-    expect(desktopBrowserBox?.x).toBeLessThan(desktopAsideBox?.x ?? 0);
-    expect(desktopAsideBox?.width).toBe(302);
-    await expect(mobileJoin).toBeHidden();
-    await expectNoOverflow(page);
-  });
-}
-
-test('fugitive lobby removes content outside the Acquire hierarchy', async ({ page }) => {
-  await mockCommunityData(page, 'fugitive');
-  await page.setViewportSize({ width: 390, height: 844 });
-  await page.goto('/game/fugitive', { waitUntil: 'domcontentloaded' });
-
-  await expect(page.getByText('做逃亡者', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('做追捕者', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('完整牌库', { exact: true })).toHaveCount(0);
-  await expect(page.getByText('城市风云榜', { exact: true })).toHaveCount(0);
-});
-
-for (const item of lobbyCases) {
-  test(`${item.gameType} lobby card binds the real owner name and avatar`, async ({ page }) => {
-    const room = ownerIdentityRoom(item.gameType);
-    await page.route('**/test-owner-avatar.png', route => route.fulfill({
-      body: avatarPNG,
-      contentType: 'image/png',
-    }));
-    await mockCommunityData(page, item.gameType, [room]);
-
-    for (const viewport of [
-      { width: 390, height: 844 },
-      { width: 1440, height: 900 },
-    ]) {
-      await page.setViewportSize(viewport);
+for (const item of cases) {
+  test(`${item.gameType} mobile lobby uses the shared public layout`,
+    async ({ page }) => {
+      await mockData(page, item.gameType);
       await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
 
-      const card = page.locator('article').filter({ hasText: room.roomID }).first();
-      const ownerAvatar = card.locator(`img[src="${ownerAvatarURL}"]`).first();
-      await expect(card.getByText('真实房主', { exact: false }).first()).toBeVisible();
-      await expect(ownerAvatar).toBeVisible();
-      await expect.poll(() => ownerAvatar.evaluate(image =>
+      const root = page.locator('[data-game-public-mobile="lobby"]');
+      const hero = page.locator('[data-game-mobile-lobby-hero]');
+      const facts = page.locator('[data-game-mobile-lobby-facts]');
+      const browser = page.locator('[data-game-mobile-lobby-browser]');
+      const join = page.locator('[data-game-mobile-lobby-join]');
+      await expect(root).toBeVisible();
+      await expect(page.getByRole('heading', { name: item.heading })).toBeVisible();
+      await expect(page.getByPlaceholder('搜索房间号 / 房主')).toBeVisible();
+      await expectMobileShell(page, item.mobileNavigation);
+
+      const [heroBox, factsBox, browserBox, joinBox] = await Promise.all([
+        hero.boundingBox(),
+        facts.boundingBox(),
+        browser.boundingBox(),
+        join.boundingBox(),
+      ]);
+      expect(heroBox).toMatchObject({ width: 362, height: 227 });
+      expect(factsBox).toMatchObject({ width: 362, height: 63 });
+      expect(browserBox?.width).toBe(362);
+      expect(joinBox?.width).toBe(362);
+
+      const create = page.getByRole('button', { name: /创建房间|新开一局/ }).first();
+      const share = page.getByRole('button', { name: /分享游戏/ }).first();
+      const [createBox, shareBox] = await Promise.all([
+        create.boundingBox(),
+        share.boundingBox(),
+      ]);
+      expect(createBox).toMatchObject({ width: 129, height: 39 });
+      expect(shareBox).toMatchObject({ width: 99, height: 39 });
+
+      await share.click();
+      await expect(page.getByRole('dialog').getByText('游戏地址')).toBeVisible();
+      await page.getByRole('dialog').getByRole('button', {
+        name: '关闭',
+        exact: true,
+      }).click();
+
+      await create.click();
+      const createDialog = page.getByRole('dialog');
+      await expect(createDialog.getByRole('button', { name: /公开房间/ }))
+        .toBeVisible();
+      await expect(createDialog.getByRole('button', { name: /私密房间/ }))
+        .toBeVisible();
+      await createDialog.getByRole('button', { name: '取消', exact: true }).click();
+      await expectNoOverflow(page);
+    });
+}
+
+for (const item of cases) {
+  test(`${item.gameType} mobile room card binds the real owner`,
+    async ({ page }) => {
+      const room = ownerRoom(item.gameType, item.maxPlayers);
+      await page.route('**/test-owner-avatar.png', route => route.fulfill({
+        body: avatarPNG,
+        contentType: 'image/png',
+      }));
+      await mockData(page, item.gameType, [room]);
+      await page.goto(`/game/${item.gameType}`, { waitUntil: 'domcontentloaded' });
+
+      const card = page.locator('[data-game-mobile-room-card]')
+        .filter({ hasText: room.roomID });
+      await expect(card).toContainText('真实房主');
+      const avatar = card.locator(`img[src="${ownerAvatarURL}"]`).first();
+      await expect(avatar).toBeVisible();
+      await expect.poll(() => avatar.evaluate(image =>
         image instanceof HTMLImageElement
         && image.complete
         && image.naturalWidth > 0)).toBe(true);
-      const avatarBox = await ownerAvatar.boundingBox();
-      expect(avatarBox?.width).toBeGreaterThanOrEqual(20);
-      expect(avatarBox?.height).toBeGreaterThanOrEqual(20);
       await expectNoOverflow(page);
-    }
-  });
+    });
 }
 
-for (const item of communityCases) {
-  test(`${item.gameType} mobile community pages follow the Acquire hierarchy`, async ({ page }) => {
-    await page.setViewportSize({ width: 390, height: 844 });
-    await mockCommunityData(page, item.gameType);
+for (const item of cases) {
+  test(`${item.gameType} mobile community pages use the shared hierarchy`,
+    async ({ page }) => {
+      await mockData(page, item.gameType);
 
-    await page.goto(`/game/${item.gameType}/rankings`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(item.title.rankings, { exact: true })).toBeHidden();
-    await expect(page.getByRole('tablist', { name: '排行榜模式' })).toBeVisible();
-    await expectAcquireMobileGeometry(page, item.mobileNavigation);
-    await expect(page.locator('[class*="podium"], [aria-label="排行榜前三名"]')).toHaveCount(0);
-    await expectNoOverflow(page);
-
-    await page.goto(`/game/${item.gameType}/guide`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(item.title.guide, { exact: true })).toBeHidden();
-    await expect(page.getByRole('button', { name: /下一步/ })).toBeVisible();
-    await expectAcquireMobileGeometry(page, item.mobileNavigation);
-    const guideLayout = page.locator('[class*="guideLayout"], .guide-layout').first();
-    const [guideBox, navigationBox] = await Promise.all([
-      guideLayout.boundingBox(),
-      page.getByRole('navigation', { name: item.mobileNavigation }).boundingBox(),
-    ]);
-    expect((guideBox?.y ?? 0) + (guideBox?.height ?? 0))
-      .toBeLessThanOrEqual(navigationBox?.y ?? 0);
-    await expectNoOverflow(page);
-
-    await page.goto(`/game/${item.gameType}/me`, { waitUntil: 'domcontentloaded' });
-    await expect(page.getByText(item.title.profile, { exact: true })).toBeHidden();
-    await expectAcquireMobileGeometry(page, item.mobileNavigation);
-    const about = page.getByTestId(`${item.gameType}-about-entry`);
-    const navigation = page.getByRole('navigation', { name: item.mobileNavigation });
-    await expect(about).toBeVisible();
-    await expect(page.getByText('PLAYER ID · mobile-profile')).toBeVisible();
-    await expect(page.getByRole('link', { name: /编辑资料/ })).toBeVisible();
-    if (item.gameType === 'fugitive') {
-      await expect(page.getByText('显示偏好', { exact: true })).toHaveCount(0);
-    }
-
-    await expect.poll(async () => {
-      await navigation.evaluate(element => {
-        let current: HTMLElement | null = element as HTMLElement;
-        while (current) {
-          const overflowY = getComputedStyle(current).overflowY;
-          if (overflowY === 'auto' || overflowY === 'scroll') {
-            current.scrollTop = current.scrollHeight;
-            return;
-          }
-          current = current.parentElement;
-        }
-        window.scrollTo(0, document.documentElement.scrollHeight);
+      await page.goto(`/game/${item.gameType}/rankings`, {
+        waitUntil: 'domcontentloaded',
       });
-      const [aboutBox, navigationBox] = await Promise.all([
-        about.boundingBox(),
-        navigation.boundingBox(),
+      const rankHero = page.locator('[data-game-mobile-rank-hero]');
+      const rankPanel = page.locator('[data-game-mobile-rank-panel]');
+      await expect(page.locator('[data-game-public-mobile="rankings"]'))
+        .toBeVisible();
+      await expect(page.getByRole('tablist', { name: '排行榜模式' }))
+        .toBeVisible();
+      const [rankHeroBox, rankPanelBox] = await Promise.all([
+        rankHero.boundingBox(),
+        rankPanel.boundingBox(),
       ]);
-      return Math.abs((navigationBox?.y ?? 0)
-        - ((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0)));
-    }).toBeLessThanOrEqual(12);
-    await expectNoOverflow(page);
-  });
+      expect(rankHeroBox).toMatchObject({ width: 362, height: 166 });
+      expect(rankPanelBox?.width).toBe(362);
+      expect(rankPanelBox?.y).toBe(
+        (rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 18,
+      );
+
+      await page.goto(`/game/${item.gameType}/guide`, {
+        waitUntil: 'domcontentloaded',
+      });
+      const guideVisual = page.locator('[data-game-mobile-guide-visual]');
+      const guidePanel = page.locator('[data-game-mobile-guide-panel]');
+      await expect(page.locator('[data-game-public-mobile="guide"]'))
+        .toBeVisible();
+      await expect(page.getByRole('tablist', { name: '玩法章节' }))
+        .toBeVisible();
+      const [visualBox, panelBox] = await Promise.all([
+        guideVisual.boundingBox(),
+        guidePanel.boundingBox(),
+      ]);
+      expect(visualBox?.width).toBe(362);
+      expect(panelBox?.width).toBe(362);
+      expect(panelBox?.y).toBe(
+        (visualBox?.y ?? 0) + (visualBox?.height ?? 0) + 8,
+      );
+
+      await page.goto(`/game/${item.gameType}/me`, {
+        waitUntil: 'domcontentloaded',
+      });
+      await expect(page.locator('[data-game-public-mobile="profile"]'))
+        .toBeVisible();
+      await expect(page.getByText('PLAYER ID · mobile-profile')).toBeVisible();
+      await expect(page.getByRole('link', { name: /编辑资料/ })).toBeVisible();
+      await expect(page.locator('[data-game-mobile-about-entry]')).toBeVisible();
+      await expectMobileShell(page, item.mobileNavigation);
+      await expectNoOverflow(page);
+    });
 }
 
-test('fugitive rankings and guide use the Acquire content hierarchy', async ({ page }) => {
-  await page.setViewportSize({ width: 390, height: 844 });
-  await mockCommunityData(page, 'fugitive');
+test('Fugitive preserves role ranking and card library extensions',
+  async ({ page }) => {
+    await mockData(page, 'fugitive');
+    await page.goto('/game/fugitive/rankings', { waitUntil: 'domcontentloaded' });
+    const roleSelect = page.getByRole('combobox', { name: '排行榜身份' });
+    await roleSelect.click();
+    await page.getByRole('option', { name: '逃亡榜' }).click();
+    await expect(roleSelect).toContainText('逃亡榜');
 
-  await page.goto('/game/fugitive/rankings', { waitUntil: 'domcontentloaded' });
-  const rankHero = page.getByTestId('fugitive-rank-hero');
-  const rankPanel = page.getByTestId('fugitive-rank-panel');
-  const [rankHeroBox, rankPanelBox] = await Promise.all([
-    rankHero.boundingBox(),
-    rankPanel.boundingBox(),
-  ]);
-  expect(rankHeroBox).toMatchObject({ x: 14, y: 72, width: 362, height: 166 });
-  expect(rankPanelBox).toMatchObject({ x: 14, width: 362 });
-  expect(rankPanelBox?.y).toBe((rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 18);
-  const roleSelect = page.getByRole('combobox', { name: '排行榜身份' });
-  await expect(roleSelect).toBeVisible();
-  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
-  await roleSelect.click();
-  await expect(roleSelect).toHaveAttribute('aria-expanded', 'true');
-  await page.getByRole('option', { name: '逃亡榜' }).click();
-  await expect(roleSelect).toContainText('逃亡榜');
-  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
-  await roleSelect.press('ArrowDown');
-  await roleSelect.press('ArrowDown');
-  await roleSelect.press('Enter');
-  await expect(roleSelect).toContainText('追捕榜');
-  await expect(roleSelect).toHaveAttribute('aria-expanded', 'false');
-
-  await page.goto('/game/fugitive/guide', { waitUntil: 'domcontentloaded' });
-  const guideSummary = page.getByTestId('fugitive-guide-summary');
-  const guidePanel = page.getByTestId('fugitive-guide-panel');
-  await expect.poll(() => guideSummary.boundingBox()).toMatchObject({
-    x: 14,
-    y: 72,
-    width: 362,
-    height: 173,
-  });
-  const [guideSummaryBox, guidePanelBox, navigationBox] = await Promise.all([
-    guideSummary.boundingBox(),
-    guidePanel.boundingBox(),
-    page.getByRole('navigation', { name: 'Fugitive 手机导航' }).boundingBox(),
-  ]);
-  expect(guidePanelBox).toMatchObject({ x: 14, width: 362 });
-  expect(guidePanelBox?.y)
-    .toBe((guideSummaryBox?.y ?? 0) + (guideSummaryBox?.height ?? 0) + 8);
-  expect((guidePanelBox?.y ?? 0) + (guidePanelBox?.height ?? 0))
-    .toBeLessThanOrEqual(navigationBox?.y ?? 0);
-  await expect(page.getByRole('tablist', { name: '玩法章节' }))
-    .toBeVisible();
-  await expectNoOverflow(page);
+    await page.goto('/game/fugitive/guide', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByRole('button', { name: /牌库速查/ })).toBeVisible();
 });
 
-test('davinci mobile profile keeps the Acquire card geometry on narrow screens', async ({ page }) => {
-  await mockCommunityData(page, 'davinci');
-  for (const viewport of [
-    { width: 390, height: 844 },
-    { width: 356, height: 783 },
-  ]) {
-    await page.setViewportSize(viewport);
-    await page.goto('/game/davinci/me', { waitUntil: 'domcontentloaded' });
+test('Onitama and War Chest preserve guide extensions', async ({ page }) => {
+  await mockData(page, 'onitama');
+  await page.goto('/game/onitama/guide', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('button', { name: /移动卡速查/ })).toBeVisible();
 
-    const card = page.getByTestId('davinci-profile-card');
-    const identity = page.getByTestId('davinci-profile-identity');
-    const history = page.getByTestId('davinci-profile-history');
-    const about = page.getByTestId('davinci-about-entry');
-    const avatar = identity.locator(':scope > span').first();
-    const playerName = identity.getByRole('heading', { name: '移动端玩家' });
-    await expect(card).toBeVisible();
-    await expect(history).toBeVisible();
-    await expect(about).toBeVisible();
-
-    const [
-      cardBox,
-      historyBox,
-      aboutBox,
-      avatarBox,
-      playerNameBox,
-    ] = await Promise.all([
-      card.boundingBox(),
-      history.boundingBox(),
-      about.boundingBox(),
-      avatar.boundingBox(),
-      playerName.boundingBox(),
-    ]);
-    expect(cardBox).not.toBeNull();
-    expect(historyBox).not.toBeNull();
-    expect(aboutBox).not.toBeNull();
-    expect(avatarBox).not.toBeNull();
-    expect(playerNameBox).not.toBeNull();
-    expect(Math.abs((cardBox?.x ?? 0) - (historyBox?.x ?? 0))).toBeLessThanOrEqual(1);
-    expect(Math.abs((cardBox?.width ?? 0) - (historyBox?.width ?? 0))).toBeLessThanOrEqual(1);
-    expect(Math.abs((cardBox?.x ?? 0) - (aboutBox?.x ?? 0))).toBeLessThanOrEqual(1);
-    expect(Math.abs((cardBox?.width ?? 0) - (aboutBox?.width ?? 0))).toBeLessThanOrEqual(1);
-    expect((avatarBox?.x ?? 0) + (avatarBox?.width ?? 0)).toBeLessThan(playerNameBox?.x ?? 0);
-    expect(Math.abs(
-      (avatarBox?.y ?? 0) + (avatarBox?.height ?? 0) / 2
-      - ((playerNameBox?.y ?? 0) + (playerNameBox?.height ?? 0) / 2),
-    )).toBeLessThanOrEqual(20);
-    await expectNoOverflow(page);
-  }
+  await mockData(page, 'warchest');
+  await page.goto('/game/warchest/guide', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('link', { name: /兵种图鉴/ })).toBeVisible();
 });
