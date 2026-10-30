@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from 'react';
-import { ArrowRight, Check, Clock, Coins, Layers, LoaderCircle, Lock, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
+import { ArrowRight, Check, Clock, Coins, Layers, LoaderCircle, ShieldCheck, TrendingUp, Wallet } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
@@ -80,7 +80,7 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
       return <div className={styles.row} key={key}><div><span className={styles.companyLabel} style={{ color: companyColors[key] }}><CompanyGlyph company={key} size={26} /><b>{key}</b></span><small>库存 {company.stockTotal} · 已持有 {data.playerData.stocks[key] ?? 0}</small></div>
         <span className={styles.price}><b><AnimatedValue value={company.stockPrice} formatter={money} /></b><small>/ 股</small></span>
         <Counter value={value} disabled={!enabled} label={`${key} 买入股数`} canAdd={buyPreview(data, { ...draft.buy, [key]: value + 1 }).valid} onChange={amount => interaction.changeBuy(key, amount)} /></div>;
-    })}</div>{active.length < companyKeys.length && <p className={styles.unavailable}><Lock size={12} />{companyKeys.length - active.length} 家公司尚未成立，暂不可买入。</p>}
+    })}</div>
     {hint('价格按当前公司规模计算；每回合最多 3 股，可分配到不同公司。')}{!buying.valid && <Feedback error>现金或库存已变化，请调整选择。</Feedback>}{error}
   </ResponsiveDialog>;
   }

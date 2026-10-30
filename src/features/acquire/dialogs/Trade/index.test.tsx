@@ -225,6 +225,7 @@ describe('TradeDialog quantity controls', () => {
     }
 
     render(<BuyHarness />);
+    expect(screen.queryByText(/家公司尚未成立/)).toBeNull();
     fireEvent.click(screen.getByRole('button', { name: '增加American 买入股数', hidden: true }));
 
     expect(screen.getByRole('status', { name: 'American 买入股数', hidden: true }).textContent).toBe('1');
