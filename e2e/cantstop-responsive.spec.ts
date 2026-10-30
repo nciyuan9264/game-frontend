@@ -396,7 +396,7 @@ test('Cant Stop mobile choose phase keeps pairing controls visible',
         borderWidth: getComputedStyle(element).borderWidth,
       })),
     ]);
-    expect(timerBox?.height).toBe(34);
+    expect(timerBox?.height).toBe(22);
     expect(rulesBox).toMatchObject({ width: 34, height: 34 });
     expect(menuBox).toMatchObject({ width: 34, height: 34 });
     expect(timerStyle).toEqual({ borderRadius: '6px', borderWidth: '1px' });

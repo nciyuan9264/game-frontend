@@ -80,6 +80,7 @@
   .actions {
     display: flex;
     min-width: 0;
+    min-height: var(--game-mobile-topbar-control-size);
     flex: 0 0 auto;
     align-items: center;
     gap: 5px;
@@ -87,6 +88,7 @@
 
   .status {
     max-width: 88px;
+    margin-left: auto;
     overflow: hidden;
     font-size: 10px;
     text-overflow: ellipsis;
@@ -94,10 +96,10 @@
 
     :global([data-game-turn-countdown]) {
       box-sizing: border-box;
-      height: var(--game-mobile-topbar-control-size);
-      min-width: 48px;
+      height: 22px;
+      min-width: 44px;
       justify-content: center;
-      padding: 0 9px;
+      padding: 0 8px;
       border-width: 1px;
       border-style: solid;
       border-radius: 6px;
@@ -106,6 +108,8 @@
   }
 
   .actions {
+    margin-left: auto;
+
     > button,
     > a,
     :global([data-game-mobile-topbar-control]) {
@@ -135,6 +139,10 @@
     svg {
       flex: 0 0 auto;
     }
+  }
+
+  .status + .actions {
+    margin-left: 0;
   }
 }
 

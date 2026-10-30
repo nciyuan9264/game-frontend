@@ -276,6 +276,8 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   const deadline = mobileTopbar.getByRole('timer');
   const endSwitch = mobileTopbar.getByRole('switch', { name: '允许结束游戏' });
   const endHelp = mobileTopbar.getByRole('button', { name: '查看终局规则' });
+  const switchTrack = endSwitch.locator('span');
+  const helpIcon = endHelp.locator('svg');
   await expect(cash).toBeVisible();
   await expect(endSwitch).toBeVisible();
   await expect(endHelp).toBeVisible();
@@ -289,7 +291,8 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   ]) {
     await page.setViewportSize(viewport);
     const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
-    const [metrics, statusMetrics, identityMetrics, timerStyle, deadlineBox, switchBox, helpBox, marketHeaderMetrics] = await Promise.all([
+    const [metrics, statusMetrics, identityMetrics, timerStyle, helpStyle, deadlineBox,
+      switchBox, switchTrackBox, helpBox, helpIconBox, marketHeaderMetrics] = await Promise.all([
       mobileTopbar.evaluate(element => ({
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
@@ -309,9 +312,15 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
         borderRadius: getComputedStyle(element).borderRadius,
         borderWidth: getComputedStyle(element).borderWidth,
       })),
+      endHelp.evaluate(element => ({
+        borderWidth: getComputedStyle(element).borderWidth,
+        backgroundColor: getComputedStyle(element).backgroundColor,
+      })),
       deadline.boundingBox(),
       endSwitch.boundingBox(),
+      switchTrack.boundingBox(),
       endHelp.boundingBox(),
+      helpIcon.boundingBox(),
       market.locator('header').evaluate(element => ({
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
@@ -326,16 +335,22 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
     expect(identityMetrics.textOverflow).toBe('ellipsis');
     expect(timerStyle.borderRadius).toBe('6px');
     expect(timerStyle.borderWidth).toBe('1px');
+    expect(helpStyle.borderWidth).toBe('0px');
+    expect(helpStyle.backgroundColor).toBe('rgba(0, 0, 0, 0)');
     expect(deadlineBox).not.toBeNull();
     expect(switchBox).not.toBeNull();
+    expect(switchTrackBox).not.toBeNull();
     expect(helpBox).not.toBeNull();
-    expect(deadlineBox!.height).toBe(34);
+    expect(helpIconBox).not.toBeNull();
+    expect(deadlineBox!.height).toBe(22);
     expect(switchBox!.width).toBe(44);
     expect(switchBox!.height).toBe(34);
+    expect(switchTrackBox).toMatchObject({ width: 42, height: 22 });
     expect(helpBox!.width).toBe(34);
     expect(helpBox!.height).toBe(34);
+    expect(helpIconBox).toMatchObject({ width: 22, height: 22 });
     expect(marketHeaderMetrics.scrollWidth).toBeLessThanOrEqual(marketHeaderMetrics.clientWidth);
-    const centers = [deadlineBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
+    const centers = [deadlineBox!, switchTrackBox!, helpIconBox!].map(box => box.y + box.height / 2);
     expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
     expect(Math.abs(helpBox!.x + helpBox!.width - metrics.right)).toBeLessThanOrEqual(1);
   }
@@ -343,6 +358,25 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(mobileTopbar).toBeHidden();
   await expect(desktopTopbar).toBeVisible();
+});
+
+test('acquire end controls stay at the trailing edge without a countdown', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const roomID = await mockAcquirePlay(page, { endEligible: true, waiting: true });
+  await page.goto(`/game/acquire/match?roomID=${roomID}`);
+  await page.getByRole('button', { name: '关闭面板' }).click();
+
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  const actions = mobileTopbar.locator('[data-game-mobile-topbar-actions]');
+  await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
+  const [topbarBox, actionsBox] = await Promise.all([
+    mobileTopbar.boundingBox(),
+    actions.boundingBox(),
+  ]);
+  expect(topbarBox).not.toBeNull();
+  expect(actionsBox).not.toBeNull();
+  expect(Math.abs(actionsBox!.x + actionsBox!.width - (topbarBox!.x + topbarBox!.width)))
+    .toBeLessThanOrEqual(1);
 });
 
 test('acquire final board keeps result access out of the mobile topbar', async ({ page }) => {
