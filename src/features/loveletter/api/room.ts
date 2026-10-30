@@ -10,7 +10,6 @@ export const createLoveLetterRoom = (
   signal?: AbortSignal,
 ) => createGameRoom('loveletter', {
   visibility,
-  displayName: '掌心密信',
   maxPlayers: 6,
   turnTimeoutSeconds: 60,
 }, { signal, authFailure: 'redirect' });

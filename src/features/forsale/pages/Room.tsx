@@ -25,6 +25,7 @@ import {
 } from '@/components/GameUI/GameRoomMobile';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { forSaleRoomInviteURL } from '../model/adapters';
 import {
   playerName,
@@ -57,9 +58,15 @@ export const Room = ({
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
-  const seats = useMemo(() => Array.from({ length: 6 }, (_, seatIndex) =>
-    players.find(([, player]) => player.seatIndex === seatIndex),
-  ), [players]);
+  const seats = useMemo(() => orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  ).map(id => id ? [id, data.players[id]] as const : undefined), [
+    data.maxPlayers,
+    data.playerOrder,
+    data.players,
+  ]);
   const allReady = players.length >= 3
     && players.every(([, player]) => player.ready && (player.online || player.ai));
   const readyCount = players.filter(([, player]) =>
@@ -225,7 +232,7 @@ export const Room = ({
           <section className="fs-seat-grid">{seats.map((entry, index) => {
             if (!entry) {
               return <button className="fs-seat empty" type="button"
-                key={index} disabled={!owner || !enabled}
+                data-game-room-seat-index={index} key={index} disabled={!owner || !enabled}
                 aria-label={`在席位 ${index + 1} 添加人机`}
                 onClick={() => session.submit('match_add_ai', { seatIndex: index })}>
                 <span>SEAT {String(index + 1).padStart(2, '0')}</span>
@@ -235,7 +242,8 @@ export const Room = ({
             }
             const [id, player] = entry;
             const self = id === data.playerID;
-            return <article className={`fs-seat ${self ? 'self' : ''}`} key={id}>
+            return <article className={`fs-seat ${self ? 'self' : ''}`}
+              data-game-room-seat-index={index} data-game-room-player-id={id} key={id}>
               <span>SEAT {String(index + 1).padStart(2, '0')}</span>
               <PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar}
                 ai={player.ai} size={58} />

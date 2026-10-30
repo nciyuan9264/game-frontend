@@ -20,6 +20,7 @@ import {
   StandardGameMobileRoomDialogs,
 } from '@/components/GameUI/GameRoomMobile';
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { sixNimmtRoomInviteURL } from '../../model/adapters';
 import { playerName, type MatchSnapshot } from '../../model/session';
 import type { SixNimmtSession } from '../../hooks/useSixNimmtSession';
@@ -47,9 +48,15 @@ export function Room({
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
-  const seats = useMemo(() => Array.from({ length: 10 }, (_, seatIndex) =>
-    players.find(([, player]) => player.seatIndex === seatIndex),
-  ), [players]);
+  const seats = useMemo(() => orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  ).map(id => id ? [id, data.players[id]] as const : undefined), [
+    data.maxPlayers,
+    data.playerOrder,
+    data.players,
+  ]);
   const allReady = players.length >= 2
     && players.every(([, player]) => player.ready && (player.online || player.ai));
   const close = () => setPanel(undefined);
@@ -192,7 +199,7 @@ export function Room({
     <section className="sn-seat-grid">{seats.map((entry, index) => {
       if (!entry) {
         return <button className="sn-seat sn-seat-empty" type="button"
-          key={index} disabled={!owner || !enabled}
+          data-game-room-seat-index={index} key={index} disabled={!owner || !enabled}
           aria-label={`添加人机到席位 ${index + 1}`}
           onClick={() => session.submit('match_add_ai', { seatIndex: index })}>
           <span>SEAT {String(index + 1).padStart(2, '0')}</span>
@@ -202,7 +209,8 @@ export function Room({
       }
       const [id, player] = entry;
       const self = id === data.playerID;
-      return <article className={`sn-seat ${self ? 'self' : ''}`} key={id}>
+      return <article className={`sn-seat ${self ? 'self' : ''}`}
+        data-game-room-seat-index={index} data-game-room-player-id={id} key={id}>
         <span>SEAT {String(index + 1).padStart(2, '0')}</span>
         <PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar}
           ai={player.ai} size={48} />

@@ -2,6 +2,7 @@ import { describe, expect, it } from 'vitest';
 import {
   filterLobbyRooms,
   gameInviteURL,
+  orderGameRoomSeats,
   playerDisplayName,
   roomEntry,
   roomOwnerName,
@@ -26,6 +27,35 @@ const room: LobbyRoomLike = {
 };
 
 describe('shared lobby room model', () => {
+  it('keeps explicit sparse seats without duplicating a player', () => {
+    const players = {
+      owner: { seatIndex: 0 },
+      ai_2: { seatIndex: 1 },
+      ai_4: { seatIndex: 3 },
+    };
+
+    const seats = orderGameRoomSeats(
+      players,
+      ['owner', 'ai_2', 'ai_4'],
+      4,
+    );
+
+    expect(seats).toEqual(['owner', 'ai_2', undefined, 'ai_4']);
+    expect(seats.filter(id => id === 'ai_4')).toHaveLength(1);
+  });
+
+  it('deduplicates player order and fills invalid seats without overwriting', () => {
+    const seats = orderGameRoomSeats({
+      owner: { seatIndex: 0 },
+      conflict: { seatIndex: 0 },
+      legacy: {},
+      outside: { seatIndex: 99 },
+    }, ['owner', 'owner', 'conflict', 'legacy', 'outside'], 4);
+
+    expect(seats).toEqual(['owner', 'conflict', 'legacy', 'outside']);
+    expect(new Set(seats).size).toBe(4);
+  });
+
   it('resolves owner names and entry states', () => {
     expect(playerDisplayName(room.roomPlayer[0])).toBe('Alice-Cooper-7');
     expect(roomOwnerName(room)).toBe('Alice-Cooper-7');

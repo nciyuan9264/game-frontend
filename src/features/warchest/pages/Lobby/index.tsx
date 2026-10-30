@@ -74,7 +74,7 @@ function RoomCard({
   return <article className="room-card">
     <div className="room-card-top"><span className={`status-tag ${playing ? 'playing' : ''}`}>
       <i />{playing ? '对局中' : '等待加入'}</span><span>#{room.roomID}</span></div>
-    <div className="room-card-name"><h3>{room.displayName || '战争之匣'}</h3>
+    <div className="room-card-name"><h3>{room.roomID}</h3>
       <span className="room-ornament"><UnitGlyph type={glyph} size={34} /></span></div>
     <p>{playing ? `领先方已控制 ${progress} 处` : '完整基础版'}<span>·</span>
       {room.turnTimeoutSeconds ?? 90} 秒行动</p>
@@ -165,7 +165,7 @@ export default function Lobby() {
     const ownerProfile = roomOwnerProfile(room);
     return <GameMobileRoomCard key={room.roomID}
       roomID={room.roomID}
-      title={room.displayName || '战争之匣'}
+      title={room.roomID}
       ownerName={ownerProfile.name}
       ownerAvatar={<PlayerAvatar name={ownerProfile.name}
         avatar={ownerProfile.avatar} size={32} />}

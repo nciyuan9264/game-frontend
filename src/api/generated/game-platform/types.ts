@@ -154,7 +154,6 @@ export interface RoomInfo {
   updatedAt: ISODateTime;
   players: RoomPlayer[];
   metrics: RoomMetrics;
-  displayName?: string;
   turnTimeoutSeconds?: number;
 }
 
@@ -163,7 +162,6 @@ export interface CreateRoomReq {
   visibility?: Visibility;
   max_players?: number;
   request_id: string;
-  display_name?: string;
   turn_timeout_seconds?: number;
 }
 
@@ -2041,7 +2039,6 @@ export interface HistoryGame {
   createdAt: ISODateTime;
   updatedAt: ISODateTime;
   players?: HistoryGamePlayer[];
-  roomDisplayName?: string;
 }
 
 export interface HistoryEventMeta {

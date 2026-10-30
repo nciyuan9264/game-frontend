@@ -67,6 +67,7 @@ describe('GameAppShell', () => {
     expect(container.querySelector('[data-game-shell="app"]')).toBeTruthy();
     expect(container.querySelector('[data-game-shell-header]')).toBeTruthy();
     expect(container.querySelector('[data-game-shell-content]')).toBeTruthy();
+    expect(container.querySelectorAll('[data-game-shell-frame]')).toHaveLength(2);
   });
 
   it('supports match and hidden shell modes', () => {
@@ -80,6 +81,7 @@ describe('GameAppShell', () => {
     expect(container.querySelector('aside')).toBeNull();
     expect(container.querySelector('header')).toBeNull();
     expect(container.querySelector('[data-game-shell="match"]')).toBeTruthy();
+    expect(container.querySelector('[data-game-shell-content][data-game-shell-frame]')).toBeTruthy();
     expect(screen.queryByRole('navigation', { name: '测试手机导航' })).toBeNull();
     expect(screen.getByText('GAME')).toBeTruthy();
   });
@@ -93,6 +95,7 @@ describe('GameAppShell', () => {
       </MemoryRouter>
     );
     expect(container.querySelector('[data-game-shell="match"]')).toBeTruthy();
+    expect(container.querySelectorAll('[data-game-shell-frame]')).toHaveLength(2);
     expect(container.querySelector('[data-game-brand]')?.textContent).toContain('BRAND');
     expect(container.querySelector('[data-game-shell-platform-home]')).toBeNull();
     expect(container.querySelector('[data-game-shell-profile]')).toBeTruthy();

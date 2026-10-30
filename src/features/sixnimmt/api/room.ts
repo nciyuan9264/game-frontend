@@ -10,7 +10,6 @@ export const createSixNimmtRoom = (
   signal?: AbortSignal,
 ) => createGameRoom('sixnimmt', {
   visibility,
-  displayName: '牧场牌桌',
   maxPlayers: 10,
   turnTimeoutSeconds: 60,
 }, { signal, authFailure: 'redirect' });

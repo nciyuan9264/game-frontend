@@ -1,5 +1,6 @@
 import { Bot, Check, Clock, Crown, Globe, Lock, MoreHorizontal, Plus, ShieldCheck, Users, Wallet } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
 import { playerName, type MatchSnapshot } from '../../model/session';
@@ -18,20 +19,7 @@ export function roomReadiness(data: MatchSnapshot) {
     reason: players.length < 2 ? '再来一位，就能开场。' : ready < players.length ? '等每一位合伙人准备好。' : '一切就绪，好局即将开场。' };
 }
 export function roomSeatOrder(data: MatchSnapshot) {
-  const order = [...data.playerOrder.filter(id => data.players[id]), ...Object.keys(data.players).filter(id => !data.playerOrder.includes(id))];
-  const seats = Array<string | undefined>(6);
-  const unassigned: string[] = [];
-  order.forEach(id => {
-    const seatIndex = data.players[id].seatIndex;
-    if (typeof seatIndex === 'number' && Number.isInteger(seatIndex) && seatIndex >= 0 && seatIndex < seats.length && !seats[seatIndex])
-      seats[seatIndex] = id;
-    else unassigned.push(id);
-  });
-  unassigned.forEach(id => {
-    const index = seats.findIndex(seat => !seat);
-    if (index >= 0) seats[index] = id;
-  });
-  return seats;
+  return orderGameRoomSeats(data.players, data.playerOrder, data.maxPlayers);
 }
 export function Seats(props: RoomProps) {
   const { data, enabled } = props;
@@ -39,13 +27,15 @@ export function Seats(props: RoomProps) {
   const seats = roomSeatOrder(data);
   return <div className={styles.seats}>{Array.from({ length: 6 }, (_, index) => {
     const id = seats[index], player = id ? data.players[id] : undefined;
-    return player && id ? <article className={`${styles.seat} ${id === data.playerID ? styles.self : ''}`} key={id}>
+    return player && id ? <article className={`${styles.seat} ${id === data.playerID ? styles.self : ''}`}
+      data-game-room-seat-index={index} data-game-room-player-id={id} key={id}>
       <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
       <PlayerAvatar size={58} name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} />
       <strong>{playerName(id, data.players)} {id === data.ownerID && <Crown size={13} />}{id === data.playerID && <em>你</em>}</strong>
       <span className={player.ready ? styles.ready : styles.muted}>{player.ready ? <Check size={13} /> : <Users size={13} />}{player.ready ? '准备就绪' : '等待准备'}{player.ai && ' · 人机'}</span>
       {isOwner && id !== data.playerID && <button disabled={!enabled} className={styles.remove} onClick={() => props.onRemove(id)} aria-label={`管理席位 ${index + 1}`}><MoreHorizontal size={18} /></button>}
-    </article> : <button className={`${styles.seat} ${styles.empty}`} key={`empty-${index}`} disabled={!enabled}
+    </article> : <button className={`${styles.seat} ${styles.empty}`}
+      data-game-room-seat-index={index} key={`empty-${index}`} disabled={!enabled}
       aria-label={isOwner ? `在席位 ${index + 1} 添加人机` : `邀请好友加入席位 ${index + 1}`}
       onClick={isOwner ? () => props.onAddAI(index) : props.onInvite}>
       <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>

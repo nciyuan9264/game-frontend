@@ -200,7 +200,7 @@ export function My() {
         String(player.userID) === String(profile.data?.id));
       return {
         id: String(game.id),
-        title: game.roomDisplayName || `牌桌 ${game.roomID}`,
+        title: game.roomID,
         detail: `${me?.isWinner ? '本场获胜' : `最终第 ${me?.finalRank ?? '—'} 名`
         } · ${me?.finalScore ?? 0} 牛头 · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
@@ -273,7 +273,7 @@ export function My() {
         {history.error && <Feedback error>{history.error}<ActionButton onClick={history.retry}>重试</ActionButton></Feedback>}
         {history.games.map(game => {
           const me = game.players?.find(player => String(player.userID) === String(profile.data?.id));
-          return <article key={game.id}><span><Bull size={20} /></span><div><b>{game.roomDisplayName || `牌桌 ${game.roomID}`}</b>
+          return <article key={game.id}><span><Bull size={20} /></span><div><b>{game.roomID}</b>
             <small>{new Date(game.startedAt).toLocaleString('zh-CN')} · {Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</small>
             <small>{me?.isWinner ? '本场获胜' : `最终第 ${me?.finalRank ?? '—'} 名`} · {me?.finalScore ?? 0} 牛头</small></div>
             {game.endedAt ? <Link to={`/game/sixnimmt/replay/${game.id}`}>全知回放<ArrowRight size={14} /></Link> : <em>进行中</em>}</article>;

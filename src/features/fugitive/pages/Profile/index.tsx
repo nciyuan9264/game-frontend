@@ -74,7 +74,7 @@ export default function Profile() {
       });
       return {
         id: String(game.id),
-        title: game.roomDisplayName || `房间 ${game.roomID}`,
+        title: game.roomID,
         detail: `${roleName(role)} · ${startedAt} · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
         accessory: me?.isWinner ? '本局获胜' : '未能获胜',
@@ -134,7 +134,7 @@ export default function Profile() {
         <p>退出不会删除线上战绩与历史记录，下次登录后仍可查看。</p>
       </Modal>}
       {panel === 'record' && record && <Modal
-        title={record.roomDisplayName || '追逃记录'}
+        title={record.roomID}
         kicker="YOUR COMPLETED CHASE" onClose={() => setPanel(undefined)}
         footer={<button className="button secondary full" type="button"
           onClick={() => setPanel(undefined)}>返回档案</button>}>
@@ -144,7 +144,7 @@ export default function Profile() {
           const role = gameRole(me?.gameRole);
           return <><div className="record-detail-heading">
             <Eyebrow>{new Date(record.startedAt).toLocaleString('zh-CN')}</Eyebrow>
-            <h3>{record.roomDisplayName || `房间 ${record.roomID}`}</h3>
+            <h3>{record.roomID}</h3>
             <span className={`pill ${me?.isWinner ? 'won' : ''}`}>
               {me?.isWinner ? '本局获胜' : '未能获胜'}
             </span>
@@ -213,7 +213,7 @@ export default function Profile() {
                   key={game.id} onClick={() => openRecord(game)}>
                   <Portrait role={role} className="avatar" />
                   <span className="record-copy">
-                    <b>{game.roomDisplayName || `房间 ${game.roomID}`}</b>
+                    <b>{game.roomID}</b>
                     <small>{roleName(role)} · {new Date(game.startedAt)
                       .toLocaleString('zh-CN')}</small>
                   </span>
@@ -254,7 +254,7 @@ export default function Profile() {
     </Modal>}
 
     {panel === 'record' && record && <Modal
-      title={record.roomDisplayName || '追逃记录'}
+      title={record.roomID}
       kicker="YOUR COMPLETED CHASE" onClose={() => setPanel(undefined)}
       footer={<button className="button secondary full" type="button"
         onClick={() => setPanel(undefined)}>返回档案</button>}>
@@ -264,7 +264,7 @@ export default function Profile() {
         const role = gameRole(me?.gameRole);
         return <><div className="record-detail-heading">
           <Eyebrow>{new Date(record.startedAt).toLocaleString('zh-CN')}</Eyebrow>
-          <h3>{record.roomDisplayName || `房间 ${record.roomID}`}</h3>
+          <h3>{record.roomID}</h3>
           <span className={`pill ${me?.isWinner ? 'won' : ''}`}>
             {me?.isWinner ? '本局获胜' : '未能获胜'}</span>
         </div><dl className="record-detail-list">

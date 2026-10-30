@@ -306,3 +306,28 @@ test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }
   expect(landscapeBox?.height).toBeGreaterThan(0);
   await expect.poll(() => page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 });
+
+test('DaVinci desktop play stage is bounded on an ultra-wide viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2557, height: 1293 });
+  await mockSession(page, initializationSnapshot());
+  await page.goto(`/game/davinci/match?roomID=${roomID}`);
+
+  const stage = page.getByTestId('davinci-play');
+  const canvas = stage.locator('canvas');
+  await expect(stage).toBeVisible();
+  await expect(canvas).toBeVisible();
+  const [stageBox, canvasBox] = await Promise.all([
+    stage.boundingBox(),
+    canvas.boundingBox(),
+  ]);
+  expect(stageBox).not.toBeNull();
+  expect(canvasBox).not.toBeNull();
+  expect(stageBox!.width).toBeLessThanOrEqual(1700.5);
+  expect(stageBox!.height).toBeLessThanOrEqual(1000.5);
+  expect(stageBox!.y).toBeLessThanOrEqual(1);
+  expect(canvasBox!.width).toBeGreaterThan(0);
+  expect(canvasBox!.height).toBeGreaterThan(0);
+  await expectNoHorizontalOverflow(page);
+});

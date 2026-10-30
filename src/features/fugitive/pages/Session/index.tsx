@@ -92,12 +92,12 @@ function Session({ roomID }: { roomID: string }) {
       && <AppShell room showRoomBack={false} title="准备房间" profile={profile}>
         {session.feedback && <div className="toast" role="alert">{session.feedback}</div>}
         {connectionNotice && <div className="toast" role="status">{connectionNotice}</div>}
-        <Room session={session} data={snapshot} room={target.data.room}
+        <Room session={session} data={snapshot}
           onLeave={leave.request} />
       </AppShell>}
     {roomID && !connection.fatal && snapshot?.type === 'ROOM_SYNC'
       && <Play session={session} data={snapshot}
-        roomName={target.data.room?.displayName || '午夜追缉'}
+        roomName={roomID}
         onLeave={leave.request}
         onStartNextMatch={() => void nextMatch.start()}
         startNextMatchPending={nextMatch.pending}

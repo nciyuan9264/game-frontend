@@ -65,7 +65,6 @@ export async function createGameRoom(
   data: {
     visibility?: string;
     maxPlayers?: number;
-    displayName?: string;
     turnTimeoutSeconds?: number;
   },
   options: GameRoomRequestOptions = {},
@@ -75,7 +74,6 @@ export async function createGameRoom(
       game_type: gameType,
       visibility: data.visibility,
       max_players: data.maxPlayers,
-      display_name: data.displayName,
       turn_timeout_seconds: data.turnTimeoutSeconds,
       request_id: crypto.randomUUID(),
     }, requestOptions(options));

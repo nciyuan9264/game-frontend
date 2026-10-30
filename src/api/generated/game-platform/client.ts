@@ -65,7 +65,6 @@ export function CreateRoom(req: CreateRoomReq, options?: any): Promise<RoomResp>
     visibility: req.visibility,
     maxPlayers: req.max_players,
     requestID: req.request_id,
-    displayName: req.display_name,
     turnTimeoutSeconds: req.turn_timeout_seconds,
   };
   return GamePlatformServiceOptions.request({ url, method, data }, options);

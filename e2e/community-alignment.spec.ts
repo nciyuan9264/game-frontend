@@ -48,6 +48,15 @@ const rankGames = new Set<GameType>([
   'forsale',
 ]);
 
+const roomTitleRegressionGames: GameType[] = [
+  'cantstop',
+  'davinci',
+  'fugitive',
+  'loveletter',
+  'sixnimmt',
+  'warchest',
+];
+
 function metric(gameType: GameType, index: number) {
   if (rankGames.has(gameType)) {
     return { rank: { avgRank: 1 + index / 10 } };
@@ -137,8 +146,6 @@ function ownerRoom(gameType: GameType, maxPlayers: number) {
     nextRoundNo: 1,
     createdAt: '2026-10-26T00:00:00Z',
     updatedAt: '2026-10-26T00:00:00Z',
-    displayName: gameType === 'fugitive' ? '午夜追缉'
-      : gameType === 'warchest' ? '雾谷前哨' : undefined,
     turnTimeoutSeconds: gameType === 'warchest' ? 90
       : gameType === 'fugitive' || gameType === 'hive' ? 120 : 60,
     players: [{
@@ -187,6 +194,33 @@ async function expectNoOverflow(page: Page) {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+const desktopPublicPageSuffixes = ['', '/rankings', '/guide', '/me'] as const;
+
+async function expectDesktopPublicFrames(page: Page, gameType: GameType) {
+  const frames = gameType === 'warchest'
+    ? page.locator('.app-header, .page')
+    : gameType === 'fugitive'
+      ? page.locator('.app-header, .page-content')
+      : page.locator('[data-game-shell-frame]');
+  await expect(frames).toHaveCount(2);
+  await expect(frames.first()).toBeVisible();
+  await expect(frames.last()).toBeVisible();
+  const geometry = await frames.evaluateAll(elements => elements.map(element => {
+    const box = element.getBoundingClientRect();
+    return {
+      width: box.width,
+      center: box.left + box.width / 2,
+      viewportCenter: window.innerWidth / 2,
+    };
+  }));
+  for (const frame of geometry) {
+    expect(frame.width).toBeLessThanOrEqual(1700.5);
+    expect(frame.width).toBeGreaterThanOrEqual(1699);
+    expect(Math.abs(frame.center - frame.viewportCenter)).toBeLessThanOrEqual(50);
+  }
+  await expectNoOverflow(page);
+}
+
 async function expectMobileShell(page: Page, navigationName: string) {
   const banner = page.getByRole('banner');
   const navigation = page.getByRole('navigation', { name: navigationName });
@@ -199,6 +233,20 @@ async function expectMobileShell(page: Page, navigationName: string) {
 }
 
 test.use({ viewport: { width: 390, height: 844 } });
+
+for (const item of cases) {
+  test(`${item.gameType} desktop public pages keep the 1700px content frame`,
+    async ({ page }) => {
+      await page.setViewportSize({ width: 2557, height: 1293 });
+      await mockData(page, item.gameType);
+      for (const suffix of desktopPublicPageSuffixes) {
+        await page.goto(`/game/${item.gameType}${suffix}`, {
+          waitUntil: 'domcontentloaded',
+        });
+        await expectDesktopPublicFrames(page, item.gameType);
+      }
+    });
+}
 
 for (const item of cases) {
   test(`${item.gameType} mobile lobby uses the shared public layout`,
@@ -485,6 +533,86 @@ for (const item of cases) {
     });
 }
 
+test('recent game titles use room numbers instead of room or opponent names',
+  async ({ page }) => {
+    await mockData(page, 'davinci');
+    await page.unroute('**/pam-api/platform/history/games?**');
+    await page.route('**/pam-api/platform/history/games?**', route => {
+      const gameType = new URL(route.request().url()).searchParams
+        .get('gameType') as GameType;
+      const roomID = `${gameType}-history-room`;
+      return route.fulfill({
+        json: {
+          status_code: 0,
+          message: 'ok',
+          data: {
+            games: [{
+              id: `${gameType}-history-game`,
+              roomID,
+              gameType,
+              startedAt: '2026-10-29T12:20:44Z',
+              endedAt: '2026-10-29T12:26:44Z',
+              durationSeconds: 360,
+              maxPlayers: 2,
+              createdAt: '2026-10-29T12:20:44Z',
+              updatedAt: '2026-10-29T12:26:44Z',
+              players: [{
+                id: `${gameType}-self`,
+                gameID: `${gameType}-history-game`,
+                userID: 'mobile-profile',
+                playerID: 'mobile-profile',
+                displayName: '移动端玩家',
+                gameRole: 'fugitive',
+                seatIndex: 0,
+                isAI: false,
+                finalScore: 3,
+                finalStocks: 0,
+                finalRank: 1,
+                isWinner: true,
+                createdAt: '2026-10-29T12:20:44Z',
+              }, {
+                id: `${gameType}-opponent`,
+                gameID: `${gameType}-history-game`,
+                playerID: `${gameType}-opponent`,
+                displayName: '不应展示的对手昵称',
+                seatIndex: 1,
+                isAI: false,
+                finalStocks: 0,
+                finalRank: 2,
+                isWinner: false,
+                createdAt: '2026-10-29T12:20:44Z',
+              }],
+            }],
+          },
+        },
+      });
+    });
+
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 1280, height: 900 },
+    ]) {
+      await page.setViewportSize(viewport);
+      for (const gameType of roomTitleRegressionGames) {
+        await page.goto(`/game/${gameType}/me`, {
+          waitUntil: 'domcontentloaded',
+        });
+        await expect(page.getByText(
+          `${gameType}-history-room`,
+          { exact: true },
+        ).first()).toBeVisible();
+        await expect(page.getByText(
+          '不应展示的自定义房间名',
+          { exact: true },
+        )).toHaveCount(0);
+        await expect(page.getByText(
+          '不应展示的对手昵称',
+          { exact: true },
+        )).toHaveCount(0);
+      }
+    }
+  });
+
 test('Fugitive mobile profile matches the Acquire frame and typography',
   async ({ page }) => {
     await mockData(page, 'fugitive');
@@ -497,7 +625,6 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
             games: [0, 1].map(index => ({
               id: `fugitive-profile-${index}`,
               roomID: `fugitive-room-${index}`,
-              roomDisplayName: '午夜追缉',
               startedAt: `2026-10-2${8 - index}T12:20:44Z`,
               endedAt: `2026-10-2${8 - index}T12:26:44Z`,
               durationSeconds: 360 + index * 120,

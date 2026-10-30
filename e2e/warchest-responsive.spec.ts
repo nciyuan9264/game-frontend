@@ -196,7 +196,6 @@ async function mockPublicData(page: Page) {
           nextRoundNo: 1,
           createdAt: '2026-10-26T00:00:00Z',
           updatedAt: '2026-10-26T00:00:00Z',
-          displayName: '雾谷前哨',
           turnTimeoutSeconds: 90,
           players: [{ ...human, userID: '220', playerID: '220', displayName: 'Elias' }],
           metrics: {
@@ -263,7 +262,6 @@ async function mockSession(page: Page, initialSnapshot = gameSnapshot()) {
         nextRoundNo: 2,
         createdAt: '2026-10-26T00:00:00Z',
         updatedAt: '2026-10-26T00:00:00Z',
-        displayName: '暮色边境',
         turnTimeoutSeconds: 90,
         players: [human, ai],
         metrics: {
@@ -320,7 +318,6 @@ async function mockReplay(page: Page) {
           game: {
             id: 99,
             roomID,
-            roomDisplayName: '暮色边境',
             gameType: 'warchest',
             startedAt: '2026-10-26T00:00:00Z',
             endedAt: '2026-10-26T00:05:00Z',
@@ -411,7 +408,6 @@ async function mockPreparation(page: Page) {
         nextRoundNo: 1,
         createdAt: '2026-10-26T00:00:00Z',
         updatedAt: '2026-10-26T00:00:00Z',
-        displayName: '雾谷前哨',
         turnTimeoutSeconds: 90,
         players: [human, ai],
         metrics: {
@@ -439,7 +435,7 @@ test('War Chest public pages render the responsive showcase shell', async ({ pag
 
   await expect(page.getByRole('heading', { name: /方寸之间/ })).toBeVisible();
   await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
-  await expect(page.getByText('雾谷前哨')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '1026_140000' })).toBeVisible();
   await expect(page.getByRole('navigation', { name: '战争之匣手机导航' })).toBeVisible();
   await expectNoOverflow(page);
   await page.screenshot({ path: 'test-results/warchest-lobby-mobile.png' });
@@ -616,7 +612,7 @@ test('War Chest mobile returns from battle to full-width lobby cards', async ({ 
   await page.getByRole('button', { name: '确认离开' }).click();
 
   await expect(page).toHaveURL(/\/game\/warchest$/);
-  await expect(page.getByText('雾谷前哨')).toBeVisible();
+  await expect(page.getByRole('heading', { name: '1026_140000' })).toBeVisible();
   const [browserBox, cardBox] = await Promise.all([
     page.locator('[data-game-mobile-lobby-browser]').boundingBox(),
     page.locator('[data-game-mobile-room-card]').first().boundingBox(),
@@ -669,4 +665,32 @@ test('War Chest desktop keeps board, factions, and intelligence visible', async 
   expect(box?.height).toBeGreaterThan(450);
   await expectNoOverflow(page);
   await page.screenshot({ path: 'test-results/warchest-battle-desktop.png' });
+});
+
+test('War Chest desktop battle surface is bounded on an ultra-wide viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2557, height: 1293 });
+  await mockSession(page);
+  await page.goto(`/game/warchest/match?roomID=${roomID}`);
+
+  const surface = page.getByTestId('warchest-battle-surface');
+  const board = page.getByTestId('warchest-board');
+  await expect(surface).toBeVisible();
+  await expect(board).toBeVisible();
+  const [surfaceBox, boardBox] = await Promise.all([
+    surface.boundingBox(),
+    board.boundingBox(),
+  ]);
+  expect(surfaceBox).not.toBeNull();
+  expect(boardBox).not.toBeNull();
+  expect(surfaceBox!.width).toBeLessThanOrEqual(1700.5);
+  expect(surfaceBox!.height).toBeLessThanOrEqual(1000.5);
+  expect(surfaceBox!.y).toBeLessThanOrEqual(1);
+  expect(Math.abs(
+    surfaceBox!.x + surfaceBox!.width / 2 - 2557 / 2,
+  )).toBeLessThanOrEqual(1);
+  expect(boardBox!.width).toBeGreaterThan(450);
+  expect(boardBox!.height).toBeGreaterThan(450);
+  await expectNoOverflow(page);
 });

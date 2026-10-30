@@ -93,7 +93,8 @@ export function Play({
       ? `放置${initialHand.activeJoker.color === 0 ? '白色' : '黑色'} JOKER`
       : '确认当前初始牌序';
 
-  return <div className={`${styles.play} ${initializing ? styles.initializing : ''}`}>
+  return <div className={`${styles.play} ${initializing ? styles.initializing : ''}`}
+    data-testid="davinci-play">
     <GameMobileTopbar
       onBack={onLeave}
       backLabel="离开对局"

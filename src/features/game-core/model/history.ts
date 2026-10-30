@@ -56,7 +56,6 @@ export interface GamePlayer {
 export interface Game {
   id: GameID;
   roomID: string;
-  roomDisplayName?: string;
   gameType: HistoryGameType;
   startedAt: string;
   endedAt?: string;

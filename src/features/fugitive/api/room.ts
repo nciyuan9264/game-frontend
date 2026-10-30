@@ -15,7 +15,6 @@ export async function createFugitiveRoom(
   return createGameRoom(
     'fugitive',
     {
-      displayName: '午夜追缉',
       visibility,
       turnTimeoutSeconds: 120,
       maxPlayers: 2,

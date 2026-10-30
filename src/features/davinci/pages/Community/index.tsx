@@ -204,10 +204,9 @@ export function My() {
     const historyItems = games.map(game => {
       const me = game.players?.find(player => player.userID != null
         && String(player.userID) === String(profile.data?.id));
-      const opponent = game.players?.find(player => player.id !== me?.id);
       return {
         id: String(game.id),
-        title: opponent?.displayName || '未知对手',
+        title: game.roomID,
         detail: `${new Date(game.startedAt).toLocaleString('zh-CN')} · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
         accessory: me?.isWinner ? '胜' : '负',
@@ -265,9 +264,8 @@ export function My() {
       <section className={styles.profileHistory} data-testid="davinci-profile-history"><h2>最近对局</h2>
         {games.map(game => {
           const me = game.players?.find(player => player.userID != null && String(player.userID) === String(profile.data?.id));
-          const opponent = game.players?.find(player => player.id !== me?.id);
           return <article key={game.id}><span className={me?.isWinner ? styles.win : styles.loss}>{me?.isWinner ? '胜' : '负'}</span>
-            <div><strong>{opponent?.displayName || '未知对手'}</strong>
+            <div><strong>{game.roomID}</strong>
               <small>{new Date(game.startedAt).toLocaleString('zh-CN')}</small></div>
             <span><b>{Math.max(0, Math.round(game.durationSeconds / 60))}</b><small>分钟</small></span></article>;
         })}

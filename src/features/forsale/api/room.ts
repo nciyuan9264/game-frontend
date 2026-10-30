@@ -10,7 +10,6 @@ export const createForSaleRoom = (
   signal?: AbortSignal,
 ) => createGameRoom('forsale', {
   visibility,
-  displayName: '周末拍卖所',
   maxPlayers: 6,
   turnTimeoutSeconds: 60,
 }, { signal, authFailure: 'redirect' });

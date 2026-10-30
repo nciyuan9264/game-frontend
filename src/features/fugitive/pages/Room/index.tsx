@@ -15,7 +15,10 @@ import {
   Users,
   X,
 } from 'lucide-react';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import {
+  orderGameRoomSeats,
+  playerDisplayName,
+} from '@/features/game-core/model/room';
 import {
   StandardGameMobileRoom,
   StandardGameMobileRoomDialogs,
@@ -31,7 +34,6 @@ import {
 import type { FugitiveSession } from '../../hooks/useFugitiveSession';
 import type { MatchSnapshot } from '../../model/session';
 import type {
-  FugitiveRoom,
   Role,
   Visibility,
 } from '../../model/types';
@@ -47,12 +49,10 @@ const otherRole = (role: Role): Role =>
 export function Room({
   session,
   data,
-  room,
   onLeave,
 }: {
   session: FugitiveSession;
   data: MatchSnapshot;
-  room?: FugitiveRoom;
   onLeave: () => void;
 }) {
   const { isMobile } = useMobileViewport();
@@ -65,16 +65,22 @@ export function Room({
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
-  const seats = useMemo(() => Array.from({ length: 2 }, (_, index) =>
-    players.find(([, player]) => player.seatIndex === index) ?? players[index]),
-  [players]);
+  const seats = useMemo(() => orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  ).map(id => id ? [id, data.players[id]] as const : undefined), [
+    data.maxPlayers,
+    data.playerOrder,
+    data.players,
+  ]);
   const hostRole = data.players[data.ownerID]?.gameRole ?? 'fugitive';
   const selfRole = data.players[data.playerID]?.gameRole
     ?? (owner ? hostRole : otherRole(hostRole));
   const allReady = players.length === 2
     && players.every(([, player]) => (player.online || player.ai) && player.ready);
   const inviteURL = fugitiveRoomInviteURL(data.roomID);
-  const roomName = room?.displayName || '午夜追缉';
+  const roomName = data.roomID;
   const close = () => setPanel(undefined);
   const copy = async (value: string, message: string) => {
     try {
@@ -184,7 +190,7 @@ export function Room({
         getPlayerName={getPlayerName}
         renderAvatar={renderMobileAvatar}
         inviteTitle="把下一步，留给朋友。"
-        settingsHint="房间名称固定为“午夜追缉”，每回合固定 120 秒。"
+        settingsHint="每回合固定 120 秒。"
         startTitle="让追逐开始？"
         startFacts={[
           { icon: <Users />, label: '本场人数', value: '2 人' },
@@ -345,7 +351,7 @@ export function Room({
           {visibility === value && <Check size={17} />}
         </button>)}</div>
       <p className="notice"><Shield size={16} />
-        <span>房间名称固定为“午夜追缉”，每回合固定 120 秒。</span></p>
+        <span>每回合固定 120 秒。</span></p>
     </Modal>}
 
     {panel === 'invite' && <Modal title="把下一步，留给朋友。"

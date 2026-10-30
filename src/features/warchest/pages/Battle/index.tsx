@@ -265,6 +265,7 @@ export function Battle({
               onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>}
         </>}
       />}
+      <div className="battle-surface" data-testid="warchest-battle-surface">
       <header className="battle-header" data-game-desktop-topbar><button className="icon-button back-lobby" type="button"
         aria-label="退出对局" onClick={onLeave}><ArrowLeft size={20} /></button><Brand />
         <div className="battle-room"><span /><b>{roomName}</b><small>房间 {roomID}</small></div>
@@ -366,6 +367,7 @@ export function Battle({
               <button className="button primary commit-button" type="button" disabled={!plan || !canInput}
                 onClick={() => submit()}>{plan ? '确认行动' : '选择目标'}<ArrowRight size={16} /></button></div></div></>}
       </section>}
+      </div>
 
       <AnimatePresence>{notice && <motion.div className="toast battle-toast" role="status"
         initial={{ opacity: 0, y: 7 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>

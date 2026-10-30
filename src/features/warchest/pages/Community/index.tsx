@@ -300,7 +300,7 @@ export function My() {
         String(player.userID) === String(profile.data?.id));
       return {
         id: String(game.id),
-        title: game.roomDisplayName || `房间 ${game.roomID}`,
+        title: game.roomID,
         detail: `${me?.isWinner ? '胜利' : '失利'} · ${
           me?.finalScore ?? '—'} / 6 据点 · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
@@ -381,7 +381,7 @@ export function My() {
         <div className="history-list">{history.games.map(game => {
           const me = game.players?.find(player => String(player.userID) === String(profile.data?.id));
           return <Link key={game.id} to={game.endedAt ? `/game/warchest/replay/${game.id}` : '#'} className="history-row">
-            <Crest side={me?.isWinner ? 0 : 1} size={49} /><div><h3>{game.roomDisplayName || `房间 ${game.roomID}`}</h3>
+            <Crest side={me?.isWinner ? 0 : 1} size={49} /><div><h3>{game.roomID}</h3>
               <p>{new Date(game.startedAt).toLocaleString('zh-CN')} · {Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</p></div>
             <span className={`result-tag ${me?.isWinner ? 'won' : ''}`}>{me?.isWinner ? '胜利' : '失利'}</span>
             <strong>{me?.finalScore ?? '—'}<small> / 6</small></strong><ArrowRight size={17} /></Link>;

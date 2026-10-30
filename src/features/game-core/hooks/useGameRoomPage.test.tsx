@@ -1,6 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
-import { orderGameRoomSeats, useGameRoomPage } from './useGameRoomPage';
+import { useGameRoomPage } from './useGameRoomPage';
 
 const players = {
   owner: {
@@ -24,11 +24,6 @@ describe('useGameRoomPage', () => {
       configurable: true,
       value: { writeText: vi.fn().mockResolvedValue(undefined) },
     });
-  });
-
-  it('orders assigned and unassigned players without losing either', () => {
-    expect(orderGameRoomSeats(players, ['owner', 'guest'], 4))
-      .toEqual(['guest', 'owner', undefined, undefined]);
   });
 
   it('resets settings and tracks room copy feedback', async () => {

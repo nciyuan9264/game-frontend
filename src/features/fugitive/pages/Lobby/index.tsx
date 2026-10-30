@@ -93,7 +93,7 @@ function RoomCard({
       <span>#{room.roomID}</span>
     </div>
     <div className="room-card-title"><div>
-      <h3>{room.displayName || '午夜追缉'}</h3>
+      <h3>{room.roomID}</h3>
       <p>{playing
         ? `最高公开 ${room.highestRevealed ?? 0}`
         : `等待${roleName(ownerRole === 'fugitive' ? 'marshal' : 'fugitive')}`}
@@ -192,7 +192,7 @@ export default function Lobby() {
     const ownerRole = roomRole(room);
     return <GameMobileRoomCard key={room.roomID}
       roomID={room.roomID}
-      title={room.displayName || '午夜追缉'}
+      title={room.roomID}
       ownerName={ownerProfile.name}
       ownerAvatar={<ProfileMonogram profile={{
         name: ownerProfile.name,
@@ -438,7 +438,7 @@ export default function Lobby() {
       {action.error && <p className="field-error" role="alert">{action.error}</p>}
       <div className="join-hint"><ShieldCheck size={16} />
         <span>输入朋友分享的完整房间号。</span></div>
-      {foundRoom && <div className="invitation"><h3>{foundRoom.displayName || '午夜追缉'}</h3>
+      {foundRoom && <div className="invitation"><h3>{foundRoom.roomID}</h3>
         <p>{roomOwnerProfile(foundRoom).name} · {foundRoom.roomPlayer.length}/2 已入座</p>
         <p>{foundRoom.roomPlayer.map(player => playerDisplayName(player)).join(' / ')}</p>
       </div>}

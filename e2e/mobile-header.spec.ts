@@ -262,6 +262,28 @@ test('acquire live play swaps only the mobile topbar structure', async ({ page }
   await expect(desktopTopbar).toBeVisible();
 });
 
+test('acquire desktop activity column ends with the board', async ({ page }) => {
+  await page.setViewportSize({ width: 1727, height: 1261 });
+  const roomID = await mockAcquirePlay(page);
+  await page.goto(`/game/acquire/match?roomID=${roomID}`);
+
+  const board = page.getByRole('group', { name: '12 列 9 行，共 108 块地' })
+    .locator('..');
+  const activity = page.getByRole('heading', { name: '城市动态' }).locator('..');
+  await expect(board).toBeVisible();
+  await expect(activity).toBeVisible();
+
+  const [boardBox, activityBox] = await Promise.all([
+    board.boundingBox(),
+    activity.boundingBox(),
+  ]);
+  expect(boardBox).not.toBeNull();
+  expect(activityBox).not.toBeNull();
+  const boardBottom = boardBox!.y + boardBox!.height;
+  const activityBottom = activityBox!.y + activityBox!.height;
+  expect(Math.abs(activityBottom - boardBottom)).toBeLessThanOrEqual(45);
+});
+
 test('davinci mobile cipher facts use the full strip width', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockHeaderData(page);

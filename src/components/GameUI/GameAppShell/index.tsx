@@ -158,7 +158,7 @@ export function GameAppShell({
       classes.main,
       compactMobileFooter ? layoutStyles.compactMobileShell : '',
     ].filter(Boolean).join(' ')}>
-      {!hideHeader && <header className={classes.header} data-game-shell-header>
+      {!hideHeader && <header className={classes.header} data-game-shell-header data-game-shell-frame>
         {inMatch
           ? <span className={classes.brand} data-game-brand>{renderBrand()}</span>
           : <Link
@@ -202,7 +202,7 @@ export function GameAppShell({
       <main className={[
         classes.content,
         compactMobileFooter ? layoutStyles.compactMobileFooter : '',
-      ].filter(Boolean).join(' ')} data-game-shell-content>{children}</main>
+      ].filter(Boolean).join(' ')} data-game-shell-content data-game-shell-frame>{children}</main>
     </div>
     {!inMatch && <nav className={classes.mobileNav} aria-label={labels.mobileNavigation}>
       {navigation.map(item => <NavLink

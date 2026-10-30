@@ -10,7 +10,6 @@ export const createCantStopRoom = (
   signal?: AbortSignal,
 ) => createGameRoom('cantstop', {
   visibility,
-  displayName: '再高一点',
   maxPlayers: 4,
   turnTimeoutSeconds: 60,
 }, { signal, authFailure: 'redirect' });

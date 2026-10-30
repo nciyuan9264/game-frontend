@@ -150,7 +150,6 @@ describe('game room API wrappers', () => {
     expect(shared.createGameRoom).toHaveBeenCalledWith(
       'fugitive',
       {
-        displayName: '午夜追缉',
         visibility: 'private',
         turnTimeoutSeconds: 120,
         maxPlayers: 2,
@@ -175,7 +174,6 @@ describe('game room API wrappers', () => {
     expect(shared.createGameRoom).toHaveBeenCalledWith(
       'warchest',
       {
-        displayName: '雾谷前哨',
         visibility: 'private',
         maxPlayers: 2,
         turnTimeoutSeconds: 90,
@@ -225,7 +223,6 @@ describe('game room API wrappers', () => {
       'loveletter',
       {
         visibility: 'private',
-        displayName: '掌心密信',
         maxPlayers: 6,
         turnTimeoutSeconds: 60,
       },

@@ -204,7 +204,6 @@ async function mockSession(
         nextRoundNo: 2,
         createdAt: '2026-10-25T00:00:00Z',
         updatedAt: '2026-10-25T00:00:00Z',
-        displayName: '午夜追缉',
         turnTimeoutSeconds: 120,
         players: [human, ai],
         metrics: {
@@ -290,19 +289,18 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
     .toBeVisible();
   await expect(createDialog.getByRole('textbox')).toHaveCount(0);
   await expect(createDialog.getByRole('combobox')).toHaveCount(0);
-  await page.getByRole('button', { name: '关闭弹窗' }).click();
+  await page.getByRole('button', { name: '关闭面板' }).click();
 
   await shareButton.click();
   await expect(page.getByRole('dialog', { name: '分享 Fugitive' })).toBeVisible();
-  await expect(page.locator('.share-qr svg')).toHaveCount(1);
+  await expect(page.getByText('https://board.gamebus.online/game/fugitive', { exact: true }))
+    .toBeVisible();
   await expect(page.getByRole('button', { name: /复制游戏链接/ })).toBeVisible();
-  await page.getByRole('button', { name: '关闭弹窗' }).click();
-
-  const mobileJoin = page.getByTestId('fugitive-lobby-mobile-join');
-  await expect(mobileJoin).toBeVisible();
-  await expect(mobileJoin.getByRole('textbox', { name: '查找房间号' }))
-    .toHaveAttribute('placeholder', '输入完整房间号');
-  await expect(mobileJoin.getByRole('button', { name: '查找房间' })).toBeDisabled();
+  await page.getByRole('button', { name: '关闭面板' }).click();
+  const roomLookup = page.getByRole('textbox', { name: '查找房间号' });
+  await expect(roomLookup).toBeVisible();
+  await expect(roomLookup).toHaveAttribute('placeholder', '输入完整房间号');
+  await expect(page.getByRole('button', { name: '查找房间' })).toBeDisabled();
   await expectNoDocumentOverflow(page);
 });
 
@@ -349,7 +347,7 @@ for (const viewport of [
     await expect(page.locator('[data-game-brand]')).toBeVisible();
     await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
     await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-    const seats = page.getByTestId('fugitive-room-seat');
+    const seats = page.locator('[data-game-mobile-room-seat]');
     await expect(seats).toHaveCount(2);
     const first = await seats.nth(0).boundingBox();
     const second = await seats.nth(1).boundingBox();
@@ -358,7 +356,7 @@ for (const viewport of [
     expect(Math.abs(first!.y - second!.y)).toBeLessThanOrEqual(1);
     expect(Math.abs(first!.height - second!.height)).toBeLessThanOrEqual(1);
 
-    const remove = await seats.nth(1).locator('.seat-remove').boundingBox();
+    const remove = await seats.nth(1).getByRole('button', { name: '管理席位 2' }).boundingBox();
     expect(remove).not.toBeNull();
     expect(remove!.x).toBeGreaterThanOrEqual(second!.x);
     expect(remove!.y).toBeGreaterThanOrEqual(second!.y);
@@ -440,5 +438,29 @@ test('Fugitive desktop keeps route, hand, and mission visible at 1440x900', asyn
   await expect(page.getByRole('heading', { name: /我的手牌/ })).toBeVisible();
   await expect(page.getByText('消失在天亮之前。')).toBeVisible();
   await expect(page.getByText('服务端权威牌局')).toBeVisible();
+  await expectNoDocumentOverflow(page);
+});
+
+test('Fugitive desktop game chrome is bounded on an ultra-wide viewport', async ({
+  page,
+}) => {
+  await page.setViewportSize({ width: 2557, height: 1293 });
+  await mockSession(page);
+  await page.goto(`/game/fugitive/match?roomID=${roomID}`);
+
+  const frames = page.locator('.game-header, .game-main');
+  await expect(frames).toHaveCount(2);
+  const geometry = await frames.evaluateAll(elements => elements.map(element => {
+    const box = element.getBoundingClientRect();
+    return {
+      width: box.width,
+      center: box.left + box.width / 2,
+    };
+  }));
+  for (const frame of geometry) {
+    expect(frame.width).toBeLessThanOrEqual(1700.5);
+    expect(frame.width).toBeGreaterThanOrEqual(1699);
+    expect(Math.abs(frame.center - 2557 / 2)).toBeLessThanOrEqual(1);
+  }
   await expectNoDocumentOverflow(page);
 });

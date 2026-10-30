@@ -65,7 +65,7 @@ async function mockSession(page: Page, snapshot: ReturnType<typeof gameSnapshot>
       roomID, gameType: 'sixnimmt', status: snapshot.type === 'MATCH_SYNC' ? 'match' : 'playing', visibility: 'private',
       ownerUserID: human.userID, ownerPlayerID: human.playerID, maxPlayers: 10, playerCount: 2,
       currentMatchID: matchID, currentMatchStatus: 'running', nextRoundNo: 2,
-      createdAt: '2026-10-27T00:00:00Z', updatedAt: '2026-10-27T00:00:00Z', displayName: '牧场牌桌', turnTimeoutSeconds: 60,
+      createdAt: '2026-10-27T00:00:00Z', updatedAt: '2026-10-27T00:00:00Z', turnTimeoutSeconds: 60,
       players: [human, ai], metrics: { sixnimmt: { maxPenalty: 13, targetPenalty: 66, progressCurrent: 13, progressTotal: 66 } },
     },
   } }));

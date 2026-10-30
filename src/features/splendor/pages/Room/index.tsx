@@ -9,6 +9,7 @@ import {
   StandardGameMobileRoomDialogs,
 } from '@/components/GameUI/GameRoomMobile';
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { SplendorSession } from '../../hooks/useSplendorSession';
@@ -30,8 +31,15 @@ export function Room({ session, data, onLeave }: {
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
-  const seats = useMemo(() => Array.from({ length: data.maxPlayers }, (_, index) =>
-    players.find(([, player]) => player.seatIndex === index) ?? players[index]), [data.maxPlayers, players]);
+  const seats = useMemo(() => orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  ).map(id => id ? [id, data.players[id]] as const : undefined), [
+    data.maxPlayers,
+    data.playerOrder,
+    data.players,
+  ]);
   const allReady = players.length >= 2 && players.every(([, player]) => player.online && player.ready);
   const readyCount = players.filter(([, player]) => player.online && player.ready).length;
   const aiCount = players.filter(([, player]) => player.ai).length;
@@ -160,7 +168,8 @@ export function Room({ session, data, onLeave }: {
         const empty = !player;
         const canAdd = owner && empty && enabled;
         const canRemove = owner && !!player && playerID !== data.ownerID && enabled;
-        return <article key={index} className={`${styles.seat} ${empty ? styles.emptySeat : ''}`}>
+        return <article key={index} className={`${styles.seat} ${empty ? styles.emptySeat : ''}`}
+          data-game-room-seat-index={index} data-game-room-player-id={playerID || undefined}>
           <span className={styles.seatNumber}>0{index + 1}</span>
           {player ? <PlayerAvatar name={playerName(playerID, data.players)} avatar={player.avatar} ai={player.ai} size={62} />
             : <button type="button" aria-label={`在席位 ${index + 1} 添加人机`} disabled={!canAdd}

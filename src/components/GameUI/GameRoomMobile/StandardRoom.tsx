@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { GameMobileRoom } from './Room';
 import {
   GameMobileRoomInviteDialog,
@@ -122,31 +123,11 @@ export function standardRoomPlayers<
 export function standardRoomSeatIDs<
   TPlayer extends StandardRoomPlayerData,
 >(data: StandardRoomData<TPlayer>) {
-  const order = [
-    ...data.playerOrder.filter(id => data.players[id]),
-    ...Object.keys(data.players).filter(id => !data.playerOrder.includes(id)),
-  ];
-  const seats = Array<string | undefined>(data.maxPlayers).fill(undefined);
-  const unassigned: string[] = [];
-  order.forEach(id => {
-    const seatIndex = data.players[id].seatIndex;
-    if (
-      typeof seatIndex === 'number'
-      && Number.isInteger(seatIndex)
-      && seatIndex >= 0
-      && seatIndex < seats.length
-      && !seats[seatIndex]
-    ) {
-      seats[seatIndex] = id;
-      return;
-    }
-    unassigned.push(id);
-  });
-  unassigned.forEach(id => {
-    const index = seats.findIndex(seat => !seat);
-    if (index >= 0) seats[index] = id;
-  });
-  return seats;
+  return orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  );
 }
 
 export function standardRoomCanStart<

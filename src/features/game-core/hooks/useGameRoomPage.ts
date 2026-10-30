@@ -1,6 +1,8 @@
 import { useCallback, useMemo, useState } from 'react';
 import { useClipboardCopy } from './useClipboardCopy';
 
+export { orderGameRoomSeats } from '../model/room';
+
 export type GameRoomPanel = 'invite' | 'settings' | 'remove' | 'start';
 
 export interface GameRoomPlayerLike {
@@ -18,39 +20,6 @@ interface UseGameRoomPageOptions<TPlayer extends GameRoomPlayerLike> {
   ownerID: string;
   playerID: string;
   players: Record<string, TPlayer>;
-}
-
-export function orderGameRoomSeats<TPlayer extends GameRoomPlayerLike>(
-  players: Record<string, TPlayer>,
-  playerOrder: readonly string[],
-  seatCount: number,
-) {
-  const orderedIDs = [
-    ...playerOrder.filter(id => players[id]),
-    ...Object.keys(players).filter(id => !playerOrder.includes(id)),
-  ];
-  const seats = Array<string | undefined>(seatCount).fill(undefined);
-  const unassigned: string[] = [];
-
-  orderedIDs.forEach(id => {
-    const seatIndex = players[id].seatIndex;
-    if (
-      typeof seatIndex === 'number'
-      && Number.isInteger(seatIndex)
-      && seatIndex >= 0
-      && seatIndex < seatCount
-      && !seats[seatIndex]
-    ) {
-      seats[seatIndex] = id;
-    } else {
-      unassigned.push(id);
-    }
-  });
-  unassigned.forEach(id => {
-    const index = seats.findIndex(seat => !seat);
-    if (index >= 0) seats[index] = id;
-  });
-  return seats;
 }
 
 export function useGameRoomPage<TPlayer extends GameRoomPlayerLike>({

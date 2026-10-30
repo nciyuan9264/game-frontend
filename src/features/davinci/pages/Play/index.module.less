@@ -56,6 +56,10 @@
 }
 @keyframes pulse { 50% { opacity: .4; } }
 
+@media (min-width: 768px) {
+  .play { height: min(100dvh, var(--game-stage-max-height, 1000px)); }
+}
+
 @media (max-width: 767px) {
   .play { grid-template-rows: var(--game-mobile-header-height,57px) 38px minmax(0,1fr) 31px; }
   .initializing { grid-template-rows: var(--game-mobile-header-height,57px) 38px minmax(0,1fr) 48px; }

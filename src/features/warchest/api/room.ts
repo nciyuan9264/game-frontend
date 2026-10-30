@@ -10,7 +10,6 @@ export async function createWarChestRoom(
   signal?: AbortSignal,
 ): Promise<{ roomID: string }> {
   return createGameRoom('warchest', {
-    displayName: '雾谷前哨',
     visibility,
     maxPlayers: 2,
     turnTimeoutSeconds: 90,

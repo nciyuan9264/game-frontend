@@ -16,13 +16,20 @@
 }
 
 @media (min-width: 768px) {
-  [data-game-shell='app'] [data-game-shell-header],
-  [data-game-shell='app'] [data-game-shell-content] {
+  [data-game-shell] {
+    --game-shell-max-width: 1700px;
+    --game-stage-max-height: 1000px;
+  }
+
+  [data-game-shell][data-game-shell] [data-game-shell-frame] {
     box-sizing: border-box;
     width: 100%;
-    max-width: 1700px;
+    max-width: var(--game-shell-max-width);
     margin-right: auto;
     margin-left: auto;
+  }
+
+  [data-game-shell='app'][data-game-shell='app'] [data-game-shell-frame] {
     padding-right: 32px;
     padding-left: 32px;
   }
@@ -55,8 +62,7 @@
 }
 
 @media (min-width: 768px) and (max-width: 1199px) {
-  [data-game-shell='app'] [data-game-shell-header],
-  [data-game-shell='app'] [data-game-shell-content] {
+  [data-game-shell='app'][data-game-shell='app'] [data-game-shell-frame] {
     padding-right: 22px;
     padding-left: 22px;
   }

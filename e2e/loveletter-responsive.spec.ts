@@ -204,7 +204,6 @@ async function mockSession(
         nextRoundNo: 2,
         createdAt: '2026-10-27T00:00:00Z',
         updatedAt: '2026-10-27T00:00:00Z',
-        displayName: '掌心密信',
         turnTimeoutSeconds: 60,
         players: [human, ai],
         metrics: {

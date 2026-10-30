@@ -40,7 +40,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
   const event = replay.currentSnapshot?.currentEvent;
   return <div className="warchest-replay-root"><Battle game={game}
     roomID={replay.detail?.game.roomID ?? ''}
-    roomName={replay.detail?.game.roomDisplayName || '全知对局回放'}
+    roomName={replay.detail?.game.roomID ?? '对局回放'}
     interactive={false} revealHands
     mobileHeading={<GameMobileReplayHeading
       backTo="/game/warchest/me"

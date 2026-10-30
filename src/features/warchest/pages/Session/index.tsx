@@ -78,12 +78,12 @@ function Session({ roomID }: { roomID: string }) {
     {snapshot?.type === 'MATCH_SYNC' && <Shell inMatch title="备战房间" profile={profile}>
       {session.feedback && <div className="toast" role="alert">{session.feedback}</div>}
       {connectionNotice && !session.feedback && <Notice>{connectionNotice}</Notice>}
-      <Room session={session} data={snapshot} room={target.data.room}
+      <Room session={session} data={snapshot}
         onLeave={leave.request} />
     </Shell>}
     {snapshot?.type === 'ROOM_SYNC' && <Battle
       game={toBattleGame(snapshot)} roomID={roomID}
-      roomName={target.data.room?.displayName || '战争之匣'}
+      roomName={roomID}
       interactive={connection.status === 'connected'}
       commandPending={!!session.pending}
       connectionNotice={connectionNotice}

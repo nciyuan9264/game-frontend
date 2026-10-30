@@ -22,11 +22,12 @@ import {
   StandardGameMobileRoomDialogs,
 } from '@/components/GameUI/GameRoomMobile';
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
+import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { warChestRoomInviteURL } from '../../adapters';
 import type { WarChestSession } from '../../hooks/useWarChestSession';
 import type { MatchSnapshot } from '../../session';
 import { matchCanStart, setupModeName } from '../../selectors';
-import type { SetupMode, Visibility, WarChestRoom } from '../../types';
+import type { SetupMode, Visibility } from '../../types';
 import { UNITS, type UnitId } from '../../model';
 import { Coin, Crest, Eyebrow, HERO, Modal, TroopArt } from '../../visuals';
 import { PlayerAvatar } from '../../components/Shell';
@@ -69,26 +70,29 @@ function Lineup({
 export function Room({
   session,
   data,
-  room,
   onLeave,
 }: {
   session: WarChestSession;
   data: MatchSnapshot;
-  room?: WarChestRoom;
   onLeave: () => void;
 }) {
   const { isMobile } = useMobileViewport();
   const [panel, setPanel] = useState<'invite' | 'settings' | 'remove' | 'start'>();
   const [target, setTarget] = useState('');
   const [copyMessage, setCopyMessage] = useState('');
-  const [displayName, setDisplayName] = useState(room?.displayName || '雾谷前哨');
-  const [name, setName] = useState(displayName);
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
   const enabled = session.connection.status === 'connected' && !session.pending;
   const owner = data.playerID === data.ownerID;
   const players = Object.entries(data.players);
-  const seats = useMemo(() => Array.from({ length: 2 }, (_, index) =>
-    players.find(([, player]) => player.seatIndex === index) ?? players[index]), [players]);
+  const seats = useMemo(() => orderGameRoomSeats(
+    data.players,
+    data.playerOrder,
+    data.maxPlayers,
+  ).map(id => id ? [id, data.players[id]] as const : undefined), [
+    data.maxPlayers,
+    data.playerOrder,
+    data.players,
+  ]);
   const allReady = matchCanStart(data);
   const setup = data.setup;
   const inviteURL = warChestRoomInviteURL(data.roomID);
@@ -229,7 +233,6 @@ export function Room({
         extension={setupExtension}
         onLeave={onLeave}
         onSettings={() => {
-          setName(displayName);
           setVisibility(data.visibility);
           setPanel('settings');
         }}
@@ -260,11 +263,6 @@ export function Room({
         getPlayerName={getPlayerName}
         renderAvatar={renderMobileAvatar}
         inviteTitle="一场好局，等你入席。"
-        settingsFields={<><label className="field-label"
-          htmlFor="warchest-mobile-settings-name">房间名称</label>
-          <input id="warchest-mobile-settings-name" className="input full"
-            maxLength={18} value={name}
-            onChange={event => setName(event.target.value)} /></>}
         settingsHint="战争之匣真人行动固定为 90 秒。"
         startTitle="让第一枚指令落下？"
         startFacts={[
@@ -280,10 +278,8 @@ export function Room({
         onSaveSettings={() => {
           if (session.submit('room_update_settings', {
             visibility,
-            displayName: name.trim(),
             turnTimeoutSeconds: 90,
           })) {
-            setDisplayName(name.trim());
             close();
           }
         }}
@@ -301,13 +297,12 @@ export function Room({
   return <main className="page room-page"><div className="section-heading room-heading" data-game-room-heading>
     <div className="room-heading-identity" data-game-room-heading-identity><button className="room-back-button" data-game-room-heading-back type="button"
       aria-label="离开当前房间" onClick={onLeave}><ArrowLeft size={19} /></button>
-      <div data-game-room-heading-copy><span data-game-room-heading-kicker><Eyebrow>RAISE YOUR BANNER</Eyebrow></span><h1 data-game-room-heading-title>{displayName}<span className="status-tag"><i />备战中</span></h1>
+      <div data-game-room-heading-copy><span data-game-room-heading-kicker><Eyebrow>RAISE YOUR BANNER</Eyebrow></span><h1 data-game-room-heading-title>{data.roomID}<span className="status-tag"><i />备战中</span></h1>
       <div className="room-id" data-game-room-heading-meta><span>房间号 <b>{data.roomID}</b></span>
         <button className="icon-button" type="button" aria-label="复制房间号"
           onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={14} /></button>
         <span>· {data.visibility === 'private' ? '私密房间' : '公开房间'} · 90 秒行动</span></div></div></div>
-    <div className="room-heading-actions" data-game-room-heading-actions>{owner && <button className="button secondary" type="button" onClick={() => {
-      setName(displayName); setVisibility(data.visibility); setPanel('settings');
+    <div className="room-heading-actions" data-game-room-heading-actions>{owner && <button className="button secondary" type="button" onClick={() => { setVisibility(data.visibility); setPanel('settings');
     }}><Settings2 size={16} />房间设置</button>}
       <button className="button primary" type="button" onClick={() => { setCopyMessage(''); setPanel('invite'); }}>
         <UserPlus size={17} />邀请好友</button></div></div>
@@ -410,7 +405,7 @@ export function Room({
         onClick={() => void copy(data.roomID, '房间号已复制')}><Copy size={15} />复制房间号</button>
         <button className="button primary" type="button" onClick={() => void copy(inviteURL, '邀请链接已复制')}>
           <Copy size={15} />复制邀请链接</button></>}>
-      <div className="invitation"><Crest size={76} /><h3>{displayName}</h3>
+      <div className="invitation"><Crest size={76} /><h3>{data.roomID}</h3>
         <span>双人完整基础版 · {setupModeName(setup.mode)}</span>
         <input aria-label="邀请房间号" readOnly value={data.roomID} onFocus={event => event.target.select()} />
         <small>房间号</small></div><p className="muted">{copyMessage || '邀请链接不包含玩家身份或隐藏信息。'}</p>
@@ -418,14 +413,11 @@ export function Room({
 
     {owner && panel === 'settings' && <Modal title="房间设置" eyebrow="ROOM SETTINGS"
       onClose={close} footer={<><button className="button secondary" type="button" onClick={close}>取消</button>
-        <button className="button primary" type="button" disabled={!enabled || !name.trim()} onClick={() => {
+        <button className="button primary" type="button" disabled={!enabled} onClick={() => {
           if (session.submit('room_update_settings', {
-            visibility, displayName: name.trim(), turnTimeoutSeconds: 90,
-          })) { setDisplayName(name.trim()); close(); }
+            visibility, turnTimeoutSeconds: 90,
+          })) close();
         }}>保存设置 <Check size={15} /></button></>}>
-      <label className="field-label" htmlFor="warchest-settings-name">房间名称</label>
-      <input id="warchest-settings-name" className="input full" maxLength={18} value={name}
-        onChange={event => setName(event.target.value)} />
       <div className="field-label">谁可以加入？</div><div className="privacy-options">
         {(['public', 'private'] as const).map(value => <button key={value} type="button"
           className={visibility === value ? 'selected' : ''} onClick={() => setVisibility(value)}>

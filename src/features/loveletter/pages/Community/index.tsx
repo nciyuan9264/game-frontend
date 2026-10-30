@@ -278,7 +278,7 @@ export function My() {
         String(player.userID) === String(profile.data?.id));
       return {
         id: String(game.id),
-        title: game.roomDisplayName || `庭院 ${game.roomID}`,
+        title: game.roomID,
         detail: `${me?.isWinner ? '本场获胜' : `最终第 ${me?.finalRank ?? '—'} 名`
         } · ${me?.finalScore ?? 0} 枚好感 · ${
           Math.max(0, Math.round(game.durationSeconds / 60))} 分钟`,
@@ -360,7 +360,7 @@ export function My() {
             const me = game.players?.find(player =>
               String(player.userID) === String(profile.data?.id));
             return <article key={game.id}><span><Mail size={19} /></span><div>
-              <b>{game.roomDisplayName || `庭院 ${game.roomID}`}</b>
+              <b>{game.roomID}</b>
               <small>{new Date(game.startedAt).toLocaleString('zh-CN')} · {
                 Math.max(0, Math.round(game.durationSeconds / 60))} 分钟</small>
               <small>{me?.isWinner ? '本场获胜' : `最终第 ${me?.finalRank ?? '—'} 名`}

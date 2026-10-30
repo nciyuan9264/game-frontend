@@ -23,7 +23,6 @@ export interface LobbyRoomLike {
   maxPlayers: number;
   status: string;
   visibility?: string;
-  displayName?: string;
   turnTimeoutSeconds?: number;
   currentMatchID?: string;
   currentMatchStatus?: string;
@@ -58,6 +57,42 @@ export type LobbyFilter = 'all' | 'joinable' | 'playing';
 
 export interface RoomEntryIdentity {
   userID: string;
+}
+
+export function orderGameRoomSeats<TPlayer extends { seatIndex?: number }>(
+  players: Record<string, TPlayer>,
+  playerOrder: readonly string[],
+  seatCount: number,
+) {
+  const orderedIDs: string[] = [];
+  const seenIDs = new Set<string>();
+  for (const id of [...playerOrder, ...Object.keys(players)]) {
+    if (!players[id] || seenIDs.has(id)) continue;
+    seenIDs.add(id);
+    orderedIDs.push(id);
+  }
+
+  const seats = Array<string | undefined>(seatCount).fill(undefined);
+  const unassigned: string[] = [];
+  orderedIDs.forEach(id => {
+    const seatIndex = players[id].seatIndex;
+    if (
+      typeof seatIndex === 'number'
+      && Number.isInteger(seatIndex)
+      && seatIndex >= 0
+      && seatIndex < seatCount
+      && !seats[seatIndex]
+    ) {
+      seats[seatIndex] = id;
+    } else {
+      unassigned.push(id);
+    }
+  });
+  unassigned.forEach(id => {
+    const index = seats.findIndex(seat => !seat);
+    if (index >= 0) seats[index] = id;
+  });
+  return seats;
 }
 
 export function playerDisplayName(
@@ -111,7 +146,7 @@ export function filterLobbyRooms<TRoom extends LobbyRoomLike>(
     const matchesFilter = filter === 'all'
       || (filter === 'joinable' ? joinable : room.status === 'playing');
     return matchesFilter
-      && `${room.roomID} ${room.displayName ?? ''} ${getOwnerName(room)}`
+      && `${room.roomID} ${getOwnerName(room)}`
         .toLowerCase()
         .includes(search);
   });
@@ -126,7 +161,6 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     maxPlayers: room.maxPlayers,
     status: room.status,
     visibility: room.visibility,
-    displayName: room.displayName,
     turnTimeoutSeconds: room.turnTimeoutSeconds,
     currentMatchID: room.currentMatchID,
     currentMatchStatus: room.currentMatchStatus,

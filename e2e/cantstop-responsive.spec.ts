@@ -112,7 +112,6 @@ async function mockMatchRoom(page: Page) {
         nextRoundNo: 1,
         createdAt: '2026-10-28T00:00:00Z',
         updatedAt: '2026-10-28T00:00:00Z',
-        displayName: '再高一点',
         turnTimeoutSeconds: 60,
         players: [human, ai],
         metrics: {
@@ -234,7 +233,6 @@ async function mockGameSession(page: Page) {
         nextRoundNo: 1,
         createdAt: '2026-10-28T00:00:00Z',
         updatedAt: '2026-10-28T00:00:00Z',
-        displayName: '再高一点',
         turnTimeoutSeconds: 60,
         players: [human, ai],
         metrics: {
