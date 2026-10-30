@@ -1,6 +1,9 @@
 import { describe, expect, it } from 'vitest';
 import { GameRoomRequestError } from '../api/room';
-import { describeSessionTargetFailure } from './sessionTarget';
+import {
+  describeSessionConnectionFailure,
+  describeSessionTargetFailure,
+} from './sessionTarget';
 
 describe('describeSessionTargetFailure', () => {
   it('maps missing rooms to a localized terminal state', () => {
@@ -20,6 +23,27 @@ describe('describeSessionTargetFailure', () => {
       title: '无法确认当前对局',
       message: '认证服务暂时不可用',
       terminal: false,
+    });
+  });
+});
+
+describe('describeSessionConnectionFailure', () => {
+  it('maps a replaced session to the shared takeover terminal state', () => {
+    expect(describeSessionConnectionFailure(
+      'IDENTITY_CONFLICT',
+      '当前对局已在另一台设备接管，此设备已停止操作。',
+    )).toEqual({
+      title: '已在其他设备接管',
+      message: '当前对局已在另一台设备接管，此设备已停止操作。',
+      terminal: true,
+    });
+  });
+
+  it('keeps other terminal connection errors generic', () => {
+    expect(describeSessionConnectionFailure('removed', '你已被移出房间')).toEqual({
+      title: '无法进入当前对局',
+      message: '你已被移出房间',
+      terminal: true,
     });
   });
 });

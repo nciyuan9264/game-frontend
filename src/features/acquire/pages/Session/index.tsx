@@ -4,7 +4,10 @@ import { RefreshCw } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { lookupGameRoom } from '@/features/game-core/api/room';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
-import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
+import {
+  describeSessionConnectionFailure,
+  describeSessionTargetFailure,
+} from '@/features/game-core/model/sessionTarget';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -35,6 +38,7 @@ function Session({ roomID }: { roomID: string }) {
   const interaction = useAcquireInteraction(session);
   const leave = useAcquireLeave(session.connection.close);
   const { connection, snapshot } = session;
+  const connectionFailure = describeSessionConnectionFailure(connection.fatalCode, connection.fatal);
   const players = snapshot?.type === 'MATCH_SYNC' ? snapshot.players : snapshot?.roomData.players;
   const playerID = snapshot ? selfID(snapshot) : '';
   const currentPlayer = players?.[playerID];
@@ -56,7 +60,7 @@ function Session({ roomID }: { roomID: string }) {
   return <AppShell inMatch hideRail hideHeader={snapshot?.type === 'ROOM_SYNC'} profile={profile} title={snapshot?.type === 'MATCH_SYNC' ? '准备房间'
     : snapshot?.roomData.gameStatus === 'end' ? '本局结算' : '经典对局'}>
     {!roomID && <SessionExitState title="对局链接无效" message="链接缺少房间号，请返回大厅重新进入。" onLeave={leave.confirm} />}
-    {connection.fatal ? <SessionExitState title="无法进入当前对局" message={connection.fatal} onLeave={leave.confirm} />
+    {connection.fatal ? <SessionExitState title={connectionFailure.title} message={connectionFailure.message} onLeave={leave.confirm} />
       : roomID && connection.status !== 'connected' && <Feedback>
         {connection.status === 'connecting' ? '正在连接房间…' : connection.status === 'reconnecting' ? `正在恢复连接（${connection.attempt} / 5）…` : '连接暂时中断'}
         <span>画面与草稿保留，恢复后请核对最新阶段。</span>

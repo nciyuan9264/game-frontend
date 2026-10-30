@@ -39,6 +39,7 @@ beforeEach(() => {
       status: 'connecting',
       attempt: 0,
       fatal: '',
+      fatalCode: '',
       close: vi.fn(),
       retry: vi.fn(),
     },
@@ -124,6 +125,38 @@ describe('Acquire session authentication preflight', () => {
     expect(screen.queryByRole('button', { name: '重新验证' })).toBeNull();
   });
 
+  it('shows the shared terminal UI when another device takes over', async () => {
+    mocks.getProfile.mockResolvedValue({
+      id: '42',
+      name: 'Alice',
+      email: 'alice@example.com',
+    });
+    mocks.useAcquireSession.mockReturnValue({
+      snapshot: undefined,
+      pending: undefined,
+      feedback: '',
+      activity: [],
+      connection: {
+        status: 'closed',
+        attempt: 0,
+        fatalCode: 'identity_conflict',
+        fatal: '当前对局已在另一台设备接管，此设备已停止操作。',
+        close: vi.fn(),
+        retry: vi.fn(),
+      },
+      submit: vi.fn(),
+      setFeedback: vi.fn(),
+    });
+
+    render(<MemoryRouter initialEntries={['/game/acquire/match?roomID=room-1']}>
+      <AcquireSessionPage />
+    </MemoryRouter>);
+
+    expect(await screen.findByRole('heading', { name: '已在其他设备接管' })).toBeTruthy();
+    expect(screen.getByText('当前对局已在另一台设备接管，此设备已停止操作。')).toBeTruthy();
+    expect(screen.queryByRole('button', { name: '重新连接' })).toBeNull();
+  });
+
   it('resets the keyed bootstrap when the room id changes', async () => {
     mocks.getProfile.mockResolvedValue({ id: '42', name: 'Alice', email: 'alice@example.com' });
     mocks.lookupGameRoom.mockImplementation(async (_gameType: string, roomID: string) => ({
@@ -172,6 +205,7 @@ describe('Acquire session authentication preflight', () => {
         status: 'connected',
         attempt: 0,
         fatal: '',
+        fatalCode: '',
         close: vi.fn(),
         retry: vi.fn(),
       },

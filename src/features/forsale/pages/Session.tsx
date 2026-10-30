@@ -6,7 +6,10 @@ import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
-import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
+import {
+  describeSessionConnectionFailure,
+  describeSessionTargetFailure,
+} from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupForSaleRoom } from '../api/room';
 import { AppShell } from '../components/AppShell';
@@ -52,6 +55,7 @@ const Session = ({ roomID }: { roomID: string }) => {
   const session = useForSaleSession(roomID, matchID, nextMatch.adoptMatch);
   const leave = useForSaleLeave(session.connection.close);
   const { connection, snapshot } = session;
+  const connectionFailure = describeSessionConnectionFailure(connection.fatalCode, connection.fatal);
   const players = snapshot?.type === 'MATCH_SYNC'
     ? snapshot.players : snapshot?.roomData.players;
   const id = snapshot ? selfID(snapshot) : '';
@@ -75,8 +79,8 @@ const Session = ({ roomID }: { roomID: string }) => {
     profile={profile} title={snapshot?.type === 'MATCH_SYNC' ? '准备房间' : '拍卖现场'}>
     {!roomID && <ExitState title="对局链接无效"
       message="链接缺少房间号，请返回大厅重新进入。" onLeave={leave.confirm} />}
-    {roomID && connection.fatal && <ExitState title="无法进入当前房间"
-      message={connection.fatal} onLeave={leave.confirm} />}
+    {roomID && connection.fatal && <ExitState title={connectionFailure.title}
+      message={connectionFailure.message} onLeave={leave.confirm} />}
     {roomID && !connection.fatal && connection.status !== 'connected'
       && <Feedback>{connection.status === 'connecting'
         ? '正在连接牌桌…'

@@ -7,7 +7,10 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
-import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
+import {
+  describeSessionConnectionFailure,
+  describeSessionTargetFailure,
+} from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupFugitiveRoom } from '../../api/room';
 import {
@@ -59,6 +62,7 @@ function Session({ roomID }: { roomID: string }) {
   const session = useFugitiveSession(roomID, matchID, nextMatch.adoptMatch);
   const leave = useFugitiveLeave(session.connection.close);
   const { connection, snapshot } = session;
+  const connectionFailure = describeSessionConnectionFailure(connection.fatalCode, connection.fatal);
   const profile = target.data?.profile;
   const initialLoading = target.loading && !target.data
     || !!roomID && !!matchID && !snapshot
@@ -87,8 +91,8 @@ function Session({ roomID }: { roomID: string }) {
       <ExitState title="对局链接无效" message="链接缺少房间号，请返回大厅重新进入。"
         onLeave={leave.confirm} />
     </AppShell>}
-    {roomID && connection.fatal && <AppShell room title="无法进入房间" profile={profile}>
-      <ExitState title="无法进入当前房间" message={connection.fatal}
+    {roomID && connection.fatal && <AppShell room title={connectionFailure.title} profile={profile}>
+      <ExitState title={connectionFailure.title} message={connectionFailure.message}
         onLeave={leave.confirm} />
     </AppShell>}
     {roomID && !connection.fatal && snapshot?.type === 'MATCH_SYNC'

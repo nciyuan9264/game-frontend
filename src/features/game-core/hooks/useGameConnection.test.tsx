@@ -91,7 +91,7 @@ describe('useGameConnection', () => {
     expect(Socket.instances[1].url).toContain('lastSeq=5');
   });
 
-  it('stops reconnecting after a terminal v2 error', () => {
+  it('stops reconnecting and preserves the normalized terminal code', () => {
     const receive = vi.fn();
     const hook = renderHook(() => useGameConnection(
       'ws://localhost/ws?roomID=room&matchID=match',
@@ -105,12 +105,13 @@ describe('useGameConnection', () => {
       roomID: 'room',
       matchID: 'match',
       seq: 1,
-      code: 'REMOVED',
-      message: '你已被移出房间',
+      code: 'IDENTITY_CONFLICT',
+      message: '当前对局已在另一台设备接管，此设备已停止操作。',
     }));
 
     expect(hook.result.current.status).toBe('closed');
-    expect(hook.result.current.fatal).toBe('你已被移出房间');
+    expect(hook.result.current.fatalCode).toBe('identity_conflict');
+    expect(hook.result.current.fatal).toBe('当前对局已在另一台设备接管，此设备已停止操作。');
     act(() => vi.runAllTimers());
     expect(Socket.instances).toHaveLength(1);
   });

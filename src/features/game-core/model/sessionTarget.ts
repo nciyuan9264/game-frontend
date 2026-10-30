@@ -47,3 +47,21 @@ export function describeSessionTargetFailure(
     terminal: false,
   };
 }
+
+export function describeSessionConnectionFailure(
+  fatalCode: string | undefined,
+  fatalMessage: string | undefined,
+): SessionTargetFailure {
+  if (fatalCode?.trim().toLowerCase() === 'identity_conflict') {
+    return {
+      title: '已在其他设备接管',
+      message: fatalMessage || '当前对局已在另一台设备接管，此设备已停止操作。',
+      terminal: true,
+    };
+  }
+  return {
+    title: '无法进入当前对局',
+    message: fatalMessage || '房间连接已失效，请返回大厅重新进入。',
+    terminal: true,
+  };
+}

@@ -38,6 +38,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
   const [status, setStatus] = useState<ConnectionStatus>('connecting');
   const [attempt, setAttempt] = useState(0);
   const [fatal, setFatal] = useState('');
+  const [fatalCode, setFatalCode] = useState('');
   const socket = useRef<WebSocket>();
   const epoch = useRef(0);
   const synchronized = useRef(false);
@@ -88,6 +89,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
         const errorCode = message.code?.toLowerCase() ?? '';
         if (message.type === 'ERROR' && terminalCodes.has(errorCode)) {
           stopped = true;
+          setFatalCode(errorCode);
           setFatal(message.message || '房间连接已失效');
           setStatus('closed');
           receive.current(message, connectionEpoch);
@@ -140,6 +142,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
       if (!synchronized.current) retry();
     };
     window.addEventListener('online', online);
+    setFatalCode('');
     setFatal('');
     connect();
     return () => {
@@ -169,6 +172,7 @@ export function useGameConnection<TMessage extends SessionServerMessageBase>(
     status,
     attempt,
     fatal,
+    fatalCode,
     epoch,
     send,
     retry: useCallback(() => retryRef.current(), []),
