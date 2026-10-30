@@ -169,14 +169,15 @@ describe('Acquire play end transition', () => {
 
     const topbar = container.querySelector('[data-game-mobile-topbar]');
     expect(topbar).toBeTruthy();
-    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByLabelText('可用现金 $6,000')).toBeNull();
+    expect(screen.getByLabelText('可用现金 $6,000')).toBeTruthy();
     expect(screen.getAllByRole('group', { name: '终局确认' })).toHaveLength(1);
     expect(within(topbar as HTMLElement).getByRole('switch', { name: '允许结束游戏' })).toBeTruthy();
     expect(within(topbar as HTMLElement).getByRole('button', { name: '查看终局规则' })).toBeTruthy();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
   });
 
-  it('keeps cash visible in the mobile topbar while waiting for an opponent', () => {
+  it('keeps cash in the mobile market while waiting for an opponent', () => {
     vi.stubGlobal('matchMedia', vi.fn(() => ({
       matches: true,
       addEventListener: vi.fn(),
@@ -200,7 +201,8 @@ describe('Acquire play end transition', () => {
     const topbar = container.querySelector('[data-game-mobile-topbar]');
 
     expect(topbar).toBeTruthy();
-    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByLabelText('可用现金 $6,000')).toBeNull();
+    expect(screen.getByLabelText('可用现金 $6,000')).toBeTruthy();
     expect(within(topbar as HTMLElement).queryByRole('timer')).toBeNull();
   });
 

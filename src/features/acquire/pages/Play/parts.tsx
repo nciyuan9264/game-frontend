@@ -1,5 +1,5 @@
 import { useEffect, useState, type CSSProperties, type ReactNode } from 'react';
-import { ArrowRight, BarChart3, Check, CircleHelp, Clock, History, ShieldCheck } from 'lucide-react';
+import { ArrowRight, BarChart3, Check, CircleHelp, Clock, History, ShieldCheck, Wallet } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
@@ -21,7 +21,8 @@ export function Deadline({ deadline }: { deadline?: string | null }) {
   if (!deadline) return null;
   const remaining = Math.max(0, Math.ceil((Date.parse(deadline) - now) / 1000));
   if (!Number.isFinite(remaining)) return null;
-  return <span className={styles.deadline} role="timer" aria-label={remaining ? `本阶段剩余 ${remaining} 秒` : '本阶段计时结束'}>
+  return <span className={styles.deadline} role="timer" data-game-turn-countdown
+    aria-label={remaining ? `本阶段剩余 ${remaining} 秒` : '本阶段计时结束'}>
     <Clock size={13} />{remaining ? `${remaining}s` : '等待推进'}
   </span>;
 }
@@ -42,9 +43,11 @@ export function EndVoteControl({ data, enabled, pending, onToggle, onHelp, varia
     role="group" aria-label="终局确认">
     {!compact && <span><b>终局确认</b><small>{pending ? '确认中' : allowed ? '已允许' : '继续对局'}</small></span>}
     <button type="button" className={`${styles.endVoteSwitch} ${allowed ? styles.endVoteSwitchOn : ''}`}
+      data-game-mobile-topbar-control={compact ? true : undefined}
       role="switch" aria-label="允许结束游戏" aria-checked={allowed} disabled={!enabled || pending}
-      onClick={() => onToggle(!allowed)}><i /></button>
+      onClick={() => onToggle(!allowed)}><span className={styles.endVoteSwitchTrack}><i /></span></button>
     <button type="button" className={styles.endVoteHelp} aria-label="查看终局规则" title="查看终局规则"
+      data-game-mobile-topbar-control={compact ? true : undefined}
       onClick={onHelp}><CircleHelp size={15} /></button>
   </div>;
 }
@@ -140,7 +143,10 @@ export function MobileMarket({ data, onCompany, onActivity }: { data: DisplaySna
   const activeCount = companyKeys.filter(key => data.roomData.companyInfo[key].tiles > 0).length;
   return <section className={styles.mobileMarket} aria-label="常驻公司行情">
     <header className={styles.mobileMarketHeader}><h2><BarChart3 size={14} />公司行情<small>{activeCount} / 7</small></h2>
-      <div><button type="button" onClick={() => onCompany('Tower')}>股价速查</button>
+      <div>{data.roomData.gameStatus !== 'end' && <span className={styles.mobileMarketCash}
+        aria-label={`可用现金 ${money(data.playerData.money)}`}><Wallet size={13} />
+        <AnimatedValue value={data.playerData.money} formatter={money} /></span>}
+        <button type="button" onClick={() => onCompany('Tower')}>股价速查</button>
         <button type="button" aria-label="查看对局动态" title="查看对局动态" onClick={onActivity}><History size={14} /></button></div>
     </header>
     <table className={styles.mobileMarketTable} aria-label="公司行情与我的持股">

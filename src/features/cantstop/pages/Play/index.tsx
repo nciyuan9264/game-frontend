@@ -19,7 +19,10 @@ import {
   TriangleAlert,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
-import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
+import {
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '@/components/GameUI/GameMobileTopbar';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { CantStopSession } from '../../hooks/useCantStopSession';
@@ -405,7 +408,7 @@ export function Play({
       backLabel="离开牌桌"
       kicker={`CAN'T STOP · 第 ${data.roomData.turnNumber || 1} 回合`}
       title={phase === 'end' ? '终局棋盘' : statusTitle(data)}
-      status={countdown}
+      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
       actions={<>
         <button type="button" aria-label="规则速览" title="规则速览"
           onClick={() => setPanel('rules')}><BookOpen size={18} /></button>

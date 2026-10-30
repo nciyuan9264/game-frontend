@@ -76,6 +76,7 @@ describe('Play layouts', () => {
     expect(screen.queryByText('Player')).toBeNull();
     expect(screen.getByRole('table', { name: '公司行情与我的持股' })).toBeTruthy();
     expect(screen.getByRole('columnheader', { name: '我持股' })).toBeTruthy();
+    expect(screen.getByLabelText('可用现金 $6,000')).toBeTruthy();
     fireEvent.click(screen.getByRole('button', { name: '查看对局动态' }));
     expect(onActivity).toHaveBeenCalledTimes(1);
     fireEvent.click(screen.getByRole('button', { name: '股价速查' }));
@@ -103,5 +104,6 @@ describe('Play layouts', () => {
     fireEvent.click(screen.getByRole('button', { name: '查看本局结算' }));
     expect(onResults).toHaveBeenCalledTimes(1);
     expect(screen.getByText('FINAL BOARD')).toBeTruthy();
+    expect(screen.queryByLabelText('可用现金 $6,000')).toBeNull();
   });
 });

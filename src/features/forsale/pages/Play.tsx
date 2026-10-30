@@ -20,7 +20,10 @@ import {
   Wallet,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
-import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
+import {
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '@/components/GameUI/GameMobileTopbar';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import sold from '../assets/sold.webp';
 import {
@@ -109,7 +112,7 @@ export const Play = ({
       backLabel="离开对局"
       kicker={`THE SUNDAY AUCTION · ${data.roomData.playerOrder.length} 人经典局`}
       title={data.roomID}
-      status={countdown}
+      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
       actions={<>
         <button type="button" aria-label="公开记录" title="公开记录"
           onClick={() => setPanel('log')}><History size={18} /></button>

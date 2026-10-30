@@ -48,6 +48,8 @@ const TurnCountdown: FC<TurnCountdownProps> = ({ deadline, className, bare, seco
 
   return (
     <div
+      role="timer"
+      data-game-turn-countdown
       className={[
         styles.countdown,
         bare ? styles.bare : '',

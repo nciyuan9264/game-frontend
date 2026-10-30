@@ -20,7 +20,10 @@ import {
   Shield,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
-import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
+import {
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '@/components/GameUI/GameMobileTopbar';
 import { CardBack, Hearts, PlayingCard, Portrait } from '../../components/Card';
 import { Dialog } from '../../components/Dialog';
 import { useLoveLetterPlayUI } from '../../hooks/useLoveLetterPlayUI';
@@ -104,7 +107,7 @@ export function Play({
       kicker="THE ROSE COURT · 玫瑰庭院"
       title={`第 ${String(data.roomData.roundNo).padStart(2, '0')} 轮 · ${
         phase === 'end' ? '终局回看' : '心意未明'}`}
-      status={countdown}
+      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
       actions={<>
         <button type="button" aria-label="公开记录" title="公开记录"
           onClick={() => ui.setPanel('log')}><History size={18} /></button>

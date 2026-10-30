@@ -103,12 +103,7 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
         backLabel="离开当前对局"
         kicker="CLASSIC TABLE · 房间号"
         title={data.roomID}
-        status={!end ? <>
-          <Deadline deadline={turnDeadline} />
-          <span className={styles.mobileCash} aria-label={`可用现金 ${money(data.playerData.money)}`}>
-            <AnimatedValue value={data.playerData.money} formatter={money} />
-          </span>
-        </> : undefined}
+        status={!end && turnDeadline ? <Deadline deadline={turnDeadline} /> : undefined}
         actions={isMobile ? mobileEndVoteControl : undefined}
       />
       <div className={styles.heading} data-game-desktop-topbar><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>

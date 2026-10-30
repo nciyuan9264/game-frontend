@@ -50,6 +50,10 @@ export function GameMobileTopbar({
   </header>;
 }
 
+export function GameMobileTopbarCountdown({ children }: { children: ReactNode }) {
+  return <span role="timer" data-game-turn-countdown>{children}</span>;
+}
+
 export interface GameMobileReplayHeadingProps {
   backTo: string;
   backLabel: string;

@@ -88,4 +88,24 @@ describe('Play phase actions', () => {
     expect(screen.getByRole('switch', { name: '允许结束游戏' }).getAttribute('aria-checked')).toBe('true');
     expect((screen.getByRole('switch', { name: '允许结束游戏' }) as HTMLButtonElement).disabled).toBe(true);
   });
+
+  it('marks compact end controls for the shared mobile topbar sizing contract', () => {
+    const data = {
+      playerId: 'me',
+      roomData: {
+        gameStatus: 'setTile',
+        endGame: {
+          eligible: true, condition: 'company_size', company: 'Tower', tileCount: 41, votes: { me: false },
+        },
+      },
+    } as unknown as GameSnapshot;
+
+    render(<EndVoteControl data={data} enabled pending={false}
+      onToggle={vi.fn()} onHelp={vi.fn()} variant="mobileTopbar" />);
+
+    expect(screen.getByRole('switch', { name: '允许结束游戏' })
+      .hasAttribute('data-game-mobile-topbar-control')).toBe(true);
+    expect(screen.getByRole('button', { name: '查看终局规则' })
+      .hasAttribute('data-game-mobile-topbar-control')).toBe(true);
+  });
 });

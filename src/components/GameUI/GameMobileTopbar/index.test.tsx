@@ -1,7 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GameMobileReplayHeading, GameMobileTopbar } from '.';
+import {
+  GameMobileReplayHeading,
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '.';
 
 afterEach(cleanup);
 
@@ -25,6 +29,19 @@ describe('GameMobileTopbar', () => {
     expect(container.querySelector('[data-game-mobile-topbar-status]')?.textContent).toContain('01:25');
     expect(container.querySelector('[data-game-mobile-topbar-actions]')?.children).toHaveLength(2);
     expect(screen.getByTestId('mobile-game-header')).toBeTruthy();
+  });
+
+  it('keeps nested controls and countdowns on the shared geometry contract', () => {
+    const { container } = render(<GameMobileTopbar
+      onBack={vi.fn()}
+      backLabel="离开对局"
+      title="A-1024"
+      status={<GameMobileTopbarCountdown>25s</GameMobileTopbarCountdown>}
+      actions={<div><button type="button" data-game-mobile-topbar-control>允许结束</button></div>}
+    />);
+
+    expect(container.querySelector('[data-game-turn-countdown]')).toBeTruthy();
+    expect(container.querySelector('[data-game-mobile-topbar-control]')).toBeTruthy();
   });
 });
 

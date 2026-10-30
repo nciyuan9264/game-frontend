@@ -270,7 +270,9 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   await expect(desktopTopbar).toBeHidden();
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
-  const cash = mobileTopbar.getByLabel('可用现金 $20,100');
+  await expect(mobileTopbar.getByLabel('可用现金 $20,100')).toHaveCount(0);
+  const market = page.getByLabel('常驻公司行情');
+  const cash = market.getByLabel('可用现金 $20,100');
   const deadline = mobileTopbar.getByRole('timer');
   const endSwitch = mobileTopbar.getByRole('switch', { name: '允许结束游戏' });
   const endHelp = mobileTopbar.getByRole('button', { name: '查看终局规则' });
@@ -287,7 +289,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   ]) {
     await page.setViewportSize(viewport);
     const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
-    const [metrics, statusMetrics, identityMetrics, deadlineBox, cashBox, switchBox, helpBox] = await Promise.all([
+    const [metrics, statusMetrics, identityMetrics, timerStyle, deadlineBox, switchBox, helpBox, marketHeaderMetrics] = await Promise.all([
       mobileTopbar.evaluate(element => ({
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
@@ -303,10 +305,17 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
         overflow: getComputedStyle(element.querySelector('strong')!).overflow,
         textOverflow: getComputedStyle(element.querySelector('strong')!).textOverflow,
       })),
+      deadline.evaluate(element => ({
+        borderRadius: getComputedStyle(element).borderRadius,
+        borderWidth: getComputedStyle(element).borderWidth,
+      })),
       deadline.boundingBox(),
-      cash.boundingBox(),
       endSwitch.boundingBox(),
       endHelp.boundingBox(),
+      market.locator('header').evaluate(element => ({
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      })),
     ]);
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
     expect(metrics.left).toBeGreaterThanOrEqual(0);
@@ -315,17 +324,18 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
     expect(identityMetrics.width).toBeLessThanOrEqual(132);
     expect(identityMetrics.overflow).toBe('hidden');
     expect(identityMetrics.textOverflow).toBe('ellipsis');
+    expect(timerStyle.borderRadius).toBe('6px');
+    expect(timerStyle.borderWidth).toBe('1px');
     expect(deadlineBox).not.toBeNull();
-    expect(cashBox).not.toBeNull();
     expect(switchBox).not.toBeNull();
     expect(helpBox).not.toBeNull();
-    expect(deadlineBox!.height).toBe(28);
-    expect(cashBox!.height).toBe(28);
-    expect(switchBox!.width).toBe(42);
-    expect(switchBox!.height).toBe(28);
-    expect(helpBox!.width).toBe(28);
-    expect(helpBox!.height).toBe(28);
-    const centers = [deadlineBox!, cashBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
+    expect(deadlineBox!.height).toBe(34);
+    expect(switchBox!.width).toBe(44);
+    expect(switchBox!.height).toBe(34);
+    expect(helpBox!.width).toBe(34);
+    expect(helpBox!.height).toBe(34);
+    expect(marketHeaderMetrics.scrollWidth).toBeLessThanOrEqual(marketHeaderMetrics.clientWidth);
+    const centers = [deadlineBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
     expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
     expect(Math.abs(helpBox!.x + helpBox!.width - metrics.right)).toBeLessThanOrEqual(1);
   }
@@ -345,29 +355,32 @@ test('acquire final board keeps result access out of the mobile topbar', async (
   await expect(mobileTopbar).toBeVisible();
   await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
   await expect(mobileTopbar.getByLabel('可用现金 $20,100')).toHaveCount(0);
+  await expect(page.getByLabel('常驻公司行情').getByLabel('可用现金 $20,100')).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '查看本局结算' })).toBeVisible();
 });
 
-test('acquire waiting topbar places cash at the trailing edge', async ({ page }) => {
+test('acquire waiting state places cash beside the stock lookup', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const roomID = await mockAcquirePlay(page, { waiting: true });
   await page.goto(`/game/acquire/match?roomID=${roomID}`);
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');
-  const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
+  const market = page.getByLabel('常驻公司行情');
+  const cash = market.getByLabel('可用现金 $20,100');
+  const stockLookup = market.getByRole('button', { name: '股价速查' });
   await expect(mobileTopbar.locator('[data-game-mobile-topbar-actions]')).toHaveCount(0);
-  await expect(status.getByLabel('可用现金 $20,100')).toBeVisible();
-  await expect(status.getByRole('timer')).toHaveCount(0);
-  const [topbarBox, statusBox] = await Promise.all([
-    mobileTopbar.boundingBox(),
-    status.boundingBox(),
+  await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
+  await expect(cash).toBeVisible();
+  const [cashBox, stockLookupBox] = await Promise.all([
+    cash.boundingBox(),
+    stockLookup.boundingBox(),
   ]);
-  expect(topbarBox).not.toBeNull();
-  expect(statusBox).not.toBeNull();
-  expect(Math.abs(statusBox!.x + statusBox!.width - (topbarBox!.x + topbarBox!.width)))
-    .toBeLessThanOrEqual(1);
+  expect(cashBox).not.toBeNull();
+  expect(stockLookupBox).not.toBeNull();
+  expect(cashBox!.x + cashBox!.width).toBeLessThanOrEqual(stockLookupBox!.x);
+  expect(stockLookupBox!.x - (cashBox!.x + cashBox!.width)).toBeLessThanOrEqual(2);
 });
 
 test('acquire desktop activity column ends with the board', async ({ page }) => {

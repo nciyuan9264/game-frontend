@@ -17,7 +17,10 @@ import {
   Trophy,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
-import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
+import {
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '@/components/GameUI/GameMobileTopbar';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
 import {
   BullScore,
@@ -306,7 +309,7 @@ export function Play({
       backLabel="离开对局"
       kicker="6 NIMMT! · 经典 66 分制"
       title={`第 ${data.roomData.roundNo} 局 · 第 ${data.roomData.turnNo} / 10 轮`}
-      status={countdown}
+      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
       actions={<>
         <button type="button" aria-label="打开记分板" title="打开记分板"
           onClick={() => setPanel('scores')}><Trophy size={18} /></button>

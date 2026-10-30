@@ -383,6 +383,25 @@ test('Cant Stop mobile choose phase keeps pairing controls visible',
     await expect(page.getByRole('button', { name: '配对 1：7 和 3' })).toBeVisible();
     await expect(page.getByRole('button', { name: '查看最近记录' })).toBeVisible();
 
+    const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+    const timer = mobileTopbar.locator('[data-game-turn-countdown]');
+    const rules = mobileTopbar.getByRole('button', { name: '规则速览' });
+    const menu = mobileTopbar.getByRole('button', { name: '牌桌菜单' });
+    const [timerBox, rulesBox, menuBox, timerStyle] = await Promise.all([
+      timer.boundingBox(),
+      rules.boundingBox(),
+      menu.boundingBox(),
+      timer.evaluate(element => ({
+        borderRadius: getComputedStyle(element).borderRadius,
+        borderWidth: getComputedStyle(element).borderWidth,
+      })),
+    ]);
+    expect(timerBox?.height).toBe(34);
+    expect(rulesBox).toMatchObject({ width: 34, height: 34 });
+    expect(menuBox).toMatchObject({ width: 34, height: 34 });
+    expect(timerStyle).toEqual({ borderRadius: '6px', borderWidth: '1px' });
+    await capture(page, info, 'topbar-mobile');
+
     const dockAdvance = page.locator('.cs-mobile-dock')
       .getByRole('button', { name: /前进/ });
     await expect(dockAdvance).toBeDisabled();

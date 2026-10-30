@@ -3,7 +3,7 @@
   .mobileTopbar :global([data-game-mobile-topbar-identity]) { width: min(36vw,132px); max-width: 132px; flex: 1 1 auto; }
   .mobileTopbar :global([data-game-mobile-topbar-status]) { min-height: 28px; gap: 7px; margin-left: auto; }
   .mobileTopbar :global([data-game-mobile-topbar-actions]) { min-height: 28px; }
-  .mobileTopbar .deadline { height: 28px; }
+  .mobileTopbar .deadline { border: 1px solid #8f794b70; background: #a4874612; color: #dcc183; font-size: 11px; font-weight: 700; }
   .mobileTopbar .deadline svg { display: none; }
   .mobile { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
   .heading { gap: 8px; margin-bottom: 13px;
@@ -49,21 +49,22 @@
   .phaseCommand .endVoteControl { min-width: 116px; min-height: 34px; gap: 5px; padding-left: 9px; border-left-color: #4c5e566e;
     > span { min-width: 42px; b { font-size: 8px; } small { font-size: 7px; } }
   }
-  .endVoteSwitch { width: 32px; height: 18px; padding: 3px;
+  .endVoteSwitch { width: 32px; height: 18px; }
+  .endVoteSwitchTrack { width: 32px; height: 18px; padding: 3px;
     i { width: 10px; height: 10px; }
   }
-  .endVoteSwitchOn i { translate: 14px 0; }
+  .endVoteSwitchOn .endVoteSwitchTrack i { translate: 14px 0; }
   .endVoteHelp { width: 23px; height: 23px; svg { width: 14px; height: 14px; } }
-  .endVoteControlMobileTopbar { min-height: 28px; gap: 8px;
-    .endVoteSwitch { width: 42px; height: 28px; padding: 4px;
-      i { width: 18px; height: 18px; }
+  .endVoteControlMobileTopbar { min-height: 34px; gap: 5px;
+    .endVoteSwitch { --game-mobile-topbar-control-width: 44px; }
+    .endVoteSwitchTrack { width: 42px; height: 22px; padding: 3px;
+      i { width: 14px; height: 14px; }
     }
-    .endVoteSwitchOn i { translate: 14px 0; }
-    .endVoteHelp { width: 28px; height: 28px; border: 1px solid #c4ac7061; background: #17343c; color: #d7bd78;
+    .endVoteSwitchOn .endVoteSwitchTrack i { translate: 20px 0; }
+    .endVoteHelp { border: 1px solid #c4ac7061; background: #17343c; color: #d7bd78;
       svg { width: 14px; height: 14px; }
     }
   }
-  .mobileCash { display: inline-flex; height: 28px; flex: 0 0 auto; align-items: center; color: #dbc783; font-size: 10px; font-weight: 800; line-height: 1; white-space: nowrap; }
   .mobileResultsAction { width: 100%; margin-bottom: 10px;
     > button { width: 100%; min-height: 44px; font-size: 12px; }
   }
@@ -78,6 +79,9 @@
       &:active:not(:disabled) { transform: translateY(1px) scale(.94); filter: brightness(1.12); color: #d8bd83; }
       &:first-child { display: flex; align-items: center; }
     }
+  }
+  .mobileMarketCash { display: inline-flex; height: 32px; align-items: center; gap: 4px; padding: 0 5px; color: #dbc783; font-size: 10px; font-weight: 800; line-height: 1; white-space: nowrap;
+    svg { width: 12px; height: 12px; }
   }
   .mobileMarketTable { width: 100%; table-layout: fixed; border-collapse: collapse; font-size: 11px; font-variant-numeric: tabular-nums;
     th, td { height: 24px; padding: 0 8px 0 2px; text-align: right; white-space: nowrap; }
@@ -123,6 +127,9 @@
       }
       button { height: 26px; min-width: 26px; padding: 0 5px; font-size: 8px;
         svg { width: 12px; height: 12px; }
+      }
+      .mobileMarketCash { height: 26px; gap: 3px; padding: 0 3px; font-size: 8px;
+        svg { width: 10px; height: 10px; }
       }
     }
     .mobileMarketTable { font-size: 9px;

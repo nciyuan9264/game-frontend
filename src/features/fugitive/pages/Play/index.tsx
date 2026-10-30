@@ -27,7 +27,10 @@ import {
   Target,
   TriangleAlert,
 } from 'lucide-react';
-import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
+import {
+  GameMobileTopbar,
+  GameMobileTopbarCountdown,
+} from '@/components/GameUI/GameMobileTopbar';
 import {
   Brand,
   CardBack,
@@ -282,7 +285,7 @@ export function Play({
         backLabel="离开对局"
         kicker={`#${data.roomID} · 第 ${pad(data.roomData.roundNo)} 回合`}
         title={roomName}
-        status={countdown}
+        status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
         actions={<>
           <button className="icon-button" type="button" aria-label="追逐记录"
             title="追逐记录"
