@@ -13,6 +13,7 @@ import {
   lookupGameRoom,
   startNextGameMatch,
 } from './room';
+import { APIRequestError } from '@/api/request';
 
 vi.mock('@/api/generated/game-platform', () => ({
   CreateRoom: vi.fn(),
@@ -124,6 +125,19 @@ describe('game room API', () => {
     await expect(listGameRooms('splendor')).rejects.toBeInstanceOf(
       GameRoomRequestError,
     );
+  });
+
+  it('preserves HTTP status and platform error code', async () => {
+    vi.mocked(GetRoom).mockRejectedValue(
+      new APIRequestError('room not found', 404, 'not_found'),
+    );
+
+    await expect(lookupGameRoom('splendor', 'missing-room')).rejects.toMatchObject({
+      name: 'GameRoomRequestError',
+      message: 'room not found',
+      status: 404,
+      code: 'not_found',
+    });
   });
 
   it('starts the next match with an idempotency request ID', async () => {

@@ -105,6 +105,25 @@ describe('Acquire session authentication preflight', () => {
     ));
   });
 
+  it('uses the terminal exit UI when the room no longer exists', async () => {
+    mocks.getProfile.mockResolvedValue({
+      id: '42',
+      name: 'Alice',
+      email: 'alice@example.com',
+    });
+    mocks.lookupGameRoom.mockRejectedValue(new Error('room not found'));
+
+    render(<MemoryRouter initialEntries={['/game/acquire/match?roomID=missing-room']}>
+      <AcquireSessionPage />
+    </MemoryRouter>);
+
+    expect(await screen.findByRole('heading', { name: '房间已失效' })).toBeTruthy();
+    expect(screen.getByText('这个房间不存在或已被关闭，请返回大厅重新进入。')).toBeTruthy();
+    expect(screen.getByRole('button', { name: '返回大厅' })).toBeTruthy();
+    expect(screen.queryByText('room not found')).toBeNull();
+    expect(screen.queryByRole('button', { name: '重新验证' })).toBeNull();
+  });
+
   it('resets the keyed bootstrap when the room id changes', async () => {
     mocks.getProfile.mockResolvedValue({ id: '42', name: 'Alice', email: 'alice@example.com' });
     mocks.lookupGameRoom.mockImplementation(async (_gameType: string, roomID: string) => ({

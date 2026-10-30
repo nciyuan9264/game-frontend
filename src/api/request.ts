@@ -10,7 +10,20 @@ interface RetryableRequestConfig extends InternalAxiosRequestConfig {
 }
 
 interface ErrorEnvelope {
+  error?: string;
   message?: string;
+  status_code?: number;
+}
+
+export class APIRequestError extends Error {
+  constructor(
+    message: string,
+    public status = 0,
+    public code?: string,
+  ) {
+    super(message);
+    this.name = 'APIRequestError';
+  }
 }
 
 export const apiInstance = axios.create({
@@ -35,8 +48,13 @@ apiInstance.interceptors.response.use(
           + encodeURIComponent(window.location.href);
       }
     }
-    const message = reason.response?.data?.message;
-    return Promise.reject(new Error(message || reason.message || '服务暂时不可用，请稍后重试'));
+    const data = reason.response?.data;
+    const message = data?.message || reason.message || '服务暂时不可用，请稍后重试';
+    return Promise.reject(new APIRequestError(
+      message,
+      reason.response?.status ?? data?.status_code ?? 0,
+      data?.error,
+    ));
   },
 );
 

@@ -10,6 +10,7 @@ import {
   toLobbyRoom,
   type LobbyRoomLike,
 } from '../model/room';
+import { APIRequestError } from '@/api/request';
 
 export interface RoomListResponse<TRoom> {
   rooms: TRoom[];
@@ -131,5 +132,9 @@ function mapError(
     window.location.href = 'https://auth.gamebus.online/login?redirect='
       + encodeURIComponent(window.location.href);
   }
-  return new GameRoomRequestError(error.message);
+  return new GameRoomRequestError(
+    error.message,
+    error instanceof APIRequestError ? error.status : 0,
+    error instanceof APIRequestError ? error.code : undefined,
+  );
 }

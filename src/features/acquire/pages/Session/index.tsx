@@ -4,6 +4,7 @@ import { RefreshCw } from 'lucide-react';
 import { getProfile } from '@/features/game-core/api/auth';
 import { lookupGameRoom } from '@/features/game-core/api/room';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { AppShell } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -27,6 +28,7 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAcquireResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('acquire', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useAcquireSession(roomID, matchID, nextMatch.adoptMatch);
@@ -40,6 +42,10 @@ function Session({ roomID }: { roomID: string }) {
     || !!roomID && !!matchID && !snapshot && (connection.status === 'connecting' || connection.status === 'reconnecting');
   const profile = currentPlayer ? { name: playerName(playerID, players ?? {}), avatar: currentPlayer.avatar } : undefined;
   if (initialLoading) return <AcquireSessionLoading />;
+  if (!target.data && targetFailure.terminal) return <AppShell inMatch hideRail title="经典对局">
+    <SessionExitState title={targetFailure.title} message={targetFailure.message}
+      onLeave={leave.confirm} />
+  </AppShell>;
   if (!target.data) return <AppShell inMatch hideRail title="经典对局">
     <Feedback error>
       对局信息确认失败

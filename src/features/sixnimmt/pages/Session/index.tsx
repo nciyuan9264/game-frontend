@@ -5,6 +5,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupSixNimmtRoom } from '../../api/room';
 import { AppShell } from '../../components/AppShell';
@@ -44,6 +45,7 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, room, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAsyncResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('sixnimmt', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useSixNimmtSession(roomID, matchID, nextMatch.adoptMatch);
@@ -63,9 +65,10 @@ function Session({ roomID }: { roomID: string }) {
   if (initialLoading) return <SixNimmtLoading fullScreen
     title="正在进入牧场牌桌。" description="正在确认身份并同步权威牌局" />;
   if (!target.data) return <AppShell inMatch title="对局验证失败" profile={profile}>
-    <ExitState title="无法确认当前对局"
-      message={target.error || '暂时无法确认登录状态与当前房间，请重试。'}
-      onRetry={target.retry} onLeave={leave.confirm} />
+    <ExitState title={targetFailure.title}
+      message={targetFailure.message}
+      onRetry={targetFailure.terminal ? undefined : target.retry}
+      onLeave={leave.confirm} />
   </AppShell>;
 
   return <AppShell inMatch hideHeader={snapshot?.type === 'ROOM_SYNC'}

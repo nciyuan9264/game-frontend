@@ -6,6 +6,7 @@ import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupForSaleRoom } from '../api/room';
 import { AppShell } from '../components/AppShell';
@@ -45,6 +46,7 @@ const Session = ({ roomID }: { roomID: string }) => {
     return { profile, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAsyncResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('forsale', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useForSaleSession(roomID, matchID, nextMatch.adoptMatch);
@@ -64,9 +66,10 @@ const Session = ({ roomID }: { roomID: string }) => {
   if (initialLoading) return <ForSaleLoading fullScreen
     title="正在进入周末拍卖所。" description="确认身份并同步权威牌桌" />;
   if (!target.data) return <AppShell inMatch title="对局验证失败" profile={profile}>
-    <ExitState title="无法确认当前对局"
-      message={target.error || '暂时无法确认登录状态与当前房间，请重试。'}
-      onRetry={target.retry} onLeave={leave.confirm} />
+    <ExitState title={targetFailure.title}
+      message={targetFailure.message}
+      onRetry={targetFailure.terminal ? undefined : target.retry}
+      onLeave={leave.confirm} />
   </AppShell>;
   return <AppShell inMatch hideHeader={snapshot?.type === 'ROOM_SYNC'}
     profile={profile} title={snapshot?.type === 'MATCH_SYNC' ? '准备房间' : '拍卖现场'}>

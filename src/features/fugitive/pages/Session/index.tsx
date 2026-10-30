@@ -7,6 +7,7 @@ import {
 import { useSearchParams } from 'react-router-dom';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupFugitiveRoom } from '../../api/room';
 import {
@@ -52,6 +53,7 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, room, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAsyncResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('fugitive', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useFugitiveSession(roomID, matchID, nextMatch.adoptMatch);
@@ -67,9 +69,10 @@ function Session({ roomID }: { roomID: string }) {
   }
   if (!target.data) {
     return <AppShell room title="对局验证失败" profile={profile}>
-      <ExitState title="无法确认当前对局"
-        message={target.error || '暂时无法确认登录状态与当前房间，请重试。'}
-        onRetry={target.retry} onLeave={leave.confirm} />
+      <ExitState title={targetFailure.title}
+        message={targetFailure.message}
+        onRetry={targetFailure.terminal ? undefined : target.retry}
+        onLeave={leave.confirm} />
     </AppShell>;
   }
 

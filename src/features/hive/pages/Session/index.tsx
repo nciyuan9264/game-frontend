@@ -4,6 +4,7 @@ import { useSearchParams } from 'react-router-dom';
 import { getProfile } from '@/features/game-core/api/auth';
 import { lookupGameRoom } from '@/features/game-core/api/room';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -41,6 +42,7 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAsyncResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('hive', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useHiveSession(roomID, matchID, nextMatch.adoptMatch);
@@ -59,6 +61,10 @@ function Session({ roomID }: { roomID: string }) {
       && (connection.status === 'connecting' || connection.status === 'reconnecting');
 
   if (initialLoading) return <HiveLoading fullScreen />;
+  if (!target.data && targetFailure.terminal) return <AppShell inMatch title="对局已结束">
+    <ExitState title={targetFailure.title} message={targetFailure.message}
+      onLeave={leave.confirm} />
+  </AppShell>;
   if (!target.data) return <AppShell inMatch title="对局验证失败"><div className={styles.authError}>
     <Feedback error>对局信息确认失败<span>{target.error || '暂时无法确认登录状态与当前对局，请重试。'}</span>
       <ActionButton onClick={target.retry}><RefreshCw size={14} />重新验证</ActionButton></Feedback>

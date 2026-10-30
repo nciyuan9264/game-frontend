@@ -3,6 +3,7 @@ import { ArrowLeft, RefreshCw, Swords } from 'lucide-react';
 import { useSearchParams } from 'react-router-dom';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useStartNextMatch } from '@/features/game-core/hooks/useStartNextMatch';
+import { describeSessionTargetFailure } from '@/features/game-core/model/sessionTarget';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { lookupWarChestRoom } from '../../api/room';
 import { Shell, Loading, Notice } from '../../components/Shell';
@@ -42,6 +43,7 @@ function Session({ roomID }: { roomID: string }) {
     return { profile, room, matchID: room.currentMatchID };
   }, [roomID]);
   const target = useAsyncResource(loadTarget);
+  const targetFailure = describeSessionTargetFailure(target.failure, target.error);
   const nextMatch = useStartNextMatch('warchest', roomID);
   const matchID = nextMatch.matchID || target.data?.matchID || '';
   const session = useWarChestSession(roomID, matchID, nextMatch.adoptMatch);
@@ -56,9 +58,10 @@ function Session({ roomID }: { roomID: string }) {
     <Loading text="正在进入战争之匣。" />
   </div>;
   if (!target.data) return <Shell title="对局验证失败" profile={profile}>
-    <ExitState title="无法确认当前对局"
-      message={target.error || '暂时无法确认登录状态与当前房间，请重试。'}
-      onRetry={target.retry} onLeave={leave.confirm} />
+    <ExitState title={targetFailure.title}
+      message={targetFailure.message}
+      onRetry={targetFailure.terminal ? undefined : target.retry}
+      onLeave={leave.confirm} />
   </Shell>;
   if (!roomID) return <Shell title="对局链接无效" profile={profile}>
     <ExitState title="对局链接无效" message="链接缺少房间号，请返回大厅重新进入。"
