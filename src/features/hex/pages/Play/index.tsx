@@ -177,7 +177,6 @@ export function Play({
           <Stone side={side} /><div><h2>{myTurn ? '轮到你了' : '等待对手'}</h2>
             <p>{status}</p></div></div>
           <button className="button primary" disabled={!selectedLegal}
-            data-click-sound="game-place"
             onClick={() => ui.selected && commit(ui.selected)}>
             {ui.selected ? `确认落子 ${coordinate(ui.selected)}` : '请选择空格'}<Check size={17} />
           </button></section>
@@ -193,7 +192,6 @@ export function Play({
       <button type="button" className="dock-undo" aria-label="取消选择"
         disabled={!ui.selected} onClick={ui.clearSelection}><X size={18} /></button>
       <ActionButton variant="primary" disabled={!selectedLegal || !interactive}
-        data-click-sound="game-place"
         onClick={() => ui.selected && commit(ui.selected)}>
         {ui.selected ? `确认落子 ${coordinate(ui.selected)}` : status}
         {selectedLegal && <Check size={17} />}

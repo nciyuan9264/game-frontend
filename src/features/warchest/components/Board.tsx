@@ -177,7 +177,7 @@ export function Board({
         ? ` ${piece.side === 0 ? '橡木' : '赤隼'}军团 ${UNITS[piece.type].name} ${piece.n} 枚` : ''}${legal ? ' 可选目标' : ''}`;
       return <g key={cell.key} role="button" tabIndex={!locked && cell.key === focusKey ? 0 : -1}
         aria-label={label} aria-disabled={locked} data-testid={`hex-${cell.label}`}
-        data-click-sound={locked ? 'false' : 'game-select'}
+        data-click-sound="false"
         data-cell-key={cell.key} className={`hex-cell ${legal ? 'legal' : ''} ${follow ? 'followup' : ''} ${picked ? 'picked' : ''} ${selected === cell.key ? 'selected' : ''} ${plan?.target === cell.key ? 'attack-target' : ''}`}
         onPointerEnter={() => !locked && setHovered(cell.key)} onPointerLeave={() => setHovered(undefined)}
         onFocus={() => { setHovered(cell.key); setFocusKey(cell.key); }} onBlur={() => setHovered(undefined)}

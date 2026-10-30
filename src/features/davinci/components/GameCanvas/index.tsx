@@ -1,7 +1,6 @@
 import { useEffect, useRef, useCallback, forwardRef, useImperativeHandle } from 'react';
 import * as PIXI from 'pixi.js';
 import gsap from 'gsap';
-import { playGameSound } from '@/components/GameUI/GameAudio';
 import type { Card, GameStatus } from '@/features/davinci/model/types';
 import { computeInsertIndex } from './layout';
 import styles from './index.module.less';
@@ -69,17 +68,12 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
   }, []);
 
   const dispatchTileClick = useCallback((tileId: string) => {
-    runPointerAction('tile:' + tileId, () => {
-      playGameSound('game-select');
-      onTileClickRef.current(tileId);
-    });
+    runPointerAction('tile:' + tileId, () => onTileClickRef.current(tileId));
   }, [runPointerAction]);
 
   const dispatchSlotSelect = useCallback((index: number, tileId: string) => {
-    runPointerAction('slot:' + index + ':' + tileId, () => {
-      playGameSound('game-place');
-      onSelectInsertPositionRef.current?.(index, tileId);
-    });
+    runPointerAction('slot:' + index + ':' + tileId, () =>
+      onSelectInsertPositionRef.current?.(index, tileId));
   }, [runPointerAction]);
 
   const findHitTarget = useCallback((x: number, y: number) => {
@@ -124,21 +118,23 @@ export const GameCanvas = forwardRef<GameCanvasHandle, GameCanvasProps>(({
   ) => {
     const baseX = container.x;
     const baseY = container.y;
-    const state = { scale: 1 };
 
     gsap.killTweensOf(container.scale);
-    gsap.to(state, {
-      scale: targetScale,
+    gsap.to(container.scale, {
+      x: targetScale,
+      y: targetScale,
       duration: 0.38,
       yoyo: true,
       repeat: 1,
       ease: 'power2.out',
       onUpdate: () => {
-        container.scale.set(state.scale);
-        container.x = baseX - centerX * (state.scale - 1);
-        container.y = baseY - centerY * (state.scale - 1);
+        if (container.destroyed) return;
+        const scale = container.scale.x;
+        container.x = baseX - centerX * (scale - 1);
+        container.y = baseY - centerY * (scale - 1);
       },
       onComplete: () => {
+        if (container.destroyed) return;
         container.scale.set(1);
         container.x = baseX;
         container.y = baseY;

@@ -157,7 +157,6 @@ export function Play({
       <em>{session.pending ? '等待服务端确认…' : initializationCopy}</em>
       {!initialHandReady && <ActionButton variant="primary"
         disabled={!initialHand.canConfirm || !!session.pending || !connected}
-        data-click-sound="game-place"
         onClick={() => session.submit('game_initialize_hand', {
           jokerPlacements: initialHand.jokerPlacements,
         })}>
@@ -170,9 +169,8 @@ export function Play({
       onClose={() => setSelectedGuess(undefined)} footer={<ActionButton onClick={() => setSelectedGuess(undefined)}>取消</ActionButton>}>
       <div className={styles.guessDialog}><p>选择你认为这张{selectedGuess.color === 0 ? '白牌' : '黑牌'}的数字。提交后不能撤回。</p>
         <div>{Array.from({ length: 12 }, (_, value) => <button type="button" key={value}
-          data-click-sound="game-confirm"
           onClick={() => { session.submit('game_guess_card', { id: selectedGuess.id, num: value }); setSelectedGuess(undefined); }}>{value}</button>)}
-          <button type="button" className={styles.joker} data-click-sound="game-confirm" onClick={() => {
+          <button type="button" className={styles.joker} onClick={() => {
             session.submit('game_guess_card', { id: selectedGuess.id, num: -1 });
             setSelectedGuess(undefined);
           }}>JOKER</button></div></div>

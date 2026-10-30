@@ -37,7 +37,7 @@ export function TokenControl({ color, count, selected = 0, disabled, blocked, ma
   return <button type="button" className={`${styles.tokenControl} ${selected ? styles.tokenPicked : ''}
     ${count === 0 ? styles.tokenEmpty : ''} ${blocked ? styles.tokenBlocked : ''}
     ${matrix ? styles.tokenMatrix : ''}`}
-    disabled={disabled} data-click-sound="game-resource"
+    disabled={disabled} data-click-sound="false"
     onClick={onClick} aria-label={`选择${gemMeta[color].label}`} aria-pressed={selected > 0}>
     <span className={styles.tokenDisc}><GemIcon color={color} size={25} /><b>{count}</b>
       {selected > 0 && <em>+{selected}</em>}</span>
@@ -149,7 +149,7 @@ export function DevelopmentCardView({
     })}</span></>;
   return onClick
     ? <button type="button" className={className} disabled={disabled} aria-pressed={selected}
-      aria-label={`查看${display.name}`} data-click-sound="game-select"
+      aria-label={`查看${display.name}`} data-click-sound="false"
       onClick={onClick}>{content}</button>
     : <span className={className}>{content}</span>;
 }
@@ -175,7 +175,7 @@ export function NobleTile({ noble, progress, compact = false, onClick }: {
   const className = `${styles.noble} ${compact ? styles.nobleCompact : ''} ${progress && !missing ? styles.nobleEligible : ''}`;
   return onClick
     ? <button type="button" className={className} data-testid="splendor-noble"
-      aria-label={`查看贵族${display.name}`} data-click-sound="game-select"
+      aria-label={`查看贵族${display.name}`} data-click-sound="false"
       onClick={onClick}>{content}</button>
     : <span className={className} data-testid="splendor-noble">{content}</span>;
 }

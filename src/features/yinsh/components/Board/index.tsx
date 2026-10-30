@@ -611,7 +611,7 @@ export function Board({
             ? '对手的圆环。'
             : undefined}
       data-testid={`point-${point.id}`}
-      data-click-sound={interactive ? 'game-select' : 'false'}
+      data-click-sound="false"
       data-ring={side ?? ''}
       data-marker={marker ?? ''}
       data-legal={!!move}

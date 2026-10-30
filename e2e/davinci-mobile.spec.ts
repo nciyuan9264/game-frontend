@@ -26,6 +26,9 @@ test.use({ viewport: { width: 390, height: 844 } });
 
 async function mockSession(page: Page, snapshot: Record<string, unknown>) {
   const commands: string[] = [];
+  let publishSnapshot = (_next: Record<string, unknown>) => {
+    throw new Error('the DaVinci websocket is not connected');
+  };
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -62,9 +65,13 @@ async function mockSession(page: Page, snapshot: Record<string, unknown>) {
   }));
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(snapshot));
+    publishSnapshot = next => socket.send(JSON.stringify(next));
     socket.onMessage(message => commands.push(String(message)));
   });
-  return commands;
+  return {
+    commands,
+    publish: (next: Record<string, unknown>) => publishSnapshot(next),
+  };
 }
 
 function matchSnapshot() {
@@ -106,12 +113,68 @@ function endedSnapshot() {
           gameStatus: 'end',
           players,
           boardCards: {},
+          lastData: {
+            action: 'guess_card',
+            playerID: human.playerID,
+            payload: {
+              targetCardID: 'black-2',
+              targetPlayerID: ai.playerID,
+              guessNum: 2,
+              correct: true,
+            },
+          },
         },
         cardData: {
           self: [{ id: 'white-1', color: 0, num: 1, isRevealed: false, index: 0 }],
-          opponents: [{ id: 'black-2', color: 1, num: 2, isRevealed: true, index: 0 }],
+          opponents: [
+            { id: 'black-1', color: 1, num: 1, isRevealed: true, index: 0 },
+            { id: 'black-2', color: 1, num: 2, isRevealed: true, index: 1 },
+          ],
         },
         result: { winnerID: human.playerID },
+      },
+    },
+  };
+}
+
+function playingSnapshot() {
+  const players = {
+    [human.playerID]: human,
+    [ai.playerID]: ai,
+  };
+  return {
+    schemaVersion: 2,
+    type: 'ROOM_SYNC',
+    roomID,
+    matchID,
+    seq: 42,
+    view: {
+      davinci: {
+        playerId: human.playerID,
+        ownerID: human.playerID,
+        roomData: {
+          currentPlayer: human.playerID,
+          gameStatus: 'guessCard',
+          players,
+          boardCards: {},
+          lastData: {
+            action: 'guess_card',
+            playerID: ai.playerID,
+            payload: {
+              targetCardID: 'white-1',
+              targetPlayerID: human.playerID,
+              guessNum: 1,
+              correct: true,
+            },
+          },
+        },
+        cardData: {
+          self: [{ id: 'white-1', color: 0, num: 1, isRevealed: true, index: 0 }],
+          opponents: [
+            { id: 'black-1', color: 1, num: 1, isRevealed: true, index: 0 },
+            { id: 'black-2', color: 1, num: 2, isRevealed: false, index: 1 },
+          ],
+        },
       },
     },
   };
@@ -217,7 +280,7 @@ async function expectVerticalScroll(anchor: Locator) {
 }
 
 test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
-  const commands = await mockSession(page, matchSnapshot());
+  const { commands } = await mockSession(page, matchSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
   await expect(page.locator('[data-game-shell-header]')).toBeVisible();
@@ -254,20 +317,31 @@ test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
 });
 
 test('DaVinci final board can reopen the results panel on mobile', async ({ page }) => {
-  await mockSession(page, endedSnapshot());
+  const pageErrors: Error[] = [];
+  page.on('pageerror', error => pageErrors.push(error));
+  const { publish } = await mockSession(page, playingSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
+  await expect(page.locator('canvas')).toBeVisible();
+  publish(endedSnapshot());
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();
   await page.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await expect(page.locator('header').first()).toHaveCSS('height', '57px');
+  const topbarActions = page.locator('[data-game-mobile-topbar-actions] > button');
+  await expect(topbarActions).toHaveCount(2);
+  await expect.poll(() => topbarActions.evaluateAll(buttons =>
+    buttons.map(button => button.getBoundingClientRect().height))).toEqual([34, 34]);
   await expectNoHorizontalOverflow(page);
   await page.setViewportSize({ width: 356, height: 783 });
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
+  await expect.poll(() => topbarActions.evaluateAll(buttons =>
+    buttons.map(button => button.getBoundingClientRect().height))).toEqual([31, 31]);
   await expectNoHorizontalOverflow(page);
 
   await page.getByRole('button', { name: '打开终局结算' }).click();
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();
+  expect(pageErrors).toEqual([]);
 });
 
 test('DaVinci initial hand confirmation fits a mobile viewport', async ({ page }) => {

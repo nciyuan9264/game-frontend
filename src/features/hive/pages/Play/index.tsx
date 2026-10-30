@@ -476,7 +476,6 @@ export function Play({
               <ActionButton variant="primary"
                 disabled={!interactive || !ui.pending || !pendingLegal}
                 pending={!!session.pending}
-                data-click-sound="game-place"
                 onClick={() => ui.pending && commit(ui.pending)}>
                 {ui.pending
                   ? ui.pending.kind === 'place' ? '确认部署' : '确认移动'

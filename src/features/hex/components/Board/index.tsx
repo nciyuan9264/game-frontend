@@ -166,7 +166,7 @@ export function Board({
             : `落子 ${coordinate(cell)}`
           : undefined}
         aria-disabled={!interactive || !allowed}
-        data-click-sound={interactive && allowed ? 'game-select' : 'false'}
+        data-click-sound="false"
         onClick={() => interactive && allowed && onSelect?.(cell)}
         onPointerEnter={event => {
           if (event.pointerType === 'mouse' && interactive && allowed) {

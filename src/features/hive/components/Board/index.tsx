@@ -278,7 +278,7 @@ export function Board({
             className={`hive-cell ${piece ? 'occupied' : 'empty'} ${selected ? 'selected' : ''} ${chosen ? 'pending' : ''} ${legal ? 'legal' : ''}`}
             style={style}
             data-testid={`${testPrefix}cell-${key}`}
-            data-click-sound={interactive ? 'game-select' : 'false'}
+            data-click-sound="false"
             aria-label={name} title={name}
             disabled={!interactive && !piece}
             tabIndex={presentFocus ? focus === key ? 0 : -1 : index === 0 ? 0 : -1}

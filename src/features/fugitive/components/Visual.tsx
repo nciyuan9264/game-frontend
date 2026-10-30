@@ -177,7 +177,7 @@ export function CardFace({
     + `${card.number === 42 ? 'escape-card' : ''}`;
   return onClick
     ? <button className={className} disabled={disabled}
-        aria-label={`选择地点 ${card.number}`} data-click-sound="game-select"
+        aria-label={`选择地点 ${card.number}`} data-click-sound="false"
         onClick={onClick}>{content}</button>
     : <div className={className}>{content}</div>;
 }
