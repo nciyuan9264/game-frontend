@@ -1,4 +1,8 @@
 @media (max-width: 767px) {
+  .mobileTopbar.mobileTopbar { column-gap: 10px; }
+  .mobileTopbar :global([data-game-mobile-topbar-identity]) { width: min(42vw,160px); max-width: 160px; flex: 1 1 auto; }
+  .mobileTopbar :global([data-game-mobile-topbar-status]) { min-height: 28px; gap: 7px; }
+  .mobileTopbar :global([data-game-mobile-topbar-actions]) { min-height: 28px; }
   .mobileTopbar .deadline svg { display: none; }
   .mobile { padding-bottom: calc(8px + env(safe-area-inset-bottom)); }
   .heading { gap: 8px; margin-bottom: 13px;
@@ -49,11 +53,11 @@
   }
   .endVoteSwitchOn i { translate: 14px 0; }
   .endVoteHelp { width: 23px; height: 23px; svg { width: 14px; height: 14px; } }
-  .endVoteControlMobileTopbar { gap: 6px;
+  .endVoteControlMobileTopbar { min-height: 28px; gap: 8px;
     .endVoteSwitch { width: 36px; height: 20px; }
     .endVoteSwitchOn i { translate: 16px 0; }
-    .endVoteHelp { width: 34px; height: 34px; border: 1px solid #c4ac7061; background: #17343c; color: #d7bd78;
-      svg { width: 16px; height: 16px; }
+    .endVoteHelp { width: 28px; height: 28px; border: 1px solid #c4ac7061; background: #17343c; color: #d7bd78;
+      svg { width: 14px; height: 14px; }
     }
   }
   .mobileCash { flex: 0 0 auto; color: #dbc783; font-size: 10px; font-weight: 800; line-height: 1; white-space: nowrap; }

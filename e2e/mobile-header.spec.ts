@@ -129,7 +129,7 @@ async function mockAcquirePlay(page: Page, options: {
           ownerID: player.playerID,
           visibility: 'private',
           playerData: {
-            money: 6000,
+            money: 20100,
             stocks: Object.fromEntries(companies.map(key => [key, 0])),
             tiles: ['1A'],
           },
@@ -269,9 +269,12 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   await expect(desktopTopbar).toBeHidden();
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
-  await expect(mobileTopbar.getByLabel('可用现金 $6,000')).toBeVisible();
-  await expect(mobileTopbar.getByRole('switch', { name: '允许结束游戏' })).toBeVisible();
-  await expect(mobileTopbar.getByRole('button', { name: '查看终局规则' })).toBeVisible();
+  const cash = mobileTopbar.getByLabel('可用现金 $20,100');
+  const endSwitch = mobileTopbar.getByRole('switch', { name: '允许结束游戏' });
+  const endHelp = mobileTopbar.getByRole('button', { name: '查看终局规则' });
+  await expect(cash).toBeVisible();
+  await expect(endSwitch).toBeVisible();
+  await expect(endHelp).toBeVisible();
   await expect(page.locator('[data-game-brand]')).toHaveCount(0);
   await expect(page.locator('[data-game-shell-profile]')).toHaveCount(0);
 
@@ -282,7 +285,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   ]) {
     await page.setViewportSize(viewport);
     const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
-    const [metrics, statusMetrics] = await Promise.all([
+    const [metrics, statusMetrics, identityMetrics, cashBox, switchBox, helpBox] = await Promise.all([
       mobileTopbar.evaluate(element => ({
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
@@ -293,11 +296,29 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
       })),
+      mobileTopbar.locator('[data-game-mobile-topbar-identity]').evaluate(element => ({
+        width: element.getBoundingClientRect().width,
+        overflow: getComputedStyle(element.querySelector('strong')!).overflow,
+        textOverflow: getComputedStyle(element.querySelector('strong')!).textOverflow,
+      })),
+      cash.boundingBox(),
+      endSwitch.boundingBox(),
+      endHelp.boundingBox(),
     ]);
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
     expect(metrics.left).toBeGreaterThanOrEqual(0);
     expect(metrics.right).toBeLessThanOrEqual(viewport.width);
     expect(statusMetrics.scrollWidth).toBeLessThanOrEqual(statusMetrics.clientWidth);
+    expect(identityMetrics.width).toBeLessThanOrEqual(160);
+    expect(identityMetrics.overflow).toBe('hidden');
+    expect(identityMetrics.textOverflow).toBe('ellipsis');
+    expect(cashBox).not.toBeNull();
+    expect(switchBox).not.toBeNull();
+    expect(helpBox).not.toBeNull();
+    expect(helpBox!.width).toBe(28);
+    expect(helpBox!.height).toBe(28);
+    const centers = [cashBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
+    expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -313,7 +334,7 @@ test('acquire final board keeps result access out of the mobile topbar', async (
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');
   await expect(mobileTopbar).toBeVisible();
-  await expect(mobileTopbar.getByLabel('可用现金 $6,000')).toBeVisible();
+  await expect(mobileTopbar.getByLabel('可用现金 $20,100')).toBeVisible();
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '查看本局结算' })).toBeVisible();
