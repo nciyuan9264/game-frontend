@@ -140,7 +140,7 @@ describe('Acquire play end transition', () => {
     const resultsButton = screen.getByRole('button', { name: '查看本局结算' });
     const topbar = container.querySelector('[data-game-mobile-topbar]');
     expect(topbar).toBeTruthy();
-    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByLabelText('可用现金 $6,000')).toBeNull();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '查看本局结算' })).toBeNull();
     fireEvent.click(resultsButton);

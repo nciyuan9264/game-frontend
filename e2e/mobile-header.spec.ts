@@ -60,6 +60,7 @@ async function mockHeaderData(page: Page) {
 async function mockAcquirePlay(page: Page, options: {
   endEligible?: boolean;
   ended?: boolean;
+  waiting?: boolean;
 } = {}) {
   const roomID = 'acquire_mobile_topbar';
   const player = {
@@ -140,7 +141,7 @@ async function mockAcquirePlay(page: Page, options: {
               stockTotal: 25,
               tiles: 0,
             }])),
-            currentPlayer: player.playerID,
+            currentPlayer: options.waiting ? opponent.playerID : player.playerID,
             gameStatus: options.ended ? 'end' : 'setTile',
             tiles: {},
             players: {
@@ -342,10 +343,31 @@ test('acquire final board keeps result access out of the mobile topbar', async (
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');
   await expect(mobileTopbar).toBeVisible();
-  await expect(mobileTopbar.getByLabel('可用现金 $20,100')).toBeVisible();
+  await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
+  await expect(mobileTopbar.getByLabel('可用现金 $20,100')).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '查看本局结算' })).toBeVisible();
+});
+
+test('acquire waiting topbar places cash at the trailing edge', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const roomID = await mockAcquirePlay(page, { waiting: true });
+  await page.goto(`/game/acquire/match?roomID=${roomID}`);
+
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
+  await expect(mobileTopbar.locator('[data-game-mobile-topbar-actions]')).toHaveCount(0);
+  await expect(status.getByLabel('可用现金 $20,100')).toBeVisible();
+  await expect(status.getByRole('timer')).toHaveCount(0);
+  const [topbarBox, statusBox] = await Promise.all([
+    mobileTopbar.boundingBox(),
+    status.boundingBox(),
+  ]);
+  expect(topbarBox).not.toBeNull();
+  expect(statusBox).not.toBeNull();
+  expect(Math.abs(statusBox!.x + statusBox!.width - (topbarBox!.x + topbarBox!.width)))
+    .toBeLessThanOrEqual(1);
 });
 
 test('acquire desktop activity column ends with the board', async ({ page }) => {
