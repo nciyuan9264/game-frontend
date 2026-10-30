@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen, within } from '@testing-library/react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
@@ -134,14 +134,44 @@ describe('Acquire play end transition', () => {
       selectTile: vi.fn(), place: vi.fn(),
     } as unknown as AcquireInteraction;
 
-    render(<Play data={ended} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    const { container } = render(<Play data={ended} session={session} interaction={interaction} onLeave={vi.fn()} />);
     fireEvent.click(screen.getByRole('button', { name: '查看终局棋盘' }));
 
-    const resultsButtons = screen.getAllByRole('button', { name: '查看本局结算' });
-    expect(resultsButtons).toHaveLength(2);
-    const resultsButton = resultsButtons[0];
+    const resultsButton = screen.getByRole('button', { name: '查看本局结算' });
+    const topbar = container.querySelector('[data-game-mobile-topbar]');
+    expect(topbar).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
+    expect(within(topbar as HTMLElement).queryByRole('button', { name: '查看本局结算' })).toBeNull();
     fireEvent.click(resultsButton);
     expect(screen.getByRole('heading', { name: '一城落定，好局未完。' })).toBeTruthy();
+  });
+
+  it('moves the end vote controls into the mobile topbar without duplicate phase actions', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    active.roomData.endGame = {
+      eligible: true, condition: 'company_size', company: 'Tower', tileCount: 41, votes: { me: false },
+    };
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    const { container } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: '关闭面板' }));
+
+    const topbar = container.querySelector('[data-game-mobile-topbar]');
+    expect(topbar).toBeTruthy();
+    expect(screen.getAllByRole('group', { name: '终局确认' })).toHaveLength(1);
+    expect(within(topbar as HTMLElement).getByRole('switch', { name: '允许结束游戏' })).toBeTruthy();
+    expect(within(topbar as HTMLElement).getByRole('button', { name: '查看终局规则' })).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
   });
 
   it('opens the end prompt once and submits the authoritative switch value', () => {

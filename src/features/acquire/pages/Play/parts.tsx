@@ -26,18 +26,21 @@ export function Deadline({ deadline }: { deadline?: string | null }) {
   </span>;
 }
 
-export function EndVoteControl({ data, enabled, pending, onToggle, onHelp }: {
+export function EndVoteControl({ data, enabled, pending, onToggle, onHelp, variant = 'default' }: {
   data: GameSnapshot;
   enabled: boolean;
   pending: boolean;
   onToggle: (allow: boolean) => void;
   onHelp: () => void;
+  variant?: 'default' | 'mobileTopbar';
 }) {
   const endGame = endGameState(data);
   if (!endGame.eligible || data.roomData.gameStatus === 'end') return null;
   const allowed = !!endGame.votes[data.playerId];
-  return <div className={styles.endVoteControl} role="group" aria-label="终局确认">
-    <span><b>终局确认</b><small>{pending ? '确认中' : allowed ? '已允许' : '继续对局'}</small></span>
+  const compact = variant === 'mobileTopbar';
+  return <div className={`${styles.endVoteControl} ${compact ? styles.endVoteControlMobileTopbar : ''}`}
+    role="group" aria-label="终局确认">
+    {!compact && <span><b>终局确认</b><small>{pending ? '确认中' : allowed ? '已允许' : '继续对局'}</small></span>}
     <button type="button" className={`${styles.endVoteSwitch} ${allowed ? styles.endVoteSwitchOn : ''}`}
       role="switch" aria-label="允许结束游戏" aria-checked={allowed} disabled={!enabled || pending}
       onClick={() => onToggle(!allowed)}><i /></button>

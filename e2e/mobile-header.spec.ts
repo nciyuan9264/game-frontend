@@ -57,7 +57,10 @@ async function mockHeaderData(page: Page) {
   }));
 }
 
-async function mockAcquirePlay(page: Page) {
+async function mockAcquirePlay(page: Page, options: {
+  endEligible?: boolean;
+  ended?: boolean;
+} = {}) {
   const roomID = 'acquire_mobile_topbar';
   const player = {
     userID: 'mobile-header-user',
@@ -138,7 +141,7 @@ async function mockAcquirePlay(page: Page) {
               tiles: 0,
             }])),
             currentPlayer: player.playerID,
-            gameStatus: 'setTile',
+            gameStatus: options.ended ? 'end' : 'setTile',
             tiles: {},
             players: {
               [player.playerID]: player,
@@ -147,6 +150,13 @@ async function mockAcquirePlay(page: Page) {
             playerOrder: [player.playerID, opponent.playerID],
             turnDeadline: new Date(Date.now() + 60_000).toISOString(),
             turnTimeoutMs: '60000',
+            endGame: options.endEligible ? {
+              eligible: true,
+              condition: 'company_size',
+              company: 'Tower',
+              tileCount: 41,
+              votes: { [player.playerID]: false },
+            } : undefined,
           },
           tempData: {
             last_tile_key: '',
@@ -157,6 +167,10 @@ async function mockAcquirePlay(page: Page) {
               otherCompany: [],
             },
           },
+          result: options.ended ? {
+            [player.playerID]: { money: 6000, stocks: 0, total: 6000 },
+            [opponent.playerID]: { money: 5000, stocks: 0, total: 5000 },
+          } : undefined,
         },
       },
     }));
@@ -243,23 +257,56 @@ for (const game of replayGames) {
   });
 }
 
-test('acquire live play swaps only the mobile topbar structure', async ({ page }) => {
+test('acquire live play keeps only the end vote controls in the mobile topbar', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  const roomID = await mockAcquirePlay(page);
+  const roomID = await mockAcquirePlay(page, { endEligible: true });
   await page.goto(`/game/acquire/match?roomID=${roomID}`);
+  await page.getByRole('button', { name: '关闭面板' }).click();
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');
   const desktopTopbar = page.locator('[data-game-desktop-topbar]');
   await expect(mobileTopbar).toBeVisible();
   await expect(desktopTopbar).toBeHidden();
-  await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toBeVisible();
-  await expect(mobileTopbar.locator('svg.lucide-wallet')).toBeVisible();
+  await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
+  await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
+  await expect(mobileTopbar.getByRole('switch', { name: '允许结束游戏' })).toBeVisible();
+  await expect(mobileTopbar.getByRole('button', { name: '查看终局规则' })).toBeVisible();
   await expect(page.locator('[data-game-brand]')).toHaveCount(0);
   await expect(page.locator('[data-game-shell-profile]')).toHaveCount(0);
+
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 360, height: 800 },
+    { width: 320, height: 700 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const metrics = await mobileTopbar.evaluate(element => ({
+      clientWidth: element.clientWidth,
+      scrollWidth: element.scrollWidth,
+      left: element.getBoundingClientRect().left,
+      right: element.getBoundingClientRect().right,
+    }));
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
+    expect(metrics.left).toBeGreaterThanOrEqual(0);
+    expect(metrics.right).toBeLessThanOrEqual(viewport.width);
+  }
 
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(mobileTopbar).toBeHidden();
   await expect(desktopTopbar).toBeVisible();
+});
+
+test('acquire final board keeps result access out of the mobile topbar', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const roomID = await mockAcquirePlay(page, { ended: true });
+  await page.goto(`/game/acquire/match?roomID=${roomID}`);
+  await page.getByRole('button', { name: '查看终局棋盘' }).click();
+
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  await expect(mobileTopbar).toBeVisible();
+  await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
+  await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '查看本局结算' })).toBeVisible();
 });
 
 test('acquire desktop activity column ends with the board', async ({ page }) => {

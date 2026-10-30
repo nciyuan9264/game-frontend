@@ -101,6 +101,8 @@ describe('TradeDialog merger state', () => {
     expect(screen.getByText('卖出旧股')).toBeTruthy();
     expect(screen.getByText('兑换新股')).toBeTruthy();
     expect(screen.getByText('保留旧股')).toBeTruthy();
+    const receipt = screen.getByText('保留旧股').closest('div');
+    expect(receipt?.textContent).toContain('2 股');
     expect(screen.getByRole('region', { name: '股东奖励明细', hidden: true })).toBeTruthy();
     expect(screen.getByText('已完成')).toBeTruthy();
     expect(screen.getByText('处理中')).toBeTruthy();

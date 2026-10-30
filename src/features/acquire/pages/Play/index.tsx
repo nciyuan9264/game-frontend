@@ -69,6 +69,8 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
   const submitEndVote = (allow: boolean) => session.submit('game_end_vote', { allow });
   const endVoteControl = showEndVote ? <EndVoteControl data={data} enabled={interaction.enabled}
     pending={endVotePending} onToggle={submitEndVote} onHelp={openFinish} /> : undefined;
+  const mobileEndVoteControl = showEndVote ? <EndVoteControl data={data} enabled={interaction.enabled}
+    pending={endVotePending} onToggle={submitEndVote} onHelp={openFinish} variant="mobileTopbar" /> : undefined;
   const mobileFit = useMobilePlayFit(isMobile && !(end && (panel === 'results' || panel === 'restart')));
   const playFitClassName = [
     styles.playFitRoot,
@@ -101,14 +103,7 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
         kicker="CLASSIC TABLE · 房间号"
         title={data.roomID}
         status={<Deadline deadline={turnDeadline} />}
-        actions={<>
-          <ActionButton aria-label="股价速查" title="股价速查"
-            onClick={() => setPriceTier(0)}><Wallet size={17} />
-            <span data-game-mobile-action-label>股价速查</span></ActionButton>
-          {end && <ActionButton aria-label="查看本局结算" title="查看结算"
-            onClick={() => setPanel('results')}><Trophy size={17} />
-            <span data-game-mobile-action-label>查看结算</span></ActionButton>}
-        </>}
+        actions={isMobile ? mobileEndVoteControl : undefined}
       />
       <div className={styles.heading} data-game-desktop-topbar><div className={styles.headingIdentity}><button type="button" className={styles.backButton} aria-label="离开当前对局" onClick={onLeave}><ArrowLeft size={19} /></button><div><small>CLASSIC TABLE · 房间号</small><h1>{data.roomID}</h1></div></div>
       <div className={styles.headingTools}><Deadline deadline={turnDeadline} /><ActionButton onClick={() => setPriceTier(0)}>股价速查</ActionButton>
@@ -116,8 +111,9 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
       {!isMobile && endVoteControl}
       <div className={styles.cash}><Wallet size={18} /><span><small>可用现金</small><b><AnimatedValue value={data.playerData.money} formatter={money} /></b></span></div></div></div>
       <PhaseBanner data={data} interaction={interaction}
-        action={!end ? isMobile ? endVoteControl
-          : <PhaseAction data={data} interaction={interaction} pending={!!session.pending} buttonOnly /> : undefined} />
+        action={!end && !isMobile
+          ? <PhaseAction data={data} interaction={interaction} pending={!!session.pending} buttonOnly />
+          : undefined} />
       {isMobile ? <PlayMobile {...props} /> : <PlayDesktop {...props} />}
     </div>
     <TradeDialog interaction={interaction} session={session} />

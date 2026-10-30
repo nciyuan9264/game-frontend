@@ -124,6 +124,25 @@ describe('Acquire drafts', () => {
     expect(result.current.eligiblePanel).toBe('merge');
     expect(result.current.panel).toBe('merge');
   });
+  it('submits the default merger draft as fully retained stock', () => {
+    const session = createSession('mergingSettle');
+    const data = session.snapshot as GameSnapshot;
+    data.playerData.stocks.American = 3;
+    data.tempData.mergeSettleData.American = { hoders: ['me'], dividends: { me: 3000 } };
+    data.tempData.merge_settle_current_player = 'me';
+    const { result } = renderHook(() => useAcquireInteraction(session));
+
+    expect(result.current.draft.merge).toEqual({});
+    act(() => result.current.submitMerge());
+
+    expect(session.submit).toHaveBeenCalledWith('game_merging_settle', {
+      actions: [{
+        company: 'American',
+        sellAmount: 0,
+        exchangeAmount: 0,
+      }],
+    });
+  });
   it('switches from merger actions to the waiting dialog after submission is acknowledged', () => {
     const session = createSession('mergingSettle');
     const data = session.snapshot as GameSnapshot;
