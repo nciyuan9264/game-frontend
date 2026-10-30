@@ -12,7 +12,7 @@ import {
   formatColumns,
   savedStepCount,
 } from '../../model/board';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 
 export function Results({
   data,
@@ -48,7 +48,7 @@ export function Results({
     <section className="cs-result-hero"><div><Bull size={42} /><Trophy size={30} /></div>
       <small>THREE SUMMITS. ONE GREAT ADVENTURE.</small>
       <h1>{won ? '这一次，山顶属于你。' : '这一次，有人先登顶。'}</h1>
-      <p>{playerName(winnerID, data.roomData.players)} 率先占领三条路线。</p>
+      <p>{playerLabel(winnerID, data.roomData.players)} 率先占领三条路线。</p>
       <span><Trophy size={14} />{data.result?.reason ?? '占领三条路线，比赛结束。'}</span>
     </section>
 
@@ -64,7 +64,7 @@ export function Results({
           <span>{String(index + 1).padStart(2, '0')}</span>
           <PlayerAvatar name={playerName(id, data.roomData.players)}
             avatar={player?.avatar} ai={player?.ai} size={38} />
-          <div><b>{playerName(id, data.roomData.players)}</b>
+          <div><b>{playerLabel(id, data.roomData.players)}</b>
             <small>{id === winnerID ? '本局登顶者' : `第 ${index + 1} 名`}</small></div>
           <strong>{claimedCount(data, id)} / 3</strong>
           <span className="cs-route-score">{savedStepCount(data.playerData[id])}</span>

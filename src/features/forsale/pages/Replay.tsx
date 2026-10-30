@@ -18,6 +18,7 @@ import {
   PropertyCard,
 } from '../components/GamePieces';
 import { ForSaleLoading } from '../components/LoadingState';
+import { playerLabel, playerName } from '../model/session';
 import { chequeMoney } from '../model/types';
 
 const ReplayContent = ({ gameID }: { gameID: number }) => {
@@ -31,6 +32,12 @@ const ReplayContent = ({ gameID }: { gameID: number }) => {
     setPreviewIndex(index);
     replay.selectIndex(index);
   };
+  const event = snapshot?.currentEvent;
+  const eventActor = event
+    ? snapshot?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, snapshot.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   return <AppShell inMatch hideHeader title="成交回放" profile={replay.profile}>
     <div className="fs-replay">
       <GameMobileReplayHeading
@@ -50,8 +57,8 @@ const ReplayContent = ({ gameID }: { gameID: number }) => {
         <ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
       {snapshot && <><section className="fs-replay-meta">
         <span>第 {snapshot.roomData.round} / {snapshot.roomData.totalRounds} 轮</span>
-        <span>{snapshot.currentEvent
-          ? `${snapshot.currentEvent.displayName ?? snapshot.currentEvent.playerID} · ${snapshot.currentEvent.cmdType}`
+        <span>{event
+          ? `${eventActor} · ${event.cmdType}`
           : '初始状态'}</span><span>阶段 {snapshot.roomData.gameStatus}</span>
       </section><div className="fs-replay-layout"><section>
         <div className="fs-replay-market">{snapshot.roomData.propertyMarket.map(value =>
@@ -62,8 +69,8 @@ const ReplayContent = ({ gameID }: { gameID: number }) => {
           const player = snapshot.roomData.players[id];
           const state = snapshot.playersData[id];
           return <article key={id}><PlayerAvatar
-            name={player?.displayName ?? id} avatar={player?.avatar}
-            ai={player?.ai} size={37} /><div><b>{player?.displayName ?? id}</b>
+            name={playerName(id, snapshot.roomData.players)} avatar={player?.avatar}
+            ai={player?.ai} size={37} /><div><b>{playerLabel(id, snapshot.roomData.players)}</b>
               <small>{state?.coins ?? 0} 枚金币 · {
                 chequeMoney((state?.cheques ?? []).reduce(
                   (sum, value) => sum + value, 0,

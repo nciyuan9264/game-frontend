@@ -17,7 +17,7 @@ import { Dialog } from '../../components/Dialog';
 import type { OnitamaSession } from '../../hooks/useOnitamaSession';
 import { useOnitamaViewport } from '../../hooks/useOnitamaViewport';
 import { onitamaRoomInviteURL } from '../../model/adapters';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import type { Visibility } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import { RoomDesktop } from './RoomDesktop';
@@ -192,7 +192,7 @@ export function Room({
             }
           }}>确认移除</ActionButton></>}>
       <p className={styles.dialogText}>
-        {playerName(target, data.players)} 将离开当前棋室。</p>
+        {playerLabel(target, data.players)} 将离开当前棋室。</p>
     </Dialog>}
 
     {panel === 'start' && <Dialog title="迈出这局的第一步？"
@@ -205,7 +205,7 @@ export function Room({
       <div className={styles.startPlayers}>{players.map(([id, player]) =>
         <span key={id}><PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={52} />
-          <b>{playerName(id, data.players)}</b>
+          <b>{playerLabel(id, data.players)}</b>
           <small><Check size={12} />
             {player.ready ? '准备就绪' : '尚未准备'}</small></span>)}</div>
       <p className={styles.startCopy}>基础版 16 张招式中随机取 5 张，双方各持 2 张，

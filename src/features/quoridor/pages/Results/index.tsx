@@ -16,7 +16,7 @@ import {
   targetRow,
 } from '../../model/board';
 import {
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import { useQuoridorViewport } from '../../hooks/useQuoridorViewport';
@@ -40,7 +40,7 @@ export function Results({
   const winnerSide = data.result?.winnerSide
     ?? data.playerData[winnerID]?.side
     ?? 'south';
-  const winner = playerName(winnerID, data.roomData.players);
+  const winner = playerLabel(winnerID, data.roomData.players);
   const owner = data.ownerID === data.playerId;
   const resigned = data.result?.reason.includes('认输') ?? false;
   const stats = [

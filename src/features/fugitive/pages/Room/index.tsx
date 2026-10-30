@@ -17,6 +17,7 @@ import {
 } from 'lucide-react';
 import {
   orderGameRoomSeats,
+  playerDisplayLabel,
   playerDisplayName,
 } from '@/features/game-core/model/room';
 import {
@@ -270,7 +271,7 @@ export function Room({
             avatar: player.avatar,
           }} className="avatar" />
           <small>{playerID === data.ownerID ? '房主' : player.ai ? '公平 AI' : '挑战者'}</small>
-          <h3>{playerDisplayName(player)}{self && <em>你</em>}</h3>
+          <h3>{playerDisplayLabel(player)}{self && <em>你</em>}</h3>
           <span className="seat-role">{role === 'fugitive'
             ? <Footprints size={13} /> : <Shield size={13} />} {roleName(role)}</span>
           <span className={`seat-ready ${player.ready ? '' : 'unready'}`}>
@@ -278,7 +279,7 @@ export function Room({
             {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}
           </span>
           {canRemove && <button className="icon-button seat-remove" type="button"
-            aria-label={`移除 ${playerDisplayName(player)}`}
+            aria-label={`移除 ${playerDisplayLabel(player)}`}
             onClick={() => { setTarget(playerID); setPanel('remove'); }}>
             <X size={15} /></button>}
         </article>;
@@ -377,7 +378,7 @@ export function Room({
         onClick={() => {
           if (session.submit('match_remove_player', { playerID: target })) close();
         }}>确认移除</button></>}>
-      <p>{playerDisplayName(data.players[target])} 将离开当前房间。</p>
+      <p>{playerDisplayLabel(data.players[target])} 将离开当前房间。</p>
     </Modal>}
 
     {panel === 'start' && <Modal title="让追逐开始？"

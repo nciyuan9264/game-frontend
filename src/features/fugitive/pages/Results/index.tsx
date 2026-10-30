@@ -12,7 +12,7 @@ import {
 } from '../../components/Visual';
 import { selfRole } from '../../model/selectors';
 import {
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import type { Role } from '../../model/types';
@@ -57,7 +57,7 @@ export function Results({
   const names = Object.fromEntries((['fugitive', 'marshal'] as const).map(item => {
     const id = Object.keys(data.playerData).find(playerID =>
       data.playerData[playerID]?.role === item) ?? '';
-    return [item, playerName(id, players)];
+    return [item, playerLabel(id, players)];
   })) as Record<Role, string>;
   const routeCount = Math.max(0, data.roomData.route.length - 1);
   const revealedCount = data.roomData.route.filter(item =>

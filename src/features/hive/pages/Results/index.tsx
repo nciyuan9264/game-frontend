@@ -9,7 +9,7 @@ import { MiniBoard } from '../../components/Board';
 import { Bug } from '../../components/Artwork';
 import { sideName } from '../../model/board';
 import {
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import { useHiveViewport } from '../../hooks/useHiveViewport';
@@ -53,7 +53,7 @@ export function Results({
     ?? 'white';
   const winner = draw
     ? '双方'
-    : playerName(winnerID, data.roomData.players);
+    : playerLabel(winnerID, data.roomData.players);
   const owner = data.ownerID === data.playerId;
   const states = Object.values(data.playerData);
   const whitePressure = states.find(state => state.side === 'white')?.queenPressure ?? 0;

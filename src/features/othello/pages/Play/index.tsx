@@ -31,7 +31,7 @@ import {
   playerForSide,
   sideName,
 } from '../../model/selectors';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import { Results } from '../Results';
 import styles from './index.module.less';
 
@@ -65,7 +65,7 @@ function PlayerCard({
       <Disc side={side} />
     </span>
     <div className={styles.playerInfo}>
-      <strong>{playerName(playerID, data.roomData.players)}
+      <strong>{playerLabel(playerID, data.roomData.players)}
         {playerID === data.playerId && <em>你</em>}</strong>
       <span>{side === 'black' ? '执黑 · 先手' : '执白 · 后手'}
         {player?.ai ? ' · AI 棋手' : ''}</span>

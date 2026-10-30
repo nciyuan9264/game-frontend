@@ -22,7 +22,7 @@ import {
   viewerSide,
 } from '../../model/selectors';
 import {
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 
@@ -42,7 +42,7 @@ export function Results({
   const { isMobile } = useOnitamaViewport();
   const winnerSide = data.result?.winnerSide ?? 'blue';
   const winnerID = data.result?.winnerID || playerForSide(data, winnerSide);
-  const winner = playerName(winnerID, data.roomData.players);
+  const winner = playerLabel(winnerID, data.roomData.players);
   const owner = data.ownerID === data.playerId;
   const reason = data.result?.reason ?? '';
   const last = data.roomData.lastAction;

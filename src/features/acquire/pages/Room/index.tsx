@@ -13,7 +13,7 @@ import { PlayerAvatar } from '../../components/AppShell';
 import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { useAcquireViewport } from '../../hooks/useAcquireViewport';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import { acquireRoomInviteURL } from '../../model/adapters';
 import { RoomDesktop } from './RoomDesktop';
 import { RoomMobile } from './RoomMobile';
@@ -48,7 +48,7 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
   const copy = roomUI.copy;
   const close = roomUI.close;
   const players = Object.entries(data.players);
-  const targetName = playerName(roomUI.targetID, data.players);
+  const targetName = playerLabel(roomUI.targetID, data.players);
   const mobilePlayers = players.map(([id, player]) => ({
     id,
     name: playerName(id, data.players),
@@ -129,7 +129,7 @@ export function Room({ session, data, onLeave }: { session: AcquireSession; data
     </ResponsiveDialog>}
     {panel === 'start' && <ResponsiveDialog title="合伙人齐了，开场吧。" eyebrow="READY FOR THE FIRST MOVE" onClose={close}
       footer={<><ActionButton onClick={close}>再等一下</ActionButton><ActionButton variant="primary" disabled={!enabled} onClick={() => { if (session.submit('match_begin')) close(); }}>确认开局<ArrowRight size={16} /></ActionButton></>}>
-      <div className={styles.startPlayers}>{players.map(([id, player]) => <div key={id}><PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} size={52} /><b>{playerName(id, data.players)}</b><small><Check size={12} />{player.ready ? '准备就绪' : '尚未准备'}</small></div>)}</div>
+      <div className={styles.startPlayers}>{players.map(([id, player]) => <div key={id}><PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} size={52} /><b>{playerLabel(id, data.players)}</b><small><Check size={12} />{player.ready ? '准备就绪' : '尚未准备'}</small></div>)}</div>
       <div className={styles.startFacts}><span><Wallet size={18} /><small>每人起始资金</small><b>$6,000</b></span><span><Layers size={18} /><small>初始手牌</small><b>6 块地</b></span><span><Clock size={18} /><small>阶段时限</small><b>20–60 秒</b></span></div>
       {hint('确认后从第 1 回合开始，本局中不能修改房间设置。')}
     </ResponsiveDialog>}

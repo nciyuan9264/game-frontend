@@ -49,6 +49,7 @@ import {
   topPieceAt,
 } from '../../model/selectors';
 import {
+  playerLabel,
   playerName,
   type GameSnapshot,
 } from '../../model/session';
@@ -118,7 +119,7 @@ function Journal({
       <span className={entry.side}><Bug
         kind={pieceKindFromID(entry.pieceID) ?? 'queen'} size={14} /></span>
       <div><strong>{actionLabel(entry)}</strong>
-        <small>{playerName(entry.playerID, data.roomData.players)}
+        <small>{playerLabel(entry.playerID, data.roomData.players)}
           {entry.automatic ? ' · 自动行动' : ''}</small></div>
     </li>)}
   </ol>;
@@ -380,7 +381,7 @@ export function Play({
             <div className="hive-action-heading"><span>{
               myTurn ? `${sideName(side)} / YOUR MOVE` : 'OPPONENT’S TURN'
             }</span><h2>{!myTurn
-              ? `${playerName(data.roomData.currentPlayer, data.roomData.players)}在思考。`
+              ? `${playerLabel(data.roomData.currentPlayer, data.roomData.players)}在思考。`
               : !data.roomData.legalActions.length
                 ? '这一手，只能过手。'
                 : queenDue

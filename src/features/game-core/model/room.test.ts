@@ -3,6 +3,7 @@ import {
   filterLobbyRooms,
   gameInviteURL,
   orderGameRoomSeats,
+  playerDisplayLabel,
   playerDisplayName,
   roomEntry,
   roomOwnerName,
@@ -58,6 +59,12 @@ describe('shared lobby room model', () => {
 
   it('resolves owner names and entry states', () => {
     expect(playerDisplayName(room.roomPlayer[0])).toBe('Alice-Cooper-7');
+    expect(playerDisplayLabel(room.roomPlayer[0])).toBe('Alice-Cooper-7');
+    expect(playerDisplayLabel({
+      playerID: 'ai_001',
+      displayName: '摩根',
+      ai: true,
+    })).toBe('摩根 · AI');
     expect(roomOwnerName(room)).toBe('Alice-Cooper-7');
     expect(roomOwnerProfile({
       ...room,

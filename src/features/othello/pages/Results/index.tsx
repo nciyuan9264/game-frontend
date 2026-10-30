@@ -2,7 +2,7 @@ import { ArrowRight, Eye, Trophy } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Disc } from '../../components/Artwork';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export function Results({
@@ -21,7 +21,7 @@ export function Results({
   const winnerID = data.result?.winnerID ?? '';
   const owner = data.ownerID === data.playerId;
   const draw = data.result?.draw ?? !winnerID;
-  const winner = winnerID ? playerName(winnerID, data.roomData.players) : '';
+  const winner = winnerID ? playerLabel(winnerID, data.roomData.players) : '';
   const blackCount = data.result?.blackCount
     ?? data.playerData[data.roomData.blackPlayerID]?.discCount
     ?? 0;
@@ -48,7 +48,7 @@ export function Results({
           <Disc side={player.side} />
           <PlayerAvatar name={playerName(player.id, data.roomData.players)}
             avatar={record?.avatar} ai={record?.ai} size={45} />
-          <div><strong>{playerName(player.id, data.roomData.players)}</strong>
+          <div><strong>{playerLabel(player.id, data.roomData.players)}</strong>
             <small>{player.side === 'black' ? '黑方 · 先手' : '白方 · 后手'}</small></div>
           <b>{player.count}<small>子</small></b>
         </article>;

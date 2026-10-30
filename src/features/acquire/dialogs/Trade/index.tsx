@@ -9,7 +9,7 @@ import { Feedback } from '@/components/GameUI/Panel';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import type { AcquireSession } from '../../hooks/useAcquireSession';
 import { buyPreview, mergeCompanies, mergePreview, mergeSettlementPlayer, pendingMergePlayers, settledMergeCompanies } from '../../model/selectors';
-import { money, playerName, type GameSnapshot } from '../../model/session';
+import { money, playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import { companyColors, companyKeys, type Company } from '../../model/types';
 import styles from './index.module.less';
 
@@ -55,7 +55,7 @@ function MergerDividends({ data, sources }: { data: GameSnapshot; sources: Compa
           const player = data.roomData.players[playerID];
           return <span key={playerID}>
             <PlayerAvatar name={playerName(playerID, data.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={27} />
-            <b>{playerName(playerID, data.roomData.players)}</b><strong>+{money(amount)}</strong>
+            <b>{playerLabel(playerID, data.roomData.players)}</b><strong>+{money(amount)}</strong>
           </span>;
         })}</div> : <small className={styles.noDividend}>无人持股，无奖励</small>}
       </div>;
@@ -94,7 +94,7 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
     const waitingForTurn = pendingSet.has(data.playerId);
     const completed = completedSet.has(data.playerId);
     const currentPlayerName = currentPlayerID
-      ? playerName(currentPlayerID, data.roomData.players)
+      ? playerLabel(currentPlayerID, data.roomData.players)
       : '其他股东';
     const participantIDs = (data.roomData.playerOrder ?? Object.keys(data.roomData.players))
       .filter(playerID => pendingSet.has(playerID) || completedSet.has(playerID));
@@ -120,7 +120,7 @@ export function TradeDialog({ interaction, session }: { interaction: AcquireInte
         const player = data.roomData.players[playerID], pending = pendingSet.has(playerID);
         const active = pending && playerID === currentPlayerID;
         return <div key={playerID}><PlayerAvatar name={playerName(playerID, data.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={35} />
-          <span>{playerName(playerID, data.roomData.players)}</span><b className={active ? styles.pendingSettlement : ''}>
+          <span>{playerLabel(playerID, data.roomData.players)}</span><b className={active ? styles.pendingSettlement : ''}>
             {active ? <><LoaderCircle size={13} />处理中</> : pending ? <><Clock size={13} />等待中</> : <><Check size={13} />已完成</>}</b></div>;
       })}</div>
       {hint(waitingForTurn ? '股东按座位顺序依次处理股票；轮到你时系统会自动打开操作面板。'

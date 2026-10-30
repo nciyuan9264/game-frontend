@@ -22,7 +22,7 @@ import { Disc } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { OthelloLoading } from '../../components/LoadingState';
 import { actionCopy, sideName } from '../../model/selectors';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, type GameSnapshot } from '../../model/session';
 import type {
   Disc as DiscValue,
   GameStatus,
@@ -157,6 +157,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
   }
 
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const last = data?.roomData.lastData;
   const total = replay.totalSnapshots;
   const board = data && <Board
@@ -189,7 +194,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
         <ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
       {data && <><main className={styles.boardArea}>
         <section><header><div><small>THE QUIET RECORD</small>
-          <h2>{event ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2>
+          <h2>{event ? `${eventActor} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2>
           {replay.pendingIndex != null && <small className={styles.frameStatus}>
             正在加载第 {replay.pendingIndex} 步
           </small>}</div>
@@ -201,9 +206,9 @@ function ReplayContent({ gameID }: { gameID: number }) {
           <p>{last ? actionCopy(last, data.roomData.players) : '中央四子已经摆好，等待黑方第一步。'}</p>
           <dl><div><dt>当前行棋</dt><dd><Disc side={data.roomData.currentSide} />
             {sideName(data.roomData.currentSide)}</dd></div>
-            <div><dt>{playerName(data.roomData.blackPlayerID, data.roomData.players)}</dt>
+            <div><dt>{playerLabel(data.roomData.blackPlayerID, data.roomData.players)}</dt>
               <dd>{data.playerData[data.roomData.blackPlayerID]?.discCount ?? 0} 黑子</dd></div>
-            <div><dt>{playerName(data.roomData.whitePlayerID, data.roomData.players)}</dt>
+            <div><dt>{playerLabel(data.roomData.whitePlayerID, data.roomData.players)}</dt>
               <dd>{data.playerData[data.roomData.whitePlayerID]?.discCount ?? 0} 白子</dd></div></dl></aside>
       </main>
       <section ref={replayPanel.panelRef}

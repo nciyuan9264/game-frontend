@@ -16,7 +16,7 @@ import {
   Swords,
   UserPlus,
 } from 'lucide-react';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayLabel, playerDisplayName } from '@/features/game-core/model/room';
 import {
   StandardGameMobileRoom,
   StandardGameMobileRoomDialogs,
@@ -114,14 +114,16 @@ export function Room({
   const availableDraftUnits = Array.isArray(draft?.availableUnits) ? draft.availableUnits : [];
   const pickedDraftUnits = Array.isArray(draft?.pickedUnits) ? draft.pickedUnits : [];
   const draftPickerName = draft?.currentPickerID
-    ? playerDisplayName(data.players[draft.currentPickerID], draft.currentPickerID)
+    ? playerDisplayLabel(data.players[draft.currentPickerID], draft.currentPickerID)
     : '下一位指挥官';
   const getPlayerName = (playerID: string) =>
     playerDisplayName(data.players[playerID], playerID);
+  const getPlayerLabel = (playerID: string) =>
+    playerDisplayLabel(data.players[playerID], playerID);
   const renderMobileAvatar = (
-    player: { name: string; avatar?: string },
+    player: { name: string; avatar?: string; ai?: boolean },
     size: number,
-  ) => <PlayerAvatar name={player.name} avatar={player.avatar} size={size} />;
+  ) => <PlayerAvatar name={player.name} avatar={player.avatar} ai={player.ai} size={size} />;
 
   if (isMobile) {
     const setupExtension = players.length === 2
@@ -329,13 +331,13 @@ export function Room({
         return <article key={playerID} className={`seat-card occupied ${side ? 'falcon' : ''}`}>
           <span className="seat-index">0{index + 1} / {side ? 'FALCON' : 'OAK'}</span>
           <Crest side={side} size={90} /><Eyebrow>{side ? 'THE FALCON LEGION' : 'THE OAK LEGION'}</Eyebrow>
-          <h2>{playerDisplayName(player)}{playerID === data.playerID && <small>你</small>}</h2>
+          <h2>{playerDisplayLabel(player)}{playerID === data.playerID && <small>你</small>}</h2>
           <p>{sideName(playerID)} · {playerID === data.ownerID ? '房主' : player.ai ? '公平 AI' : '挑战者'}</p>
           <span className={`ready-tag ${player.ready ? '' : 'not-ready'}`}>
             {player.ready ? <Check size={14} /> : <Clock3 size={14} />}
             {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}</span>
           {removable && <button className="icon-button warchest-seat-remove" type="button"
-            aria-label={`移除 ${playerDisplayName(player)}`}
+            aria-label={`移除 ${playerDisplayLabel(player)}`}
             onClick={() => { setTarget(playerID); setPanel('remove'); }}>×</button>}
         </article>;
       })}</div>
@@ -368,9 +370,9 @@ export function Room({
           </> : <div className="draft-status"><Swords size={19} /><div><b>正在初始化官方轮抽</b>
             <small>轮抽池会随服务端确认状态自动出现</small></div></div>}
         </section>}
-        {setup.rosters[oakID]?.length > 0 && <Lineup title={`${playerDisplayName(data.players[oakID])} · 橡木军团`}
+        {setup.rosters[oakID]?.length > 0 && <Lineup title={`${getPlayerLabel(oakID)} · 橡木军团`}
           units={setup.rosters[oakID]} side={0} />}
-        {setup.rosters[falconID]?.length > 0 && <div className="opponent-lineup"><b>{playerDisplayName(data.players[falconID])} · 赤隼军团</b>
+        {setup.rosters[falconID]?.length > 0 && <div className="opponent-lineup"><b>{getPlayerLabel(falconID)} · 赤隼军团</b>
           <div>{setup.rosters[falconID].map(value => {
             const type = isUnitId(value) ? value : undefined;
             return <span key={value}><Coin type={type ?? 'royal'} side={1} size={31} />
@@ -386,7 +388,7 @@ export function Room({
         <div><dt>房间范围</dt><dd>{data.visibility === 'private' ? '私密房间' : '公开房间'}</dd></div>
         <div><dt>编成方式</dt><dd>{setupModeName(setup.mode)}</dd></div>
         <div><dt>思考时间</dt><dd>固定 90 秒</dd></div>
-        <div><dt>初始先手</dt><dd>{setup.initialPlayerID ? playerDisplayName(data.players[setup.initialPlayerID]) : '编成后确定'}</dd></div>
+        <div><dt>初始先手</dt><dd>{setup.initialPlayerID ? getPlayerLabel(setup.initialPlayerID) : '编成后确定'}</dd></div>
         <div><dt>准备状态</dt><dd>{players.filter(([, player]) => player.ready).length} / {players.length} 人</dd></div></dl>
       <p className="helper"><ShieldCheck size={15} />隐藏手牌、军袋顺序与背面弃币按身份隔离。</p>
       {owner ? <button className="button primary full" type="button" disabled={!enabled || !allReady}
@@ -432,7 +434,7 @@ export function Room({
       footer={<><button className="button secondary" type="button" onClick={close}>取消</button>
         <button className="button primary" type="button" disabled={!enabled} onClick={() => {
           if (session.submit('match_remove_player', { playerID: target })) close();
-        }}>确认移除</button></>}><p>{playerDisplayName(data.players[target])} 将离开当前房间。</p></Modal>}
+        }}>确认移除</button></>}><p>{getPlayerLabel(target)} 将离开当前房间。</p></Modal>}
 
     {panel === 'start' && <Modal title="让第一枚指令落下？" eyebrow="BEGIN THE CAMPAIGN" onClose={close}
       footer={<><button className="button secondary" type="button" onClick={close}>再等一下</button>

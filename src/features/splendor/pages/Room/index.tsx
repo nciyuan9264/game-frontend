@@ -13,7 +13,7 @@ import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Dialog } from '../../components/Dialog';
 import type { SplendorSession } from '../../hooks/useSplendorSession';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import { splendorRoomInviteURL } from '../../model/adapters';
 import type { Visibility } from '../../model/types';
 import styles from './index.module.less';
@@ -175,10 +175,10 @@ export function Room({ session, data, onLeave }: {
             : <button type="button" aria-label={`在席位 ${index + 1} 添加人机`} disabled={!canAdd}
               onClick={() => session.submit('match_add_ai', { seatIndex: index })}><Plus size={23} /></button>}
           <div><small>{playerID === data.ownerID ? '展会主人' : empty ? '等待入座' : player?.ai ? 'AI 收藏家' : '受邀收藏家'}</small>
-            <h2>{player ? playerName(playerID, data.players) : '空席位'}</h2>
+            <h2>{player ? playerLabel(playerID, data.players) : '空席位'}</h2>
             <span className={player?.ready ? styles.ready : styles.waiting}>{player?.ready ? <Check size={12} /> : <Clock size={12} />}
               {player?.ready ? '准备就绪' : empty ? '可添加人机' : player?.online ? '等待准备' : '暂时离线'}</span></div>
-          {canRemove && <button type="button" className={styles.remove} aria-label={`移除 ${playerName(playerID, data.players)}`}
+          {canRemove && <button type="button" className={styles.remove} aria-label={`移除 ${playerLabel(playerID, data.players)}`}
             onClick={() => { setTarget(playerID); setPanel('remove'); }}><X size={16} /></button>}
         </article>;
       })}</div><div className={styles.coordinates}><span>SPLENDOR / CLASSIC</span><span>THE JEWEL SALON</span></div></div>
@@ -216,11 +216,11 @@ export function Room({ session, data, onLeave }: {
     </Dialog>}
     {panel === 'remove' && <Dialog title="让这个席位空出来？" eyebrow="REMOVE COLLECTOR" onClose={close}
       footer={<><ActionButton onClick={close}>取消</ActionButton><ActionButton variant="danger" disabled={!enabled} onClick={() => { if (session.submit('match_remove_player', { playerID: target })) close(); }}>确认移除</ActionButton></>}>
-      <p className={styles.dialogText}>{playerName(target, data.players)} 将离开当前房间。你可以重新邀请朋友或添加人机。</p>
+      <p className={styles.dialogText}>{playerLabel(target, data.players)} 将离开当前房间。你可以重新邀请朋友或添加人机。</p>
     </Dialog>}
     {panel === 'start' && <Dialog title="让珠宝展正式揭幕？" eyebrow="OPEN THE EXHIBITION" onClose={close}
       footer={<><ActionButton onClick={close}>再等一下</ActionButton><ActionButton variant="primary" disabled={!enabled} onClick={() => { if (session.submit('match_begin')) close(); }}>确认开局<ArrowRight size={16} /></ActionButton></>}>
-      <div className={styles.startPlayers}>{players.map(([id, player]) => <span key={id}><PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} size={50} /><b>{playerName(id, data.players)}</b><small><Check size={12} />准备就绪</small></span>)}</div>
+      <div className={styles.startPlayers}>{players.map(([id, player]) => <span key={id}><PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} size={50} /><b>{playerLabel(id, data.players)}</b><small><Check size={12} />准备就绪</small></span>)}</div>
       <div className={styles.startHint}><Sparkles size={19} /><p>每回合选择拿宝石、购买发展卡或预留卡牌。任一玩家达到 15 声望后进入最后一轮。</p></div>
     </Dialog>}
   </div>;

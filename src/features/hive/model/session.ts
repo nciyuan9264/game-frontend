@@ -19,7 +19,7 @@ import {
   type RealtimeCommandResult,
   type RealtimeErrorMessage,
 } from '@/features/game-core/model/realtime';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayLabel, playerDisplayName } from '@/features/game-core/model/room';
 import type {
   ActionEntry,
   ActionKind,
@@ -421,3 +421,7 @@ export const playerName = (
   id: string,
   players?: Record<string, HivePlayer>,
 ) => playerDisplayName(players?.[id], id);
+export const playerLabel = (
+  id: string,
+  players?: Record<string, HivePlayer>,
+) => playerDisplayLabel(players?.[id], id);

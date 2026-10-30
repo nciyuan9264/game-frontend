@@ -58,8 +58,8 @@ function replaySnapshot(index: number) {
     totalEvents: 1,
     currentEvent: moved ? {
       seq: 0,
-      playerID: 'me',
-      displayName: 'Alice',
+      playerID: 'ai_2',
+      displayName: 'Legacy AI',
       cmdType: 'game_place_disc',
       payload: { index: 19 },
     } : undefined,
@@ -172,6 +172,8 @@ describe('Othello replay', () => {
     });
     expect(screen.getByRole('button', { name: '初始' })).toBeTruthy();
     expect(screen.getByRole('button', { name: '末步' })).toBeTruthy();
+    fireEvent.click(screen.getByRole('button', { name: '末步' }));
+    await screen.findByText('墨白 · AI · 落子');
 
     fireEvent.click(screen.getByRole('button', { name: '收起回放面板' }));
     expect(screen.getByRole('button', { name: '展开回放面板' })).toBeTruthy();

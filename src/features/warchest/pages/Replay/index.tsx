@@ -11,6 +11,7 @@ import type { WarChestReplaySnapshot } from '@/api/generated/game-platform';
 import { GameMobileReplayHeading } from '@/components/GameUI/GameMobileTopbar';
 import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
 import { Shell, Loading, Notice } from '../../components/Shell';
+import { playerDisplayLabel } from '@/features/game-core/model/room';
 import { replaySource, toBattleGame } from '../../selectors';
 import { Battle } from '../Battle';
 
@@ -38,6 +39,14 @@ function ReplayContent({ gameID }: { gameID: number }) {
   </Shell>;
 
   const event = replay.currentSnapshot?.currentEvent;
+  const eventPlayer = event
+    ? game.players.find(player => player.playerID === event.playerID)
+    : undefined;
+  const eventActor = event
+    ? eventPlayer
+      ? playerDisplayLabel(eventPlayer, event.playerID)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   return <div className="warchest-replay-root"><Battle game={game}
     roomID={replay.detail?.game.roomID ?? ''}
     roomName={replay.detail?.game.roomID ?? '对局回放'}
@@ -53,7 +62,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       aria-label="返回战绩"><ArrowLeft size={17} />返回战绩</Link>
     <section className="warchest-root replay-dock" data-testid="warchest-replay-panel">
       <header><History size={15} /><strong>{event
-        ? `${event.displayName} · ${event.cmdType}` : '初始局面'}</strong>
+        ? `${eventActor} · ${event.cmdType}` : '初始局面'}</strong>
         <span><Eye size={13} />全知视角</span></header>
       <div className="replay-controls"><button className="icon-button" type="button"
         aria-label="初始局面" disabled={!replay.selectedIndex} onClick={() => select(0)}>首</button>

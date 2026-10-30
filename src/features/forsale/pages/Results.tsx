@@ -12,6 +12,7 @@ import {
   chequeMoney,
 } from '../model/types';
 import {
+  playerLabel,
   playerName,
   type GameSnapshot,
 } from '../model/session';
@@ -41,7 +42,7 @@ export const Results = ({
       <small>本局已结束 · 服务端结算已锁定</small>
       <h1>{self?.winner
         ? winners.length > 1 ? '好买卖，并肩赢。' : '这一局，你眼光独到。'
-        : `${playerName(winners[0]?.[0] ?? '', data.roomData.players)}，做成了好买卖。`}</h1>
+        : `${playerLabel(winners[0]?.[0] ?? '', data.roomData.players)}，做成了好买卖。`}</h1>
       <p>房产全部售出，最后一笔财富已经入账。</p>
       <div><span>你的总财富</span><strong>{chequeMoney(self?.total ?? 0)}</strong>
         <b>第 {self?.rank ?? '—'} 名 / {rows.length} 人</b></div></div>
@@ -60,7 +61,7 @@ export const Results = ({
         <PlayerAvatar name={playerName(id, data.roomData.players)}
           avatar={data.roomData.players[id]?.avatar}
           ai={data.roomData.players[id]?.ai} size={38} />
-        <b>{playerName(id, data.roomData.players)}
+        <b>{playerLabel(id, data.roomData.players)}
           {id === data.playerId && <em>你</em>}</b>
         <span>{chequeMoney(result.chequeTotal)}</span>
         <span>{chequeMoney(result.coins)}</span>

@@ -15,7 +15,7 @@ import {
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Brand, Disc } from '../../components/Artwork';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export interface RoomProps {
@@ -88,7 +88,7 @@ export function Seats(props: RoomProps) {
         <Disc side={side} className={styles.sideMarker} />
         <PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={54} />
-        <strong>{playerName(id, data.players)}
+        <strong>{playerLabel(id, data.players)}
           {id === data.playerID && <em>你</em>}</strong>
         <span className={player.ready ? styles.ready : styles.muted}>
           {player.ready ? <Check size={12} /> : <Clock size={12} />}

@@ -104,6 +104,14 @@ export function playerDisplayName(
     || (player?.ai ? 'AI' : playerID ? `玩家 ${playerID}` : '玩家');
 }
 
+export function playerDisplayLabel(
+  player: Pick<LobbyPlayerLike, 'playerID' | 'displayName' | 'name' | 'ai'> | undefined,
+  playerID = player?.playerID ?? '',
+) {
+  const name = playerDisplayName(player, playerID);
+  return player?.ai ? `${name} · AI` : name;
+}
+
 export function roomOwnerProfile(room: LobbyRoomLike) {
   const owner = room.roomPlayer.find(player => player.playerID === room.ownerID);
   return {

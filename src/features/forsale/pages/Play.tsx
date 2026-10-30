@@ -35,6 +35,7 @@ import {
   latestSale,
 } from '../model/selectors';
 import {
+  playerLabel,
   playerName,
   type GameSnapshot,
 } from '../model/session';
@@ -160,7 +161,7 @@ export const Play = ({
             ? 'SELL SMART / 好房等好价' : 'BUY LOW / 看准再出手'}</small>
           <h2>{phase === 'auction'
             ? myTurn ? '轮到你出价，好房值得多少？'
-              : `${playerName(data.roomData.currentPlayer,
+              : `${playerLabel(data.roomData.currentPlayer,
                 data.roomData.players)}正在考虑下一口价…`
             : phase === 'buyResult' ? '一声落槌，房子各有所属。'
               : phase === 'sellSelect' ? '选一处房产，把眼光变成回报。'
@@ -177,7 +178,7 @@ export const Play = ({
             <PlayerAvatar name={playerName(id, data.roomData.players)}
               avatar={data.roomData.players[id]?.avatar}
               ai={data.roomData.players[id]?.ai} size={25} />
-            <b>{id === data.playerId ? '你' : playerName(id, data.roomData.players)}</b>
+            <b>{id === data.playerId ? '你' : playerLabel(id, data.roomData.players)}</b>
             <small>{phase.startsWith('sell')
               ? value?.locked ? '已锁定' : '待选择'
               : value?.passed ? `获 ${value.wonProperty ?? '—'} 号`
@@ -197,7 +198,7 @@ export const Play = ({
                 <span><PlayerAvatar
                   name={playerName(trade.playerID, data.roomData.players)}
                   ai={data.roomData.players[trade.playerID]?.ai} size={20} />
-                  <b>{playerName(trade.playerID, data.roomData.players)}</b>
+                  <b>{playerLabel(trade.playerID, data.roomData.players)}</b>
                   <small>实付 {trade.amount} 枚</small></span></div>)
               : market.map((value, index) => <div key={value}>
                 <PropertyCard value={value} />
@@ -247,7 +248,7 @@ export const Play = ({
             data.roomData.propertyMarket[0]} 号</b> · 退 <b>{
             refund(self?.bid ?? 0)} 枚</b> · 实付 <b>{
             (self?.bid ?? 0) - refund(self?.bid ?? 0)} 枚</b></>
-            : `等待 ${playerName(data.roomData.currentPlayer,
+            : `等待 ${playerLabel(data.roomData.currentPlayer,
               data.roomData.players)} 行动…`}</footer>
         </section>}
 
@@ -291,7 +292,7 @@ export const Play = ({
                 ai={data.roomData.players[id]?.ai} size={22} />{
                 id === data.playerId && data.playerData[id]?.lockedProperty
                   ? `你 · ${data.playerData[id].lockedProperty} 号`
-                  : playerName(id, data.roomData.players)}</p></article>)}</div>
+                  : playerLabel(id, data.roomData.players)}</p></article>)}</div>
           <footer><ShieldCheck size={14} />揭晓前不会显示其他玩家的房产。
             <ActionButton variant="primary" disabled={!enabled}
               onClick={() => session.submit('game_reveal_sale')}>
@@ -307,7 +308,7 @@ export const Play = ({
               <span>{String(index + 1).padStart(2, '0')}</span>
               <PlayerAvatar name={playerName(trade.playerID, data.roomData.players)}
                 ai={data.roomData.players[trade.playerID]?.ai} size={30} />
-              <b>{playerName(trade.playerID, data.roomData.players)}</b>
+              <b>{playerLabel(trade.playerID, data.roomData.players)}</b>
               <span><Home size={14} />{trade.property} 号</span>
               <ArrowRight size={15} /><strong>{chequeMoney(trade.amount)}</strong>
             </article>)}</div><footer><Coins size={17} />你本轮获得 <b>{
@@ -333,7 +334,7 @@ export const Play = ({
           <PlayerAvatar name={playerName(id, data.roomData.players)}
             avatar={data.roomData.players[id]?.avatar}
             ai={data.roomData.players[id]?.ai} size={34} />
-          <span><b>{playerName(id, data.roomData.players)}</b>
+          <span><b>{playerLabel(id, data.roomData.players)}</b>
             <small>{phase.startsWith('sell')
               ? data.playerData[id]?.locked ? '已锁定' : '正在选择'
               : data.playerData[id]?.passed ? '已获得房产' : '仍在竞价'}</small></span>
@@ -389,7 +390,7 @@ export const Play = ({
       onClose={() => setPanel(undefined)}><ol className="fs-log">{
         data.roomData.actionLog.slice().reverse().map(action =>
           <li key={action.id}><span>{String(action.id).padStart(2, '0')}</span>
-            <p><b>{playerName(action.playerID, data.roomData.players)}</b>
+            <p><b>{playerLabel(action.playerID, data.roomData.players)}</b>
               {action.kind === 'bid' ? ` 出价 ${action.amount} 枚`
                 : action.kind === 'pass' ? ` 退出并获得 ${action.property} 号房产`
                   : action.kind === 'lockSale' ? ' 已锁定暗牌'

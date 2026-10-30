@@ -24,7 +24,7 @@ import {
   gemSelectionValid, overflowCount, phaseCopy, tokenTotal, walletAfterReserve,
   walletAfterTake,
 } from '../../model/selectors';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import {
   cardColors, gemColors,
   type GemTakePayload, type ReserveCardPayload,
@@ -85,8 +85,8 @@ export function Play({
   const [roundTitle, roundDescription] = data.roomData.gameStatus === 'end'
     ? ['已结束', '本局已经结算']
     : data.roomData.gameStatus === 'last_turn'
-      ? ['最后一轮', `${playerName(data.roomData.currentPlayer, data.roomData.players)} 正在行动`]
-      : [`第 ${Math.max(1, data.turnNumber)} 轮`, `${playerName(data.roomData.currentPlayer, data.roomData.players)} 正在行动`];
+      ? ['最后一轮', `${playerLabel(data.roomData.currentPlayer, data.roomData.players)} 正在行动`]
+      : [`第 ${Math.max(1, data.turnNumber)} 轮`, `${playerLabel(data.roomData.currentPlayer, data.roomData.players)} 正在行动`];
 
   useEffect(() => {
     if (data.roomData.gameStatus === 'end') setShowResults(true);
@@ -212,7 +212,7 @@ export function Play({
             ${id === data.playerId ? styles.selfPlayer : ''}`}
             onClick={() => ui.openCollection(id)} aria-current={current || undefined}>
             <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={34} />
-            <div className={styles.playerInfo}><strong>{playerName(id, data.roomData.players)}
+            <div className={styles.playerInfo}><strong>{playerLabel(id, data.roomData.players)}
               {id === data.playerId && <em>你</em>}</strong>
               <span><Layers size={11} />{state?.normalCard.length ?? 0}<i /> <Coins size={11} />{tokenTotal(state)}
                 <i /> <Bookmark size={11} />{state?.reserveCard.length ?? 0}</span></div>
@@ -249,9 +249,9 @@ export function Play({
           onClick={() => ui.openCollection(data.playerId)} aria-current={myTurn && playable || undefined}>
           <PlayerAvatar name={playerName(data.playerId, data.roomData.players)}
             avatar={data.roomData.players[data.playerId]?.avatar} ai={data.roomData.players[data.playerId]?.ai} size={34} />
-          <span className={styles.bankPlayerInfo}><strong>{playerName(data.playerId, data.roomData.players)}<em>你</em></strong>
+          <span className={styles.bankPlayerInfo}><strong>{playerLabel(data.playerId, data.roomData.players)}<em>你</em></strong>
             <span><i />{!playable ? '本局已结束' : myTurn ? '你的回合'
-              : `等待 ${playerName(data.roomData.currentPlayer, data.roomData.players)}`}
+              : `等待 ${playerLabel(data.roomData.currentPlayer, data.roomData.players)}`}
               <small>· {me.normalCard.length} 张发展卡</small></span></span>
           <span className={styles.playerScore}><b>{me.score}</b><small>声望</small></span>
           <ChevronRight size={14} />

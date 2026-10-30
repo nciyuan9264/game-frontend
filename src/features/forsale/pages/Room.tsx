@@ -28,6 +28,7 @@ import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport'
 import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { forSaleRoomInviteURL } from '../model/adapters';
 import {
+  playerLabel,
   playerName,
   type MatchSnapshot,
 } from '../model/session';
@@ -247,7 +248,7 @@ export const Room = ({
               <span>SEAT {String(index + 1).padStart(2, '0')}</span>
               <PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar}
                 ai={player.ai} size={58} />
-              <h3>{playerName(id, data.players)}
+              <h3>{playerLabel(id, data.players)}
                 {id === data.ownerID && <Crown size={12} />}
                 {self && <em>你</em>}</h3>
               <b className={player.ready ? 'ready' : ''}>{
@@ -256,7 +257,7 @@ export const Room = ({
                 {player.ai && ' · 人机'}</b>
               {owner && id !== data.ownerID && <button type="button"
                 className="fs-seat-remove" disabled={!enabled}
-                aria-label={`移除 ${playerName(id, data.players)}`}
+                aria-label={`移除 ${playerLabel(id, data.players)}`}
                 onClick={() => { setTarget(id); setPanel('remove'); }}>
                 <X size={14} /></button>}</article>;
           })}</section>
@@ -344,7 +345,7 @@ export const Room = ({
         <ActionButton variant="danger" disabled={!enabled} onClick={() => {
           if (session.submit('match_remove_player', { playerID: target })) close();
         }}>确认移除</ActionButton></>}>
-      <p>{playerName(target, data.players)} 将离开当前房间。</p>
+      <p>{playerLabel(target, data.players)} 将离开当前房间。</p>
     </ResponsiveDialog>}
 
     {panel === 'start' && <ResponsiveDialog title="合伙人齐了，开场吧。"
@@ -356,7 +357,7 @@ export const Room = ({
       <div className="fs-start-dialog"><div>{players.map(([id, player]) =>
         <span key={id}><PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={45} />
-          <b>{playerName(id, data.players)}</b><small><Check size={11} />已准备</small></span>)}</div>
+          <b>{playerLabel(id, data.players)}</b><small><Check size={11} />已准备</small></span>)}</div>
         <dl><span><Users size={17} /><small>本场人数</small><b>{players.length} 人</b></span>
           <span><Coins size={17} /><small>起始金币</small>
             <b>{startingCoins(players.length)} 枚</b></span>

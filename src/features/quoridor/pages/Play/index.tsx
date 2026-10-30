@@ -53,6 +53,7 @@ import {
   wallSelectionCopy,
 } from '../../model/selectors';
 import {
+  playerLabel,
   playerName,
   type GameSnapshot,
 } from '../../model/session';
@@ -336,6 +337,7 @@ export function Play({
           <PlayerAvatar
             name={playerName(data.playerId, data.roomData.players)}
             avatar={data.roomData.players[data.playerId]?.avatar}
+            ai={data.roomData.players[data.playerId]?.ai}
             size={32}
           />
         </span>
@@ -416,7 +418,7 @@ export function Play({
               }</span><i className={!myTurn ? 'thinking' : ''} />
             </div>
             <div className="turn-heading"><Pawn side={side} /><div>
-              <h2>{myTurn ? '轮到你了' : `${playerName(
+              <h2>{myTurn ? '轮到你了' : `${playerLabel(
                 data.roomData.currentPlayer,
                 data.roomData.players,
               )}在思考`}</h2>

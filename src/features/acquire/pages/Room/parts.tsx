@@ -3,7 +3,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { AnimatedValue } from '../../components/AnimatedValue';
 import { PlayerAvatar } from '../../components/AppShell';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import tableArt from '../../assets/table-art.webp';
 import styles from './index.module.less';
 
@@ -31,7 +31,7 @@ export function Seats(props: RoomProps) {
       data-game-room-seat-index={index} data-game-room-player-id={id} key={id}>
       <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
       <PlayerAvatar size={58} name={playerName(id, data.players)} avatar={player.avatar} ai={player.ai} />
-      <strong>{playerName(id, data.players)} {id === data.ownerID && <Crown size={13} />}{id === data.playerID && <em>你</em>}</strong>
+      <strong>{playerLabel(id, data.players)} {id === data.ownerID && <Crown size={13} />}{id === data.playerID && <em>你</em>}</strong>
       <span className={player.ready ? styles.ready : styles.muted}>{player.ready ? <Check size={13} /> : <Users size={13} />}{player.ready ? '准备就绪' : '等待准备'}{player.ai && ' · 人机'}</span>
       {isOwner && id !== data.playerID && <button disabled={!enabled} className={styles.remove} onClick={() => props.onRemove(id)} aria-label={`管理席位 ${index + 1}`}><MoreHorizontal size={18} /></button>}
     </article> : <button className={`${styles.seat} ${styles.empty}`}

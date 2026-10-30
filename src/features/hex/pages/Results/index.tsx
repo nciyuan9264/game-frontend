@@ -3,7 +3,7 @@ import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Stone } from '../../components/Artwork';
 import { direction, sideName } from '../../model/board';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export function Results({
@@ -23,7 +23,7 @@ export function Results({
   const winnerSide = data.result?.winnerSide
     ?? data.playerData[winnerID]?.side
     ?? 'red';
-  const winner = playerName(winnerID, data.roomData.players);
+  const winner = playerLabel(winnerID, data.roomData.players);
   const owner = data.ownerID === data.playerId;
   const resigned = data.result?.reason.includes('认输') ?? false;
   const playerOrder = data.roomData.playerOrder.length
@@ -46,7 +46,7 @@ export function Results({
           <PlayerAvatar name={playerName(id, data.roomData.players)}
             avatar={data.roomData.players[id]?.avatar}
             ai={data.roomData.players[id]?.ai} size={52} />
-          <div><strong>{playerName(id, data.roomData.players)}</strong>
+          <div><strong>{playerLabel(id, data.roomData.players)}</strong>
             <small>{sideName(side)} · {direction(side)}</small></div>
           <b>{state?.stoneCount ?? 0}<small> 子</small></b>
         </article>;

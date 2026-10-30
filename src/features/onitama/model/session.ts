@@ -9,7 +9,7 @@ import type {
   OnitamaRoomData,
   RoomPlayer,
 } from '@/api/generated/game-platform';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayLabel, playerDisplayName } from '@/features/game-core/model/room';
 import {
   parseRealtimeEnvelope,
   type RealtimeCommandResult,
@@ -494,3 +494,7 @@ export const playerName = (
   id: string,
   players?: Record<string, OnitamaPlayer>,
 ) => playerDisplayName(players?.[id], id);
+export const playerLabel = (
+  id: string,
+  players?: Record<string, OnitamaPlayer>,
+) => playerDisplayLabel(players?.[id], id);

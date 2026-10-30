@@ -46,7 +46,7 @@ import {
 } from '../../model/selectors';
 import {
   parseReplaySnapshot,
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import { Results } from '../Results';
@@ -147,6 +147,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
   }
 
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const last = data?.roomData.lastAction;
   const total = replay.totalSnapshots;
   const view = data ? viewerSide(data) : 'blue';
@@ -184,10 +189,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
           <section>
             <header><div><small>THE QUIET RECORD</small>
               <h2>{event
-                ? `${event.displayName || playerName(
-                    event.playerID,
-                    data.roomData.players,
-                  )} · ${commandLabels[event.cmdType] ?? event.cmdType}`
+                ? `${eventActor} · ${commandLabels[event.cmdType] ?? event.cmdType}`
                 : '初始状态'}</h2>
               {replay.pendingIndex != null && <small className={styles.frameStatus}>
                 正在加载第 {replay.pendingIndex} 步
@@ -207,11 +209,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
               <div><dt>当前行棋</dt><dd>
                 <i className={`side-dot ${currentSide(data)}`} />
                 {sideName(currentSide(data))}</dd></div>
-              <div><dt>{playerName(
+              <div><dt>{playerLabel(
                 data.roomData.bluePlayerID,
                 data.roomData.players,
               )}</dt><dd>{data.playerData[data.roomData.bluePlayerID]?.pieceCount ?? 0} 枚</dd></div>
-              <div><dt>{playerName(
+              <div><dt>{playerLabel(
                 data.roomData.redPlayerID,
                 data.roomData.players,
               )}</dt><dd>{data.playerData[data.roomData.redPlayerID]?.pieceCount ?? 0} 枚</dd></div>

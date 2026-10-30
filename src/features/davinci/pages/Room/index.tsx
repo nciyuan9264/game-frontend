@@ -24,7 +24,7 @@ import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport'
 import { PlayerAvatar } from '../../components/AppShell';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
 import { davinciRoomInviteURL } from '../../model/adapters';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import type { Visibility } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import {
@@ -339,7 +339,7 @@ export function Room({
       </>}
     >
       <p className={styles.dialogText}>
-        {playerName(target, data.players)} 将离开当前房间。
+        {playerLabel(target, data.players)} 将离开当前房间。
       </p>
     </ResponsiveDialog>}
 
@@ -369,7 +369,7 @@ export function Room({
             ai={player.ai}
             size={50}
           />
-          <b>{playerName(id, data.players)}</b>
+          <b>{playerLabel(id, data.players)}</b>
           <small><Check size={12} />
             {player.ready ? '准备就绪' : '尚未准备'}</small>
         </span>)}

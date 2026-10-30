@@ -32,6 +32,7 @@ import {
   isSelecting,
 } from '../../model/selectors';
 import {
+  playerLabel,
   playerName,
   turnKey,
   type GameSnapshot,
@@ -91,7 +92,7 @@ function ResolutionQueue({ data }: { data: GameSnapshot }) {
       return <div key={`${selection.playerID}:${selection.card}`}
         className={placement ? 'resolved' : 'current'}>
         <strong>{selection.card}</strong>
-        <small>{playerName(selection.playerID, data.roomData.players)}</small>
+        <small>{playerLabel(selection.playerID, data.roomData.players)}</small>
         {placement && <Check size={11} />}
       </div>;
     })}
@@ -181,7 +182,7 @@ function ActionPanel({
   if (phase === 'chooseRow') {
     if (!isMyRowChoice(data)) return <div className="sn-waiting">
       <NumberCard value={choiceCard ?? 1} compact />
-      <h2>{playerName(data.roomData.pendingChoice?.playerID ?? '',
+      <h2>{playerLabel(data.roomData.pendingChoice?.playerID ?? '',
         data.roomData.players)} 正在选择收行</h2>
       <p>这张牌小于全部行尾，牌桌会在选择完成后继续结算。</p><span>· · ·</span></div>;
     const penalty = selectedRow == null
@@ -419,7 +420,7 @@ export function Play({
           name={playerName(id, data.roomData.players)}
           avatar={data.roomData.players[id]?.avatar}
           ai={data.roomData.players[id]?.ai} size={35} />
-          <b>{playerName(id, data.roomData.players)}</b>
+          <b>{playerLabel(id, data.roomData.players)}</b>
           <span>本局 +{data.playerData[id]?.roundPenalty ?? 0}</span>
           <BullScore value={data.playerData[id]?.totalPenalty ?? 0} /></div>)}</div>
       <p className="sn-note">66 分只在完整 10 轮结束后判断；累计牛头最少者获胜。</p>

@@ -14,7 +14,7 @@ import {
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export interface RoomProps {
@@ -99,7 +99,7 @@ export function Seats(props: RoomProps) {
           {id === data.ownerID ? '房主' : player.ai ? 'AI 对手' : '挑战者'}
         </small>
         <strong>
-          {playerName(id, data.players)}
+          {playerLabel(id, data.players)}
           {id === data.playerID && <em>你</em>}
         </strong>
         <span className={player.ready ? styles.ready : styles.muted}>

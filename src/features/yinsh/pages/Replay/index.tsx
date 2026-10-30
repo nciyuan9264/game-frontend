@@ -22,6 +22,7 @@ import { Dialog } from '../../components/Dialog';
 import { YinshLoading } from '../../components/LoadingState';
 import { actionCopy } from '../../model/selectors';
 import type { GameSnapshot } from '../../model/session';
+import { playerLabel } from '../../model/session';
 import type {
   LastAction,
   MoveOption,
@@ -173,6 +174,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
 
   const currentSide = data?.playerData[data.roomData.currentPlayer]?.side;
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const total = replay.totalSnapshots;
   const board = data && <Board
     rings={data.roomData.rings}
@@ -211,7 +217,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
     {data && <><main className={styles.boardArea}><section><header>
       <div><small>THE QUIET RECORD</small>
         <h2>{event
-          ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}`
+          ? `${eventActor} · ${commandLabels[event.cmdType] ?? event.cmdType}`
           : '初始状态'}</h2>
         {replay.pendingIndex != null && <small className={styles.frameStatus}>
           正在加载第 {replay.pendingIndex} 步
@@ -228,7 +234,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
         <dl><div><dt>公共棋子</dt>
           <dd>{data.roomData.markerPool} / 51</dd></div>
         {data.roomData.playerOrder.map(id => <div key={id}>
-          <dt>{data.roomData.players[id]?.displayName || `玩家 ${id}`}</dt>
+          <dt>{playerLabel(id, data.roomData.players)}</dt>
           <dd>{data.playerData[id]?.ringsRemoved ?? 0} 环</dd></div>)}</dl>
       </aside></main>
       <section ref={replayPanel.panelRef}

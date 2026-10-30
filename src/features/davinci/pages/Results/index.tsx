@@ -2,7 +2,7 @@ import { ArrowLeft, Eye, RotateCcw, Trophy } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import { winner } from '../../model/selectors';
 import styles from './index.module.less';
 
@@ -35,7 +35,7 @@ export function Results({
     <p>{won ? '你的序列仍有暗牌保留，判断与收手都恰到好处。' : '所有牌已经公开，可以回看终局牌面并准备下一场。'}</p>
     <section className={styles.duel}>{players.map(([id, player]) => <article key={id} className={id === winnerID ? styles.champion : ''}>
       <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={player.avatar} ai={player.ai} size={58} />
-      <div><small>{id === winnerID ? 'WINNER' : 'CHALLENGER'}</small><h2>{playerName(id, data.roomData.players)}</h2>
+      <div><small>{id === winnerID ? 'WINNER' : 'CHALLENGER'}</small><h2>{playerLabel(id, data.roomData.players)}</h2>
         <span>{id === data.playerId ? '你' : player.ai ? 'AI 对手' : '对手'}</span></div>
       {id === winnerID && <Trophy size={18} />}
     </article>)}</section>

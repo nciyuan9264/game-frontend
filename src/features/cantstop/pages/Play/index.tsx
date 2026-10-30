@@ -52,6 +52,7 @@ import {
   isTransition,
 } from '../../model/selectors';
 import {
+  playerLabel,
   playerName,
   turnKey,
   type GameSnapshot,
@@ -107,7 +108,7 @@ function PlayerBar({ data }: { data: GameSnapshot }) {
         className={`cs-player-chip ${active ? 'current' : ''} ${self ? 'self' : ''}`}>
         <PlayerAvatar name={playerName(id, data.roomData.players)}
           avatar={player?.avatar} ai={player?.ai} size={32} />
-        <div className="cs-player-name"><b>{playerName(id, data.roomData.players)}</b>
+        <div className="cs-player-name"><b>{playerLabel(id, data.roomData.players)}</b>
           <small>{data.result?.winnerID === id ? '本局登顶者'
             : active ? '本回合行动' : player?.online || player?.ai ? '等待回合' : '暂时离线'}</small></div>
         <span className="cs-flag-count"><Flag size={13} />
@@ -132,7 +133,7 @@ function Board({
   const activeSaved = savedProgress(data.playerData[activeID]);
   return <section className={`cs-route-board ${compact ? 'compact' : ''}`}
     role="img"
-    aria-label={`十一条路线棋盘，当前玩家 ${playerName(activeID, data.roomData.players)}`}>
+    aria-label={`十一条路线棋盘，当前玩家 ${playerLabel(activeID, data.roomData.players)}`}>
     <header><span>THE ELEVEN TRAILS</span>
       <span>率先占领 <b>{TARGET_COLUMNS}</b> 条路线</span></header>
     <div className="cs-mountain-lines" aria-hidden="true">
@@ -178,7 +179,7 @@ function Board({
                 const seat = player?.seatIndex ?? 0;
                 return progressAt(savedProgress(data.playerData[playerID]), column) === step
                   ? <i key={playerID}
-                    title={`${playerName(playerID, data.roomData.players)}：${column}号 ${step}/${columnHeight(column)}`}
+                    title={`${playerLabel(playerID, data.roomData.players)}：${column}号 ${step}/${columnHeight(column)}`}
                     style={{ background: playerColor(seat) }}>
                     {playerSymbol(seat)}</i>
                   : null;
@@ -233,7 +234,7 @@ function DecisionPanel({
 }) {
   const phase = data.roomData.gameStatus;
   const activeID = data.roomData.currentPlayer;
-  const activeName = playerName(activeID, data.roomData.players);
+  const activeName = playerLabel(activeID, data.roomData.players);
   const selfTurn = isMyTurn(data);
   const canAct = enabled && selfTurn;
   const gain = turnGain(data);
@@ -308,10 +309,10 @@ function DecisionPanel({
   if (isTransition(data)) return <section className={`cs-decision-panel phase-${phase}`}>
     <header><span className="cs-eyebrow">{phase === 'bust' ? 'TAKE A BREATH' : 'SAFELY BANKED'}</span>
       <h2>{phase === 'bust' ? `退回 ${data.roomData.lostGain} 步。` : `保存 ${last?.gain ?? gain} 步。`}</h2>
-      <p>{last ? actionSummary(last, id => playerName(id, data.roomData.players)) : statusTitle(data)}</p></header>
+      <p>{last ? actionSummary(last, id => playerLabel(id, data.roomData.players)) : statusTitle(data)}</p></header>
     <div className="cs-turn-ended">{phase === 'bust'
       ? <TriangleAlert size={42} /> : <ShieldCheck size={42} />}
-      <p>接下来轮到 {playerName(data.roomData.nextPlayer, data.roomData.players)}。</p>
+      <p>接下来轮到 {playerLabel(data.roomData.nextPlayer, data.roomData.players)}。</p>
       <ActionButton variant="primary" disabled={!enabled} onClick={onNextTurn}>
         下一位出发<ArrowRight size={16} /></ActionButton>
       {transitionCountdown && <small>自动推进 {transitionCountdown}</small>}</div>
@@ -342,7 +343,7 @@ function ActivityStrip({
   return <button className="cs-activity" type="button"
     aria-label="查看最近记录" onClick={onOpen}>
     <History size={15} /><span>{last
-      ? actionSummary(last, id => playerName(id, data.roomData.players))
+      ? actionSummary(last, id => playerLabel(id, data.roomData.players))
       : '牌桌刚刚开始，等待第一掷。'}</span>
     {last && <b>{actionSourceLabel(last)}<ArrowRight size={12} /></b>}
   </button>;
@@ -375,7 +376,7 @@ export function Play({
   const preview = selectedOption?.runnerPositions
     ?? hoveredOption?.runnerPositions;
   const phase = data.roomData.gameStatus;
-  const activeName = playerName(data.roomData.currentPlayer, data.roomData.players);
+  const activeName = playerLabel(data.roomData.currentPlayer, data.roomData.players);
 
   useEffect(() => {
     setSelectedActionID(undefined);
@@ -454,7 +455,7 @@ export function Play({
           <article key={action.id}><span>{action.kind === 'roll' ? <Dices size={16} />
             : action.kind === 'bank' ? <ShieldCheck size={16} />
               : action.kind === 'bust' ? <TriangleAlert size={16} /> : <Flag size={16} />}</span>
-            <div><p>{actionSummary(action, id => playerName(id, data.roomData.players))}</p>
+            <div><p>{actionSummary(action, id => playerLabel(id, data.roomData.players))}</p>
               <small>{actionSourceLabel(action)}</small></div>
             {!!action.gain && <b>{action.gain > 0 ? `+${action.gain}` : action.gain}</b>}</article>)
           : <div className="cs-event-empty"><CircleHelp size={18} />
@@ -488,7 +489,7 @@ export function Play({
         <PlayerAvatar name={playerName(id, data.roomData.players)}
           avatar={data.roomData.players[id]?.avatar}
           ai={data.roomData.players[id]?.ai} size={32} />
-        <b>{playerName(id, data.roomData.players)}</b>
+        <b>{playerLabel(id, data.roomData.players)}</b>
         <span>{claimedCount(data, id)} 条路线</span>
         <span>{savedStepCount(data.playerData[id])} 步</span></div>)}</div>
     </Dialog>}
@@ -498,7 +499,7 @@ export function Play({
         <li key={action.id}><span>{action.kind === 'roll' ? <Dices size={16} />
           : action.kind === 'bank' ? <ShieldCheck size={16} />
             : action.kind === 'bust' ? <TriangleAlert size={16} /> : <Flag size={16} />}</span>
-          <div><p>{actionSummary(action, id => playerName(id, data.roomData.players))}</p>
+          <div><p>{actionSummary(action, id => playerLabel(id, data.roomData.players))}</p>
             <small>第 {action.turnNumber} 回合 · 第 {action.rollNumber} 掷 · {actionSourceLabel(action)}</small></div>
           {!!action.gain && <b>{action.gain > 0 ? `+${action.gain}` : action.gain}</b>}</li>)}</ol>
     </Dialog>}
@@ -508,7 +509,7 @@ export function Play({
         const owner = ownerAt(data.roomData.claimedBy, column);
         return <div key={column}><b>{column}</b>
           <span>{columnHeight(column)} 阶</span>
-          <small>{owner ? `${playerName(owner, data.roomData.players)} 已占领`
+          <small>{owner ? `${playerLabel(owner, data.roomData.players)} 已占领`
             : progressAt(data.roomData.runners, column)
               ? `临时 ${progressAt(data.roomData.runners, column)} 阶`
               : '开放中'}</small></div>;

@@ -48,6 +48,7 @@ import {
   viewerSide,
 } from '../../model/selectors';
 import {
+  playerLabel,
   playerName,
   type GameSnapshot,
 } from '../../model/session';
@@ -492,7 +493,7 @@ export function Play({
 
     <div className="mobile-game-table">
       <div className="mobile-opponent"><span><i className={`side-dot ${opponent}`} />
-        <strong>{playerName(playerForSide(data, opponent), data.roomData.players)}</strong>
+        <strong>{playerLabel(playerForSide(data, opponent), data.roomData.players)}</strong>
         <small>{sideName(opponent)} · {piecesForSide(data, opponent).length} 枚</small></span>
         <span><ArrowDown size={12} />对手向下</span></div>
       <div className="opponent-hand">{hand(opponentHand, opponent, false)}</div>

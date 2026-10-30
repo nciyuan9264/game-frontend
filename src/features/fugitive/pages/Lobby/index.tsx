@@ -29,7 +29,7 @@ import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
 import { useLatestAsyncAction } from '@/features/game-core/hooks/useLatestAsyncAction';
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
-import { playerDisplayName, roomOwnerProfile } from '@/features/game-core/model/room';
+import { playerDisplayLabel, roomOwnerProfile } from '@/features/game-core/model/room';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   createFugitiveRoom,
@@ -440,7 +440,7 @@ export default function Lobby() {
         <span>输入朋友分享的完整房间号。</span></div>
       {foundRoom && <div className="invitation"><h3>{foundRoom.roomID}</h3>
         <p>{roomOwnerProfile(foundRoom).name} · {foundRoom.roomPlayer.length}/2 已入座</p>
-        <p>{foundRoom.roomPlayer.map(player => playerDisplayName(player)).join(' / ')}</p>
+        <p>{foundRoom.roomPlayer.map(player => playerDisplayLabel(player)).join(' / ')}</p>
       </div>}
     </Modal>}
 

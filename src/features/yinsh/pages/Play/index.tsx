@@ -20,7 +20,7 @@ import {
   phaseCopy,
   playerForSide,
 } from '../../model/selectors';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import { Results } from '../Results';
 import styles from './index.module.less';
 
@@ -41,7 +41,7 @@ function PlayerCard({
   return <article className={`${styles.playerCard} ${styles[side]} ${active ? styles.activePlayer : ''} ${compact ? styles.compactPlayer : ''}`}>
     <PlayerAvatar name={playerName(playerID, data.roomData.players)}
       avatar={player?.avatar} ai={player?.ai} size={compact ? 32 : 42} />
-    <div className={styles.playerInfo}><strong>{playerName(playerID, data.roomData.players)}
+    <div className={styles.playerInfo}><strong>{playerLabel(playerID, data.roomData.players)}
       {playerID === data.playerId && <em>你</em>}</strong>
       <span>{side === 'white' ? '执白 · 本局先手' : '执黑'}{player?.ai ? ' · AI 棋手' : ''}</span></div>
     <div className={styles.playerRings}><div>{[0, 1, 2].map(index =>
@@ -56,7 +56,7 @@ function Journal({ data, full = false }: { data: GameSnapshot; full?: boolean })
   return <div className={`${styles.journal} ${full ? styles.fullJournal : ''}`}>
     {entries.map((entry, index) => <div key={`${entry.action}-${data.roomData.activity.length - index}`}>
       <span className={styles.eventDot}>{entry.action === 'remove_ring' ? <Trophy size={10} /> : null}</span>
-      <p><strong>{entry.playerID ? playerName(entry.playerID, data.roomData.players) : '系统'}</strong>
+      <p><strong>{entry.playerID ? playerLabel(entry.playerID, data.roomData.players) : '系统'}</strong>
         {actionCopy(entry, data.roomData.players)}</p>
       <small>{String(data.roomData.activity.length - index).padStart(2, '0')}</small>
     </div>)}

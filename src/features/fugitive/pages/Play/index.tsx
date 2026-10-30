@@ -49,7 +49,7 @@ import {
   selfRole,
 } from '../../model/selectors';
 import {
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import type {
@@ -140,7 +140,7 @@ export function Play({
     (['fugitive', 'marshal'] as const).map(item => {
       const id = Object.keys(data.playerData).find(playerID =>
         data.playerData[playerID]?.role === item) ?? '';
-      return [item, playerName(id, data.roomData.players)];
+      return [item, playerLabel(id, data.roomData.players)];
     }),
   ) as Record<Role, string>, [data.playerData, data.roomData.players]);
   const actingRole = data.playerData[data.roomData.currentPlayer]?.role;

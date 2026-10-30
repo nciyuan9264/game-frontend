@@ -45,7 +45,7 @@ import {
 } from '../../model/selectors';
 import {
   parseReplaySnapshot,
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import type { Side } from '../../model/types';
@@ -156,6 +156,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
   }
 
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const last = data?.roomData.lastAction;
   const total = replay.totalSnapshots;
   const board = data && <Board
@@ -194,7 +199,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
           <section>
             <header><div><small>THE HIVE RECORD</small>
               <h2>{event
-                ? `${event.displayName} · ${
+                ? `${eventActor} · ${
                   commandLabels[event.cmdType] ?? event.cmdType
                 }`
                 : '初始状态'}</h2>
@@ -220,7 +225,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
               {(['white', 'black'] as Side[]).map(side => {
                 const playerID = playerForSide(data, side);
                 const state = data.playerData[playerID];
-                return <div key={side}><dt>{playerName(
+                return <div key={side}><dt>{playerLabel(
                   playerID,
                   data.roomData.players,
                 )}</dt><dd>{state?.queenPressure ?? 0} / 6 压力 · {

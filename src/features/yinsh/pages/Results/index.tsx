@@ -2,7 +2,7 @@ import { ArrowRight, Eye, Trophy } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { RingIcon } from '../../components/Artwork';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export function Results({
@@ -21,7 +21,7 @@ export function Results({
   const winnerID = data.result?.winnerID ?? '';
   const owner = data.ownerID === data.playerId;
   const draw = !winnerID;
-  const winner = winnerID ? playerName(winnerID, data.roomData.players) : '';
+  const winner = winnerID ? playerLabel(winnerID, data.roomData.players) : '';
   return <div className={styles.page}><header><span>THE FINAL CHAPTER</span><h1>
     {draw ? '棋逢对手，平局收场。' : '这一局，落定。'}
   </h1><p>{data.result?.reason || '对局已经由服务端完成结算。'}</p></header>
@@ -35,7 +35,7 @@ export function Results({
         return <article key={id} className={id === winnerID ? styles.winner : ''}>
           <PlayerAvatar name={playerName(id, data.roomData.players)}
             avatar={data.roomData.players[id]?.avatar} ai={data.roomData.players[id]?.ai} size={52} />
-          <div><strong>{playerName(id, data.roomData.players)}</strong><small>{state?.side === 'white' ? '白方 · 先手' : '黑方'}</small></div>
+          <div><strong>{playerLabel(id, data.roomData.players)}</strong><small>{state?.side === 'white' ? '白方 · 先手' : '黑方'}</small></div>
           <b>{state?.ringsRemoved ?? 0}<small> 环</small></b>
         </article>;
       })}</div>

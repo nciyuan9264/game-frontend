@@ -3,7 +3,7 @@ import {
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Hearts, Portrait } from '../../components/Card';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, type GameSnapshot } from '../../model/session';
 import stillLife from '../../assets/still-life.webp';
 
 export function Results({
@@ -44,7 +44,7 @@ export function Results({
     <section className="ll-result-hero"><div><Flower2 /><Crown size={31} /></div>
       <small>{final ? '一场心意，终于有了答案' : '这一轮，尘埃落定'}</small>
       <h1>{title}</h1>
-      <p>{winners.map(id => playerName(id, data.roomData.players)).join('、')}
+      <p>{winners.map(id => playerLabel(id, data.roomData.players)).join('、')}
         {winners.length > 1 ? ' 共同获胜' : ' 赢得本轮'}。</p>
       {final && <span><Crown size={14} />达到 {data.roomData.goal} 枚好感，赢得本场</span>}
     </section>
@@ -65,7 +65,7 @@ export function Results({
         return <article key={id} className={winners.includes(id) ? 'winner' : ''}>
           <span>{String(final ? rank ?? index + 1 : index + 1).padStart(2, '0')}</span>
           <Portrait rank={revealed?.rank ?? index % 10} />
-          <div><b>{playerName(id, data.roomData.players)}
+          <div><b>{playerLabel(id, data.roomData.players)}
             {id === data.playerId && <em>你</em>}</b>
             <small>{winners.includes(id) ? final ? '整场胜者' : '本轮胜者'
               : value?.alive ? '留在本轮' : '本轮出局'}</small></div>
@@ -80,7 +80,7 @@ export function Results({
         <small>{final ? 'THE LETTER FOUND ITS WAY' : 'THE FAVOR YOU EARNED'}</small>
         <h2>{final ? `${winners.length} 位最终胜者` : won ? '+1 枚好感' : '下一封，继续。'}</h2>
         <p>{round?.spyPlayerID
-          ? `${playerName(round.spyPlayerID, data.roomData.players)} 通过唯一存活的密探额外获得 1 枚好感。`
+          ? `${playerLabel(round.spyPlayerID, data.roomData.players)} 通过唯一存活的密探额外获得 1 枚好感。`
           : '本轮没有符合条件的唯一密探奖励。'}</p>
         <span><Heart size={13} />{final
           ? `共完成 ${data.roomData.roundNo} 轮传信`

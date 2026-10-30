@@ -8,7 +8,7 @@ import {
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
 import { BullScore, NumberCard } from '../../components/Card';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 
 export function Results({
   data,
@@ -58,7 +58,7 @@ export function Results({
       <h1>{final
         ? won ? '收得少，才是真的牛。' : '这一桌，牛头有了归处。'
         : '这一局，先记在记分板上。'}</h1>
-      <p>{winners.map(id => playerName(id, data.roomData.players)).join('、')}
+      <p>{winners.map(id => playerLabel(id, data.roomData.players)).join('、')}
         {winners.length > 1 ? ' 并列领先' : final ? ' 赢得本场' : ' 本局牛头最少'}。</p>
       {final && <span><Trophy size={14} />完整局结束后达到 66 分阈值，比赛结束</span>}
     </section>
@@ -80,7 +80,7 @@ export function Results({
           <span>{String(rank ?? index + 1).padStart(2, '0')}</span>
           <PlayerAvatar name={playerName(id, data.roomData.players)}
             avatar={player?.avatar} ai={player?.ai} size={38} />
-          <div><b>{playerName(id, data.roomData.players)}</b>
+          <div><b>{playerLabel(id, data.roomData.players)}</b>
             <small>{winners.includes(id) ? final ? '本场胜者' : '本局领先'
               : `第 ${rank} 名`}</small></div>
           <strong>+{roundPenalty}</strong>

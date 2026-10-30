@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import {
   BookOpen,
+  Bot,
   ChevronDown,
   Flag,
   Home,
@@ -41,11 +42,13 @@ const isActive = (pathname: string, path: string) =>
 export function PlayerAvatar({
   name,
   avatar,
+  ai,
   size = 36,
   className = '',
 }: {
   name: string;
   avatar?: string;
+  ai?: boolean;
   size?: number;
   className?: string;
 }) {
@@ -54,8 +57,11 @@ export function PlayerAvatar({
     className={`crest user-avatar ${className}`.trim()}
     name={name}
     avatar={avatar}
+    ai={ai}
     size={size}
-    renderFallback={() => initial}
+    renderFallback={({ ai: isAI }) => isAI
+      ? <Bot size={Math.max(15, Math.round(size * 0.52))} />
+      : initial}
   />;
 }
 

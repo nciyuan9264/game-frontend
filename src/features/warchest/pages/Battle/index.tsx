@@ -19,6 +19,7 @@ import {
   Trophy,
   X,
 } from 'lucide-react';
+import { playerDisplayLabel } from '@/features/game-core/model/room';
 import TurnCountdown from '@/components/TurnCountdown';
 import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import {
@@ -281,10 +282,10 @@ export function Battle({
           {game.turnDeadline ? <TurnCountdown bare secondsOnly deadline={game.turnDeadline} /> : '--'}</span>}
       </header>
       {connectionNotice && <div className="battle-connection" role="status">{connectionNotice}</div>}
-      <div className="mobile-scoreboard"><div><Crest size={34} /><span>{game.players[0].name}
+      <div className="mobile-scoreboard"><div><Crest size={34} /><span>{playerDisplayLabel(game.players[0], game.players[0].playerID)}
         <small>{game.players[0].playerID === self.playerID ? '你 · ' : ''}{game.initiative === 0 ? '先手' : '橡木军团'}</small></span>
         <b>{playerScore(0)}<small>/6</small></b></div><span className="score-vs">VS</span>
-        <div><Crest side={1} size={34} /><span>{game.players[1].name}
+        <div><Crest side={1} size={34} /><span>{playerDisplayLabel(game.players[1], game.players[1].playerID)}
           <small>{game.players[1].playerID === self.playerID ? '你 · ' : ''}{game.initiative === 1 ? '先手' : '赤隼军团'}</small></span>
           <b>{playerScore(1)}<small>/6</small></b></div></div>
       <div className="battle-grid"><aside className="battle-left"><Eyebrow>THE TWO BANNERS</Eyebrow>
@@ -429,7 +430,9 @@ export function Battle({
       {panel === 'log' && <Modal title="战场纪事" eyebrow="FIELD DISPATCHES"
         onClose={() => setPanel(undefined)}><div className="battle-log">{game.log.map(entry => <div
           className="log-entry" key={entry.id}><span className={`log-dot ${entry.side === 1 ? 'enemy' : ''}`} />
-          <small>第 {entry.round} 轮 · {entry.side == null ? '系统' : game.players[entry.side].name}</small>
+          <small>第 {entry.round} 轮 · {entry.side == null
+            ? '系统'
+            : playerDisplayLabel(game.players[entry.side], game.players[entry.side].playerID)}</small>
           <p>{entry.text}</p></div>)}</div></Modal>}
 
       {panel === 'rules' && <Modal title="先控局，再言胜。" eyebrow="QUICK REFERENCE"

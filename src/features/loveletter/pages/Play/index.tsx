@@ -26,7 +26,7 @@ import { Dialog } from '../../components/Dialog';
 import { useLoveLetterPlayUI } from '../../hooks/useLoveLetterPlayUI';
 import type { LoveLetterSession } from '../../hooks/useLoveLetterSession';
 import { isMyTurn, publicCardCount } from '../../model/selectors';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, type GameSnapshot } from '../../model/session';
 import { ROLES, role } from '../../model/roles';
 import { Results } from '../Results';
 
@@ -44,7 +44,7 @@ function useCountdown(deadline?: string) {
 const actionText = (data: GameSnapshot) => {
   const phase = data.roomData.gameStatus;
   if (!isMyTurn(data)) {
-    return `${playerName(data.roomData.currentPlayer, data.roomData.players)} 正在斟酌`;
+    return `${playerLabel(data.roomData.currentPlayer, data.roomData.players)} 正在斟酌`;
   }
   if (phase === 'draw') return '轮到你，先摸一张';
   if (phase === 'play') return '轮到你，选一张牌打出';
@@ -87,7 +87,7 @@ export function Play({
 
   const chooseCard = (card: typeof hand[number]) =>
     ui.chooseCard(card, window.matchMedia('(max-width: 767px)').matches);
-  const targetName = playerName(ui.targetPlayerID, data.roomData.players);
+  const targetName = playerLabel(ui.targetPlayerID, data.roomData.players);
   const actionPanel = <ActionPanel
     data={data}
     enabled={enabled}
@@ -152,7 +152,7 @@ export function Play({
               : ui.openPlayer(id)}>
             <span className="ll-avatar-wrap"><Portrait rank={roomPlayer?.seatIndex ?? 0} />
               {value?.protected && <i><Shield size={11} /></i>}</span>
-            <strong>{playerName(id, data.roomData.players)}</strong>
+            <strong>{playerLabel(id, data.roomData.players)}</strong>
             <Hearts value={value?.favors} total={data.roomData.goal} />
             <small>{!value?.alive ? '本轮出局' : value?.protected ? '侍女保护中'
               : data.roomData.currentPlayer === id ? '正在行动' : `${value?.handCount ?? 0} 张手牌`}</small>
@@ -179,7 +179,7 @@ export function Play({
 
       <section className="ll-hand">
         <header><Portrait rank={data.roomData.players[data.playerId]?.seatIndex ?? 9} />
-          <div><h2>{playerName(data.playerId, data.roomData.players)}
+          <div><h2>{playerLabel(data.playerId, data.roomData.players)}
             <small>{myTurn ? '正在行动' : '执笔人'}</small></h2>
             <Hearts value={self?.favors} total={data.roomData.goal} /></div>
           <span className="ll-hand-private"><LockKeyhole size={11} />仅你可见</span></header>
@@ -236,7 +236,7 @@ export function Play({
       <ol className="ll-log-list">{data.roomData.activityLog
         .filter(item => item.roundNo === data.roomData.roundNo)
         .map((item, index) => <li key={item.id}><span>{String(index + 1).padStart(2, '0')}</span>
-          <p><b>{playerName(item.playerID, data.roomData.players)}</b>
+          <p><b>{playerLabel(item.playerID, data.roomData.players)}</b>
             {item.summary || item.kind}{item.automatic && <small>超时托管</small>}</p></li>)}</ol>
     </Dialog>}
     {ui.panel === 'player' && <PlayerDialog data={data} playerID={ui.playerID}
@@ -300,7 +300,7 @@ function ActionPanel({
   if (!active) return <div className="ll-waiting"><span className="ll-eyebrow">THE LETTER IS TRAVELLING</span>
     <Portrait rank={data.roomData.players[data.roomData.currentPlayer]?.seatIndex ?? 0} />
     <h2>{phase === 'end' ? '正在查看终局牌桌'
-      : `${playerName(data.roomData.currentPlayer, data.roomData.players)} 正在斟酌`}</h2>
+      : `${playerLabel(data.roomData.currentPlayer, data.roomData.players)} 正在斟酌`}</h2>
     <p>牌桌保持只读，服务端会在阶段变化后同步最新状态。</p>
     <span>· · ·</span></div>;
   if (phase === 'draw') return <><span className="ll-eyebrow">YOUR TURN / 01</span>
@@ -326,7 +326,7 @@ function ActionPanel({
         return <button key={id} type="button" disabled={!legal}
           className={ui.targetPlayerID === id ? 'active' : ''}
           onClick={() => ui.setTargetPlayerID(id)}>
-          <span>{playerName(id, data.roomData.players)}{id === data.playerId && '（自己）'}</span>
+          <span>{playerLabel(id, data.roomData.players)}{id === data.playerId && '（自己）'}</span>
           {!value?.alive ? <small>已出局</small> : value.protected
             ? <Shield size={12} /> : ui.targetPlayerID === id && <Check size={13} />}</button>;
       })}</div></div>}
@@ -345,7 +345,7 @@ function ActionPanel({
       <Flag size={15} />弃掉公主会立即出局，这个选择无法撤回。</div>}
     <div className="ll-action-confirm"><p>{ui.canSubmit
       ? selectedRole.rank === 1 && ui.targetPlayerID
-        ? `向 ${playerName(ui.targetPlayerID, data.roomData.players)} 猜测「${role(ui.guessRank ?? 0).name}」`
+        ? `向 ${playerLabel(ui.targetPlayerID, data.roomData.players)} 猜测「${role(ui.guessRank ?? 0).name}」`
         : `确认打出「${selectedRole.name}」`
       : ui.requiresTarget && !ui.targetPlayerID ? '请先选择一位有效目标' : '完成所需选择后再确认'}</p>
       <ActionButton variant={selectedRole.rank === 9 ? 'danger' : 'primary'}
@@ -401,10 +401,10 @@ function PlayerDialog({
   onClose: () => void;
 }) {
   const value = data.playerData[playerID];
-  return <Dialog title={`${playerName(playerID, data.roomData.players)} · 公开信息`}
+  return <Dialog title={`${playerLabel(playerID, data.roomData.players)} · 公开信息`}
     onClose={onClose}><div className="ll-player-dialog">
       <Portrait rank={data.roomData.players[playerID]?.seatIndex ?? 0} />
-      <div><h2>{playerName(playerID, data.roomData.players)}</h2>
+      <div><h2>{playerLabel(playerID, data.roomData.players)}</h2>
         <Hearts value={value?.favors} total={data.roomData.goal} />
         <p>{!value?.alive ? '本轮已经出局' : value.protected
           ? '侍女保护中，直到自己的下一回合开始' : '仍在本轮，手牌身份保密'}</p></div></div>

@@ -142,7 +142,8 @@ export function Play({
         </strong><small>本回合剩余</small></span>}
       <span className="header-user"><PlayerAvatar
         name={playerName(data.playerId, data.roomData.players)}
-        avatar={data.roomData.players[data.playerId]?.avatar} size={32} /></span>
+        avatar={data.roomData.players[data.playerId]?.avatar}
+        ai={data.roomData.players[data.playerId]?.ai} size={32} /></span>
     </header></div>
 
     <main className="game-main"><div className="game-head"><div>

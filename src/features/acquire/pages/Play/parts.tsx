@@ -6,7 +6,7 @@ import { PlayerAvatar } from '../../components/AppShell';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
 import type { AcquireInteraction } from '../../hooks/useAcquireInteraction';
 import { canPlace, mergeSettlementPlayer, tilePreview } from '../../model/selectors';
-import { endGameState, money, playerName, type GameSnapshot, type DisplaySnapshot } from '../../model/session';
+import { endGameState, money, playerLabel, playerName, type GameSnapshot, type DisplaySnapshot } from '../../model/session';
 import { companyColors, companyKeys, type Company } from '../../model/types';
 import styles from './index.module.less';
 
@@ -66,7 +66,7 @@ export function PhaseBanner({ data, interaction, action }: { data: GameSnapshot;
   const headline = ended ? '城市已定格，对局结束。'
     : waitingForMerger ? '公司正在合并，等待股东完成处理。'
       : interaction.autoSkippingBuy ? '没有可购买的股票，正在跳过。'
-      : !mine ? `等待 ${playerName(data.roomData.currentPlayer, data.roomData.players)}`
+      : !mine ? `等待 ${playerLabel(data.roomData.currentPlayer, data.roomData.players)}`
       : data.roomData.gameStatus === 'setTile' ? '轮到你了，下一块地落在哪里？'
         : data.roomData.gameStatus === 'createCompany' ? '一家公司，等待你命名未来。'
           : data.roomData.gameStatus.startsWith('merging') ? '城市正在重组，处理你的持股。'
@@ -85,7 +85,7 @@ export function PhaseBanner({ data, interaction, action }: { data: GameSnapshot;
           : data.roomData.gameStatus === 'setTile' ? '点棋盘选地'
             : data.roomData.gameStatus === 'buyStock' ? '每回合最多 3 股' : '完成公司处理';
   return <div className={`${styles.phase} ${mine ? styles.myTurn : ''} ${ended ? styles.neutralPhase : ''}`}><div className={styles.phaseSummary}>
-    <span className={styles.phaseIcon} aria-label={phasePlayer ? `当前行动玩家：${playerName(phasePlayerID, players)}` : undefined}>
+    <span className={styles.phaseIcon} aria-label={phasePlayer ? `当前行动玩家：${playerLabel(phasePlayerID, players)}` : undefined}>
       {phasePlayer ? <PlayerAvatar name={playerName(phasePlayerID, players)} avatar={phasePlayer.avatar} ai={phasePlayer.ai} size={30} /> : <Clock size={20} />}
     </span><span>
       <strong>{headline}</strong>

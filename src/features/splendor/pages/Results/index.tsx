@@ -4,7 +4,7 @@ import hero from '../../assets/hero.webp';
 import { PlayerAvatar } from '../../components/AppShell';
 import { BrandMark, Eyebrow } from '../../components/Artwork';
 import type { SplendorSession } from '../../hooks/useSplendorSession';
-import { playerName, type GameSnapshot } from '../../model/session';
+import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
 import { winnerIDs } from '../../model/selectors';
 import styles from './index.module.less';
 
@@ -25,7 +25,7 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
     return (b?.score ?? 0) - (a?.score ?? 0) || (a?.cards ?? 0) - (b?.cards ?? 0);
   });
   const winnerNames = players.filter(([id]) => winners.includes(id))
-    .map(([id]) => playerName(id, data.roomData.players)).join('、');
+    .map(([id]) => playerLabel(id, data.roomData.players)).join('、');
   const topScore = players[0] ? data.result?.[players[0][0]]?.score ?? data.playerData[players[0][0]]?.score ?? 0 : 0;
 
   return <div className={styles.results} data-testid="splendor-results">
@@ -47,7 +47,7 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
             return <div key={id} className={`${styles.row} ${id === data.playerId ? styles.mine : ''}`}>
               <div><b>{String(index + 1).padStart(2, '0')}</b>
                 <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={player.avatar} ai={player.ai} size={36} />
-                <strong>{playerName(id, data.roomData.players)}{id === data.playerId && <small>你</small>}</strong></div>
+                <strong>{playerLabel(id, data.roomData.players)}{id === data.playerId && <small>你</small>}</strong></div>
               <span>{result?.cards ?? data.playerData[id]?.normalCard.length ?? 0}<small>张</small></span>
               <span>{result?.nobles ?? data.playerData[id]?.nobleCard.length ?? 0}<small>位</small></span>
               <b>{result?.score ?? data.playerData[id]?.score ?? 0}</b>

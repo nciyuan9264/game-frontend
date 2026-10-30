@@ -19,7 +19,7 @@ import {
   savedProgress,
   savedStepCount,
 } from '../../model/board';
-import { playerName } from '../../model/session';
+import { playerLabel, playerName } from '../../model/session';
 
 function ReplayBoard({ snapshot }: { snapshot: CantStopSnapshot }) {
   const activeID = snapshot.roomData.currentPlayer || snapshot.roomData.playerOrder[0];
@@ -68,6 +68,12 @@ function ReplayContent({ gameID }: { gameID: number }) {
     setPreviewIndex(index);
     replay.selectIndex(index);
   };
+  const event = snapshot?.currentEvent;
+  const eventActor = event
+    ? snapshot?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, snapshot.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
 
   return <AppShell inMatch hideHeader title="全知回放" profile={replay.profile}>
     <div className="cs-replay">
@@ -89,7 +95,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       {snapshot && <><section className="cs-replay-meta">
         <span>回合 {snapshot.roomData.turnNumber}</span>
         <span>第 {snapshot.roomData.rollNumber} 掷</span>
-        <span>{snapshot.currentEvent ? `${snapshot.currentEvent.displayName} · ${snapshot.currentEvent.cmdType}` : '初始状态'}</span>
+        <span>{event ? `${eventActor} · ${event.cmdType}` : '初始状态'}</span>
         <span>阶段 {snapshot.roomData.gameStatus}</span></section>
         <div className="cs-replay-layout"><section className="cs-replay-main">
           <div className="cs-replay-players">{snapshot.roomData.playerOrder.map(id => {
@@ -98,7 +104,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
             return <article key={id}>
               <PlayerAvatar name={playerName(id, snapshot.roomData.players)}
                 avatar={player?.avatar} ai={player?.ai} size={36} />
-              <div><b>{playerName(id, snapshot.roomData.players)}</b>
+              <div><b>{playerLabel(id, snapshot.roomData.players)}</b>
                 <small>{state?.claimedColumns?.length ?? 0} 条路线 · {savedStepCount(state)} 步</small></div>
               <strong>{state?.claimedColumns?.join(' / ') || '—'}</strong>
             </article>;
@@ -107,12 +113,12 @@ function ReplayContent({ gameID }: { gameID: number }) {
         </section><aside className="cs-replay-side"><Bull size={28} />
           <h2>此刻的权威状态</h2>
           <p>回放直接读取服务端快照，不在浏览器重演骰子或路线推进。</p>
-          <dl><dt>当前玩家</dt><dd>{playerName(snapshot.roomData.currentPlayer, snapshot.roomData.players)}</dd>
+          <dl><dt>当前玩家</dt><dd>{playerLabel(snapshot.roomData.currentPlayer, snapshot.roomData.players)}</dd>
             <dt>当前序号</dt><dd>{snapshot.seq}</dd>
             <dt>总事件</dt><dd>{snapshot.totalEvents}</dd></dl>
           {snapshot.roomData.lastAction && <div className="cs-replay-resolution"><b>最近行动</b>
             <span>{actionSummary(snapshot.roomData.lastAction, id =>
-              playerName(id, snapshot.roomData.players))}</span></div>}
+              playerLabel(id, snapshot.roomData.players))}</span></div>}
         </aside></div>
         <section className="cs-replay-controls"><header><span>已加载 {replay.loadedCount} / {replay.totalSnapshots}</span>
           {replay.backgroundLoading && <small>继续载入中…</small>}</header>

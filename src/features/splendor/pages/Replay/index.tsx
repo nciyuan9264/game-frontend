@@ -16,7 +16,7 @@ import {
 import { SplendorLoading } from '../../components/LoadingState';
 import { deckCount, discounts, tokenTotal } from '../../model/selectors';
 import type { GameSnapshot } from '../../model/session';
-import { playerName } from '../../model/session';
+import { playerLabel, playerName } from '../../model/session';
 import {
   cardColors, gemColors, type DevelopmentCard, type Noble, type PlayerState,
   type SplendorPlayer, type SplendorResult,
@@ -108,6 +108,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
     ? adapt(final, replay.viewer, replay.detail.game.roomID, order)
     : undefined, [final, order, replay.detail, replay.viewer]);
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const select = (index: number) => {
     setPreview(index);
     replay.selectIndex(index);
@@ -142,7 +147,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       const bonus = discounts(state);
       return <article key={id} className={id === data.roomData.currentPlayer ? styles.current : ''}>
         <PlayerAvatar name={playerName(id, data.roomData.players)} ai={data.roomData.players[id]?.ai} size={34} />
-        <div><b>{playerName(id, data.roomData.players)}</b><small><Layers size={10} />{state?.normalCard.length ?? 0}
+        <div><b>{playerLabel(id, data.roomData.players)}</b><small><Layers size={10} />{state?.normalCard.length ?? 0}
           <i /> <Coins size={10} />{tokenTotal(state)} <i /> <Bookmark size={10} />{state?.reserveCard.length ?? 0}</small></div>
         <strong>{state?.score ?? 0}<small>声望</small></strong>
         <span className={styles.resources}>{gemColors.map(color => <i key={color}><GemIcon color={color} size={15} />
@@ -150,7 +155,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       </article>;
     })}</section>
       <main className={styles.table}><section className={styles.market}><header><div><small>DEVELOPMENT MARKET</small>
-        <h2>{event ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2></div>
+        <h2>{event ? `${eventActor} · ${commandLabels[event.cmdType] ?? event.cmdType}` : '初始状态'}</h2></div>
         <span>第 {replay.selectedIndex} / {Math.max(0, replay.totalSnapshots - 1)} 步</span></header>
         <div className={styles.nobles}><span><Crown size={14} />贵族的青睐</span>
           <div>{data.roomData.nobles.map(noble => <NobleTile key={noble.id} noble={noble} progress={viewerDiscounts} compact />)}</div></div>

@@ -10,7 +10,7 @@ import { AppShell, Bull, PlayerAvatar } from '../../components/AppShell';
 import { BullScore, NumberCard } from '../../components/Card';
 import { SixNimmtLoading } from '../../components/LoadingState';
 import { rowLetters } from '../../model/cards';
-import { playerName } from '../../model/session';
+import { playerLabel, playerName } from '../../model/session';
 
 function ReplayContent({ gameID }: { gameID: number }) {
   const replay = useProgressiveReplay<SixNimmtSnapshot>(gameID, 'sixnimmt');
@@ -23,6 +23,12 @@ function ReplayContent({ gameID }: { gameID: number }) {
     setPreviewIndex(index);
     replay.selectIndex(index);
   };
+  const event = snapshot?.currentEvent;
+  const eventActor = event
+    ? snapshot?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, snapshot.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
 
   return <AppShell inMatch hideHeader title="全知回放" profile={replay.profile}>
     <div className="sn-replay">
@@ -42,7 +48,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
         <ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
       {snapshot && <><section className="sn-replay-meta">
         <span>第 {snapshot.roomData.roundNo} 局</span><span>第 {snapshot.roomData.turnNo} / 10 轮</span>
-        <span>{snapshot.currentEvent ? `${snapshot.currentEvent.displayName} · ${snapshot.currentEvent.cmdType}` : '初始状态'}</span>
+        <span>{event ? `${eventActor} · ${event.cmdType}` : '初始状态'}</span>
         <span>阶段 {snapshot.roomData.gameStatus}</span></section>
         <div className="sn-replay-layout"><section className="sn-replay-main">
           <div className="sn-replay-players">{snapshot.roomData.playerOrder.map(id => {
@@ -51,7 +57,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
             const privateData = snapshot.privateData[id];
             return <article key={id}>
               <PlayerAvatar name={playerName(id, snapshot.roomData.players)} avatar={player?.avatar} ai={player?.ai} size={36} />
-              <div><b>{playerName(id, snapshot.roomData.players)}</b>
+              <div><b>{playerLabel(id, snapshot.roomData.players)}</b>
                 <small>{state?.locked ? `已锁定 ${privateData?.lockedCard ?? '—'}` : `${state?.handCount ?? 0} 张手牌`}</small></div>
               <BullScore value={state?.totalPenalty ?? 0} />
               <span>{privateData?.hand.map(card => <NumberCard key={card} value={card} compact />)}</span>

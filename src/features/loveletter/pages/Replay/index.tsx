@@ -11,7 +11,7 @@ import { useProgressiveReplay } from '@/hooks/useProgressiveReplay';
 import { AppShell } from '../../components/AppShell';
 import { CardBack, Hearts, PlayingCard, Portrait } from '../../components/Card';
 import { LoveLetterLoading } from '../../components/LoadingState';
-import { playerName } from '../../model/session';
+import { playerLabel } from '../../model/session';
 import { role } from '../../model/roles';
 
 function ReplayContent({ gameID }: { gameID: number }) {
@@ -25,6 +25,12 @@ function ReplayContent({ gameID }: { gameID: number }) {
     setPreviewIndex(index);
     replay.selectIndex(index);
   };
+  const event = snapshot?.currentEvent;
+  const eventActor = event
+    ? snapshot?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, snapshot.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
 
   return <AppShell inMatch hideHeader title="全知回放" profile={replay.profile}>
     <div className="ll-replay">
@@ -44,8 +50,8 @@ function ReplayContent({ gameID }: { gameID: number }) {
         <ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
       {snapshot && <><section className="ll-replay-meta">
         <span>第 {snapshot.roomData.roundNo} 轮</span>
-        <span>{snapshot.currentEvent
-          ? `${snapshot.currentEvent.displayName} · ${snapshot.currentEvent.cmdType}`
+        <span>{event
+          ? `${eventActor} · ${event.cmdType}`
           : '初始状态'}</span>
         <span>阶段 {snapshot.roomData.gameStatus}</span></section>
         <div className="ll-replay-layout"><section className="ll-replay-table">
@@ -53,7 +59,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
             const value = snapshot.playersData[id];
             const privateValue = snapshot.privateData[id];
             return <article key={id}><Portrait rank={index % 10} />
-              <div><b>{playerName(id, snapshot.roomData.players)}</b>
+              <div><b>{playerLabel(id, snapshot.roomData.players)}</b>
                 <Hearts value={value?.favors} total={snapshot.roomData.goal} />
                 <small>{!value?.alive ? '本轮出局' : value.protected
                   ? '侍女保护中' : snapshot.roomData.currentPlayer === id ? '正在行动' : '仍在本轮'}</small></div>
@@ -73,10 +79,10 @@ function ReplayContent({ gameID }: { gameID: number }) {
         </section>
         <aside className="ll-replay-side"><BookOpen size={21} />
           <h2>此刻的全部信息</h2><p>已结束对局向参赛者展示当时所有手牌、牌堆顺序、封存牌与私密效果。</p>
-          {snapshot.currentEvent && <dl><dt>行动者</dt>
-            <dd>{snapshot.currentEvent.displayName}</dd><dt>命令</dt>
-            <dd>{snapshot.currentEvent.cmdType}</dd><dt>序号</dt>
-            <dd>{snapshot.currentEvent.seq}</dd></dl>}</aside></div>
+          {event && <dl><dt>行动者</dt>
+            <dd>{eventActor}</dd><dt>命令</dt>
+            <dd>{event.cmdType}</dd><dt>序号</dt>
+            <dd>{event.seq}</dd></dl>}</aside></div>
         <section className="ll-replay-controls"><header><span>已加载 {
           replay.loadedCount} / {replay.totalSnapshots}</span>
           {replay.backgroundLoading && <small>继续载入中…</small>}</header>

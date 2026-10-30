@@ -42,7 +42,7 @@ import {
 import { currentSide } from '../../model/selectors';
 import {
   parseReplaySnapshot,
-  playerName,
+  playerLabel,
   type GameSnapshot,
 } from '../../model/session';
 import { Results } from '../Results';
@@ -147,6 +147,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
   }
 
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const last = data?.roomData.lastAction;
   const total = replay.totalSnapshots;
   const board = data && <Board
@@ -187,7 +192,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
           <section>
             <header><div><small>THE QUIET RECORD</small>
               <h2>{event
-                ? `${event.displayName} · ${
+                ? `${eventActor} · ${
                   commandLabels[event.cmdType] ?? event.cmdType
                 }`
                 : '初始状态'}</h2>
@@ -210,13 +215,13 @@ function ReplayContent({ gameID }: { gameID: number }) {
             <dl>
               <div><dt>当前行棋</dt><dd><Pawn side={currentSide(data)} />
                 {sideName(currentSide(data))}</dd></div>
-              <div><dt>{playerName(
+              <div><dt>{playerLabel(
                 data.roomData.southPlayerID,
                 data.roomData.players,
               )}</dt><dd>{coordinate(data.roomData.pawns.south)} · {
                 data.roomData.wallStock.south
               } 墙</dd></div>
-              <div><dt>{playerName(
+              <div><dt>{playerLabel(
                 data.roomData.northPlayerID,
                 data.roomData.players,
               )}</dt><dd>{coordinate(data.roomData.pawns.north)} · {

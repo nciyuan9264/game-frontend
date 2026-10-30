@@ -11,7 +11,7 @@ import type {
   SessionPendingCommand,
   SessionSnapshotBase,
 } from '@/features/game-core/model/session';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayLabel, playerDisplayName } from '@/features/game-core/model/room';
 import {
   parseRealtimeEnvelope,
   type RealtimeCommandResult,
@@ -339,6 +339,13 @@ export function playerName(
   players?: Record<string, HexPlayer>,
 ) {
   return playerDisplayName(players?.[id], id);
+}
+
+export function playerLabel(
+  id: string,
+  players?: Record<string, HexPlayer>,
+) {
+  return playerDisplayLabel(players?.[id], id);
 }
 
 export function selfID(snapshot: Snapshot) {

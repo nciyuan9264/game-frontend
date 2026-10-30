@@ -7,7 +7,7 @@ import type {
   SessionPendingCommand,
   SessionSnapshotBase,
 } from '@/features/game-core/model/session';
-import { playerDisplayName } from '@/features/game-core/model/room';
+import { playerDisplayLabel, playerDisplayName } from '@/features/game-core/model/room';
 import {
   parseRealtimeEnvelope,
   type RealtimeCommandResult,
@@ -127,3 +127,7 @@ export const playerName = (
   id: string,
   players?: Record<string, WarChestPlayer>,
 ) => playerDisplayName(players?.[id], id);
+export const playerLabel = (
+  id: string,
+  players?: Record<string, WarChestPlayer>,
+) => playerDisplayLabel(players?.[id], id);

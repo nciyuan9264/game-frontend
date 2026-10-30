@@ -2,7 +2,7 @@ import { ArrowRight, ShieldCheck, TrendingUp, Trophy, Wallet } from 'lucide-reac
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { CompanyGlyph } from '../../components/CompanyGlyph';
-import { money, playerName, type DisplaySnapshot } from '../../model/session';
+import { money, playerLabel, playerName, type DisplaySnapshot } from '../../model/session';
 import { companyColors, companyKeys } from '../../model/types';
 import cityArt from '../../assets/city-art.webp';
 import styles from './index.module.less';
@@ -28,7 +28,7 @@ export function Results({ data, onClose, onRestart, onLeave, enabled }: {
       {rows.map(([id, score], index) => <article key={id} className={`${index === 0 ? styles.winner : ''} ${id === data.playerId ? styles.self : ''}`}>
         <span className={styles.rank}>{String(index + 1).padStart(2, '0')}</span>
         <PlayerAvatar name={playerName(id, data.roomData.players)} avatar={playerAvatar(id)} ai={data.roomData.players[id]?.ai} size={56} />
-        <div><strong>{playerName(id, data.roomData.players)}{id === data.playerId && <em>你</em>}</strong><small>{index === 0 ? <><Trophy size={13} />本局领先者</> : '下一座城，再见。'}</small></div>
+        <div><strong>{playerLabel(id, data.roomData.players)}{id === data.playerId && <em>你</em>}</strong><small>{index === 0 ? <><Trophy size={13} />本局领先者</> : '下一座城，再见。'}</small></div>
         <span><small>总资产</small><strong>{money(score.total)}</strong></span>
       </article>)}
       <div className={styles.resultNote}><ShieldCheck size={17} /><span>终局结果已锁定，你仍可以查看棋盘与资产明细。</span></div>

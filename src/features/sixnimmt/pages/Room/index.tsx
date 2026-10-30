@@ -22,7 +22,7 @@ import {
 import { useMobileViewport } from '@/features/game-core/hooks/useMobileViewport';
 import { orderGameRoomSeats } from '@/features/game-core/model/room';
 import { sixNimmtRoomInviteURL } from '../../model/adapters';
-import { playerName, type MatchSnapshot } from '../../model/session';
+import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
 import type { SixNimmtSession } from '../../hooks/useSixNimmtSession';
 import type { Visibility } from '../../model/types';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
@@ -215,13 +215,13 @@ export function Room({
         <PlayerAvatar name={playerName(id, data.players)} avatar={player.avatar}
           ai={player.ai} size={48} />
         <small>{id === data.ownerID ? '房主' : player.ai ? '公平 AI' : '牧场玩家'}</small>
-        <h3>{playerName(id, data.players)}{self && <em>你</em>}</h3>
+        <h3>{playerLabel(id, data.players)}{self && <em>你</em>}</h3>
         <b className={player.ready ? 'ready' : ''}>
           {player.ready ? <Check size={12} /> : <Clock3 size={12} />}
           {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}</b>
         {owner && id !== data.ownerID && <button type="button"
           className="sn-seat-remove" disabled={!enabled}
-          aria-label={`移除 ${playerName(id, data.players)}`}
+          aria-label={`移除 ${playerLabel(id, data.players)}`}
           onClick={() => { setTarget(id); setPanel('remove'); }}>
           <X size={14} /></button>}
       </article>;
@@ -300,7 +300,7 @@ export function Room({
           if (session.submit('match_remove_player', { playerID: target })) close();
         }}>确认移除</ActionButton></>}>
       <div className="sn-remove-copy"><Bull size={48} />
-        <p>{playerName(target, data.players)} 将离开当前房间。之后仍可邀请朋友或添加公平 AI。</p></div>
+        <p>{playerLabel(target, data.players)} 将离开当前房间。之后仍可邀请朋友或添加公平 AI。</p></div>
     </Dialog>}
 
     {panel === 'start' && <Dialog title="现在开始发牌？"
@@ -313,7 +313,7 @@ export function Room({
       <div className="sn-start-dialog"><div>{players.map(([id, player]) =>
         <span key={id}><PlayerAvatar name={playerName(id, data.players)}
           avatar={player.avatar} ai={player.ai} size={42} />
-          <b>{playerName(id, data.players)}</b><small><Check size={11} />已准备</small></span>)}</div>
+          <b>{playerLabel(id, data.players)}</b><small><Check size={11} />已准备</small></span>)}</div>
         <dl><span><Users size={17} /><small>本场人数</small><b>{players.length} 人</b></span>
           <span><Bull size={17} /><small>终局阈值</small><b>66 牛头</b></span>
           <span><Clock3 size={17} /><small>阶段时限</small><b>60 秒</b></span></dl>

@@ -19,7 +19,7 @@ import { HexLoading } from '../../components/LoadingState';
 import { actionLabel, sideName } from '../../model/board';
 import { currentSide } from '../../model/selectors';
 import {
-  parseReplaySnapshot, playerName, type GameSnapshot,
+  parseReplaySnapshot, playerLabel, type GameSnapshot,
 } from '../../model/session';
 import { Results } from '../Results';
 import styles from './index.module.less';
@@ -107,6 +107,11 @@ function ReplayContent({ gameID }: { gameID: number }) {
     currentSide={currentSide(data)} winningPath={data.roomData.winningPath}
     lastAction={data.roomData.lastAction} interactive={false} coordinates />;
   const event = replay.currentSnapshot?.currentEvent;
+  const eventActor = event
+    ? data?.roomData.players[event.playerID]
+      ? playerLabel(event.playerID, data.roomData.players)
+      : event.displayName || `玩家 ${event.playerID}`
+    : '';
   const total = replay.totalSnapshots;
 
   return <AppShell inMatch hideHeader title="对局回放" profile={replay.profile}>
@@ -127,7 +132,7 @@ function ReplayContent({ gameID }: { gameID: number }) {
       <ActionButton onClick={replay.retryInitial}>重试</ActionButton></Feedback>}
     {data && <><main className={styles.boardArea}><section>
       <header><div><small>THE QUIET RECORD</small><h2>{event
-        ? `${event.displayName} · ${commandLabels[event.cmdType] ?? event.cmdType}`
+        ? `${eventActor} · ${commandLabels[event.cmdType] ?? event.cmdType}`
         : '初始状态'}</h2></div><div><span>
           第 {replay.selectedIndex} / {Math.max(0, total - 1)} 步</span>
           <button className={styles.zoomButton} onClick={() => setPanel('zoom')}>
@@ -138,10 +143,10 @@ function ReplayContent({ gameID }: { gameID: number }) {
           ? actionLabel(data.roomData.lastAction) : '空棋盘，等待第一子。'}</p>
         <dl><div><dt>当前行棋</dt><dd><Stone side={currentSide(data)} />
           {sideName(currentSide(data))}</dd></div>
-          <div><dt>陶红</dt><dd>{playerName(
+          <div><dt>陶红</dt><dd>{playerLabel(
             data.roomData.redPlayerID, data.roomData.players,
           )}</dd></div>
-          <div><dt>湖绿</dt><dd>{playerName(
+          <div><dt>湖绿</dt><dd>{playerLabel(
             data.roomData.tealPlayerID, data.roomData.players,
           )}</dd></div></dl></aside>
     </main>
