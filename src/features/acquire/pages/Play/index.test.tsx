@@ -140,6 +140,7 @@ describe('Acquire play end transition', () => {
     const resultsButton = screen.getByRole('button', { name: '查看本局结算' });
     const topbar = container.querySelector('[data-game-mobile-topbar]');
     expect(topbar).toBeTruthy();
+    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '查看本局结算' })).toBeNull();
     fireEvent.click(resultsButton);
@@ -168,10 +169,39 @@ describe('Acquire play end transition', () => {
 
     const topbar = container.querySelector('[data-game-mobile-topbar]');
     expect(topbar).toBeTruthy();
+    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
     expect(screen.getAllByRole('group', { name: '终局确认' })).toHaveLength(1);
     expect(within(topbar as HTMLElement).getByRole('switch', { name: '允许结束游戏' })).toBeTruthy();
     expect(within(topbar as HTMLElement).getByRole('button', { name: '查看终局规则' })).toBeTruthy();
     expect(within(topbar as HTMLElement).queryByRole('button', { name: '股价速查' })).toBeNull();
+  });
+
+  it('keeps cash visible in the mobile topbar while waiting for an opponent', () => {
+    vi.stubGlobal('matchMedia', vi.fn(() => ({
+      matches: true,
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn(),
+    })));
+    const active = snapshot('setTile');
+    active.roomData.currentPlayer = 'guest';
+    active.roomData.playerOrder = ['me', 'guest'];
+    active.roomData.players.guest = {
+      playerID: 'guest', name: 'Guest', online: true, ai: false, ready: true,
+    };
+    active.roomData.turnDeadline = '2026-10-31T02:00:00Z';
+    const session = { pending: undefined, activity: [], submit: vi.fn() } as unknown as AcquireSession;
+    const interaction = {
+      data: active, draft: { key: 'room:1', buy: {}, merge: {} },
+      enabled: true, eligiblePanel: undefined, panel: undefined,
+      selectTile: vi.fn(), place: vi.fn(),
+    } as unknown as AcquireInteraction;
+
+    const { container } = render(<Play data={active} session={session} interaction={interaction} onLeave={vi.fn()} />);
+    const topbar = container.querySelector('[data-game-mobile-topbar]');
+
+    expect(topbar).toBeTruthy();
+    expect(within(topbar as HTMLElement).getByLabelText('可用现金 $6,000')).toBeTruthy();
+    expect(within(topbar as HTMLElement).queryByRole('timer')).toBeNull();
   });
 
   it('opens the end prompt once and submits the authoritative switch value', () => {

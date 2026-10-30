@@ -269,6 +269,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   await expect(desktopTopbar).toBeHidden();
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
+  await expect(mobileTopbar.getByLabel('可用现金 $6,000')).toBeVisible();
   await expect(mobileTopbar.getByRole('switch', { name: '允许结束游戏' })).toBeVisible();
   await expect(mobileTopbar.getByRole('button', { name: '查看终局规则' })).toBeVisible();
   await expect(page.locator('[data-game-brand]')).toHaveCount(0);
@@ -280,15 +281,23 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
     { width: 320, height: 700 },
   ]) {
     await page.setViewportSize(viewport);
-    const metrics = await mobileTopbar.evaluate(element => ({
-      clientWidth: element.clientWidth,
-      scrollWidth: element.scrollWidth,
-      left: element.getBoundingClientRect().left,
-      right: element.getBoundingClientRect().right,
-    }));
+    const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
+    const [metrics, statusMetrics] = await Promise.all([
+      mobileTopbar.evaluate(element => ({
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+        left: element.getBoundingClientRect().left,
+        right: element.getBoundingClientRect().right,
+      })),
+      status.evaluate(element => ({
+        clientWidth: element.clientWidth,
+        scrollWidth: element.scrollWidth,
+      })),
+    ]);
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth);
     expect(metrics.left).toBeGreaterThanOrEqual(0);
     expect(metrics.right).toBeLessThanOrEqual(viewport.width);
+    expect(statusMetrics.scrollWidth).toBeLessThanOrEqual(statusMetrics.clientWidth);
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
@@ -304,6 +313,7 @@ test('acquire final board keeps result access out of the mobile topbar', async (
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');
   await expect(mobileTopbar).toBeVisible();
+  await expect(mobileTopbar.getByLabel('可用现金 $6,000')).toBeVisible();
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '查看本局结算' })).toBeVisible();
