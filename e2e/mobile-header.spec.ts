@@ -270,6 +270,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   await expect(mobileTopbar.getByRole('button', { name: '股价速查' })).toHaveCount(0);
   await expect(mobileTopbar.getByRole('button', { name: '查看本局结算' })).toHaveCount(0);
   const cash = mobileTopbar.getByLabel('可用现金 $20,100');
+  const deadline = mobileTopbar.getByRole('timer');
   const endSwitch = mobileTopbar.getByRole('switch', { name: '允许结束游戏' });
   const endHelp = mobileTopbar.getByRole('button', { name: '查看终局规则' });
   await expect(cash).toBeVisible();
@@ -285,7 +286,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
   ]) {
     await page.setViewportSize(viewport);
     const status = mobileTopbar.locator('[data-game-mobile-topbar-status]');
-    const [metrics, statusMetrics, identityMetrics, cashBox, switchBox, helpBox] = await Promise.all([
+    const [metrics, statusMetrics, identityMetrics, deadlineBox, cashBox, switchBox, helpBox] = await Promise.all([
       mobileTopbar.evaluate(element => ({
         clientWidth: element.clientWidth,
         scrollWidth: element.scrollWidth,
@@ -301,6 +302,7 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
         overflow: getComputedStyle(element.querySelector('strong')!).overflow,
         textOverflow: getComputedStyle(element.querySelector('strong')!).textOverflow,
       })),
+      deadline.boundingBox(),
       cash.boundingBox(),
       endSwitch.boundingBox(),
       endHelp.boundingBox(),
@@ -309,16 +311,22 @@ test('acquire live play keeps only the end vote controls in the mobile topbar', 
     expect(metrics.left).toBeGreaterThanOrEqual(0);
     expect(metrics.right).toBeLessThanOrEqual(viewport.width);
     expect(statusMetrics.scrollWidth).toBeLessThanOrEqual(statusMetrics.clientWidth);
-    expect(identityMetrics.width).toBeLessThanOrEqual(160);
+    expect(identityMetrics.width).toBeLessThanOrEqual(132);
     expect(identityMetrics.overflow).toBe('hidden');
     expect(identityMetrics.textOverflow).toBe('ellipsis');
+    expect(deadlineBox).not.toBeNull();
     expect(cashBox).not.toBeNull();
     expect(switchBox).not.toBeNull();
     expect(helpBox).not.toBeNull();
+    expect(deadlineBox!.height).toBe(28);
+    expect(cashBox!.height).toBe(28);
+    expect(switchBox!.width).toBe(42);
+    expect(switchBox!.height).toBe(28);
     expect(helpBox!.width).toBe(28);
     expect(helpBox!.height).toBe(28);
-    const centers = [cashBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
+    const centers = [deadlineBox!, cashBox!, switchBox!, helpBox!].map(box => box.y + box.height / 2);
     expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
+    expect(Math.abs(helpBox!.x + helpBox!.width - metrics.right)).toBeLessThanOrEqual(1);
   }
 
   await page.setViewportSize({ width: 1440, height: 900 });
