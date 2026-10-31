@@ -143,8 +143,8 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   const countdown = topbar.getByRole('timer');
   const score = topbar.getByRole('button', { name: '打开记分板' });
   const rules = topbar.getByRole('button', { name: '玩法速查' });
-  const menu = topbar.getByRole('button', { name: '对局菜单' });
   await expect(topbar).toBeVisible();
+  await expect(topbar.getByRole('button', { name: '对局菜单' })).toHaveCount(0);
   await expect(page.locator('.sn-game-header')).toBeHidden();
   for (const viewport of [
     { width: 390, height: 844 },
@@ -152,14 +152,13 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
     { width: 320, height: 700 },
   ]) {
     await page.setViewportSize(viewport);
-    const [topbarBox, countdownBox, scoreBox, rulesBox, menuBox,
-      countdownTextBox, scoreIconBox, rulesIconBox, menuIconBox,
-      scoreStyle, rulesStyle, menuStyle] = await Promise.all([
+    const [topbarBox, countdownBox, scoreBox, rulesBox,
+      countdownTextBox, scoreIconBox, rulesIconBox,
+      scoreStyle, rulesStyle] = await Promise.all([
         topbar.boundingBox(),
         countdown.boundingBox(),
         score.boundingBox(),
         rules.boundingBox(),
-        menu.boundingBox(),
         countdown.evaluate(element => {
           const range = document.createRange();
           range.selectNodeContents(element);
@@ -168,7 +167,6 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
         }),
         score.locator('svg').boundingBox(),
         rules.locator('svg').boundingBox(),
-        menu.locator('svg').boundingBox(),
         score.evaluate(element => ({
           backgroundColor: getComputedStyle(element).backgroundColor,
           borderWidth: getComputedStyle(element).borderWidth,
@@ -177,38 +175,29 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
           backgroundColor: getComputedStyle(element).backgroundColor,
           borderWidth: getComputedStyle(element).borderWidth,
         })),
-        menu.evaluate(element => ({
-          backgroundColor: getComputedStyle(element).backgroundColor,
-          borderWidth: getComputedStyle(element).borderWidth,
-        })),
       ]);
     expect(topbarBox).not.toBeNull();
     expect(countdownBox).not.toBeNull();
     expect(scoreBox).not.toBeNull();
     expect(rulesBox).not.toBeNull();
-    expect(menuBox).not.toBeNull();
     expect(scoreIconBox).not.toBeNull();
     expect(rulesIconBox).not.toBeNull();
-    expect(menuIconBox).not.toBeNull();
     expect(scoreStyle).toEqual({
       backgroundColor: 'rgba(0, 0, 0, 0)',
       borderWidth: '0px',
     });
     expect(rulesStyle).toEqual(scoreStyle);
-    expect(menuStyle).toEqual(scoreStyle);
     expect(countdownBox!.height).toBe(22);
     expect(scoreBox).toMatchObject({ width: 34, height: 34 });
     expect(rulesBox).toMatchObject({ width: 34, height: 34 });
-    expect(menuBox).toMatchObject({ width: 34, height: 34 });
     expect(scoreIconBox).toMatchObject({ width: 22, height: 22 });
     expect(rulesIconBox).toMatchObject({ width: 22, height: 22 });
-    expect(menuIconBox).toMatchObject({ width: 22, height: 22 });
     expect(Math.abs(countdownTextBox.y + countdownTextBox.height / 2
       - (countdownBox!.y + countdownBox!.height / 2))).toBeLessThanOrEqual(1);
-    const centers = [countdownBox!, scoreIconBox!, rulesIconBox!, menuIconBox!]
+    const centers = [countdownBox!, scoreIconBox!, rulesIconBox!]
       .map(box => box.y + box.height / 2);
     expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
-    expect(Math.abs(menuBox!.x + menuBox!.width
+    expect(Math.abs(rulesBox!.x + rulesBox!.width
       - (topbarBox!.x + topbarBox!.width))).toBeLessThanOrEqual(1);
     await expectNoOverflow(page);
   }

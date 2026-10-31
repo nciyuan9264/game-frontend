@@ -318,8 +318,6 @@ export function Play({
           onClick={() => setPanel('scores')}><Trophy size={18} /></button>
         <button type="button" aria-label="玩法速查" title="玩法速查"
           onClick={() => setPanel('rules')}><BookOpen size={18} /></button>
-        <button type="button" aria-label="对局菜单" title="对局菜单"
-          onClick={onLeave}><MoreHorizontal size={20} /></button>
       </>}
     />
     <header className="sn-game-header" data-game-desktop-topbar>
@@ -334,8 +332,6 @@ export function Play({
         <Trophy size={18} /></button>
       <button type="button" aria-label="玩法速查" onClick={() => setPanel('rules')}>
         <BookOpen size={18} /></button>
-      <button type="button" aria-label="对局菜单" onClick={onLeave}>
-        <MoreHorizontal size={20} /></button>
     </header>
 
     {session.feedback && <div className="sn-game-toast" role="alert">{session.feedback}</div>}
