@@ -202,31 +202,28 @@
     overflow-y: auto;
   }
   :scope.q-app .mobile-game-dock {
+    display: grid;
     z-index: 50;
     min-height: calc(68px + env(safe-area-inset-bottom));
+    align-items: start;
+    grid-template-columns: 48px minmax(0, 1fr);
+    gap: 8px;
     padding: 10px 12px env(safe-area-inset-bottom);
     border-top-color: #d9cebf;
     background: #faf7f1f5;
     backdrop-filter: blur(12px);
   }
-  :scope.q-app .mobile-game-dock > div:first-child {
-    display: grid;
-    align-items: start;
-    grid-template-columns: 48px minmax(0, 1fr);
-    gap: 8px;
-  }
   :scope.q-app .mobile-game-dock .dock-undo {
+    display: grid;
     width: 48px;
     height: 44px;
+    place-items: center;
     border-color: #ddd1c3;
     border-radius: 5px;
     background: #fffdf8;
   }
-  :scope.q-app .mobile-game-dock .button {
+  :scope.q-app .mobile-game-dock > button[data-game-action-button] {
     min-height: 44px;
-  }
-  :scope.q-app .mobile-game-dock .button > svg:last-child {
-    display: none;
   }
   :scope.q-app.playing-page .toast { top: 124px; bottom: auto; }
 }

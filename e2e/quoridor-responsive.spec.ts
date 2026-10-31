@@ -336,7 +336,9 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   expect(cancelBox).toMatchObject({ width: 48, height: 44 });
   expect(actionBox?.height).toBe(44);
   expect((actionBox?.x ?? 0) - ((cancelBox?.x ?? 0) + (cancelBox?.width ?? 0))).toBe(8);
-  await expect(actionButton.locator('svg')).toBeHidden();
+  await expect(actionButton.locator('svg')).toHaveCount(0);
+  await expect(actionButton).toHaveCSS('background-color', 'rgb(121, 68, 83)');
+  await expect(actionButton).toHaveCSS('color', 'rgb(255, 250, 243)');
   await page.setViewportSize({ width: 360, height: 800 });
   const topbar = page.locator('[data-game-mobile-topbar]');
   const visibleTopbarBoxes = await topbar.locator(':scope > *').evaluateAll(elements =>
@@ -346,25 +348,16 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
     }));
   expect(visibleTopbarBoxes.every((box, index) =>
     index === 0 || visibleTopbarBoxes[index - 1].right <= box.left)).toBe(true);
+  await expect(page.getByRole('button', {
+    name: '打开对局菜单',
+  })).toHaveCount(0);
   await capture(page, testInfo, 'mobile-topbar-360');
-  await page.getByRole('button', { name: '打开对局菜单' }).click();
-  const gameMenu = page.getByTestId('quoridor-game-menu');
-  await expect(gameMenu).toHaveCSS('display', 'flex');
-  await expect(gameMenu.locator(':scope > button')).toHaveCount(3);
-  await expect(gameMenu.locator('small').first()).toHaveCSS('display', 'block');
-  expect((await gameMenu.locator(':scope > button').first().boundingBox())?.height)
-    .toBeGreaterThanOrEqual(60);
-  await capture(page, testInfo, 'mobile-game-menu');
-  await page.getByRole('button', { name: '关闭面板' }).click();
   await page.setViewportSize({ width: 390, height: 844 });
   const centerOffset = await actionButton.evaluate(element => {
-    const label = [...element.childNodes].find(node =>
-      node.nodeType === Node.TEXT_NODE && node.textContent?.trim());
+    const label = element.querySelector<HTMLElement>(':scope > span');
     if (!label) return Number.POSITIVE_INFINITY;
-    const range = document.createRange();
-    range.selectNodeContents(label);
     const buttonBox = element.getBoundingClientRect();
-    const labelBox = range.getBoundingClientRect();
+    const labelBox = label.getBoundingClientRect();
     return Math.abs(
       labelBox.left + labelBox.width / 2
       - (buttonBox.left + buttonBox.width / 2),
@@ -473,4 +466,7 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
   await expectNoOverflow(page);
   await capture(page, testInfo, 'game-1440x900');
+  await expect(page.getByRole('button', {
+    name: '打开对局菜单',
+  })).toBeVisible();
 });

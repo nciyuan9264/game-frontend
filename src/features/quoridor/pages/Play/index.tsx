@@ -204,14 +204,9 @@ export function Play({
   const confirm = () => {
     if (selected && selectedLegal) commit(selected);
   };
-  const primaryAction = selected
-    ? plainButton(<>{selected.kind === 'wall' ? '确认放墙' : '确认移动'}
-      <ArrowRight size={17} /></>, {
-      label: selected.kind === 'wall' ? '确认放墙' : '确认移动',
-      disabled: !interactive || !selectedLegal,
-      onClick: confirm,
-    })
-    : plainButton(<>{session.pending
+  const primaryLabel = selected
+    ? selected.kind === 'wall' ? '确认放墙' : '确认移动'
+    : session.pending
       ? '等待服务端确认'
       : !connected
         ? '等待连接恢复'
@@ -221,11 +216,17 @@ export function Play({
             ? '请先选择墙槽'
             : isMobile
               ? '点选可达位置'
-              : '选择棋盘上的可达位置'}
-      <Clock3 size={17} /></>, {
-      label: '当前行动状态',
-      disabled: true,
-    });
+              : '选择棋盘上的可达位置';
+  const primaryActionLabel = selected ? primaryLabel : '当前行动状态';
+  const primaryActionDisabled = selected
+    ? !interactive || !selectedLegal
+    : true;
+  const primaryAction = plainButton(<>{primaryLabel}
+    {selected ? <ArrowRight size={17} /> : <Clock3 size={17} />}</>, {
+    label: primaryActionLabel,
+    disabled: primaryActionDisabled,
+    onClick: selected ? confirm : undefined,
+  });
 
   const board = (readOnly = false, prefix = '') => <Board
     pawns={data.roomData.pawns}
@@ -299,9 +300,6 @@ export function Play({
         <button type="button" className="header-help" aria-label="玩法指南"
           title="玩法指南" onClick={() => ui.setPanel('rules')}>
           <BookOpen size={19} /><span data-game-mobile-action-label>玩法指南</span></button>
-        {!ended && <button type="button" className="icon-button"
-          aria-label="打开对局菜单" title="打开对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>}
         {ended && <button type="button" className="header-help"
           aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}>
@@ -545,11 +543,13 @@ export function Play({
       <div className="game-footer"><Brand small />
         <span>有墙的地方，也有路。</span>
         <span>QUORIDOR · ABSTRACT STRATEGY</span></div>
-      <div className="mobile-game-dock" data-testid="quoridor-mobile-dock"><div>
+      <div className="mobile-game-dock" data-testid="quoridor-mobile-dock">
         <button type="button" className="dock-undo" aria-label="取消选择"
-          disabled={!selected} onClick={ui.clearSelection}><X size={21} /></button>
-        {primaryAction}
-      </div></div>
+          disabled={!selected} onClick={ui.clearSelection}><X size={18} /></button>
+        <ActionButton variant="primary" aria-label={primaryActionLabel}
+          disabled={primaryActionDisabled} onClick={selected ? confirm : undefined}>
+          {primaryLabel}</ActionButton>
+      </div>
     </main>
 
     {ui.panel === 'activity' && <Dialog title="每一步，都有来路。"
