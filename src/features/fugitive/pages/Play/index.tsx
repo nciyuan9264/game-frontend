@@ -98,6 +98,13 @@ function routeCardForViewer(
   return undefined;
 }
 
+function routeSprintSummary(routeCard: RouteCard) {
+  if (!routeCard.sprintCount) return '';
+  if (!routeCard.sprints) return ` · ${routeCard.sprintCount} 张冲刺`;
+  const value = routeCard.sprints.reduce((total, card) => total + card.sprint, 0);
+  return ` · 冲刺 +${value}`;
+}
+
 export function Play({
   session,
   data,
@@ -382,6 +389,7 @@ export function Play({
               aria-label="按出牌顺序排列的逃亡路线">
               {data.roomData.route.map((item, index) => {
                 const visibleCard = routeCardForViewer(item, role, peek, revealAll);
+                const sprintSummary = routeSprintSummary(item);
                 return <div className={`route-stop ${
                   item.revealed || revealAll ? 'stop-open' : ''}`}
                   key={item.index}>
@@ -396,11 +404,12 @@ export function Play({
                   <span className={`stop-state ${
                     item.revealed || revealAll ? 'exposed' : ''}`}>
                     {item.revealed
-                      ? <><Eye size={11} />{visibleCard?.number === 42 ? '终点已打出' : '已公开'}</>
+                      ? <><Eye size={11} />{
+                        visibleCard?.number === 42 ? '终点已打出' : '已公开'
+                      }{sprintSummary}</>
                       : revealAll
-                        ? <><Eye size={11} />终局公开</>
-                        : <><LockKeyhole size={11} />暗置{item.sprintCount
-                        ? ` · 冲刺 ${item.sprintCount}` : ''}</>}
+                        ? <><Eye size={11} />终局公开{sprintSummary}</>
+                        : <><LockKeyhole size={11} />暗置{sprintSummary}</>}
                   </span>
                 </div>;
               })}

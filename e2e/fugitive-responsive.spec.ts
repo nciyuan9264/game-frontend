@@ -554,6 +554,9 @@ test('Fugitive mobile result and final board controls stay aligned', async ({ pa
   await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   await expect(page.getByRole('button', { name: '查看路线地点 5' })).toBeVisible();
   await expect(page.getByRole('button', { name: '查看路线地点 9' })).toBeVisible();
+  await expect(page.locator('.route-stop').filter({
+    has: page.getByRole('button', { name: '查看路线地点 9' }),
+  }).locator('.stop-state')).toHaveText('终局公开 · 冲刺 +2');
   await expect(page.getByText('终局已公开所有藏身点与附带冲刺牌。')).toBeVisible();
   await expect(page.getByText('下一处', { exact: true })).toHaveCount(0);
   await page.getByRole('button', { name: '查看路线地点 9' }).click();
