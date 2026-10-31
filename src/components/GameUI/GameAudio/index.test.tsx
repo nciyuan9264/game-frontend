@@ -1,10 +1,13 @@
 import { cleanup, render } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
-import { GameAudio } from '.';
+import { GameAudio, playGameSound } from '.';
 
 const click = (element: Element) => element.dispatchEvent(new MouseEvent('click', { bubbles: true, button: 0, detail: 1 }));
 
-afterEach(cleanup);
+afterEach(() => {
+  cleanup();
+  vi.unstubAllGlobals();
+});
 
 describe('GameAudio', () => {
   it('maps standard and semantic controls to sound names', () => {
@@ -35,5 +38,19 @@ describe('GameAudio', () => {
     container.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 0 }));
     container.dispatchEvent(new MouseEvent('click', { bubbles: true, detail: 1, button: 2 }));
     expect(soundPlayer).not.toHaveBeenCalled();
+  });
+
+  it('plays the background click sound at a reduced volume', () => {
+    const play = vi.fn().mockResolvedValue(undefined);
+    const audio = { preload: '', volume: 0, currentTime: 0, play };
+    const Audio = vi.fn(() => audio);
+    vi.stubGlobal('navigator', { userAgent: 'browser' });
+    vi.stubGlobal('Audio', Audio);
+
+    playGameSound('ui-click');
+
+    expect(Audio).toHaveBeenCalledWith('/game-sounds/ui-click.mp3');
+    expect(audio.volume).toBe(0.3);
+    expect(play).toHaveBeenCalledOnce();
   });
 });

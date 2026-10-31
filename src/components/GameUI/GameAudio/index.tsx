@@ -24,7 +24,7 @@ interface SoundDefinition {
 }
 
 const soundDefinitions: Record<GameSound, SoundDefinition> = {
-  'ui-click': { url: '/game-sounds/ui-click.mp3', volume: 0.36 },
+  'ui-click': { url: '/game-sounds/ui-click.mp3', volume: 0.3 },
   'button-click': { url: '/game-sounds/button-click.mp3', volume: 0.5 },
   'tab-click': { url: '/game-sounds/tab-click.mp3', volume: 0.5 },
   'game-select': { url: '/game-sounds/tile-select.mp3', volume: 0.5 },
