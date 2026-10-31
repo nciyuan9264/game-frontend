@@ -440,6 +440,14 @@ test('Onitama results return to a compact final board', async ({
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expect(page.locator('.result-art')).toHaveCount(0);
   await expect(page.locator('.result-copy')).toHaveCSS('text-align', 'center');
+  const resultTitle = page.getByRole('heading', {
+    name: '一招定局，石之道成。',
+  });
+  await expect(resultTitle).toHaveCSS('white-space', 'nowrap');
+  await page.setViewportSize({ width: 320, height: 800 });
+  expect(await resultTitle.evaluate(element =>
+    element.scrollWidth <= element.clientWidth)).toBe(true);
+  await page.setViewportSize({ width: 390, height: 844 });
   await expect.poll(() => page.locator('.result-seal').evaluate(element => {
     const box = element.getBoundingClientRect();
     return Math.abs(box.left + box.width / 2 - window.innerWidth / 2);

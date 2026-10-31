@@ -49,7 +49,7 @@ export function Results({
   const lastCard = last?.cardID ?? 'tiger';
   const viewer = viewerSide(data);
   const title = reason === 'stone'
-    ? '一招定局，\n石之道成。'
+    ? '一招定局，石之道成。'
     : reason === 'stream'
       ? '山门已至，\n流水无争。'
       : '收起这一式，\n下局再相逢。';
