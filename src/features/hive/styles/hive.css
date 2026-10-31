@@ -940,11 +940,9 @@
     .hive-insect-detail { gap: 21px; }
     .hive-insect-detail > .tile-svg { width: 78px; height: 86px; }
     .hive-insect-detail p { font-size: 11px; }
-    .hive-result-page { min-height: 100dvh; padding: 22px 18px calc(82px + env(safe-area-inset-bottom)); }
     .hive-result-heading > div { width: 57px; height: 60px; }
     .hive-result-heading h1 { font-size: 23px; line-height: 1.6; }
     .hive-result-heading p { padding: 0 8px; font-size: 10px; line-height: 1.8; }
-    .hive-result-grid { display: block; margin-top: 20px; }
     .hive-result-board { height: auto; overflow: visible; padding: 8px 15px; background: var(--hive-surface); }
     .hive-result-players article { display: grid; min-height: 61px; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 10px; border-bottom: 1px solid var(--hive-line); text-align: left; }
     .hive-result-players article:last-child { border-bottom: 0; }
@@ -955,20 +953,6 @@
     .hive-result-players article > b { color: #ad945d; font: 20px Georgia,serif; }
     .hive-result-summary { padding: 19px; }
     .hive-result-summary h2 { font-size: 20px; }
-    .hive-result-actions {
-      position: fixed;
-      right: 0;
-      bottom: 0;
-      left: 0;
-      z-index: 30;
-      height: calc(66px + env(safe-area-inset-bottom));
-      align-items: center;
-      margin: 0;
-      padding: 10px 17px calc(11px + env(safe-area-inset-bottom));
-      border-top: 1px solid #e1dacb;
-      background: #faf8ef;
-    }
-    .hive-result-actions > button { min-width: 0; flex: 1; }
     .hive-root .boardFrame > .hive-board { min-height: calc(100dvh - 302px); }
     .hive-root .zoomBoard > .hive-board { min-height: 65dvh; }
   }

@@ -417,6 +417,8 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expectMobileFinalResultLayout(page);
+  await expect(page.locator('[data-game-final-result-actions]'))
+    .not.toHaveClass(/page-actions/);
   await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
   await expect(page.locator('.result-player-list article')).toHaveCount(2);

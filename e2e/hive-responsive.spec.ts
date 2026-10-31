@@ -389,8 +389,14 @@ test('Hive mobile results return to a compact final board', async ({
 
   await expect(page.getByTestId('result-page')).toBeVisible();
   await expectMobileFinalResultLayout(page);
+  const resultHero = await page.locator('[data-game-final-result-hero]')
+    .boundingBox();
+  expect(resultHero).not.toBeNull();
+  expect(resultHero!.height).toBeLessThan(220);
+  expect(resultHero!.height).not.toBe(246);
   await expect(page.locator('.hive-result-players article')).toHaveCount(2);
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
+  await capture(page, testInfo, 'mobile-results');
   await page.getByRole('button', { name: '回看终局蜂巢' }).click();
   const board = page.getByRole('group', { name: '无边界六边形棋盘' });
   await expect(board).toBeVisible();

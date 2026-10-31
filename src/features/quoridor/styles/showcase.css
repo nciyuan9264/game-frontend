@@ -63,7 +63,7 @@
 .result-summary>.eyebrow{font-size:8px}
 
 @media(max-width:767px){
- .result-page[data-game-final-result] .result-certificate{justify-content:center;padding:15px 14px;box-shadow:inset 0 0 0 5px #fffaf2,inset 0 0 0 6px #dfc89e7a}
+ .result-page[data-game-final-result] .result-certificate{min-height:0;justify-content:center;padding:15px 14px;box-shadow:inset 0 0 0 5px #fffaf2,inset 0 0 0 6px #dfc89e7a}
  .result-page[data-game-final-result] .result-certificate>.eyebrow{font-size:6px}
  .result-page[data-game-final-result] .result-emblem{margin-top:5px}
  .result-page[data-game-final-result] .result-certificate h1{margin:9px 0 6px;font-size:23px}

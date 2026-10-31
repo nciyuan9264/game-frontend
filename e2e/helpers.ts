@@ -127,6 +127,7 @@ export async function expectMobileFinalResultLayout(
   const standings = root.locator('[data-game-final-result-standings]');
   const summary = root.locator('[data-game-final-result-summary]');
   const actions = root.locator('[data-game-final-result-actions]');
+  const footerNote = root.locator('[data-game-final-result-note]');
 
   await expect(root).toBeVisible();
   await expect(hero).toBeVisible();
@@ -134,35 +135,77 @@ export async function expectMobileFinalResultLayout(
   await expect(summary).toBeVisible();
   await expect(actions).toBeVisible();
 
-  const boxes = await Promise.all([
-    hero.boundingBox(),
-    standings.boundingBox(),
-    summary.boundingBox(),
-    actions.boundingBox(),
-  ]);
-  expect(boxes.every(Boolean)).toBe(true);
-  const [heroBox, standingsBox, summaryBox, actionsBox] = boxes;
-  expect(standingsBox!.y).toBeGreaterThanOrEqual(heroBox!.y + heroBox!.height);
-  expect(summaryBox!.y).toBeGreaterThanOrEqual(
-    standingsBox!.y + standingsBox!.height,
-  );
-  expect(actionsBox!.y).toBeGreaterThanOrEqual(
-    summaryBox!.y + summaryBox!.height,
-  );
-  await expect(actions).toHaveCSS('position', 'static');
-  await expect(actions.locator('button')).toHaveCount(options.actionCount ?? 3);
-  await expect.poll(() => page.evaluate(() =>
-    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  const expectCurrentGeometry = async () => {
+    const [rootBox, heroBox, standingsBox, summaryBox, actionsBox] =
+      await Promise.all([
+        root.boundingBox(),
+        hero.boundingBox(),
+        standings.boundingBox(),
+        summary.boundingBox(),
+        actions.boundingBox(),
+      ]);
+    expect(rootBox).not.toBeNull();
+    expect(heroBox).not.toBeNull();
+    expect(standingsBox).not.toBeNull();
+    expect(summaryBox).not.toBeNull();
+    expect(actionsBox).not.toBeNull();
 
-  const viewport = page.viewportSize();
-  if (viewport && viewport.width > 320) {
-    await page.setViewportSize({ width: 320, height: 700 });
-    await expect(root).toBeVisible();
+    const gaps = [
+      standingsBox!.y - (heroBox!.y + heroBox!.height),
+      summaryBox!.y - (standingsBox!.y + standingsBox!.height),
+      actionsBox!.y - (summaryBox!.y + summaryBox!.height),
+    ];
+    for (const gap of gaps) {
+      expect(Math.abs(gap - 18)).toBeLessThanOrEqual(1);
+    }
+
+    const computedGaps = await Promise.all([
+      root.evaluate(element => getComputedStyle(element).gap),
+      root.locator('[data-game-final-result-content]')
+        .evaluate(element => getComputedStyle(element).gap),
+    ]);
+    expect(computedGaps).toEqual(['18px', '18px']);
+
+    const viewport = page.viewportSize();
+    expect(viewport).not.toBeNull();
+    const leftGutter = heroBox!.x;
+    const rightGutter = viewport!.width - heroBox!.x - heroBox!.width;
+    expect(Math.abs(heroBox!.y - 8)).toBeLessThanOrEqual(1);
+    expect(Math.abs(leftGutter - 8)).toBeLessThanOrEqual(1);
+    expect(Math.abs(rightGutter - 8)).toBeLessThanOrEqual(1);
+
+    const hasFooterNote = await footerNote.count() > 0;
+    if (hasFooterNote) {
+      const footerNoteBox = await footerNote.boundingBox();
+      expect(footerNoteBox).not.toBeNull();
+      const noteGap = footerNoteBox!.y
+        - (actionsBox!.y + actionsBox!.height);
+      expect(Math.abs(noteGap - 18)).toBeLessThanOrEqual(1);
+    }
+    const lastSection = hasFooterNote ? footerNote : actions;
+    const lastSectionBox = await lastSection.boundingBox();
+    expect(lastSectionBox).not.toBeNull();
+    const bottomPadding = rootBox!.y + rootBox!.height
+      - (lastSectionBox!.y + lastSectionBox!.height);
+    expect(Math.abs(bottomPadding - 8)).toBeLessThanOrEqual(1);
+
+    await expect(actions).toHaveCSS('position', 'static');
+    await expect(actions.locator('button')).toHaveCount(
+      options.actionCount ?? 3,
+    );
     await expect.poll(() => page.evaluate(() =>
       document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
     const buttonsFit = await actions.locator('button').evaluateAll(buttons =>
       buttons.every(button => button.scrollWidth <= button.clientWidth));
     expect(buttonsFit).toBe(true);
+  };
+
+  await expectCurrentGeometry();
+
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width > 320) {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await expectCurrentGeometry();
     await page.setViewportSize(viewport);
   }
 }

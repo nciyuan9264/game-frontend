@@ -64,7 +64,7 @@ export function Results({
     contentClassName="result-grid"
     standingsClassName="final-position"
     summaryClassName="result-summary"
-    actionsClassName="page-actions result-actions"
+    actionsClassName="result-actions"
     hero={<>
         <span className="eyebrow"><i />THE OTHER SIDE OF THE JOURNEY</span>
         <div className="result-emblem"><i /><Trophy size={33} /><i /></div>
