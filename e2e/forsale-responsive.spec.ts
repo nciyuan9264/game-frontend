@@ -445,8 +445,8 @@ test('For Sale mobile auction keeps cards and actions usable',
     ]) {
       await page.setViewportSize(viewport);
       const [topbarBox, identityBox, countdownBox, historyBox, menuBox,
-        historyIconBox, menuIconBox, countdownStyle, historyStyle, menuStyle] =
-        await Promise.all([
+        historyIconBox, menuIconBox, countdownTextBox, countdownStyle,
+        historyStyle, menuStyle] = await Promise.all([
           mobileTopbar.boundingBox(),
           mobileTopbar.locator('[data-game-mobile-topbar-identity]').boundingBox(),
           countdown.boundingBox(),
@@ -454,6 +454,17 @@ test('For Sale mobile auction keeps cards and actions usable',
           menu.boundingBox(),
           history.locator('svg').boundingBox(),
           menu.locator('svg').boundingBox(),
+          countdown.evaluate(element => {
+            const range = document.createRange();
+            range.selectNodeContents(element);
+            const box = range.getBoundingClientRect();
+            return {
+              height: box.height,
+              width: box.width,
+              x: box.x,
+              y: box.y,
+            };
+          }),
           countdown.evaluate(element => ({
             borderRadius: getComputedStyle(element).borderRadius,
             borderWidth: getComputedStyle(element).borderWidth,
@@ -474,6 +485,7 @@ test('For Sale mobile auction keeps cards and actions usable',
       expect(menuBox).not.toBeNull();
       expect(historyIconBox).not.toBeNull();
       expect(menuIconBox).not.toBeNull();
+      expect(countdownTextBox.height).toBeGreaterThan(0);
       expect(identityBox!.width).toBeLessThanOrEqual(132);
       expect(countdownStyle).toEqual({
         borderRadius: '6px',
@@ -489,6 +501,8 @@ test('For Sale mobile auction keeps cards and actions usable',
       expect(menuBox).toMatchObject({ width: 34, height: 34 });
       expect(historyIconBox).toMatchObject({ width: 22, height: 22 });
       expect(menuIconBox).toMatchObject({ width: 22, height: 22 });
+      expect(Math.abs(countdownTextBox.y + countdownTextBox.height / 2
+        - (countdownBox!.y + countdownBox!.height / 2))).toBeLessThanOrEqual(1);
       const centers = [countdownBox!, historyIconBox!, menuIconBox!]
         .map(box => box.y + box.height / 2);
       expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
@@ -541,6 +555,64 @@ test('For Sale mobile sale selection locks only after confirmation',
       && command.includes('"property":27'))).toBe(true);
     await expectNoOverflow(page);
     await capture(page, info, 'sale-select-mobile');
+  });
+
+test('For Sale mobile sale reveal aligns player and property details',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const snapshot = saleSnapshot('sellReveal');
+    const userAvatar = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg"/%3E';
+    snapshot.view.forSale.roomData.players['110'].avatar = userAvatar;
+    await mockSession(page, 3, snapshot);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+
+    const reveal = page.locator('.fs-reveal');
+    const rows = reveal.locator('article');
+    await expect(rows).toHaveCount(3);
+    await expect(rows.locator('.fs-reveal-player img')).toHaveCount(1);
+    await expect(rows.locator('.fs-reveal-player img'))
+      .toHaveAttribute('src', userAvatar);
+
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 360, height: 800 },
+      { width: 320, height: 700 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const geometry = await rows.evaluateAll(elements => elements.map(element => {
+        const player = element.querySelector<HTMLElement>('.fs-reveal-player')!;
+        const avatar = player.querySelector<HTMLElement>('.fs-avatar')!;
+        const name = player.querySelector<HTMLElement>('b')!;
+        const property = element.querySelector<HTMLElement>('.fs-reveal-property')!;
+        const icon = property.querySelector<SVGElement>('svg')!;
+        const number = property.querySelector<HTMLElement>('span')!;
+        const playerBox = player.getBoundingClientRect();
+        const avatarBox = avatar.getBoundingClientRect();
+        const nameBox = name.getBoundingClientRect();
+        const iconBox = icon.getBoundingClientRect();
+        const numberBox = number.getBoundingClientRect();
+        return {
+          avatarLeftOffset: avatarBox.left - playerBox.left,
+          nameGap: nameBox.left - avatarBox.right,
+          playerJustify: getComputedStyle(player).justifyContent,
+          propertyCenterDelta: Math.abs(
+            iconBox.top + iconBox.height / 2
+            - numberBox.top - numberBox.height / 2,
+          ),
+          propertyGap: numberBox.left - iconBox.right,
+        };
+      }));
+      for (const row of geometry) {
+        expect(Math.abs(row.avatarLeftOffset)).toBeLessThanOrEqual(1);
+        expect(Math.abs(row.nameGap - 7)).toBeLessThanOrEqual(1);
+        expect(row.playerJustify).toBe('flex-start');
+        expect(row.propertyCenterDelta).toBeLessThanOrEqual(1);
+        expect(Math.abs(row.propertyGap - 5)).toBeLessThanOrEqual(1);
+      }
+      await expectNoOverflow(page);
+    }
+    await page.setViewportSize({ width: 390, height: 844 });
+    await capture(page, info, 'sale-reveal-mobile');
   });
 
 test('For Sale results support tied winners and final-table review',

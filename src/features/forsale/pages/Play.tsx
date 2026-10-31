@@ -314,12 +314,22 @@ export const Play = ({
           <div>{saleTrades.slice().sort((a, b) => b.property - a.property)
             .map((trade, index) => <article className={
               trade.playerID === data.playerId ? 'self' : ''} key={trade.playerID}>
-              <span>{String(index + 1).padStart(2, '0')}</span>
-              <PlayerAvatar name={playerName(trade.playerID, data.roomData.players)}
-                ai={data.roomData.players[trade.playerID]?.ai} size={30} />
-              <b>{playerLabel(trade.playerID, data.roomData.players)}</b>
-              <span><Home size={14} />{trade.property} 号</span>
-              <ArrowRight size={15} /><strong>{chequeMoney(trade.amount)}</strong>
+              <span className="fs-reveal-rank">{
+                String(index + 1).padStart(2, '0')}</span>
+              <span className="fs-reveal-player">
+                <PlayerAvatar
+                  name={playerName(trade.playerID, data.roomData.players)}
+                  avatar={data.roomData.players[trade.playerID]?.avatar}
+                  ai={data.roomData.players[trade.playerID]?.ai}
+                  size={30}
+                />
+                <b>{playerLabel(trade.playerID, data.roomData.players)}</b>
+              </span>
+              <span className="fs-reveal-property">
+                <Home size={14} /><span>{trade.property} 号</span>
+              </span>
+              <ArrowRight className="fs-reveal-arrow" size={15} />
+              <strong>{chequeMoney(trade.amount)}</strong>
             </article>)}</div><footer><Coins size={17} />你本轮获得 <b>{
               chequeMoney(mySale?.amount ?? 0)}</b>
             <ActionButton variant="primary" disabled={!enabled}
