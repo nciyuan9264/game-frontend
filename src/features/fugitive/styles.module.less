@@ -1686,8 +1686,7 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
 .lobby-join-card{padding:18px 19px;border:1px solid #3c513b;border-radius:8px;background:#1d2b21}
 .lobby-join-card h3{display:flex;align-items:center;gap:8px;font-size:13px}
 .lobby-join-card h3>svg{color:#d0ad77}
-.lobby-join-card p{margin:8px 0 12px;color:var(--muted);font-size:10px}
-.lobby-join-card form{display:flex;height:36px;overflow:hidden;border:1px solid #3f5540;border-radius:5px;background:#121e16}
+.lobby-join-card form{display:flex;height:36px;margin-top:12px;overflow:hidden;border:1px solid #3f5540;border-radius:5px;background:#121e16}
 .lobby-join-card input{width:100%;min-width:0;padding:0 10px;border:0;outline:0;background:transparent;font-size:10px}
 .lobby-join-card form button{display:grid;width:38px;flex-shrink:0;place-items:center;background:#2b3d2d;color:#e2b77c}
 .mobile-lobby-join{display:none}
@@ -1731,6 +1730,33 @@ padding-bottom:calc(66px + env(safe-area-inset-bottom))
  .framework-lobby .mobile-lobby-join .lobby-join-card form{height:40px}
  .framework-lobby .mobile-lobby-join .lobby-join-card input{font-size:12px}
  .framework-lobby .mobile-lobby-join .lobby-join-card form button{width:42px}
+ [data-game-mobile-lobby-join] form{margin-top:12px}
+ [data-game-mobile-lobby-join] input{padding:0 10px;font-size:12px;line-height:1.4;letter-spacing:0}
+ [data-game-mobile-lobby-join] input::placeholder{color:#6f8072;font-size:12px;opacity:1}
+ .fugitive-mobile-room-card{min-width:0;padding:16px 16px 14px;border:1px solid #3d513d;border-radius:9px;background:#1a2d21;box-shadow:0 2px 5px #030c1215}
+ .fugitive-mobile-room-heading{display:flex;align-items:flex-start;justify-content:space-between;gap:12px}
+ .fugitive-mobile-room-identity{min-width:0}
+ .fugitive-mobile-room-identity small{display:block;margin-bottom:4px;color:#96aa8c;font-size:9px;line-height:1.4;letter-spacing:.04em}
+ .fugitive-mobile-room-identity h3{margin:0;color:#e7e9df;font-size:21px;font-weight:500;font-variant-numeric:tabular-nums;line-height:1.25;letter-spacing:.015em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .fugitive-mobile-room-status{display:inline-flex;align-items:center;align-self:flex-start;justify-content:center;gap:5px;min-height:23px;flex-shrink:0;margin-top:1px;padding:3px 7px;border:1px solid #5f8a713b;border-radius:5px;color:#abd0b5;background:#547d6312;font-size:9px;font-weight:500;white-space:nowrap}
+ .fugitive-mobile-room-status:before{content:'';width:5px;height:5px;border-radius:50%;background:currentColor}
+ .fugitive-mobile-room-status.playing{color:#dfb47c;border-color:#97764355;background:#493c2724}
+ .fugitive-mobile-room-meta{display:flex;align-items:center;justify-content:space-between;gap:12px;min-width:0;margin-top:12px;color:#96aa8c;font-size:10px}
+ .fugitive-mobile-room-host{display:flex;align-items:center;gap:6px;min-width:0}
+ .fugitive-mobile-room-host>.profile-monogram{width:22px;height:22px;flex-shrink:0}
+ .fugitive-mobile-room-host>span{flex-shrink:0}
+ .fugitive-mobile-room-host>strong{min-width:0;color:#c4d3b8;font-size:12px;font-weight:500;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+ .fugitive-mobile-room-mode{display:flex;align-items:center;gap:4px;flex-shrink:0;color:#8fa789;font-size:9px;white-space:nowrap}
+ .fugitive-mobile-room-mode.private{color:#dfb47c}
+ .fugitive-mobile-room-progress{height:3px;margin-top:12px;overflow:hidden;border-radius:999px;background:#102017;box-shadow:inset 0 0 0 1px #3b513b54}
+ .fugitive-mobile-room-progress>i{display:block;height:100%;border-radius:inherit;background:#9ab772;transition:width .2s ease}
+ .fugitive-mobile-room-bottom{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:13px;padding-top:12px;border-top:1px solid #637b7930}
+ .fugitive-mobile-room-bottom>button{min-width:100px;min-height:38px;flex-shrink:0;padding:0 11px;gap:9px;border-color:#71866a70;background:#71896116;color:#e1dbbf!important;font-size:11px;box-shadow:none}
+ .fugitive-mobile-room-capacity{display:flex;align-items:center;gap:11px;min-width:0;color:#96aa8c;font-size:11px}
+ .fugitive-mobile-room-capacity>span{display:flex;align-items:baseline;gap:4px;white-space:nowrap}
+ .fugitive-mobile-room-capacity svg{align-self:center;width:15px;height:15px;margin-right:2px;color:#a4bc9b}
+ .fugitive-mobile-room-capacity b{color:#e1e7e3;font-size:16px;font-weight:600}
+ .fugitive-mobile-room-capacity small{padding-left:11px;border-left:1px solid #58707966;color:#96aa8c;font-size:9px;line-height:1.4;white-space:nowrap}
  .framework-waiting{padding-bottom:215px}
  [data-game-brand]{gap:8px}
  [data-game-room-heading]{display:flex;align-items:stretch;flex-direction:column;gap:16px;margin:0 2px 17px}

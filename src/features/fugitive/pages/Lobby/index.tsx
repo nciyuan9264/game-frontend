@@ -21,9 +21,9 @@ import { GameShareContent } from '@/components/GameUI/GameShareContent';
 import {
   GameMobileCreateRoomDialog,
   GameMobileLobby,
-  GameMobileRoomCard,
   GameMobileShareDialog,
 } from '@/components/GameUI/GamePublicMobile';
+import { ActionButton } from '@/components/GameUI/ActionButton';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
@@ -127,7 +127,6 @@ function JoinCard({
   onJoin: () => void;
 }) {
   return <section className="lobby-join-card"><h3><KeyRound size={18} />朋友已经开好房间？</h3>
-    <p>输入完整房间号，找到朋友的追逐。</p>
     <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
       <input aria-label="查找房间号" placeholder="输入完整房间号" value={code}
         onChange={event => setCode(event.target.value)} autoCapitalize="off"
@@ -190,26 +189,55 @@ export default function Lobby() {
     const entry = roomEntry(room, { userID });
     const ownerProfile = roomOwnerProfile(room);
     const ownerRole = roomRole(room);
-    return <GameMobileRoomCard key={room.roomID}
-      roomID={room.roomID}
-      title={room.roomID}
-      ownerName={ownerProfile.name}
-      ownerAvatar={<ProfileMonogram profile={{
-        name: ownerProfile.name,
-        avatar: ownerProfile.avatar,
-      }} />}
-      playerCount={room.roomPlayer.length}
-      maxPlayers={room.maxPlayers}
-      status={room.status === 'match' ? '等待加入' : '对局中'}
-      meta={room.status === 'match'
-        ? `等待${roleName(ownerRole === 'fugitive' ? 'marshal' : 'fugitive')
-        } · ${timeoutLabel(room.turnTimeoutSeconds)}`
-        : `最高公开 ${room.highestRevealed ?? 0}`}
-      privateRoom={room.visibility === 'private'}
-      actionLabel={entry.label}
-      actionDisabled={!entry.allowed}
-      onEnter={() => enter(room)}
-    />;
+    const progress = room.status === 'match'
+      ? 0
+      : Math.min(42, Math.max(0, room.highestRevealed ?? 0));
+    return <article key={room.roomID} className="fugitive-mobile-room-card"
+      aria-label={`房间 ${room.roomID}`} data-game-mobile-room-card>
+      <div className="fugitive-mobile-room-heading">
+        <div className="fugitive-mobile-room-identity">
+          <small>房间号</small><h3>{room.roomID}</h3>
+        </div>
+        <span className={`fugitive-mobile-room-status ${
+          room.status !== 'match' ? 'playing' : ''}`}>
+          {room.status === 'match' ? '等待入座'
+            : room.status === 'end' ? '已结束' : '对局中'}
+        </span>
+      </div>
+      <div className="fugitive-mobile-room-meta">
+        <div className="fugitive-mobile-room-host">
+          <ProfileMonogram profile={{
+            name: ownerProfile.name,
+            avatar: ownerProfile.avatar,
+          }} />
+          <span>房主</span><strong title={ownerProfile.name}>{ownerProfile.name}</strong>
+        </div>
+        <span className={`fugitive-mobile-room-mode ${
+          room.visibility === 'private' ? 'private' : ''}`}>
+          {room.visibility === 'private'
+            ? <><LockKeyhole size={13} />仅你可见</>
+            : <><Globe2 size={13} />公开房间</>}
+        </span>
+      </div>
+      <div className="fugitive-mobile-room-progress" role="progressbar"
+        aria-label="逃亡进度" aria-valuemin={0} aria-valuemax={42}
+        aria-valuenow={progress}>
+        <i style={{ width: `${progress / 42 * 100}%` }} />
+      </div>
+      <div className="fugitive-mobile-room-bottom">
+        <div className="fugitive-mobile-room-capacity">
+          <span><Users size={16} /><b>{room.roomPlayer.length}</b>
+            / {room.maxPlayers} 人</span>
+          <small>{room.status === 'match'
+            ? `等待${roleName(ownerRole === 'fugitive' ? 'marshal' : 'fugitive')}`
+            : `最高公开 ${room.highestRevealed ?? 0}`}</small>
+        </div>
+        <ActionButton disabled={!entry.allowed} onClick={() => enter(room)}
+          aria-label={`${entry.label} ${room.roomID}`}>
+          {entry.label}<ArrowRight size={15} />
+        </ActionButton>
+      </div>
+    </article>;
   };
 
   if (isMobile) {
@@ -253,7 +281,7 @@ export default function Lobby() {
             action.reset();
           }}
           onJoin={() => void find()}
-          joinDescription="输入完整房间号，找到朋友的追逐。"
+          joinDescription={null}
           error={lobby.error && <p className="notice">{lobby.error}
             <button className="text-button" type="button"
               onClick={lobby.refresh}>重试</button>

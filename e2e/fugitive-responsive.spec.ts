@@ -250,6 +250,34 @@ function marshalEndedSnapshot() {
   };
 }
 
+function lobbyRoom() {
+  return {
+    roomID,
+    gameType: 'fugitive',
+    status: 'playing',
+    visibility: 'private',
+    ownerUserID: human.userID,
+    ownerPlayerID: human.playerID,
+    maxPlayers: 2,
+    playerCount: 2,
+    currentMatchID: matchID,
+    currentMatchStatus: 'running',
+    nextRoundNo: 2,
+    createdAt: '2026-10-31T00:00:00Z',
+    updatedAt: '2026-10-31T00:00:00Z',
+    turnTimeoutSeconds: 120,
+    players: [human, ai],
+    metrics: {
+      fugitive: {
+        highestRevealed: 35,
+        hiddenHideoutCount: 1,
+        progressCurrent: 35,
+        progressTotal: 42,
+      },
+    },
+  };
+}
+
 async function mockSession(
   page: Page,
   snapshot = gameSnapshot(),
@@ -305,7 +333,7 @@ async function mockSession(
   return commands;
 }
 
-async function mockLobby(page: Page, avatar = '') {
+async function mockLobby(page: Page, avatar = '', rooms: unknown[] = []) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -321,7 +349,7 @@ async function mockLobby(page: Page, avatar = '') {
     json: {
       status_code: 0,
       message: 'ok',
-      data: { rooms: [] },
+      data: { rooms },
     },
   }));
   await page.route('**/pam-api/platform/history/stats?**', route => route.fulfill({
@@ -350,7 +378,7 @@ async function expectNoDocumentOverflow(page: Page) {
 
 test('Fugitive mobile lobby uses product chrome and shared entry flows', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockLobby(page);
+  await mockLobby(page, '', [lobbyRoom()]);
   await page.goto('/game/fugitive');
 
   const createButton = page.getByRole('button', { name: /创建房间/ });
@@ -365,6 +393,13 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(createButton).toHaveCSS('align-items', 'center');
   await expect(shareButton).toHaveCSS('justify-content', 'center');
   await expect(shareButton).toHaveCSS('align-items', 'center');
+  const roomCard = page.locator('[data-game-mobile-room-card]');
+  await expect(roomCard).toHaveCount(1);
+  await expect(roomCard.getByText('房间号', { exact: true })).toBeVisible();
+  await expect(roomCard.getByText(roomID, { exact: true })).toHaveCount(1);
+  await expect(roomCard.getByText('最高公开 35', { exact: true })).toBeVisible();
+  await expect(roomCard.getByRole('progressbar', { name: '逃亡进度' }))
+    .toHaveAttribute('aria-valuenow', '35');
 
   await createButton.click();
   const createDialog = page.getByRole('dialog', { name: '创建房间' });
@@ -392,6 +427,11 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   const roomLookup = page.getByRole('textbox', { name: '查找房间号' });
   await expect(roomLookup).toBeVisible();
   await expect(roomLookup).toHaveAttribute('placeholder', '输入完整房间号');
+  await expect(page.getByText('输入完整房间号，找到朋友的追逐。')).toHaveCount(0);
+  await expect(roomLookup).toHaveCSS('font-size', '12px');
+  await expect(roomLookup).toHaveCSS('padding-left', '10px');
+  await expect(roomLookup).toHaveCSS('padding-right', '10px');
+  await expect(roomLookup.locator('xpath=..')).toHaveCSS('margin-top', '12px');
   await expect(roomLookup).toHaveCSS('border-top-width', '0px');
   await expect(roomLookup).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   const roomSearch = page.getByRole('textbox', { name: '搜索房间号或房主' });

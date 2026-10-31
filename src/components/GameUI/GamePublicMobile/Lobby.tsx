@@ -116,7 +116,8 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
           <h3>{emptyTitle}</h3><p>{emptyDescription}</p></div>}
     </section>
     <section className={styles.joinCard} data-game-mobile-lobby-join>
-      <h3><KeyRound size={18} />{joinTitle}</h3><p>{joinDescription}</p>
+      <h3><KeyRound size={18} />{joinTitle}</h3>
+      {joinDescription && <p>{joinDescription}</p>}
       <form onSubmit={event => { event.preventDefault(); onJoin(); }}>
         <input aria-label="查找房间号" placeholder="输入完整房间号"
           value={joinCode} onChange={event => onJoinCodeChange(event.target.value)}
