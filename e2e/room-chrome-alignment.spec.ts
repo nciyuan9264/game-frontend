@@ -225,7 +225,7 @@ for (const config of games) {
       if (geometry.mediaPosition) expect(geometry.mediaPosition).toBe('absolute');
       expect(geometry.seatOffset).toBeGreaterThanOrEqual(0);
       expect(geometry.seatOffset).toBeLessThanOrEqual(24);
-      if (config.game === 'quoridor') {
+      if (config.game === 'quoridor' || config.game === 'onitama') {
         for (const viewport of [
           { width: 390, height: 844 },
           { width: 320, height: 568 },
