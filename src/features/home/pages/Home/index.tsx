@@ -1,6 +1,8 @@
 import type { CSSProperties } from 'react';
 import { useMemo, useState } from 'react';
+import { Popover } from 'antd';
 import styles from './index.module.less';
+import wechatGroupQr from '../../assets/wechat-group-qr.jpg';
 import { AnimatePresence, motion } from 'motion/react';
 import {
   ArrowRight,
@@ -16,6 +18,7 @@ import {
   Heart,
   Home as HomeIcon,
   Mail,
+  MessageCircle,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
@@ -763,12 +766,43 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className={styles.plazaShell}
       >
+        <header className={styles.topBar}>
+          <div className={styles.brandRow}>
+            <span>GameBus Online</span>
+            <b>{gameCatalog.length} 款游戏</b>
+          </div>
+          <Popover
+            placement="bottomRight"
+            trigger="click"
+            color="#151e2d"
+            classNames={{ root: styles.communityPopover }}
+            content={(
+              <div className={styles.communityPopoverContent}>
+                <div className={styles.communityPopoverTitle}>
+                  <span>微信玩家群</span>
+                  <strong>桌游线上版</strong>
+                </div>
+                <a
+                  href={wechatGroupQr}
+                  target="_blank"
+                  rel="noreferrer"
+                  aria-label="查看桌游线上版玩家群二维码原图"
+                >
+                  <img src={wechatGroupQr} alt="桌游线上版微信玩家群二维码" />
+                </a>
+                <p>约局、反馈与版本更新</p>
+              </div>
+            )}
+          >
+            <button type="button" className={styles.communityTrigger}>
+              <MessageCircle size={17} />
+              <span>玩家群</span>
+            </button>
+          </Popover>
+        </header>
+
         <section className={styles.heroSection}>
           <div className={styles.heroCopy}>
-            <div className={styles.brandRow}>
-              <span>GameBus Online</span>
-              <b>{gameCatalog.length} 款游戏</b>
-            </div>
             <h1>桌游广场</h1>
             <p>
               从商业经营到抽象棋，从隐藏推理到战术调遣，选择当前想玩的规则，直接进入对应大厅。
