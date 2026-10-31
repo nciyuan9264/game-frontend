@@ -112,6 +112,7 @@ export const Play = ({
 
   return <div className="fs-play" data-testid="forsale-play">
     <GameMobileTopbar
+      className="fs-mobile-topbar"
       onBack={onLeave}
       backLabel="离开对局"
       kicker={`THE SUNDAY AUCTION · ${data.roomData.playerOrder.length} 人经典局`}

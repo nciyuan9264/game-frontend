@@ -434,25 +434,69 @@ test('For Sale mobile auction keeps cards and actions usable',
     await expect(page.getByTestId('forsale-play')).toBeVisible();
     await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
     await expect(page.locator('.fs-game-header')).toBeHidden();
-    const headerGeometry = await page.locator('[data-game-mobile-topbar]').evaluate(header => {
-      const box = header.getBoundingClientRect();
-      const identity = header.querySelector<HTMLElement>('[data-game-mobile-topbar-identity]')
-        ?.getBoundingClientRect();
-      const timer = header.querySelector<HTMLElement>('[data-game-mobile-topbar-status]')
-        ?.getBoundingClientRect();
-      const buttons = header.querySelectorAll<HTMLElement>(
-        '[data-game-mobile-topbar-actions] > button',
-      );
-      const menu = buttons.item(buttons.length - 1).getBoundingClientRect();
-      return {
-        menuRightInset: box.right - menu.right,
-        identityToTimerGap: identity && timer ? timer.left - identity.right : 0,
-        menuWidth: menu.width,
-      };
-    });
-    expect(headerGeometry.menuRightInset).toBeGreaterThanOrEqual(7);
-    expect(headerGeometry.identityToTimerGap).toBeGreaterThanOrEqual(5);
-    expect(headerGeometry.menuWidth).toBeGreaterThanOrEqual(31);
+    const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+    const countdown = mobileTopbar.getByRole('timer');
+    const history = mobileTopbar.getByRole('button', { name: '公开记录' });
+    const menu = mobileTopbar.getByRole('button', { name: '对局菜单' });
+    for (const viewport of [
+      { width: 390, height: 844 },
+      { width: 360, height: 800 },
+      { width: 320, height: 700 },
+    ]) {
+      await page.setViewportSize(viewport);
+      const [topbarBox, identityBox, countdownBox, historyBox, menuBox,
+        historyIconBox, menuIconBox, countdownStyle, historyStyle, menuStyle] =
+        await Promise.all([
+          mobileTopbar.boundingBox(),
+          mobileTopbar.locator('[data-game-mobile-topbar-identity]').boundingBox(),
+          countdown.boundingBox(),
+          history.boundingBox(),
+          menu.boundingBox(),
+          history.locator('svg').boundingBox(),
+          menu.locator('svg').boundingBox(),
+          countdown.evaluate(element => ({
+            borderRadius: getComputedStyle(element).borderRadius,
+            borderWidth: getComputedStyle(element).borderWidth,
+          })),
+          history.evaluate(element => ({
+            backgroundColor: getComputedStyle(element).backgroundColor,
+            borderWidth: getComputedStyle(element).borderWidth,
+          })),
+          menu.evaluate(element => ({
+            backgroundColor: getComputedStyle(element).backgroundColor,
+            borderWidth: getComputedStyle(element).borderWidth,
+          })),
+        ]);
+      expect(topbarBox).not.toBeNull();
+      expect(identityBox).not.toBeNull();
+      expect(countdownBox).not.toBeNull();
+      expect(historyBox).not.toBeNull();
+      expect(menuBox).not.toBeNull();
+      expect(historyIconBox).not.toBeNull();
+      expect(menuIconBox).not.toBeNull();
+      expect(identityBox!.width).toBeLessThanOrEqual(132);
+      expect(countdownStyle).toEqual({
+        borderRadius: '6px',
+        borderWidth: '1px',
+      });
+      expect(historyStyle).toEqual({
+        backgroundColor: 'rgba(0, 0, 0, 0)',
+        borderWidth: '0px',
+      });
+      expect(menuStyle).toEqual(historyStyle);
+      expect(countdownBox!.height).toBe(22);
+      expect(historyBox).toMatchObject({ width: 34, height: 34 });
+      expect(menuBox).toMatchObject({ width: 34, height: 34 });
+      expect(historyIconBox).toMatchObject({ width: 22, height: 22 });
+      expect(menuIconBox).toMatchObject({ width: 22, height: 22 });
+      const centers = [countdownBox!, historyIconBox!, menuIconBox!]
+        .map(box => box.y + box.height / 2);
+      expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
+      expect(Math.abs(menuBox!.x + menuBox!.width
+        - (topbarBox!.x + topbarBox!.width))).toBeLessThanOrEqual(1);
+      await expectNoOverflow(page);
+    }
+    await page.setViewportSize({ width: 358, height: 784 });
     await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
     await expect(page.getByLabel('总出价金币')).toHaveValue('3');
     await page.getByRole('button', { name: '退出本轮' }).click();

@@ -923,6 +923,21 @@
   .fs-phase-chip { display: none; }
   .fs-game-header > button { width: 29px; flex: 0 0 29px; }
   .fs-timer { flex: 0 0 auto; }
+  .fs-mobile-topbar.fs-mobile-topbar { column-gap: 10px; padding-right: 0; }
+  .fs-mobile-topbar [data-game-mobile-topbar-identity] {
+    width: min(36vw, 132px); max-width: 132px; flex: 1 1 auto;
+  }
+  .fs-mobile-topbar [data-game-mobile-topbar-status] { gap: 7px; }
+  .fs-mobile-topbar [data-game-turn-countdown] {
+    border-color: #bd603e70; background: #bd603e12; color: var(--fs-orange);
+    font-size: 11px; font-weight: 700; line-height: 1;
+  }
+  .fs-mobile-topbar [data-game-mobile-topbar-actions] > button {
+    border: 0; background: transparent; color: var(--fs-green);
+  }
+  .fs-mobile-topbar [data-game-mobile-topbar-actions] > button svg {
+    width: 22px; height: 22px;
+  }
   .fs-phase-bar { padding: 10px 12px; }
   .fs-phase-bar span { font-size: 8px; }
   .fs-table-layout { display: block; padding: 0 8px 190px; }
