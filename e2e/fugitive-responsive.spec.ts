@@ -473,6 +473,9 @@ test('Fugitive marshal can select and submit a hideout search on mobile', async 
   const openNotebook = page.getByTestId('fugitive-mobile-dock')
     .getByRole('button', { name: '打开推理手册' });
   await expect(openNotebook).toBeEnabled();
+  await expect(openNotebook).toHaveCSS('background-color', 'rgb(154, 195, 164)');
+  await expect(openNotebook).toHaveCSS('color', 'rgb(19, 36, 26)');
+  await expect(openNotebook).toHaveCSS('border-top-color', 'rgb(168, 210, 180)');
   await openNotebook.click();
 
   const notebook = page.getByRole('dialog', { name: '你的私密推理手册' });
