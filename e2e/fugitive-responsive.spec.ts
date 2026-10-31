@@ -215,6 +215,41 @@ function endedSnapshot() {
   };
 }
 
+function marshalEndedSnapshot() {
+  const snapshot = endedSnapshot();
+  const marshal = { ...human, gameRole: 'marshal' };
+  const fugitive = { ...ai, gameRole: 'fugitive' };
+  return {
+    ...snapshot,
+    view: {
+      fugitive: {
+        ...snapshot.view.fugitive,
+        playerData: {
+          [human.playerID]: { role: 'marshal', handCount: 2 },
+          [ai.playerID]: { role: 'fugitive', handCount: 4 },
+        },
+        hand: [
+          { number: 7, sprint: 1 },
+          { number: 17, sprint: 2 },
+        ],
+        result: {
+          winnerID: ai.playerID,
+          winnerRole: 'fugitive',
+          reason: 'manhunt_missed',
+          searches: 2,
+        },
+        roomData: {
+          ...snapshot.view.fugitive.roomData,
+          players: {
+            [human.playerID]: marshal,
+            [ai.playerID]: fugitive,
+          },
+        },
+      },
+    },
+  };
+}
+
 async function mockSession(
   page: Page,
   snapshot = gameSnapshot(),
@@ -497,7 +532,7 @@ test('Fugitive marshal can select and submit a hideout search on mobile', async 
 
 test('Fugitive mobile result and final board controls stay aligned', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockSession(page, endedSnapshot());
+  await mockSession(page, marshalEndedSnapshot());
   await page.goto(`/game/fugitive/match?roomID=${roomID}`);
 
   await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
@@ -517,6 +552,15 @@ test('Fugitive mobile result and final board controls stay aligned', async ({ pa
   await review.click();
   await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
   await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
+  await expect(page.getByRole('button', { name: '查看路线地点 5' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '查看路线地点 9' })).toBeVisible();
+  await expect(page.getByText('终局已公开所有藏身点与附带冲刺牌。')).toBeVisible();
+  await expect(page.getByText('下一处', { exact: true })).toHaveCount(0);
+  await page.getByRole('button', { name: '查看路线地点 9' }).click();
+  const routeDetail = page.getByRole('dialog', { name: '09 号藏身点' });
+  await expect(routeDetail.getByText('该地点在终局结算后公开。')).toBeVisible();
+  await expect(routeDetail.getByText(/04（\+2）/)).toBeVisible();
+  await routeDetail.getByRole('button', { name: '关闭弹窗' }).click();
   const settlement = page.getByTestId('fugitive-mobile-dock')
     .getByRole('button', { name: /查看结算/ });
   const settlementBox = await settlement.boundingBox();

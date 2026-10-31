@@ -90,8 +90,11 @@ function routeCardForViewer(
   routeCard: RouteCard,
   role: Role,
   peek: boolean,
+  revealAll: boolean,
 ) {
-  if (routeCard.revealed || role === 'fugitive' && peek) return routeCard.card;
+  if (revealAll || routeCard.revealed || role === 'fugitive' && peek) {
+    return routeCard.card;
+  }
   return undefined;
 }
 
@@ -126,6 +129,7 @@ export function Play({
   const role = selfRole(data);
   const isRunner = role === 'fugitive';
   const phase = data.roomData.gameStatus;
+  const revealAll = phase === 'end';
   const myTurn = isMyTurn(data);
   const enabled = session.connection.status === 'connected' && !session.pending;
   const active = enabled && myTurn;
@@ -137,8 +141,11 @@ export function Play({
   const countdown = useCountdown(data.roomData.turnDeadline);
   const selectedCard = data.hand.find(value => value.number === selected);
   const detailView = data.roomData.route[detail];
+  const detailCard = detailView
+    ? routeCardForViewer(detailView, role, peek, revealAll)
+    : undefined;
   const logs = [...data.roomData.activityLog].reverse();
-  const routeProgress = isRunner && peek
+  const routeProgress = revealAll || isRunner && peek
     ? current
     : data.roomData.highestRevealed;
   const names = useMemo(() => Object.fromEntries(
@@ -350,8 +357,11 @@ export function Play({
           <section className="route-board" data-testid="fugitive-route">
             <header className="board-heading"><div><Eyebrow>THE ESCAPE ROUTE</Eyebrow>
               <h2>逃亡路线</h2></div>
-              <span className="hidden-count"><LockKeyhole size={13} />{hidden} 处未发现</span>
-              {isRunner && <button className="board-peek" type="button"
+              <span className="hidden-count">
+                {revealAll ? <Eye size={13} /> : <LockKeyhole size={13} />}
+                {hidden} 处{revealAll ? '此前未发现' : '未发现'}
+              </span>
+              {isRunner && !revealAll && <button className="board-peek" type="button"
                 aria-label={peek ? '遮住我的暗置牌' : '查看我的暗置牌'}
                 onClick={() => setPeek(value => !value)}>
                 {peek ? <Eye size={16} /> : <EyeOff size={16} />}
@@ -365,13 +375,15 @@ export function Play({
                   [0, 14, 28, 42].indexOf(number)]}</small></span>)}
               <div className="route-position" style={{
                 left: `${Math.max(5, Math.min(93, routeProgress / 42 * 100))}%`,
-              }}>{isRunner && peek ? '你在' : '最新公开'} {pad(routeProgress)}</div>
+              }}>{revealAll ? '终局地点' : isRunner && peek ? '你在' : '最新公开'} {
+                pad(routeProgress)}</div>
             </div>
             <div className="route-scroll" ref={routeScroll}
               aria-label="按出牌顺序排列的逃亡路线">
               {data.roomData.route.map((item, index) => {
-                const visibleCard = routeCardForViewer(item, role, peek);
-                return <div className={`route-stop ${item.revealed ? 'stop-open' : ''}`}
+                const visibleCard = routeCardForViewer(item, role, peek, revealAll);
+                return <div className={`route-stop ${
+                  item.revealed || revealAll ? 'stop-open' : ''}`}
                   key={item.index}>
                   <span className="stop-index">{index === 0 ? '起点' : `第 ${pad(index)} 处`}</span>
                   <button className="route-card-button" type="button"
@@ -381,20 +393,25 @@ export function Play({
                     onClick={() => { setDetail(index); setPanel('detail'); }}>
                     {visibleCard ? <CardFace card={visibleCard} /> : <CardBack />}
                   </button>
-                  <span className={`stop-state ${item.revealed ? 'exposed' : ''}`}>
+                  <span className={`stop-state ${
+                    item.revealed || revealAll ? 'exposed' : ''}`}>
                     {item.revealed
                       ? <><Eye size={11} />{visibleCard?.number === 42 ? '终点已打出' : '已公开'}</>
-                      : <><LockKeyhole size={11} />暗置{item.sprintCount
+                      : revealAll
+                        ? <><Eye size={11} />终局公开</>
+                        : <><LockKeyhole size={11} />暗置{item.sprintCount
                         ? ` · 冲刺 ${item.sprintCount}` : ''}</>}
                   </span>
                 </div>;
               })}
-              {current !== 42 && <div className="next-stop"><span />
+              {!revealAll && current !== 42 && <div className="next-stop"><span />
                 <div><MapPin size={25} strokeWidth={1.2} /><small>下一处<br />藏身点</small></div>
                 <span>TO BE CONTINUED</span></div>}
             </div>
             <footer className="board-footer"><span><Route size={14} />
-              {isRunner
+              {revealAll
+                ? '终局已公开所有藏身点与附带冲刺牌。'
+                : isRunner
                 ? '暗置牌面只对你可见，对方只能看到牌背。'
                 : '只显示已公开信息；暗置牌不透露地点。'}</span>
               <small className="route-scroll-hint">左右滑动查看</small><span>00 ─── 42</span>
@@ -627,17 +644,19 @@ export function Play({
     </Modal>}
 
     {panel === 'detail' && detailView && <Modal
-      title={routeCardForViewer(detailView, role, peek)
-        ? `${pad(routeCardForViewer(detailView, role, peek)!.number)} 号藏身点`
+      title={detailCard
+        ? `${pad(detailCard.number)} 号藏身点`
         : '尚未公开的藏身点'}
       kicker="ROUTE DETAIL" onClose={() => setPanel(undefined)}>
       <div className="route-detail-card">
-        {routeCardForViewer(detailView, role, peek)
-          ? <CardFace card={routeCardForViewer(detailView, role, peek)!} />
+        {detailCard
+          ? <CardFace card={detailCard} />
           : <CardBack />}
       </div>
       <p>{detailView.revealed
         ? '该地点已经公开。'
+        : revealAll
+          ? '该地点在终局结算后公开。'
         : isRunner && peek
           ? '这是你的私密路线。追捕者只能看到牌背。'
           : '该地点号码不可见，只公开顺序及附带冲刺牌数量。'}</p>
