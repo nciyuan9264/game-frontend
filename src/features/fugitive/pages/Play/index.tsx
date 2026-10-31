@@ -129,6 +129,8 @@ export function Play({
   const myTurn = isMyTurn(data);
   const enabled = session.connection.status === 'connected' && !session.pending;
   const active = enabled && myTurn;
+  const canPlanSearch = !isRunner && myTurn
+    && ['marshalSearch', 'manhunt'].includes(phase);
   const current = lastPrivateHideout(data);
   const hidden = data.roomData.hiddenHideoutCount;
   const known = knownNumbers(data);
@@ -184,13 +186,14 @@ export function Play({
     }
   };
   const pickNumber = (number: number) => {
-    if (!active || isRunner || known.has(number)) return;
+    if (isRunner || known.has(number)) return;
     if (markMode) {
       setNotes(currentNotes => currentNotes.includes(number)
         ? currentNotes.filter(value => value !== number)
         : [...currentNotes, number]);
       return;
     }
+    if (!canPlanSearch) return;
     const limit = phase === 'manhunt' ? 1 : Math.max(1, hidden);
     setNumbers(currentNumbers => currentNumbers.includes(number)
       ? currentNumbers.filter(value => value !== number)
@@ -199,7 +202,7 @@ export function Play({
         : currentNumbers);
   };
   const submitSearch = () => {
-    if (!numbers.length) return;
+    if (!active || !canPlanSearch || !numbers.length) return;
     if (session.submit('game_search_hideouts', { numbers })) {
       setNumbers([]);
       setPanel(undefined);
@@ -273,7 +276,7 @@ export function Play({
       onClick={() => setPanel('choose')}>
       选择藏身点<ArrowRight size={17} /></button>
     : <button className="button green full" type="button"
-      disabled={!active || !['marshalSearch', 'manhunt'].includes(phase)}
+      disabled={!canPlanSearch}
       onClick={() => setPanel('notebook')}>
       <Search size={17} />{phase === 'manhunt' ? '继续最终追缉' : '打开推理手册'}</button>;
 

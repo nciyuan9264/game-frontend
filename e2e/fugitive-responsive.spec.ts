@@ -123,6 +123,50 @@ function gameSnapshot() {
   };
 }
 
+function marshalSearchSnapshot() {
+  const snapshot = gameSnapshot();
+  const marshal = { ...human, gameRole: 'marshal' };
+  const fugitive = { ...ai, gameRole: 'fugitive' };
+  return {
+    ...snapshot,
+    seq: 13,
+    view: {
+      fugitive: {
+        ...snapshot.view.fugitive,
+        playerData: {
+          [human.playerID]: { role: 'marshal', handCount: 2 },
+          [ai.playerID]: { role: 'fugitive', handCount: 4 },
+        },
+        hand: [
+          { number: 7, sprint: 1 },
+          { number: 17, sprint: 2 },
+        ],
+        roomData: {
+          ...snapshot.view.fugitive.roomData,
+          currentPlayer: human.playerID,
+          gameStatus: 'marshalSearch',
+          roundNo: 1,
+          route: [
+            {
+              index: 0,
+              revealed: true,
+              sprintCount: 0,
+              card: { number: 0, sprint: 0 },
+              sprints: [],
+            },
+            { index: 1, revealed: false, sprintCount: 0 },
+            { index: 2, revealed: false, sprintCount: 1 },
+          ],
+          players: {
+            [human.playerID]: marshal,
+            [ai.playerID]: fugitive,
+          },
+        },
+      },
+    },
+  };
+}
+
 function roomSnapshot() {
   return {
     schemaVersion: 2,
@@ -175,6 +219,7 @@ async function mockSession(
   page: Page,
   snapshot = gameSnapshot(),
   status: 'match' | 'playing' = 'playing',
+  commands: string[] = [],
 ) {
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
@@ -220,7 +265,9 @@ async function mockSession(
   }));
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(snapshot));
+    socket.onMessage(message => commands.push(String(message)));
   });
+  return commands;
 }
 
 async function mockLobby(page: Page, avatar = '') {
@@ -416,6 +463,33 @@ test('Fugitive mobile route and action dock fit 390x844', async ({ page }) => {
   await expect(page.getByRole('heading', { name: '前往 20 号藏身点' })).toBeVisible();
   await expectNoDocumentOverflow(page);
   expect(pageErrors).toEqual([]);
+});
+
+test('Fugitive marshal can select and submit a hideout search on mobile', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const commands = await mockSession(page, marshalSearchSnapshot());
+  await page.goto(`/game/fugitive/match?roomID=${roomID}`);
+
+  const openNotebook = page.getByTestId('fugitive-mobile-dock')
+    .getByRole('button', { name: '打开推理手册' });
+  await expect(openNotebook).toBeEnabled();
+  await openNotebook.click();
+
+  const notebook = page.getByRole('dialog', { name: '你的私密推理手册' });
+  await notebook.getByRole('button', { name: '搜查号码 5' }).click();
+  await notebook.getByRole('button', { name: '搜查所选 1 处' }).click();
+  await page.getByRole('dialog', { name: '锁定这个藏身点？' })
+    .getByRole('button', { name: '确认搜查' }).click();
+
+  await expect.poll(() => commands.map(command => JSON.parse(command))
+    .find(command => command.type === 'game_search_hideouts')).toMatchObject({
+    type: 'game_search_hideouts',
+    payload: {
+      fugitive: {
+        searchHideouts: { numbers: [5] },
+      },
+    },
+  });
 });
 
 test('Fugitive mobile result and final board controls stay aligned', async ({ page }) => {
