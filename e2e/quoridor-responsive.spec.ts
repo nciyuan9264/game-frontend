@@ -4,6 +4,7 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'quoridor_layout';
 const matchID = `${roomID}-r1`;
@@ -415,10 +416,10 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
   await page.goto(`/game/quoridor/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('result-page')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
-  const actions = page.locator('.result-certificate > .page-actions');
-  expect((await actions.boundingBox())?.height).toBe(66);
+  await expect(page.locator('.result-player-list article')).toHaveCount(2);
   await capture(page, testInfo, 'mobile-results');
 
   await page.getByRole('button', { name: '回看棋盘' }).click();

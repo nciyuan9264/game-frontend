@@ -1,18 +1,21 @@
 import {
-  ArrowRight,
-  Eye,
-  History,
   Trophy,
 } from 'lucide-react';
-import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { MiniBoard } from '../../components/Board';
+import { PlayerAvatar } from '../../components/AppShell';
 import { Bug } from '../../components/Artwork';
 import { sideName } from '../../model/board';
 import {
   playerLabel,
+  playerName,
   type GameSnapshot,
 } from '../../model/session';
 import { useHiveViewport } from '../../hooks/useHiveViewport';
+import { playerForSide } from '../../model/selectors';
 import type { Side } from '../../model/types';
 
 function Pressure({
@@ -34,12 +37,14 @@ function Pressure({
 export function Results({
   data,
   onViewBoard,
+  onLeave,
   onRestart,
   restarting = false,
   readOnly = false,
 }: {
   data: GameSnapshot;
   onViewBoard: () => void;
+  onLeave?: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
@@ -59,23 +64,39 @@ export function Results({
   const whitePressure = states.find(state => state.side === 'white')?.queenPressure ?? 0;
   const blackPressure = states.find(state => state.side === 'black')?.queenPressure ?? 0;
 
-  return <main className="hive-result-page" data-testid="result-page">
-    <header className="hive-result-heading">
+  return <GameFinalResult
+    className="hive-result-page"
+    testId="result-page"
+    mobileInset="self"
+    heroClassName="hive-result-heading"
+    contentClassName="hive-result-grid"
+    standingsClassName="hive-result-board"
+    summaryClassName="hive-result-summary"
+    actionsClassName="hive-result-actions"
+    hero={<>
       <span>THE LAST SHAPE OF THE HIVE</span>
       <div><Trophy size={31} /></div>
       <h1>{draw ? '同归一巢，胜负未分。' : '蜂巢合拢，胜局已定。'}</h1>
       <p>{draw
         ? result?.reason || '双方在同一局面中达成和棋。'
         : `${winner}获胜，${result?.reason || '对方蜂后已被围住。'}`}</p>
-    </header>
-    <div className="hive-result-grid">
-      {!isMobile && <section className="hive-result-board">
+    </>}
+    standings={!isMobile ? <>
         <header><span>终局蜂巢</span><small>只读快照</small></header>
         <MiniBoard stacks={data.roomData.stacks}
           lastAction={data.roomData.lastAction} />
-      </section>}
-      <section className="hive-result-summary">
-        <span>OUTCOME / FINAL PRESSURE</span>
+      </> : <div className="hive-result-players">{(['white', 'black'] as Side[]).map(side => {
+        const id = playerForSide(data, side);
+        const player = data.roomData.players[id];
+        return <article key={side} className={!draw && id === winnerID ? 'winner' : ''}>
+          <PlayerAvatar name={playerName(id, data.roomData.players)}
+            avatar={player?.avatar} ai={player?.ai} size={42} />
+          <div><strong>{playerLabel(id, data.roomData.players)}</strong>
+            <small>{sideName(side)} · {id === data.playerId ? '你' : '对手'}</small></div>
+          <b>{draw ? '和' : id === winnerID ? '胜' : '负'}</b>
+        </article>;
+      })}</div>}
+    summary={<><span>OUTCOME / FINAL PRESSURE</span>
         <h2>{draw ? '两只蜂后，同时被命运围住。' : `${sideName(winnerSide)}守住了自己的蜂后。`}</h2>
         <Pressure side="white" value={whitePressure} />
         <Pressure side="black" value={blackPressure} />
@@ -93,18 +114,13 @@ export function Results({
         </div>
         <p className="hive-result-reason">{result?.reason
           || '本局结果已由服务端确认。'}</p>
-        <ActionButton onClick={onViewBoard}><Eye size={15} />
-          {readOnly ? '回到回放棋盘' : '回看终局蜂巢'}</ActionButton>
-      </section>
-    </div>
-    <div className="hive-result-actions">
-      <ActionButton onClick={onViewBoard}><History size={16} />查看棋盘</ActionButton>
-      {!readOnly && (owner
-        ? <ActionButton variant="primary" pending={restarting}
-          disabled={!onRestart} onClick={() => void onRestart?.()}>
-          再来一局<ArrowRight size={17} /></ActionButton>
-        : <ActionButton variant="primary" disabled>
-          等待房主再来一局</ActionButton>)}
-    </div>
-  </main>;
+    </>}
+    actions={readOnly
+      ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
+          viewBoardLabel="回到回放棋盘" />
+      : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+          viewBoardLabel="回看终局蜂巢" onLeave={onLeave ?? onViewBoard}
+          canRestart={owner} onRestart={onRestart}
+          restartPending={restarting} />}
+  />;
 }

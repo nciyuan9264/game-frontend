@@ -4,6 +4,7 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'hex_layout';
 const matchID = `${roomID}-r1`;
@@ -305,6 +306,7 @@ test('Hex result returns to a compact final board', async ({
   await page.goto(`/game/hex/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('result-page')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.getByText('这一局最后的模样')).toHaveCount(0);
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
   await capture(page, testInfo, 'result-mobile-390x844');

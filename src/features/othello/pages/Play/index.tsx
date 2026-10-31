@@ -181,6 +181,7 @@ export function Play({
     return <Results
       data={data}
       onViewBoard={() => ui.setShowResults(false)}
+      onLeave={onLeave}
       onRestart={onStartNextMatch}
       restarting={startNextMatchPending}
     />;

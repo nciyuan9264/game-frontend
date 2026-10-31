@@ -1,4 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'cantstop_vfw7hms8fza5';
 const matchID = `${roomID}-r1`;
@@ -125,7 +126,7 @@ async function mockMatchRoom(page: Page) {
   });
 }
 
-function gameSnapshot() {
+function gameSnapshot(status: 'choose' | 'end' = 'choose') {
   const lastAction = {
     id: 1,
     kind: 'roll',
@@ -152,8 +153,8 @@ function gameSnapshot() {
         playerData: {
           [human.playerID]: {
             savedProgress: {},
-            claimedColumns: [],
-            savedStepCount: 0,
+            claimedColumns: status === 'end' ? [2, 3, 4] : [],
+            savedStepCount: status === 'end' ? 18 : 0,
             busts: 0,
           },
           [ai.playerID]: {
@@ -164,7 +165,7 @@ function gameSnapshot() {
           },
         },
         roomData: {
-          gameStatus: 'choose',
+          gameStatus: status,
           currentPlayer: human.playerID,
           nextPlayer: ai.playerID,
           turnNumber: 1,
@@ -207,12 +208,20 @@ function gameSnapshot() {
           },
           playerOrder: [human.playerID, ai.playerID],
         },
+        result: status === 'end' ? {
+          winnerID: human.playerID,
+          claimedColumns: [2, 3, 4],
+          turnCount: 12,
+          rollCount: 31,
+          bustCounts: { [human.playerID]: 0, [ai.playerID]: 2 },
+          reason: '占领三条路线，比赛结束。',
+        } : undefined,
       },
     },
   };
 }
 
-async function mockGameSession(page: Page) {
+async function mockGameSession(page: Page, snapshot = gameSnapshot()) {
   const commands: string[] = [];
   await mockPublic(page);
   await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({
@@ -242,7 +251,7 @@ async function mockGameSession(page: Page) {
     },
   }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(gameSnapshot()));
+    socket.send(JSON.stringify(snapshot));
     socket.onMessage(message => commands.push(String(message)));
   });
   return commands;
@@ -417,3 +426,13 @@ test('Cant Stop mobile choose phase keeps pairing controls visible',
     await expectNoOverflow(page);
     await capture(page, info, 'choose-mobile');
   });
+
+test('Cant Stop mobile final result uses the shared layout', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockGameSession(page, gameSnapshot('end'));
+  await page.goto(`/game/cantstop/match?roomID=${roomID}`);
+
+  await expectMobileFinalResultLayout(page);
+  await page.setViewportSize({ width: 320, height: 700 });
+  await expectMobileFinalResultLayout(page);
+});

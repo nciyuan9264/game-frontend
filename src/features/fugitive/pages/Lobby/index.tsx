@@ -37,7 +37,7 @@ import {
 } from '../../api/room';
 import {
   AppShell,
-  fugitiveThemeClassName,
+  fugitiveDialogThemeClassName,
   ProfileMonogram,
 } from '../../components/AppShell';
 import { FugitiveLoading } from '../../components/LoadingState';
@@ -266,11 +266,11 @@ export default function Lobby() {
         error={action.error && <p className="field-error"
           role="alert">{action.error}</p>}
         pending={action.pending} disabled={!profile.data}
-        themeClassName={fugitiveThemeClassName}
+        themeClassName={fugitiveDialogThemeClassName}
         onClose={close} onSubmit={() => void create()} />}
       {panel === 'share' && <GameMobileShareDialog gameName="Fugitive"
         url={FUGITIVE_PUBLIC_URL} color="#172c22" background="#eee8d8"
-        themeClassName={fugitiveThemeClassName} onClose={close} />}
+        themeClassName={fugitiveDialogThemeClassName} onClose={close} />}
       {panel === 'join' && <Modal title="通过房间号加入"
         kicker="FIND YOUR FRIENDS' TABLE" onClose={close}
         footer={<button className="button primary" type="button"

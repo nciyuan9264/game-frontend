@@ -1,5 +1,8 @@
-import { ArrowRight, Eye, RotateCcw, ShieldCheck, Trophy } from 'lucide-react';
-import { ActionButton } from '@/components/GameUI/ActionButton';
+import { ShieldCheck, Trophy } from 'lucide-react';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import hero from '../../assets/hero.webp';
 import { PlayerAvatar } from '../../components/AppShell';
 import { BrandMark, Eyebrow } from '../../components/Artwork';
@@ -8,10 +11,11 @@ import { playerLabel, playerName, type GameSnapshot } from '../../model/session'
 import { winnerIDs } from '../../model/selectors';
 import styles from './index.module.less';
 
-export function Results({ session, data, onViewBoard, onRestart, restarting = false, readOnly = false }: {
+export function Results({ session, data, onViewBoard, onLeave, onRestart, restarting = false, readOnly = false }: {
   session?: SplendorSession;
   data: GameSnapshot;
   onViewBoard: () => void;
+  onLeave?: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
@@ -27,17 +31,27 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
   const winnerNames = players.filter(([id]) => winners.includes(id))
     .map(([id]) => playerLabel(id, data.roomData.players)).join('、');
   const topScore = players[0] ? data.result?.[players[0][0]]?.score ?? data.playerData[players[0][0]]?.score ?? 0 : 0;
+  const self = data.result?.[data.playerId];
 
-  return <div className={styles.results} data-testid="splendor-results">
+  return <div className={styles.results}>
     <header className={styles.topbar} data-game-result-topbar>
       <span className={styles.brand}><BrandMark size={25} /><span><b>SPLENDOR</b><small>璀 璨 宝 石 · 商 会</small></span></span>
       <span className={styles.spacer} /><em>{readOnly ? '只读回放 · 最终结算' : '对局结算'}</em></header>
-    <main className={styles.page}><section className={styles.celebration}><img src={hero} alt="暮色中的文艺复兴宝石商港" />
+    <GameFinalResult
+      className={styles.page}
+      testId="splendor-results"
+      mobileInset="self"
+      heroClassName={styles.celebration}
+      contentClassName={styles.resultContent}
+      standingsClassName={styles.summary}
+      summaryClassName={styles.personalSummary}
+      actionsClassName={styles.actions}
+      hero={<><img src={hero} alt="暮色中的文艺复兴宝石商港" />
       <i /><div><Eyebrow>THE ART OF PROSPERITY</Eyebrow><Trophy size={48} strokeWidth={1.2} />
         <h1>{won ? '荣耀，属于你的远见。' : '每一次选择，都有回响。'}</h1>
         <p>{winnerNames || '收藏家'} {winners.length > 1 ? '共同赢得' : '赢得'}本次商会</p>
-        <strong>{topScore}<small>最终声望</small></strong></div></section>
-      <section className={styles.summary}><header><div><Eyebrow>THE FINAL COLLECTION</Eyebrow><h2>这一局的璀璨</h2></div>
+        <strong>{topScore}<small>最终声望</small></strong></div></>}
+      standings={<><header><div><Eyebrow>THE FINAL COLLECTION</Eyebrow><h2>这一局的璀璨</h2></div>
         <span>第 {Math.max(1, data.turnNumber)} 轮 · 已完成</span></header>
         <div className={styles.table} data-testid="splendor-results-table">
           <div className={`${styles.row} ${styles.tableHead}`} data-testid="splendor-results-header">
@@ -54,11 +68,19 @@ export function Results({ session, data, onViewBoard, onRestart, restarting = fa
             </div>;
           })}</div>
         <p className={styles.note}><ShieldCheck size={15} />同分时发展卡更少者优先；仍相同则共享胜利。</p>
-        <div className={styles.actions} data-testid="splendor-results-actions">
-          <ActionButton onClick={onViewBoard}><Eye size={16} />查看终局牌面</ActionButton>
-          {!readOnly && owner && session && onRestart && <ActionButton variant="primary"
-            disabled={!!session.pending || restarting} onClick={() => { void onRestart(); }}>
-            <RotateCcw size={16} />再来一局<ArrowRight size={17} /></ActionButton>}</div>
-      </section></main>
+      </>}
+      summary={<><Eyebrow>YOUR FINAL COLLECTION</Eyebrow><h2>你的收藏小结</h2>
+        <div><span><b>{self?.score ?? data.playerData[data.playerId]?.score ?? 0}</b><small>总声望</small></span>
+          <span><b>{self?.cards ?? data.playerData[data.playerId]?.normalCard.length ?? 0}</b><small>发展卡</small></span>
+          <span><b>{self?.nobles ?? data.playerData[data.playerId]?.nobleCard.length ?? 0}</b><small>贵族</small></span></div>
+      </>}
+      actions={readOnly
+        ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
+            viewBoardLabel="回到回放牌面" />
+        : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+            viewBoardLabel="查看终局牌面" onLeave={onLeave ?? onViewBoard}
+            canRestart={owner} onRestart={onRestart}
+            restartPending={restarting} restartDisabled={!!session?.pending} />}
+    />
   </div>;
 }

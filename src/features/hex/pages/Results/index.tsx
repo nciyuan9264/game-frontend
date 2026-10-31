@@ -1,5 +1,8 @@
-import { ArrowRight, Eye, Trophy } from 'lucide-react';
-import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Trophy } from 'lucide-react';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Stone } from '../../components/Artwork';
 import { direction, sideName } from '../../model/board';
@@ -9,12 +12,14 @@ import styles from './index.module.less';
 export function Results({
   data,
   onViewBoard,
+  onLeave,
   onRestart,
   restarting = false,
   readOnly = false,
 }: {
   data: GameSnapshot;
   onViewBoard: () => void;
+  onLeave?: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
@@ -30,12 +35,20 @@ export function Results({
     ? data.roomData.playerOrder
     : Object.keys(data.roomData.players);
 
-  return <div className={styles.page} data-testid="result-page"><header>
+  return <GameFinalResult
+    className={styles.page}
+    testId="result-page"
+    mobileInset="self"
+    heroClassName={styles.hero}
+    standingsClassName={styles.result}
+    summaryClassName={styles.summary}
+    actionsClassName={styles.actions}
+    hero={<><header>
     <span>THE FINAL CONNECTION</span>
     <h1>{resigned ? '此局，落定。' : '两岸，终于相连。'}</h1>
     <p>{data.result?.reason || '结果已由服务端确认。'}</p>
-  </header>
-    <section className={styles.result}><div className={styles.seal}>
+  </header></>}
+    standings={<><div className={styles.seal}>
       <Trophy size={36} /><div><Stone side={winnerSide} />
         <span>{sideName(winnerSide)}</span><Stone side={winnerSide} /></div></div>
       <h2>{winner}，{resigned ? '赢得这一局。' : direction(winnerSide)}</h2>
@@ -51,14 +64,15 @@ export function Results({
           <b>{state?.stoneCount ?? 0}<small> 子</small></b>
         </article>;
       })}</div>
-      <p className={styles.caption}>连接不必笔直，抵达自有方向。</p></section>
-    <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
-      {readOnly ? '回到回放棋盘' : '查看终局棋盘'}</ActionButton>
-      {!readOnly && (owner
-        ? <ActionButton variant="primary" pending={restarting}
-          disabled={!onRestart} onClick={() => void onRestart?.()}>
-          再来一局<ArrowRight size={16} /></ActionButton>
-        : <ActionButton variant="primary" disabled>
-          等待房主再来一局</ActionButton>)}</footer>
-  </div>;
+      <p className={styles.caption}>连接不必笔直，抵达自有方向。</p></>}
+    summary={<><span>WINNING CONNECTION</span><h3>{sideName(winnerSide)} · {direction(winnerSide)}</h3>
+      <p>{data.result?.reason || '结果已由服务端确认。'}</p></>}
+    actions={readOnly
+      ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
+          viewBoardLabel="回到回放棋盘" />
+      : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+          viewBoardLabel="查看终局棋盘" onLeave={onLeave ?? onViewBoard}
+          canRestart={owner} onRestart={onRestart}
+          restartPending={restarting} />}
+  />;
 }

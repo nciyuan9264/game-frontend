@@ -22,5 +22,6 @@
 }
 @media(max-width:767px){
  .loveletter-root .ll-results{padding-top:14px}
+ .loveletter-root .ll-final-results{padding:0}
  .loveletter-root .ll-results>[data-game-result-topbar]{display:none}
 }

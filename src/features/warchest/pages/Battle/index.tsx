@@ -36,6 +36,7 @@ import {
   type UnitId,
 } from '../../model';
 import { Board } from '../../components/Board';
+import { Results } from '../Results';
 import {
   ACTION_GROUPS,
   ACTION_HINTS,
@@ -65,6 +66,7 @@ interface Props {
   onResign?: () => boolean;
   onLeave?: () => void;
   onRematch?: () => void;
+  canRematch?: boolean;
   rematchPending?: boolean;
   revealHands?: boolean;
   mobileHeading?: ReactNode;
@@ -100,6 +102,7 @@ export function Battle({
   onResign,
   onLeave,
   onRematch,
+  canRematch = false,
   rematchPending = false,
   revealHands = false,
   mobileHeading,
@@ -117,7 +120,8 @@ export function Battle({
   const [selectedKeys, setSelectedKeys] = useState<string[]>([]);
   const [plan, setPlan] = useState<Plan>();
   const [inspect, setInspect] = useState<UnitId>(self.roster[0] ?? 'sword');
-  const [panel, setPanel] = useState<'unit' | 'bag' | 'enemy-bag' | 'pile' | 'log' | 'rules' | 'more' | 'recruit' | 'menu' | 'result'>();
+  const [panel, setPanel] = useState<'unit' | 'bag' | 'enemy-bag' | 'pile' | 'log' | 'rules' | 'more' | 'recruit' | 'menu'>();
+  const [showResults, setShowResults] = useState(game.phase === 'end');
   const [pileSide, setPileSide] = useState<Side>(game.selfSide);
   const [notice, setNotice] = useState('');
   const [recruit, setRecruit] = useState<UnitId>();
@@ -168,7 +172,8 @@ export function Battle({
     return () => window.clearTimeout(timer);
   }, [notice]);
   useEffect(() => {
-    if (game.phase === 'end') setPanel('result');
+    if (game.phase === 'end') setShowResults(true);
+    else setShowResults(false);
   }, [game.phase]);
 
   const selectCoin = (coinID: string) => {
@@ -241,6 +246,14 @@ export function Battle({
   const end = game.phase === 'end';
   const playerScore = (side: Side) => score(game, side);
 
+  if (end && showResults) {
+    return <div className="warchest-root">
+      <Results game={game} onViewBoard={() => setShowResults(false)}
+        onLeave={() => onLeave?.()} canRestart={canRematch}
+        onRestart={onRematch} restartPending={rematchPending} />
+    </div>;
+  }
+
   return <MotionConfig reducedMotion={reducedMotion ? 'always' : 'never'}>
     <div className={`warchest-root battle-app ${myTurn ? 'is-your-turn' : ''}`}
       data-testid="warchest-battle" data-round={game.round} data-phase={game.phase}>
@@ -260,7 +273,7 @@ export function Battle({
           {end
             ? <button className="icon-button" type="button" aria-label="打开终局结算"
               title="打开终局结算"
-              onClick={() => setPanel('result')}><Trophy size={19} /></button>
+              onClick={() => setShowResults(true)}><Trophy size={19} /></button>
             : <button className="icon-button" type="button" aria-label="打开对局菜单"
               title="打开对局菜单"
               onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>}
@@ -275,7 +288,7 @@ export function Battle({
           onClick={() => setPanel('rules')}><BookOpen size={19} /></button>
         {end
           ? <button className="icon-button" type="button" aria-label="打开终局结算"
-            onClick={() => setPanel('result')}><Trophy size={19} /></button>
+            onClick={() => setShowResults(true)}><Trophy size={19} /></button>
           : <button className="icon-button" type="button" aria-label="打开对局菜单"
             onClick={() => setPanel('menu')}><MoreHorizontal size={21} /></button>}
         {!end && <span className="battle-timer"><Clock3 size={13} />
@@ -455,19 +468,6 @@ export function Battle({
           onClick={() => { if (onResign()) setPanel(undefined); }}>认输本局</button>}
       </Modal>}
 
-      {panel === 'result' && end && <Modal title={game.winner === game.selfSide
-        ? '六面旗帜，见证你的远见。' : '战局已定，下次再战。'}
-        eyebrow={game.winner === game.selfSide ? 'VICTORY · THE FIELD IS YOURS' : 'A BATTLE WELL FOUGHT'}
-        onClose={() => setPanel(undefined)} className="victory-modal game-result-modal"
-        footer={<><button className="button secondary" type="button" onClick={() => setPanel(undefined)}>回到棋盘</button>
-          {onRematch && <button className="button primary" type="button" disabled={rematchPending}
-            onClick={onRematch}>{rematchPending ? '正在建立下一局' : '再来一局'}<ArrowRight size={16} /></button>}</>}>
-        <div className="victory-emblem"><Crest side={game.winner ?? 0} size={101} /><Trophy size={27} /></div>
-        <div className="victory-six-flags">{Array.from({ length: 6 }, (_, index) => <span key={index}><Flag size={17} /></span>)}</div>
-        <div className="victory-result"><span>橡木军团</span><b>{playerScore(0)} <small>:</small> {playerScore(1)}</b><span>赤隼军团</span></div>
-        <p>最后一枚控制标记落下，对局立即结束。</p><div className="result-stats"><div><b>{game.round}</b><span>结束轮次</span></div>
-          <div><b>{game.actions}</b><span>本次行动</span></div><div><b>6</b><span>获胜据点</span></div></div>
-      </Modal>}
     </div>
   </MotionConfig>;
 }

@@ -87,7 +87,9 @@ export function Play({ data, session, interaction, onLeave, onStartNextMatch, st
     resultsAction: end ? <ActionButton variant="primary" aria-label="查看本局结算" onClick={() => setPanel('results')}><Trophy size={16} />查看结算</ActionButton> : undefined,
     boardTools: <div className={styles.boardTools}><button className={styles.zoomButton} onClick={() => setPanel('zoom')}><Maximize2 size={13} />放大棋盘</button></div> };
   if (end && (panel === 'results' || panel === 'restart')) return <><Results data={data} enabled={interaction.enabled} onClose={() => setPanel(undefined)}
-    onLeave={onLeave} onRestart={data.ownerID === data.playerId && onStartNextMatch ? () => setPanel('restart') : undefined} />
+    onLeave={onLeave} restartPending={startNextMatchPending}
+    canRestart={data.ownerID === data.playerId}
+    onRestart={data.ownerID === data.playerId && onStartNextMatch ? () => setPanel('restart') : undefined} />
     {panel === 'restart' && <ResponsiveDialog title="重新开局" onClose={() => setPanel('results')}
       footer={<><ActionButton onClick={() => setPanel('results')}>取消</ActionButton><ActionButton variant="primary"
         disabled={!interaction.enabled || startNextMatchPending} onClick={() => {

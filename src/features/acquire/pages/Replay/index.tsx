@@ -78,7 +78,8 @@ function ReplayContent({ gameID }: { gameID: number }) {
     }
   };
   if (panel === 'score' && finalDisplay) return <AppShell inMatch title="本局结算" profile={replay.profile} hideHeader hideRail>
-    <Results data={{ ...finalDisplay, roomID: replay.detail?.game.roomID }} enabled={false} onClose={() => setPanel(undefined)} />
+    <Results readOnly data={{ ...finalDisplay, roomID: replay.detail?.game.roomID }}
+      enabled={false} onClose={() => setPanel(undefined)} />
   </AppShell>;
   return <AppShell inMatch title="对局回放" profile={replay.profile} hideHeader hideRail><div
     className={`${styles.page} ${tab === 'economy' ? styles.economyPage : ''}`}>

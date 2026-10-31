@@ -1,4 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'sixnimmt_layout';
 const matchID = `${roomID}-r1`;
@@ -158,12 +159,12 @@ test('Six Nimmt mobile results omit the game topbar', async ({ page }) => {
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
 
   await expect(page.locator('.sn-results')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
   await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
-  await expect(page.locator('.sn-mobile-result-review')).toBeVisible();
+  await expect(page.locator('[data-game-final-result-action="view"]')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator('[data-game-result-topbar]')).toBeVisible();
-  await expect(page.locator('.sn-mobile-result-review')).toBeHidden();
 });
 
 test('Six Nimmt round results can return from the final table', async ({ page }) => {
@@ -172,6 +173,7 @@ test('Six Nimmt round results can return from the final table', async ({ page })
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
 
   await expect(page.locator('.sn-results')).toBeVisible();
+  await expect(page.locator('[data-game-final-result]')).toHaveCount(0);
   await page.getByRole('button', { name: '查看终局牌桌' }).click();
   await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
 

@@ -94,6 +94,7 @@ export function Play({
 
   if (ended && ui.showResults) {
     return <Results data={data} onViewBoard={() => ui.setShowResults(false)}
+      onLeave={onLeave}
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
   const status = session.pending ? '等待服务端确认'

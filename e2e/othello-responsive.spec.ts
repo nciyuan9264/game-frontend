@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'othello_layout';
 const matchID = `${roomID}-r1`;
@@ -241,17 +242,11 @@ test('Othello mobile final result returns through the timer slot', async ({
   await page.goto(`/game/othello/match?roomID=${roomID}`);
 
   await expect(page.getByRole('button', { name: '回到棋盘' })).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.getByRole('button', { name: '再来一局' })).toBeVisible();
-  await expect(page.getByRole('button', { name: /返回大厅/ })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '回到大厅' })).toBeVisible();
   const scoreNote = page.getByText('终局实际子数 · 空格不补计分');
-  const ratio = scoreNote.locator('xpath=preceding-sibling::div[1]');
-  const [ratioBox, scoreNoteBox] = await Promise.all([
-    ratio.boundingBox(),
-    scoreNote.boundingBox(),
-  ]);
-  expect(ratioBox).not.toBeNull();
-  expect(scoreNoteBox).not.toBeNull();
-  expect(scoreNoteBox!.y - (ratioBox!.y + ratioBox!.height)).toBeGreaterThanOrEqual(12);
+  await expect(scoreNote).toBeVisible();
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
   await page.screenshot({
     path: testInfo.outputPath('othello-mobile-results.png'),

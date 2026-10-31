@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'warchest_layout';
 const matchID = `${roomID}-r1`;
@@ -627,10 +628,9 @@ test('War Chest final board keeps history and results without the live menu', as
   await mockSession(page, endedSnapshot());
   await page.goto(`/game/warchest/match?roomID=${roomID}`);
 
-  await expect(page.getByRole('dialog', {
-    name: '六面旗帜，见证你的远见。',
-  })).toBeVisible();
-  await page.getByRole('button', { name: '回到棋盘' }).click();
+  await expect(page.getByTestId('warchest-results')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
+  await page.getByRole('button', { name: '回到终局棋盘' }).click();
 
   await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
   await expect(page.locator('.battle-header')).toBeHidden();
@@ -646,9 +646,8 @@ test('War Chest final board keeps history and results without the live menu', as
   await expectNoOverflow(page);
 
   await page.getByRole('button', { name: '打开终局结算' }).click();
-  await expect(page.getByRole('dialog', {
-    name: '六面旗帜，见证你的远见。',
-  })).toBeVisible();
+  await expect(page.getByTestId('warchest-results')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
 });
 
 test('War Chest desktop keeps board, factions, and intelligence visible', async ({ page }) => {

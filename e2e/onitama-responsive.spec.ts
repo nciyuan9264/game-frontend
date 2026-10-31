@@ -4,6 +4,7 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'onitama_layout';
 const matchID = `${roomID}-r1`;
@@ -438,6 +439,7 @@ test('Onitama results return to a compact final board', async ({
   await page.goto(`/game/onitama/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('result-page')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.locator('.result-art')).toHaveCount(0);
   await expect(page.locator('.result-copy')).toHaveCSS('text-align', 'center');
   const resultTitle = page.getByRole('heading', {

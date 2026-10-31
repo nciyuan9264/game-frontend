@@ -1,4 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'loveletter_layout';
 const matchID = `${roomID}-r1`;
@@ -369,10 +370,22 @@ test('Love Letter mobile results omit the game topbar', async ({ page }) => {
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
 
   await expect(page.locator('.ll-results')).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
   await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
-  await expect(page.locator('.ll-mobile-result-review')).toBeVisible();
+  await expect(page.locator('[data-game-final-result-action="view"]')).toBeVisible();
   await page.setViewportSize({ width: 1440, height: 900 });
   await expect(page.locator('[data-game-result-topbar]')).toBeVisible();
-  await expect(page.locator('.ll-mobile-result-review')).toBeHidden();
+});
+
+test('Love Letter round result keeps its own layout', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('roundEnd'));
+  await page.goto(`/game/loveletter/match?roomID=${roomID}`);
+
+  await expect(page.locator('.ll-results')).toBeVisible();
+  await expect(page.locator('[data-game-final-result]')).toHaveCount(0);
+  await expect(page.getByRole('button', {
+    name: '下一轮，继续传信',
+  })).toBeVisible();
 });

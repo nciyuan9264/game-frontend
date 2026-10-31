@@ -29,7 +29,7 @@ import {
   fugitiveRoomInviteURL,
 } from '../../model/adapters';
 import {
-  fugitiveThemeClassName,
+  fugitiveDialogThemeClassName,
   ProfileMonogram,
 } from '../../components/AppShell';
 import type { FugitiveSession } from '../../hooks/useFugitiveSession';
@@ -98,12 +98,12 @@ export function Room({
   const getPlayerName = (playerID: string) =>
     playerDisplayName(data.players[playerID], playerID);
   const renderMobileAvatar = (
-    player: { name: string; avatar?: string },
+    player: { name: string; avatar?: string; ai?: boolean },
     _size: number,
   ) => <ProfileMonogram profile={{
     name: player.name,
     avatar: player.avatar,
-  }} className="avatar" />;
+  }} ai={player.ai} className="avatar" />;
 
   if (isMobile) {
     const rolePicker = owner
@@ -133,13 +133,6 @@ export function Room({
           ?? (index === data.players[data.ownerID]?.seatIndex
             ? hostRole : otherRole(hostRole)))}
         renderAvatar={renderMobileAvatar}
-        renderSeatDecoration={(player, index) => {
-          const role = data.players[player.id]?.gameRole
-            ?? (index === data.players[data.ownerID]?.seatIndex
-              ? hostRole : otherRole(hostRole));
-          return role === 'fugitive'
-            ? <Footprints size={18} /> : <Shield size={18} />;
-        }}
         copy={{
           kicker: 'BEFORE THE CHASE · 房间号',
           gameLabel: '二版基础规则',
@@ -199,7 +192,7 @@ export function Room({
           { icon: <Shield />, label: '追捕者', value: '找出全部' },
         ]}
         startHint="逃亡者先放置 1–2 个藏身点，追捕者随后抽取两张线索并开始搜查。"
-        themeClassName={fugitiveThemeClassName}
+        themeClassName={fugitiveDialogThemeClassName}
         onVisibilityChange={setVisibility}
         onCopyRoomID={() => void copy(data.roomID, '房间号已复制')}
         onCopyInviteURL={() => void copy(inviteURL, '邀请链接已复制')}

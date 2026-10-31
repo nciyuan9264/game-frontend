@@ -1,9 +1,11 @@
 import {
   ArrowLeft,
-  ArrowRight,
   Check,
-  Eye,
 } from 'lucide-react';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import {
   Eyebrow,
   Portrait,
@@ -73,19 +75,24 @@ export function Results({
         <span className="pill">已完成</span>
       </header>
     </div>
-    <main className="result-page">
-      <div className="result-art"><Scene index={result.winnerRole === 'fugitive' ? 5 : 3} />
+    <GameFinalResult
+      className="result-page"
+      mobileInset="self"
+      heroClassName="result-hero"
+      standingsClassName="result-summary result-standings"
+      summaryClassName="result-summary result-detail"
+      actionsClassName="result-dock"
+      hero={<><div className="result-art"><Scene index={result.winnerRole === 'fugitive' ? 5 : 3} />
         <span className="result-stamp">{result.winnerRole === 'fugitive'
           ? 'ESCAPED' : 'CASE CLOSED'}</span></div>
-      <section className="result-title">
+      <div className="result-title">
         <Eyebrow>{won ? 'A NIGHT TO REMEMBER' : 'UNTIL THE NEXT CHASE'}</Eyebrow>
         <h1>{result.winnerRole === 'fugitive'
           ? '消失在城市尽头。' : '这场追逐，到此为止。'}</h1>
         <p>{won ? '你赢了' : '本局未能获胜'} · {names[result.winnerRole]}
           {result.winnerRole === 'fugitive' ? '逃亡成功' : '追捕成功'}</p>
-      </section>
-      <section className="result-summary">
-        <div className="section-heading"><h2>这一局的追逐</h2>
+      </div></>}
+      standings={<><div className="section-heading"><h2>这一局的追逐</h2>
           <span className="pill">第 {data.roomData.roundNo} 回合</span></div>
         <div className="result-player-list">
           {(['fugitive', 'marshal'] as const).map(item =>
@@ -98,22 +105,21 @@ export function Results({
                 : item === 'fugitive' ? '未能逃脱' : '未能抓获'}</strong>
             </div>)}
         </div>
+      </>}
+      summary={<><span className="eyebrow">THE CHASE IN NUMBERS</span>
         <div className="result-stats">
           <div><b>{routeCount}</b><span>途经地点</span></div>
           <div><b>{revealedCount}</b><span>已公开地点</span></div>
           <div><b>{result.searches}</b><span>搜查次数</span></div>
         </div>
         <p className="result-explanation">{reasonText(result.reason, result.winnerRole)}</p>
-        <button className="text-button review-board" type="button" onClick={onReview}>
-          <Eye size={15} />查看终局牌桌<ArrowRight size={14} /></button>
-      </section>
-    </main>
-    <footer className="result-dock"><div>
-      <button className="button secondary" type="button" onClick={onExit}>回到大厅</button>
-      <button className="button primary" type="button"
-        disabled={rematchPending} onClick={onRematch}>
-        {rematchPending ? '正在准备…' : '再来一局'}<ArrowRight size={16} /></button>
-    </div><small>续局保留房间设置，房主可重新选择双方身份。</small>
-    </footer>
+      </>}
+      actions={<GameFinalResultActions mode="live"
+        onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
+        onLeave={onExit} canRestart={data.ownerID === data.playerId}
+        onRestart={onRematch} restartPending={rematchPending} />}
+      footerNote="续局保留房间设置，房主可重新选择双方身份。"
+      footerNoteClassName="result-note"
+    />
   </div>;
 }

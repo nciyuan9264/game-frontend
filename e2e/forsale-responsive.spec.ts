@@ -4,6 +4,7 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'forsale_kq1n52s1wwnm';
 const matchID = `${roomID}-r1`;
@@ -504,6 +505,7 @@ test('For Sale results support tied winners and final-table review',
     await mockSession(page, 3, saleSnapshot('end'));
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.getByTestId('forsale-results')).toBeVisible();
+    await expectMobileFinalResultLayout(page);
     await expect(page.getByText('好买卖，并肩赢。')).toBeVisible();
     await expect(page.getByText('$70,000').first()).toBeVisible();
     await capture(page, info, 'results-mobile');

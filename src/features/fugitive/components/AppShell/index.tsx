@@ -2,6 +2,7 @@ import { useState, type ReactNode } from 'react';
 import { NavLink, useLocation, useNavigate } from 'react-router-dom';
 import {
   ArrowLeft,
+  Bot,
   BookOpen,
   Check,
   ChevronDown,
@@ -62,15 +63,19 @@ export function FugitiveRoot({
 export function ProfileMonogram({
   profile,
   className = '',
+  ai = false,
 }: {
   profile?: Pick<AuthProfile, 'name'> & { avatar?: AuthProfile['avatar'] };
   className?: string;
+  ai?: boolean;
 }) {
   const value = Array.from(profile?.name.trim() || '追').slice(0, 1).join('');
-  return <span className={`${className} profile-monogram`} aria-hidden="true">
+  return <span className={`${className} profile-monogram ${
+    ai ? 'ai-avatar' : ''}`} data-fugitive-ai-avatar={ai || undefined}
+    aria-hidden="true">
     {profile?.avatar
       ? <img src={profile.avatar} alt="" referrerPolicy="no-referrer" />
-      : value}
+      : ai ? <Bot /> : value}
   </span>;
 }
 

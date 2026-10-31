@@ -4,6 +4,7 @@ import {
   type Page,
   type TestInfo,
 } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'hive_layout';
 const matchID = `${roomID}-r1`;
@@ -387,10 +388,9 @@ test('Hive mobile results return to a compact final board', async ({
   await page.goto(`/game/hive/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('result-page')).toBeVisible();
-  await expect(page.locator('.hive-result-board')).toHaveCount(0);
+  await expectMobileFinalResultLayout(page);
+  await expect(page.locator('.hive-result-players article')).toHaveCount(2);
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
-  expect((await page.locator('.hive-result-actions').boundingBox())?.height)
-    .toBe(66);
   await page.getByRole('button', { name: '回看终局蜂巢' }).click();
   const board = page.getByRole('group', { name: '无边界六边形棋盘' });
   await expect(board).toBeVisible();

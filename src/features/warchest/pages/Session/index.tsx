@@ -97,6 +97,7 @@ function Session({ roomID }: { roomID: string }) {
       onAction={actionID => session.submit('game_play_action', { actionID })}
       onResign={() => session.submit('game_resign')}
       onLeave={leave.request}
+      canRematch={snapshot.ownerID === snapshot.playerId}
       onRematch={() => { void nextMatch.start(); }}
       rematchPending={nextMatch.pending} />}
     {leave.visible && <div className="warchest-root warchest-modal-root"><Modal

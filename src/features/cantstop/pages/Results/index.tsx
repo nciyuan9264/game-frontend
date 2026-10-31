@@ -1,11 +1,12 @@
 import {
   ArrowLeft,
-  ArrowRight,
   Eye,
-  History,
   Trophy,
 } from 'lucide-react';
-import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
 import {
   claimedCount,
@@ -45,15 +46,20 @@ export function Results({
       <button type="button" onClick={onReview}>
         <Eye size={15} />查看终局棋盘</button>
     </header>
-    <section className="cs-result-hero"><div><Bull size={42} /><Trophy size={30} /></div>
+    <GameFinalResult
+      mobileInset="self"
+      heroClassName="cs-result-hero"
+      contentClassName="cs-result-layout"
+      standingsClassName="cs-result-board"
+      summaryClassName="cs-result-detail"
+      actionsClassName="cs-result-actions"
+      hero={<><div><Bull size={42} /><Trophy size={30} /></div>
       <small>THREE SUMMITS. ONE GREAT ADVENTURE.</small>
       <h1>{won ? '这一次，山顶属于你。' : '这一次，有人先登顶。'}</h1>
       <p>{playerLabel(winnerID, data.roomData.players)} 率先占领三条路线。</p>
       <span><Trophy size={14} />{data.result?.reason ?? '占领三条路线，比赛结束。'}</span>
-    </section>
-
-    <div className="cs-result-layout"><section className="cs-result-board">
-      <header><h2>最终登顶榜</h2>
+    </>}
+      standings={<><header><h2>最终登顶榜</h2>
         <small><Bull size={12} />占领路线越多越好</small></header>
       <div className="cs-score-head"><span>排名 / 玩家</span>
         <span>登顶路线</span><span>保存步数</span></div>
@@ -69,8 +75,8 @@ export function Results({
           <strong>{claimedCount(data, id)} / 3</strong>
           <span className="cs-route-score">{savedStepCount(data.playerData[id])}</span>
         </article>;
-      })}</section>
-      <aside className="cs-result-detail"><span className="cs-eyebrow">YOUR CLIMB</span>
+      })}</>}
+      summary={<><span className="cs-eyebrow">YOUR CLIMB</span>
         <h2>你的山路小结。</h2>
         <div><span><b>{claimedCount(data, data.playerId)}</b>
           <small>占领路线</small></span>
@@ -80,14 +86,12 @@ export function Results({
           .map(column => <span key={column}><Bull size={18} /><b>{column}</b>
             <small>已封列</small></span>)}</div>
         <p>获胜路线：{formatColumns(data.result?.claimedColumns ?? [])}。失手次数由服务端记录在历史结果中。</p>
-      </aside></div>
-
-    <footer className="cs-result-actions">
-      <ActionButton onClick={onExit}><History size={15} />回到大厅</ActionButton>
-      <ActionButton onClick={onReview}><Eye size={15} />查看棋盘</ActionButton>
-      {owner && <ActionButton variant="primary" pending={rematchPending}
-        disabled={!enabled} onClick={onRematch}>再来一场<ArrowRight size={16} /></ActionButton>}
-      {!owner && <span>本场已经结束</span>}
-    </footer>
+      </>}
+      actions={<GameFinalResultActions mode="live"
+        onViewBoard={onReview} viewBoardLabel="查看终局棋盘"
+        onLeave={onExit} canRestart={owner} onRestart={onRematch}
+        restartLabel="再来一场" restartPending={rematchPending}
+        restartDisabled={!enabled} />}
+    />
   </div>;
 }

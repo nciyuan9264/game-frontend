@@ -1,4 +1,5 @@
 import { expect, test, type Locator, type Page } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'davinci_mobilelayout';
 const matchID = `${roomID}-r1`;
@@ -325,6 +326,7 @@ test('DaVinci final board can reopen the results panel on mobile', async ({ page
   await expect(page.locator('canvas')).toBeVisible();
   publish(endedSnapshot());
   await expect(page.getByRole('heading', { name: '你破解了这组密码。' })).toBeVisible();
+  await expectMobileFinalResultLayout(page);
   await page.getByRole('button', { name: '查看终局牌面' }).click();
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await expect(page.locator('header').first()).toHaveCSS('height', '57px');
@@ -336,7 +338,7 @@ test('DaVinci final board can reopen the results panel on mobile', async ({ page
   await page.setViewportSize({ width: 356, height: 783 });
   await expect(page.getByRole('button', { name: '打开终局结算' })).toBeVisible();
   await expect.poll(() => topbarActions.evaluateAll(buttons =>
-    buttons.map(button => button.getBoundingClientRect().height))).toEqual([31, 31]);
+    buttons.map(button => button.getBoundingClientRect().height))).toEqual([34, 34]);
   await expectNoHorizontalOverflow(page);
 
   await page.getByRole('button', { name: '打开终局结算' }).click();

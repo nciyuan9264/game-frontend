@@ -8,7 +8,8 @@
   small { display:block; margin-top:5px; color:#917e67; font-size:6px; letter-spacing:1.5px; }
 }
 .page { display:grid; max-width:1300px; grid-template-columns:42% minmax(0,1fr); align-items:stretch; gap:33px; margin:0 auto; padding:48px 35px 38px; }
-.celebration { position:relative; min-height:623px; overflow:hidden; border-radius:7px; background:#543337;
+.resultContent { min-width:0; grid-column:2; }
+.celebration { position:relative; min-height:623px; grid-row:1 / span 2; overflow:hidden; border-radius:7px; background:#543337;
   > img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; object-position:67% center; }
   > i { position:absolute; inset:0; background:linear-gradient(180deg,#492b32a1,#472734cc 50%,#3d2330ed); }
   > div { position:relative; z-index:1; display:flex; height:100%; align-items:center; flex-direction:column; padding:39px 34px 33px; color:#e6c493; text-align:center; }
@@ -40,7 +41,8 @@
 .mine { background:#f1e2da; }
 .summary > .note { display:flex; align-items:flex-start; gap:7px; margin-top:20px; color:#a38a65; font-size:11px; line-height:1.9; }
 .note svg { margin-top:4px; }
-.actions { display:flex; gap:12px; margin-top:27px;
+.personalSummary { display:none; }
+.actions { display:flex; grid-column:2; gap:12px; margin-top:27px;
   > button { min-height:45px; flex:1; font-size:12px; }
 }
 @media (max-width:1150px) and (min-width:768px) { .page { gap:23px; padding-inline:23px; } .row { grid-template-columns:minmax(0,1fr) 61px 53px 57px; padding-inline:12px; } }
@@ -78,5 +80,12 @@
   .summary > .note { align-items:center; margin-top:20px; font-size:10px; line-height:1.5; white-space:nowrap;
     svg { margin-top:0; }
   }
-  .actions { position:fixed; right:0; bottom:0; left:0; z-index:50; gap:10px; margin:0; padding:10px 16px calc(10px + env(safe-area-inset-bottom)); border-top:1px solid #dfd1bf; background:#fbf7f0; }
+  .personalSummary { display:block; padding:20px; border:1px solid #deceb7; border-radius:7px; background:#fcf6ea;
+    h2 { margin-top:8px; color:#775144; font-size:20px; }
+    > div { display:grid; grid-template-columns:repeat(3,1fr); margin-top:18px; }
+    > div > span { text-align:center; border-right:1px solid #e0d2bd; }
+    > div > span:last-child { border-right:0; }
+    b { display:block; color:#855747; font-size:24px; }
+    small { display:block; margin-top:5px; color:#a1865e; font-size:9px; }
+  }
 }

@@ -5,6 +5,7 @@
 @media(max-width:360px){.sn-play{padding-inline:8px}.sn-game-header h1{font-size:16px}.sn-row-cards{gap:2px}.sn-row-cost{min-width:25px}.sn-hand-cards{gap:6px}.sn-hand-cards>.sn-number-card{height:54px;--number-size:26px}.sn-mobile-dock{padding-inline:11px}.sn-result-board article{grid-template-columns:16px 28px minmax(54px,1fr) 43px 50px}.sn-point-legend .sn-number-card{width:38px}}
 @media(max-width:767px){
  .sn-results{padding-top:14px}
+ .sn-final-results{padding:0}
  .sn-results>[data-game-result-topbar]{display:none}
  .sn-mobile-result-review{display:inline-flex}
 }

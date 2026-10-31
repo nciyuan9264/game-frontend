@@ -16,6 +16,7 @@ import {
   GameMobileAboutDialog,
   GameMobileProfile,
 } from '@/components/GameUI/GamePublicMobile';
+import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -100,12 +101,11 @@ export default function Profile() {
           ]}
           historyTitle="追逃档案"
           historyItems={historyItems}
-          emptyHistory={<div className="empty-state profile-empty">
-            <Route size={38} /><h3>城市还在等你的第一步。</h3>
-            <Link className="button primary" to="/game/fugitive">
-              开始第一场追逐
+          emptyHistory={<Feedback>还没有追逃记录。
+            <Link className="profile-empty-link" to="/game/fugitive">
+              去大厅开始第一场
             </Link>
-          </div>}
+          </Feedback>}
           historyFooter={history.hasMore && <button
             className="button secondary full" type="button"
             disabled={history.loading} onClick={history.loadMore}>

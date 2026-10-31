@@ -94,7 +94,7 @@ export function Play({
 
   if (!me) return null;
   if (data.roomData.gameStatus === 'end' && showResults) {
-    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)}
+    return <Results session={session} data={data} onViewBoard={() => setShowResults(false)} onLeave={onLeave}
       onRestart={onStartNextMatch} restarting={startNextMatchPending} />;
   }
 

@@ -118,6 +118,55 @@ export function regressionRunID(): string {
     || `${Date.now()}-${Math.random().toString(16).slice(2, 10)}`;
 }
 
+export async function expectMobileFinalResultLayout(
+  page: Page,
+  options: { actionCount?: number } = {},
+): Promise<void> {
+  const root = page.locator('[data-game-final-result]');
+  const hero = root.locator('[data-game-final-result-hero]');
+  const standings = root.locator('[data-game-final-result-standings]');
+  const summary = root.locator('[data-game-final-result-summary]');
+  const actions = root.locator('[data-game-final-result-actions]');
+
+  await expect(root).toBeVisible();
+  await expect(hero).toBeVisible();
+  await expect(standings).toBeVisible();
+  await expect(summary).toBeVisible();
+  await expect(actions).toBeVisible();
+
+  const boxes = await Promise.all([
+    hero.boundingBox(),
+    standings.boundingBox(),
+    summary.boundingBox(),
+    actions.boundingBox(),
+  ]);
+  expect(boxes.every(Boolean)).toBe(true);
+  const [heroBox, standingsBox, summaryBox, actionsBox] = boxes;
+  expect(standingsBox!.y).toBeGreaterThanOrEqual(heroBox!.y + heroBox!.height);
+  expect(summaryBox!.y).toBeGreaterThanOrEqual(
+    standingsBox!.y + standingsBox!.height,
+  );
+  expect(actionsBox!.y).toBeGreaterThanOrEqual(
+    summaryBox!.y + summaryBox!.height,
+  );
+  await expect(actions).toHaveCSS('position', 'static');
+  await expect(actions.locator('button')).toHaveCount(options.actionCount ?? 3);
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+
+  const viewport = page.viewportSize();
+  if (viewport && viewport.width > 320) {
+    await page.setViewportSize({ width: 320, height: 700 });
+    await expect(root).toBeVisible();
+    await expect.poll(() => page.evaluate(() =>
+      document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+    const buttonsFit = await actions.locator('button').evaluateAll(buttons =>
+      buttons.every(button => button.scrollWidth <= button.clientWidth));
+    expect(buttonsFit).toBe(true);
+    await page.setViewportSize(viewport);
+  }
+}
+
 async function safeResponseMessage(response: {
   status(): number;
   text(): Promise<string>;

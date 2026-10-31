@@ -5,15 +5,15 @@
   padding:32px 20px;
   background:radial-gradient(circle at 50% 35%,#fffaf1,#eee5d8);
   text-align:center;
-  > header {
+}
+.hero { display:grid; place-content:center;
     > span { color:#a1815d; font:9px Georgia,serif; letter-spacing:2.4px; }
     h1 { margin:10px 0; color:#593b44; font-size:35px; }
     p { color:#8e7c6a; font-size:12px; }
-  }
-  > footer { display:flex; justify-content:center; gap:10px; margin-top:22px;
-    button { min-width:132px; }
-    button:only-child { min-width:220px; }
-  }
+}
+.actions { display:flex; justify-content:center; gap:10px; margin-top:22px;
+  button { min-width:132px; }
+  button:only-child { min-width:220px; }
 }
 .result {
   width:min(620px,calc(100vw - 40px));
@@ -41,19 +41,17 @@
   }
 }
 .winner { border-color:#9b6b7655!important; background:#f6eaeb; }
-.ratio { width:230px; height:5px; overflow:hidden; margin:19px auto 0; border:1px solid #d7ccb3; border-radius:4px; background:#e6dfca;
+.summary { width:min(620px,calc(100vw - 40px)); padding:20px 31px; border:1px solid #ddcfbc; border-radius:7px; background:#fffdf8; text-align:center; }
+.ratio { width:230px; max-width:100%; height:5px; overflow:hidden; margin:0 auto; border:1px solid #d7ccb3; border-radius:4px; background:#e6dfca;
   i { display:block; height:100%; border-radius:3px; background:#464841; }
 }
-.result > .scoreNote { margin-top:9px; color:#b29d7e; font-size:9px; }
+.scoreNote { margin-top:12px; color:#74505a; font-size:12px; }
+.summary > small { display:block; margin-top:8px; color:#b29d7e; font-size:9px; }
 @media(max-width:620px) {
   .page { place-content:start center; padding-top:70px;
-    > header h1 { font-size:29px; }
-    > footer { display:grid; width:min(100%,420px); grid-template-columns:repeat(2,minmax(0,1fr));
-      button { min-width:0; min-height:44px; padding:0 9px; }
-      button:only-child { grid-column:1/-1; min-width:0; }
-    }
+    .hero h1 { font-size:29px; }
   }
   .result { padding:24px 17px; }
   .score { grid-template-columns:1fr; }
-  .result > .scoreNote { margin-top:12px; }
+  .summary { width:100%; padding:21px 17px; }
 }

@@ -945,6 +945,14 @@
     .hive-result-heading h1 { font-size: 23px; line-height: 1.6; }
     .hive-result-heading p { padding: 0 8px; font-size: 10px; line-height: 1.8; }
     .hive-result-grid { display: block; margin-top: 20px; }
+    .hive-result-board { height: auto; overflow: visible; padding: 8px 15px; background: var(--hive-surface); }
+    .hive-result-players article { display: grid; min-height: 61px; grid-template-columns: auto minmax(0,1fr) auto; align-items: center; gap: 10px; border-bottom: 1px solid var(--hive-line); text-align: left; }
+    .hive-result-players article:last-child { border-bottom: 0; }
+    .hive-result-players article > div { min-width: 0; }
+    .hive-result-players strong,.hive-result-players small { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+    .hive-result-players strong { color: #8d7f5e; font-size: 12px; }
+    .hive-result-players small { margin-top: 4px; color: #b4a17d; font-size: 9px; }
+    .hive-result-players article > b { color: #ad945d; font: 20px Georgia,serif; }
     .hive-result-summary { padding: 19px; }
     .hive-result-summary h2 { font-size: 20px; }
     .hive-result-actions {

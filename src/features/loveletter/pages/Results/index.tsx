@@ -2,6 +2,10 @@ import {
   ArrowLeft, ArrowRight, Crown, Eye, Flower2, Heart, History,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { Hearts, Portrait } from '../../components/Card';
 import { playerLabel, type GameSnapshot } from '../../model/session';
 import stillLife from '../../assets/still-life.webp';
@@ -34,22 +38,20 @@ export function Results({
     ? won ? '你的信，送到了。' : '一场心意，有了答案。'
     : won ? '这一轮，你的信抵达了。' : '心意有归处，下封再相逢。';
 
-  return <div className="ll-results">
-    <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
+  const topbar = <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
       <ArrowLeft size={19} /></button>
       <span>ROUND {String(data.roomData.roundNo).padStart(2, '0')}
         {' / '}{final ? 'THE FINAL LETTER' : 'A LETTER DELIVERED'}</span>
       <button type="button" onClick={onReview}><Eye size={15} />查看终局牌桌</button>
-    </header>
-    <section className="ll-result-hero"><div><Flower2 /><Crown size={31} /></div>
+    </header>;
+  const hero = <><div><Flower2 /><Crown size={31} /></div>
       <small>{final ? '一场心意，终于有了答案' : '这一轮，尘埃落定'}</small>
       <h1>{title}</h1>
       <p>{winners.map(id => playerLabel(id, data.roomData.players)).join('、')}
         {winners.length > 1 ? ' 共同获胜' : ' 赢得本轮'}。</p>
       {final && <span><Crown size={14} />达到 {data.roomData.goal} 枚好感，赢得本场</span>}
-    </section>
-    <div className="ll-result-layout">
-      <section className="ll-result-players"><header>
+    </>;
+  const players = <><header>
         <h2>{final ? '最终心意排行' : '揭开最后的心意'}</h2>
         <small>{final ? '整场好感 · 最终名次' : '轮末手牌 · 好感变化'}</small>
       </header>
@@ -75,9 +77,8 @@ export function Results({
           <Hearts value={favor} total={data.roomData.goal} />
           {!final && <strong>{delta > 0 ? `+${delta}` : '—'}</strong>}
         </article>;
-      })}</section>
-      <aside className="ll-result-letter" style={{ backgroundImage: `url(${stillLife})` }}>
-        <small>{final ? 'THE LETTER FOUND ITS WAY' : 'THE FAVOR YOU EARNED'}</small>
+      })}</>;
+  const letter = <><small>{final ? 'THE LETTER FOUND ITS WAY' : 'THE FAVOR YOU EARNED'}</small>
         <h2>{final ? `${winners.length} 位最终胜者` : won ? '+1 枚好感' : '下一封，继续。'}</h2>
         <p>{round?.spyPlayerID
           ? `${playerLabel(round.spyPlayerID, data.roomData.players)} 通过唯一存活的密探额外获得 1 枚好感。`
@@ -85,18 +86,42 @@ export function Results({
         <span><Heart size={13} />{final
           ? `共完成 ${data.roomData.roundNo} 轮传信`
           : round?.reason === 'last_player' ? '最后一位未出局者获胜' : '最高手牌者获得好感'}</span>
-      </aside>
+      </>;
+
+  if (final) return <div className="ll-results ll-final-results">
+    {topbar}
+    <GameFinalResult
+      mobileInset="self"
+      heroClassName="ll-result-hero"
+      contentClassName="ll-result-layout"
+      standingsClassName="ll-result-players"
+      summaryClassName="ll-result-letter"
+      summaryStyle={{ backgroundImage: `url(${stillLife})` }}
+      actionsClassName="ll-result-actions"
+      hero={hero}
+      standings={players}
+      summary={letter}
+      actions={<GameFinalResultActions mode="live"
+        onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
+        onLeave={onExit} canRestart={owner} onRestart={onRematch}
+        restartPending={rematchPending} restartDisabled={!enabled} />}
+    />
+  </div>;
+
+  return <div className="ll-results">
+    {topbar}
+    <section className="ll-result-hero">{hero}</section>
+    <div className="ll-result-layout">
+      <section className="ll-result-players">{players}</section>
+      <aside className="ll-result-letter" style={{ backgroundImage: `url(${stillLife})` }}>{letter}</aside>
     </div>
     <footer className="ll-result-actions">
       <ActionButton onClick={onExit}><History size={15} />回到大厅</ActionButton>
       <ActionButton className="ll-mobile-result-review"
         onClick={onReview}><Eye size={15} />查看终局牌桌</ActionButton>
-      {!final && owner && <ActionButton variant="primary" disabled={!enabled}
+      {owner && <ActionButton variant="primary" disabled={!enabled}
         onClick={onNextRound}>下一轮，继续传信<ArrowRight size={16} /></ActionButton>}
-      {!final && !owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}
-      {final && owner && <ActionButton variant="primary" pending={rematchPending}
-        onClick={onRematch}>再来一局<ArrowRight size={16} /></ActionButton>}
-      {final && !owner && <span>本场已经结束</span>}
+      {!owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}
     </footer>
   </div>;
 }

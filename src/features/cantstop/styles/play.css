@@ -37,3 +37,7 @@
   .cs-result-actions>button:last-child:nth-child(3){grid-column:1/-1}
   .cs-result-actions>span{align-self:center;text-align:center}
 }
+
+@media(max-width:767px){
+  .cs-results{padding:0}
+}

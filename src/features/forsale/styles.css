@@ -623,7 +623,7 @@
 .fs-result-hero { min-height: 275px; display: flex; align-items: center; justify-content: space-between;
   position: relative; gap: 20px; overflow: hidden; padding: 28px 38px; border: 1px solid #ddd6c4;
   border-radius: 12px; background: #ede9d9; }
-.fs-result-hero h1 { margin: 12px 0 7px; font: 500 29px/1.4 Georgia, serif; }
+.fs-result-hero h1 { margin: 12px 0 7px; font: 500 29px/1.4 "Noto Serif SC Variable", "Noto Serif SC", Georgia, serif; }
 .fs-result-hero > div > small { display: inline-block; margin-top: 12px; padding: 4px 7px;
   border-radius: 4px; background: #e4decf; color: #827e6e; font-size: 8px; }
 .fs-result-hero p { color: var(--fs-muted); font-size: 10px; }

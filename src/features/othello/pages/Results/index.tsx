@@ -1,5 +1,8 @@
-import { ArrowRight, Eye, Trophy } from 'lucide-react';
-import { ActionButton } from '@/components/GameUI/ActionButton';
+import { Trophy } from 'lucide-react';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Disc } from '../../components/Artwork';
 import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
@@ -8,12 +11,14 @@ import styles from './index.module.less';
 export function Results({
   data,
   onViewBoard,
+  onLeave,
   onRestart,
   restarting = false,
   readOnly = false,
 }: {
   data: GameSnapshot;
   onViewBoard: () => void;
+  onLeave?: () => void;
   onRestart?: () => Promise<boolean>;
   restarting?: boolean;
   readOnly?: boolean;
@@ -34,12 +39,17 @@ export function Results({
     { id: data.roomData.whitePlayerID, side: 'white' as const, count: whiteCount },
   ];
 
-  return <div className={styles.page}>
-    <header><span>THE FINAL CHAPTER</span>
+  return <GameFinalResult
+    className={styles.page}
+    mobileInset="self"
+    heroClassName={styles.hero}
+    standingsClassName={styles.result}
+    summaryClassName={styles.summary}
+    actionsClassName={styles.actions}
+    hero={<><span>THE FINAL CHAPTER</span>
       <h1>{draw ? '棋逢对手，平局收场。' : '黑白落定，胜负已分。'}</h1>
-      <p>下一次翻转，仍有新的可能。</p></header>
-    <section className={styles.result}>
-      <div className={styles.seal}><span /><Trophy size={37} /><span /></div>
+      <p>下一次翻转，仍有新的可能。</p></>}
+    standings={<><div className={styles.seal}><span /><Trophy size={37} /><span /></div>
       <span className={styles.eyebrow}>{draw ? 'A PERFECT BALANCE' : 'WELL PLAYED'}</span>
       <h2>{draw ? '黑白之间，未分高下。' : `${winner}，赢得这一局。`}</h2>
       <div className={styles.score}>{players.map(player => {
@@ -53,15 +63,18 @@ export function Results({
           <b>{player.count}<small>子</small></b>
         </article>;
       })}</div>
+    </>}
+    summary={<>
       <div className={styles.ratio}><i style={{ width: `${blackCount / total * 100}%` }} /></div>
-      <p className={styles.scoreNote}>终局实际子数 · 空格不补计分</p>
-    </section>
-    <footer><ActionButton onClick={onViewBoard}><Eye size={15} />
-      {readOnly ? '回到回放棋盘' : '回到棋盘'}</ActionButton>
-      {!readOnly && (owner
-        ? <ActionButton variant="primary" pending={restarting} disabled={!onRestart}
-          onClick={() => void onRestart?.()}>
-          再来一局<ArrowRight size={16} /></ActionButton>
-        : <ActionButton variant="primary" disabled>等待房主再来一局</ActionButton>)}</footer>
-  </div>;
+      <p className={styles.scoreNote}>黑方 {blackCount} · 白方 {whiteCount}</p>
+      <small>终局实际子数 · 空格不补计分</small>
+    </>}
+    actions={readOnly
+      ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
+          viewBoardLabel="回到回放棋盘" />
+      : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+          viewBoardLabel="回到棋盘" onLeave={onLeave ?? onViewBoard}
+          canRestart={owner} onRestart={onRestart}
+          restartPending={restarting} />}
+  />;
 }

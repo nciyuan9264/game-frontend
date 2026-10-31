@@ -1,4 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'splendor_mobile_layout';
 const matchID = `${roomID}-r1`;
@@ -311,9 +312,10 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
 
   const results = page.getByTestId('splendor-results');
   await expect(results).toBeVisible();
-  await expect(results.locator('[data-game-result-topbar]')).toBeHidden();
+  await expectMobileFinalResultLayout(page);
+  await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
   await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
-  await expect(results.getByRole('button', { name: '返回大厅' })).toHaveCount(0);
+  await expect(results.getByRole('button', { name: '回到大厅' })).toBeVisible();
   await expect(results.getByText('结算结果来自本局服务端快照')).toHaveCount(0);
   await expect(results.getByRole('button', { name: '查看终局牌面' })).toBeVisible();
   await expect(results.getByRole('button', { name: /再来一局/ })).toBeVisible();

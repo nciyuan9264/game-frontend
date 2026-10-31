@@ -347,6 +347,14 @@ test('Othello room uses the aligned two-seat mobile layout', async ({ page }) =>
   await expect(page.getByRole('button', { name: '开始对局' })).toBeVisible();
   await expectNoOverflow(page);
 
+  await page.getByRole('button', { name: '展开回放面板' }).click();
+  await page.getByRole('button', { name: '最终结算' }).click();
+  await expect(page.locator('[data-game-final-result]')).toBeVisible();
+  await expect(page.locator('[data-game-final-result-actions] button'))
+    .toHaveCount(1);
+  await page.getByRole('button', { name: '回到回放棋盘' }).click();
+  await expect(panel).toBeVisible();
+
   await page.setViewportSize({ width: 320, height: 568 });
   await expect(seats).toHaveCount(2);
   await expectNoOverflow(page);
@@ -549,6 +557,14 @@ test('Othello replay exposes the aligned movable mobile panel', async ({ page })
   const collapsed = await panel.boundingBox();
   expect(collapsed?.height).toBe(56);
   await expectNoOverflow(page);
+  await page.getByRole('button', { name: '展开回放面板' }).click();
+
+  await page.getByRole('button', { name: '最终结算' }).click();
+  await expect(page.locator('[data-game-final-result]')).toBeVisible();
+  await expect(page.locator('[data-game-final-result-actions] button'))
+    .toHaveCount(1);
+  await page.getByRole('button', { name: '回到回放棋盘' }).click();
+  await expect(panel).toBeVisible();
 
   await page.setViewportSize({ width: 320, height: 568 });
   await expect(panel).toBeVisible();

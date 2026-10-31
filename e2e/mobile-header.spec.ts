@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const games = [
   'acquire',
@@ -383,6 +384,7 @@ test('acquire final board keeps result access out of the mobile topbar', async (
   await page.setViewportSize({ width: 390, height: 844 });
   const roomID = await mockAcquirePlay(page, { ended: true });
   await page.goto(`/game/acquire/match?roomID=${roomID}`);
+  await expectMobileFinalResultLayout(page);
   await page.getByRole('button', { name: '查看终局棋盘' }).click();
 
   const mobileTopbar = page.locator('[data-game-mobile-topbar]');

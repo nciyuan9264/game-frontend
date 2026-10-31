@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'fugitive_layout';
 const matchID = `${roomID}-r1`;
@@ -255,6 +256,9 @@ async function mockLobby(page: Page, avatar = '') {
       },
     },
   }));
+  await page.route('**/pam-api/platform/history/games?**', route => route.fulfill({
+    json: { status_code: 0, message: 'ok', data: { games: [] } },
+  }));
 }
 
 async function expectNoDocumentOverflow(page: Page) {
@@ -285,6 +289,12 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   await expect(createDialog).toBeVisible();
   await expect(createDialog.getByRole('button', { name: '公开房间' })).toBeVisible();
   await expect(createDialog.getByRole('button', { name: '私密房间' })).toBeVisible();
+  await expect(createDialog.getByRole('button', { name: '公开房间' }))
+    .toHaveCSS('background-color', 'rgb(32, 53, 42)');
+  await expect(createDialog.getByRole('button', { name: '创建并入座' }))
+    .toHaveCSS('color', 'rgb(45, 27, 16)');
+  await expect(createDialog.getByRole('button', { name: '创建并入座' }))
+    .toHaveCSS('background-color', 'rgb(226, 145, 93)');
   await expect(createDialog.getByText('午夜追缉 · 固定 2 人 · 每回合 120 秒'))
     .toBeVisible();
   await expect(createDialog.getByRole('textbox')).toHaveCount(0);
@@ -300,7 +310,24 @@ test('Fugitive mobile lobby uses product chrome and shared entry flows', async (
   const roomLookup = page.getByRole('textbox', { name: '查找房间号' });
   await expect(roomLookup).toBeVisible();
   await expect(roomLookup).toHaveAttribute('placeholder', '输入完整房间号');
+  await expect(roomLookup).toHaveCSS('border-top-width', '0px');
+  await expect(roomLookup).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+  const roomSearch = page.getByRole('textbox', { name: '搜索房间号或房主' });
+  await expect(roomSearch).toHaveCSS('border-top-width', '0px');
+  await expect(roomSearch).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
   await expect(page.getByRole('button', { name: '查找房间' })).toBeDisabled();
+
+  await page.goto('/game/fugitive/guide');
+  const guidePrimary = page.getByRole('button', { name: /下一步/ });
+  await expect(guidePrimary).toHaveCSS('color', 'rgb(45, 27, 16)');
+  await expect(guidePrimary).toHaveCSS('background-color', 'rgb(226, 145, 93)');
+
+  await page.goto('/game/fugitive/me');
+  const emptyHistory = page.getByRole('status');
+  await expect(emptyHistory).toContainText('还没有追逃记录');
+  const emptyBox = await emptyHistory.boundingBox();
+  expect(emptyBox).not.toBeNull();
+  expect(emptyBox!.height).toBeLessThanOrEqual(120);
   await expectNoDocumentOverflow(page);
 });
 
@@ -349,6 +376,9 @@ for (const viewport of [
     await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
     const seats = page.locator('[data-game-mobile-room-seat]');
     await expect(seats).toHaveCount(2);
+    await expect(seats.nth(1).locator('[data-fugitive-ai-avatar]')).toBeVisible();
+    await expect(seats.nth(1)).toContainText('追捕者');
+    await expect(seats.nth(1)).toContainText('人机');
     const first = await seats.nth(0).boundingBox();
     const second = await seats.nth(1).boundingBox();
     expect(first).not.toBeNull();
@@ -394,22 +424,18 @@ test('Fugitive mobile result and final board controls stay aligned', async ({ pa
   await page.goto(`/game/fugitive/match?roomID=${roomID}`);
 
   await expect(page.locator('[data-game-result-topbar]')).toBeHidden();
+  await expectMobileFinalResultLayout(page);
   await expect(page.locator('[data-game-mobile-topbar]')).toHaveCount(0);
   const review = page.getByRole('button', { name: '查看终局牌桌' });
   await expect(review).toBeVisible();
   const reviewLayout = await review.evaluate(element => {
-    const button = element.getBoundingClientRect();
-    const icons = Array.from(element.querySelectorAll('svg'))
-      .map(icon => icon.getBoundingClientRect());
     return {
       justifyContent: getComputedStyle(element).justifyContent,
-      leftInset: icons[0].left - button.left,
-      rightInset: button.right - icons[1].right,
+      iconCount: element.querySelectorAll('svg').length,
     };
   });
   expect(reviewLayout.justifyContent).toBe('center');
-  expect(reviewLayout.leftInset).toBeGreaterThan(50);
-  expect(reviewLayout.rightInset).toBeGreaterThan(50);
+  expect(reviewLayout.iconCount).toBe(1);
 
   await review.click();
   await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();

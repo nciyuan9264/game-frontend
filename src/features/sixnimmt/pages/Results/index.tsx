@@ -6,6 +6,10 @@ import {
   Trophy,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import {
+  GameFinalResult,
+  GameFinalResultActions,
+} from '@/components/GameUI/GameFinalResult';
 import { Bull, PlayerAvatar } from '../../components/AppShell';
 import { BullScore, NumberCard } from '../../components/Card';
 import { playerLabel, playerName, type GameSnapshot } from '../../model/session';
@@ -45,15 +49,14 @@ export function Results({
     total(id) === total(ranked[0]));
   const won = winners.includes(data.playerId);
 
-  return <div className="sn-results">
-    <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
+  const topbar = <header data-game-result-topbar><button type="button" aria-label="返回大厅" onClick={onExit}>
       <ArrowLeft size={19} /></button>
       <span>ROUND {String(data.roomData.roundNo).padStart(2, '0')}
         {' / '}{final ? 'FINAL SCORE' : 'ROUND COMPLETE'}</span>
       <button type="button" onClick={onReview}>
         <Eye size={15} />查看终局牌桌</button>
-    </header>
-    <section className="sn-result-hero"><div><Bull size={42} /><Trophy size={30} /></div>
+    </header>;
+  const hero = <><div><Bull size={42} /><Trophy size={30} /></div>
       <small>{final ? 'LESS BULL. MORE BRAGGING RIGHTS.' : 'TEN CARDS ARE DONE'}</small>
       <h1>{final
         ? won ? '收得少，才是真的牛。' : '这一桌，牛头有了归处。'
@@ -61,10 +64,8 @@ export function Results({
       <p>{winners.map(id => playerLabel(id, data.roomData.players)).join('、')}
         {winners.length > 1 ? ' 并列领先' : final ? ' 赢得本场' : ' 本局牛头最少'}。</p>
       {final && <span><Trophy size={14} />完整局结束后达到 66 分阈值，比赛结束</span>}
-    </section>
-
-    <div className="sn-result-layout"><section className="sn-result-board">
-      <header><h2>{final ? '最终记分板' : '累计记分板'}</h2>
+    </>;
+  const board = <><header><h2>{final ? '最终记分板' : '累计记分板'}</h2>
         <small><Bull size={12} />牛头越少越好</small></header>
       <div className="sn-score-head"><span>排名 / 玩家</span>
         <span>本局牛头</span><span>累计牛头</span></div>
@@ -86,8 +87,8 @@ export function Results({
           <strong>+{roundPenalty}</strong>
           <BullScore value={total(id)} />
         </article>;
-      })}</section>
-      <aside className="sn-result-detail"><span className="sn-eyebrow">YOUR LITTLE HERD</span>
+      })}</>;
+  const detail = <><span className="sn-eyebrow">YOUR LITTLE HERD</span>
         <h2>你的收牛小结。</h2>
         <div><span><b>{data.playerData[data.playerId]?.takenCount ?? 0}</b>
           <small>收取卡牌</small></span>
@@ -97,18 +98,42 @@ export function Results({
         <div className="sn-result-cards">{[23, 25, 30, 44, 55].map(value =>
           <NumberCard key={value} value={value} compact />)}</div>
         <p>分数来自收取牌上的牛头总数，不是牌面数字，也不是收牌张数。</p>
-      </aside></div>
+      </>;
 
+  if (final) return <div className="sn-results sn-final-results">
+    {topbar}
+    <GameFinalResult
+      mobileInset="self"
+      heroClassName="sn-result-hero"
+      contentClassName="sn-result-layout"
+      standingsClassName="sn-result-board"
+      summaryClassName="sn-result-detail"
+      actionsClassName="sn-result-actions"
+      hero={hero}
+      standings={board}
+      summary={detail}
+      actions={<GameFinalResultActions mode="live"
+        onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
+        onLeave={onExit} canRestart={owner} onRestart={onRematch}
+        restartLabel="再来一场" restartPending={rematchPending}
+        restartDisabled={!enabled} />}
+    />
+  </div>;
+
+  return <div className="sn-results">
+    {topbar}
+    <section className="sn-result-hero">{hero}</section>
+    <div className="sn-result-layout">
+      <section className="sn-result-board">{board}</section>
+      <aside className="sn-result-detail">{detail}</aside>
+    </div>
     <footer className="sn-result-actions">
       <ActionButton onClick={onExit}><History size={15} />回到大厅</ActionButton>
       <ActionButton className="sn-mobile-result-review"
         onClick={onReview}><Eye size={15} />查看终局牌桌</ActionButton>
-      {!final && owner && <ActionButton variant="primary" disabled={!enabled}
+      {owner && <ActionButton variant="primary" disabled={!enabled}
         onClick={onNextRound}>继续下一局<ArrowRight size={16} /></ActionButton>}
-      {!final && !owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}
-      {final && owner && <ActionButton variant="primary" pending={rematchPending}
-        onClick={onRematch}>再来一场<ArrowRight size={16} /></ActionButton>}
-      {final && !owner && <span>本场已经结束</span>}
+      {!owner && <span>等待房主继续{countdown && ` · ${countdown}`}</span>}
     </footer>
   </div>;
 }
