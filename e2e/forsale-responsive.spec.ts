@@ -437,23 +437,23 @@ test('For Sale mobile auction keeps cards and actions usable',
     const mobileTopbar = page.locator('[data-game-mobile-topbar]');
     const countdown = mobileTopbar.getByRole('timer');
     const history = mobileTopbar.getByRole('button', { name: '公开记录' });
-    const menu = mobileTopbar.getByRole('button', { name: '对局菜单' });
+    const rules = mobileTopbar.getByRole('button', { name: '桌边规则' });
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 360, height: 800 },
       { width: 320, height: 700 },
     ]) {
       await page.setViewportSize(viewport);
-      const [topbarBox, identityBox, countdownBox, historyBox, menuBox,
-        historyIconBox, menuIconBox, countdownTextBox, countdownStyle,
-        historyStyle, menuStyle] = await Promise.all([
+      const [topbarBox, identityBox, countdownBox, historyBox, rulesBox,
+        historyIconBox, rulesIconBox, countdownTextBox, countdownStyle,
+        historyStyle, rulesStyle] = await Promise.all([
           mobileTopbar.boundingBox(),
           mobileTopbar.locator('[data-game-mobile-topbar-identity]').boundingBox(),
           countdown.boundingBox(),
           history.boundingBox(),
-          menu.boundingBox(),
+          rules.boundingBox(),
           history.locator('svg').boundingBox(),
-          menu.locator('svg').boundingBox(),
+          rules.locator('svg').boundingBox(),
           countdown.evaluate(element => {
             const range = document.createRange();
             range.selectNodeContents(element);
@@ -473,7 +473,7 @@ test('For Sale mobile auction keeps cards and actions usable',
             backgroundColor: getComputedStyle(element).backgroundColor,
             borderWidth: getComputedStyle(element).borderWidth,
           })),
-          menu.evaluate(element => ({
+          rules.evaluate(element => ({
             backgroundColor: getComputedStyle(element).backgroundColor,
             borderWidth: getComputedStyle(element).borderWidth,
           })),
@@ -482,9 +482,9 @@ test('For Sale mobile auction keeps cards and actions usable',
       expect(identityBox).not.toBeNull();
       expect(countdownBox).not.toBeNull();
       expect(historyBox).not.toBeNull();
-      expect(menuBox).not.toBeNull();
+      expect(rulesBox).not.toBeNull();
       expect(historyIconBox).not.toBeNull();
-      expect(menuIconBox).not.toBeNull();
+      expect(rulesIconBox).not.toBeNull();
       expect(countdownTextBox.height).toBeGreaterThan(0);
       expect(identityBox!.width).toBeLessThanOrEqual(132);
       expect(countdownStyle).toEqual({
@@ -495,22 +495,25 @@ test('For Sale mobile auction keeps cards and actions usable',
         backgroundColor: 'rgba(0, 0, 0, 0)',
         borderWidth: '0px',
       });
-      expect(menuStyle).toEqual(historyStyle);
+      expect(rulesStyle).toEqual(historyStyle);
       expect(countdownBox!.height).toBe(22);
       expect(historyBox).toMatchObject({ width: 34, height: 34 });
-      expect(menuBox).toMatchObject({ width: 34, height: 34 });
+      expect(rulesBox).toMatchObject({ width: 34, height: 34 });
       expect(historyIconBox).toMatchObject({ width: 22, height: 22 });
-      expect(menuIconBox).toMatchObject({ width: 22, height: 22 });
+      expect(rulesIconBox).toMatchObject({ width: 22, height: 22 });
       expect(Math.abs(countdownTextBox.y + countdownTextBox.height / 2
         - (countdownBox!.y + countdownBox!.height / 2))).toBeLessThanOrEqual(1);
-      const centers = [countdownBox!, historyIconBox!, menuIconBox!]
+      const centers = [countdownBox!, historyIconBox!, rulesIconBox!]
         .map(box => box.y + box.height / 2);
       expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
-      expect(Math.abs(menuBox!.x + menuBox!.width
+      expect(Math.abs(rulesBox!.x + rulesBox!.width
         - (topbarBox!.x + topbarBox!.width))).toBeLessThanOrEqual(1);
       await expectNoOverflow(page);
     }
     await page.setViewportSize({ width: 358, height: 784 });
+    await rules.click();
+    await expect(page.getByRole('dialog', { name: '桌边规则卡' })).toBeVisible();
+    await page.getByRole('button', { name: '关闭面板' }).click();
     await expect(page.locator('.fs-property-market .fs-property')).toHaveCount(3);
     await expect(page.getByLabel('总出价金币')).toHaveValue('3');
     await page.getByRole('button', { name: '退出本轮' }).click();
@@ -535,6 +538,9 @@ test('For Sale six-player desktop market remains stable',
     await expect(page.getByRole('heading', {
       name: /轮到你出价/,
     })).toBeVisible();
+    await page.getByRole('button', { name: '桌边规则' }).click();
+    await expect(page.getByRole('dialog', { name: '桌边规则卡' })).toBeVisible();
+    await page.getByRole('button', { name: '关闭面板' }).click();
     await expectNoOverflow(page);
     await capture(page, info, 'auction-six-player-desktop');
   });

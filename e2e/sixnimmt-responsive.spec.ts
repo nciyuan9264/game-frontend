@@ -139,8 +139,80 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   const commands = await mockSession(page);
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
   await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  const countdown = topbar.getByRole('timer');
+  const score = topbar.getByRole('button', { name: '打开记分板' });
+  const rules = topbar.getByRole('button', { name: '玩法速查' });
+  const menu = topbar.getByRole('button', { name: '对局菜单' });
+  await expect(topbar).toBeVisible();
   await expect(page.locator('.sn-game-header')).toBeHidden();
+  for (const viewport of [
+    { width: 390, height: 844 },
+    { width: 360, height: 800 },
+    { width: 320, height: 700 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const [topbarBox, countdownBox, scoreBox, rulesBox, menuBox,
+      countdownTextBox, scoreIconBox, rulesIconBox, menuIconBox,
+      scoreStyle, rulesStyle, menuStyle] = await Promise.all([
+        topbar.boundingBox(),
+        countdown.boundingBox(),
+        score.boundingBox(),
+        rules.boundingBox(),
+        menu.boundingBox(),
+        countdown.evaluate(element => {
+          const range = document.createRange();
+          range.selectNodeContents(element);
+          const box = range.getBoundingClientRect();
+          return { height: box.height, y: box.y };
+        }),
+        score.locator('svg').boundingBox(),
+        rules.locator('svg').boundingBox(),
+        menu.locator('svg').boundingBox(),
+        score.evaluate(element => ({
+          backgroundColor: getComputedStyle(element).backgroundColor,
+          borderWidth: getComputedStyle(element).borderWidth,
+        })),
+        rules.evaluate(element => ({
+          backgroundColor: getComputedStyle(element).backgroundColor,
+          borderWidth: getComputedStyle(element).borderWidth,
+        })),
+        menu.evaluate(element => ({
+          backgroundColor: getComputedStyle(element).backgroundColor,
+          borderWidth: getComputedStyle(element).borderWidth,
+        })),
+      ]);
+    expect(topbarBox).not.toBeNull();
+    expect(countdownBox).not.toBeNull();
+    expect(scoreBox).not.toBeNull();
+    expect(rulesBox).not.toBeNull();
+    expect(menuBox).not.toBeNull();
+    expect(scoreIconBox).not.toBeNull();
+    expect(rulesIconBox).not.toBeNull();
+    expect(menuIconBox).not.toBeNull();
+    expect(scoreStyle).toEqual({
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      borderWidth: '0px',
+    });
+    expect(rulesStyle).toEqual(scoreStyle);
+    expect(menuStyle).toEqual(scoreStyle);
+    expect(countdownBox!.height).toBe(22);
+    expect(scoreBox).toMatchObject({ width: 34, height: 34 });
+    expect(rulesBox).toMatchObject({ width: 34, height: 34 });
+    expect(menuBox).toMatchObject({ width: 34, height: 34 });
+    expect(scoreIconBox).toMatchObject({ width: 22, height: 22 });
+    expect(rulesIconBox).toMatchObject({ width: 22, height: 22 });
+    expect(menuIconBox).toMatchObject({ width: 22, height: 22 });
+    expect(Math.abs(countdownTextBox.y + countdownTextBox.height / 2
+      - (countdownBox!.y + countdownBox!.height / 2))).toBeLessThanOrEqual(1);
+    const centers = [countdownBox!, scoreIconBox!, rulesIconBox!, menuIconBox!]
+      .map(box => box.y + box.height / 2);
+    expect(Math.max(...centers) - Math.min(...centers)).toBeLessThanOrEqual(1);
+    expect(Math.abs(menuBox!.x + menuBox!.width
+      - (topbarBox!.x + topbarBox!.width))).toBeLessThanOrEqual(1);
+    await expectNoOverflow(page);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: '选择手牌 55' }).click();
   await page.getByRole('button', { name: /锁定 55/ }).click();
   await expect.poll(() => commands.filter(command => command.includes('"game_lock_card"')).length).toBe(1);

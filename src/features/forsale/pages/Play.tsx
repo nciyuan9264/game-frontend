@@ -12,7 +12,6 @@ import {
   Layers3,
   LockKeyhole,
   Minus,
-  MoreHorizontal,
   Plus,
   ReceiptText,
   ShieldCheck,
@@ -61,7 +60,7 @@ const useCountdown = (deadline?: string) => {
     new Date(deadline).getTime() - now) / 1000)}s`;
 };
 
-type Panel = 'pass' | 'assets' | 'rules' | 'log' | 'menu' | undefined;
+type Panel = 'pass' | 'assets' | 'rules' | 'log' | undefined;
 
 export const Play = ({
   session,
@@ -123,8 +122,8 @@ export const Play = ({
       actions={<>
         <button type="button" aria-label="公开记录" title="公开记录"
           onClick={() => setPanel('log')}><History size={18} /></button>
-        <button type="button" aria-label="对局菜单" title="对局菜单"
-          onClick={() => setPanel('menu')}><MoreHorizontal size={20} /></button>
+        <button type="button" aria-label="桌边规则" title="桌边规则"
+          onClick={() => setPanel('rules')}><CircleHelp size={20} /></button>
       </>}
     />
     <header className="fs-game-header" data-game-desktop-topbar><button type="button"
@@ -138,8 +137,8 @@ export const Play = ({
       {countdown && <b className="fs-timer">{countdown}</b>}
       <button type="button" aria-label="公开记录" onClick={() => setPanel('log')}>
         <History size={18} /></button>
-      <button type="button" aria-label="对局菜单" onClick={() => setPanel('menu')}>
-        <MoreHorizontal size={20} /></button></header>
+      <button type="button" aria-label="桌边规则" title="桌边规则"
+        onClick={() => setPanel('rules')}><CircleHelp size={20} /></button></header>
     {reviewing && phase === 'end' && <button type="button"
       className="fs-review-banner" onClick={() => setReviewing(false)}>
       正在查看终局牌桌 · 返回结算<ArrowRight size={14} /></button>}
@@ -419,16 +418,5 @@ export const Play = ({
               {action.source === 'ai' && <small>AI 操作</small>}</p></li>)}</ol>
     </ResponsiveDialog>}
 
-    {panel === 'menu' && <ResponsiveDialog title="桌边菜单"
-      onClose={() => setPanel(undefined)}><div className="fs-menu">
-      <button type="button" onClick={() => setPanel('assets')}>
-        <Layers3 />我的资产<ArrowRight /></button>
-      <button type="button" onClick={() => setPanel('log')}>
-        <History />公开记录<ArrowRight /></button>
-      <button type="button" onClick={() => setPanel('rules')}>
-        <CircleHelp />桌边规则<ArrowRight /></button>
-      <button type="button" onClick={onLeave}>
-        <ArrowLeft />离开当前对局<ArrowRight /></button></div>
-    </ResponsiveDialog>}
   </div>;
 };
