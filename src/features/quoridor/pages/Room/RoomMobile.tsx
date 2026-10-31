@@ -41,6 +41,7 @@ export function RoomMobile(props: RoomProps & { onLeave: () => void }) {
     }}
     media={<><div className={styles.boardPattern} aria-hidden="true" />
       <Brand small /></>}
+    classNames={{ seat: styles.mobileSeat }}
     onLeave={props.onLeave}
     onSettings={props.onSettings}
     onInvite={props.onInvite}

@@ -225,5 +225,23 @@ for (const config of games) {
       if (geometry.mediaPosition) expect(geometry.mediaPosition).toBe('absolute');
       expect(geometry.seatOffset).toBeGreaterThanOrEqual(0);
       expect(geometry.seatOffset).toBeLessThanOrEqual(24);
+      if (config.game === 'quoridor') {
+        for (const viewport of [
+          { width: 390, height: 844 },
+          { width: 320, height: 568 },
+        ]) {
+          await page.setViewportSize(viewport);
+          const seat = page.locator('[data-game-mobile-room-seat]').first();
+          const status = seat.getByText('准备就绪');
+          const [seatBox, statusBox] = await Promise.all([
+            seat.boundingBox(),
+            status.boundingBox(),
+          ]);
+          expect(seatBox).not.toBeNull();
+          expect(statusBox).not.toBeNull();
+          expect(statusBox!.y + statusBox!.height)
+            .toBeLessThanOrEqual(seatBox!.y + seatBox!.height);
+        }
+      }
     });
 }
