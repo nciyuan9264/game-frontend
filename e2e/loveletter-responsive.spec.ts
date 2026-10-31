@@ -327,8 +327,12 @@ test('Love Letter mobile submits guard target and guess atomically', async ({
   await page.goto(`/game/loveletter/match?roomID=${roomID}`);
 
   await expect(page.getByTestId('loveletter-play')).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
-  await expect(page.locator('.ll-game-header')).toBeHidden();
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  const desktopTopbar = page.locator('.ll-game-header');
+  await expect(mobileTopbar).toBeVisible();
+  await expect(mobileTopbar.getByRole('button', { name: '对局菜单' })).toHaveCount(0);
+  await expect(desktopTopbar.locator('button[aria-label="对局菜单"]')).toHaveCount(1);
+  await expect(desktopTopbar).toBeHidden();
   const identityPortraitLocator = page.locator(
     '.ll-hand > header > .ll-portrait',
   );
@@ -385,7 +389,28 @@ test('Love Letter round result keeps its own layout', async ({ page }) => {
 
   await expect(page.locator('.ll-results')).toBeVisible();
   await expect(page.locator('[data-game-final-result]')).toHaveCount(0);
-  await expect(page.getByRole('button', {
+  const nextRound = page.getByRole('button', {
     name: '下一轮，继续传信',
-  })).toBeVisible();
+  });
+  await expect(nextRound).toBeVisible();
+  for (const width of [390, 320]) {
+    await page.setViewportSize({ width, height: 844 });
+    const actions = page.locator('.ll-result-actions');
+    const [leaveBox, reviewBox, nextBox, actionsBox] = await Promise.all([
+      actions.getByRole('button', { name: '回到大厅' }).boundingBox(),
+      actions.getByRole('button', { name: '查看终局牌桌' }).boundingBox(),
+      nextRound.boundingBox(),
+      actions.boundingBox(),
+    ]);
+    expect(leaveBox).not.toBeNull();
+    expect(reviewBox).not.toBeNull();
+    expect(nextBox).not.toBeNull();
+    expect(actionsBox).not.toBeNull();
+    expect(Math.abs(leaveBox!.y - reviewBox!.y)).toBeLessThanOrEqual(1);
+    expect(nextBox!.y).toBeGreaterThan(leaveBox!.y + leaveBox!.height);
+    expect(Math.abs(nextBox!.x - actionsBox!.x - 16)).toBeLessThanOrEqual(1);
+    expect(nextBox!.x + nextBox!.width)
+      .toBeLessThanOrEqual(actionsBox!.x + actionsBox!.width - 15);
+    await expectNoOverflow(page);
+  }
 });

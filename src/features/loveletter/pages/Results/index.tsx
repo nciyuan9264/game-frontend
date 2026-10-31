@@ -108,7 +108,7 @@ export function Results({
     />
   </div>;
 
-  return <div className="ll-results">
+  return <div className="ll-results ll-round-results">
     {topbar}
     <section className="ll-result-hero">{hero}</section>
     <div className="ll-result-layout">

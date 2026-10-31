@@ -1,5 +1,8 @@
 import { useEffect, useMemo, useState } from 'react';
-import type { LoveLetterCard } from '@/api/generated/game-platform';
+import type {
+  LoveLetterCard,
+  LoveLetterPrivateEffect,
+} from '@/api/generated/game-platform';
 import type { LoveLetterSession } from './useLoveLetterSession';
 import { phaseKey, type GameSnapshot } from '../model/session';
 
@@ -26,6 +29,7 @@ export function useLoveLetterPlayUI(
   const [reverseBottom, setReverseBottom] = useState(false);
   const [reviewing, setReviewing] = useState(false);
   const [seenEffectID, setSeenEffectID] = useState('');
+  const [privateEffect, setPrivateEffect] = useState<LoveLetterPrivateEffect>();
 
   const hand = data.privateData.hand ?? [];
   const selectedCard = hand.find(card => card.cardID === selectedCardID);
@@ -48,15 +52,22 @@ export function useLoveLetterPlayUI(
     setSelectedCardID('');
     setTargetPlayerID('');
     setGuessRank(undefined);
-    setPanel(undefined);
+    setPanel(current => current === 'private' ? current : undefined);
     setKeepCardID('');
     setReverseBottom(false);
   }, [phaseKey(data)]);
 
   useEffect(() => {
-    const effectID = data.privateData.effect?.effectID;
+    setPrivateEffect(undefined);
+    setPanel(current => current === 'private' ? undefined : current);
+  }, [data.roomData.roundNo]);
+
+  useEffect(() => {
+    const effect = data.privateData.effect;
+    const effectID = effect?.effectID;
     if (!effectID || effectID === seenEffectID) return;
     setSeenEffectID(effectID);
+    setPrivateEffect(effect);
     setPanel('private');
   }, [data.privateData.effect?.effectID, seenEffectID]);
 
@@ -132,6 +143,11 @@ export function useLoveLetterPlayUI(
     reverseBottom,
     setReverseBottom,
     settleChancellor,
+    privateEffect,
+    closePrivateEffect: () => {
+      setPrivateEffect(undefined);
+      setPanel(undefined);
+    },
     reviewing,
     setReviewing,
   };

@@ -115,8 +115,6 @@ export function Play({
           onClick={() => ui.setPanel('log')}><History size={18} /></button>
         <button type="button" aria-label="角色速查" title="角色速查"
           onClick={() => ui.setPanel('reference')}><BookOpen size={18} /></button>
-        <button type="button" aria-label="对局菜单" title="对局菜单"
-          onClick={onLeave}><MoreHorizontal size={20} /></button>
       </>}
     />
     <header className="ll-game-header" data-game-desktop-topbar>
@@ -246,19 +244,19 @@ export function Play({
     </Dialog>}
     {ui.panel === 'player' && <PlayerDialog data={data} playerID={ui.playerID}
       onClose={() => ui.setPanel(undefined)} />}
-    {ui.panel === 'private' && data.privateData.effect && <Dialog
+    {ui.panel === 'private' && ui.privateEffect && <Dialog
       title="只给你看的秘密" className="ll-secret-dialog"
-      onClose={() => ui.setPanel(undefined)}
-      footer={<ActionButton variant="primary" onClick={() => ui.setPanel(undefined)}>
+      onClose={ui.closePrivateEffect}
+      footer={<ActionButton variant="primary" onClick={ui.closePrivateEffect}>
         记住了，收起秘密<EyeOff size={15} /></ActionButton>}>
       <div className="ll-secret"><LockKeyhole size={14} />
         <span>不会向其他玩家公开</span>
-        {data.privateData.effect.targetRank != null
-          && <PlayingCard rank={data.privateData.effect.targetRank} />}
-        <h3>{data.privateData.effect.kind === 'baron' ? '男爵完成了秘密比较' : '神父看见了这封信'}</h3>
-        <p>{data.privateData.effect.summary}
-          {data.privateData.effect.actorRank != null
-            && ` 你的手牌点数为 ${data.privateData.effect.actorRank}。`}</p></div>
+        {ui.privateEffect.targetRank != null
+          && <PlayingCard rank={ui.privateEffect.targetRank} />}
+        <h3>{ui.privateEffect.kind === 'baron' ? '男爵完成了秘密比较' : '神父看见了这封信'}</h3>
+        <p>{ui.privateEffect.summary}
+          {ui.privateEffect.actorRank != null
+            && ` 你的手牌点数为 ${ui.privateEffect.actorRank}。`}</p></div>
     </Dialog>}
     {ui.panel === 'chancellor' && phase === 'chancellor' && myTurn && <Dialog
       title="大臣 · 留一封，其余沉底" wide className="ll-chancellor-dialog">

@@ -84,4 +84,35 @@ describe('useLoveLetterPlayUI', () => {
     });
     expect(result.current.selectedCard).toBeUndefined();
   });
+
+  it('keeps a private effect open across phase snapshots until dismissed', () => {
+    const session = { submit: vi.fn(() => true) } as unknown as LoveLetterSession;
+    const effect = {
+      effectID: '1-priest-p1',
+      kind: 'priest',
+      targetPlayerID: 'p2',
+      targetRank: 4,
+      summary: '秘密查看了目标手牌。',
+    };
+    const initial = snapshot(1);
+    initial.privateData.effect = effect;
+    const { result, rerender } = renderHook(
+      ({ data }) => useLoveLetterPlayUI(session, data),
+      { initialProps: { data: initial } },
+    );
+
+    expect(result.current.panel).toBe('private');
+    expect(result.current.privateEffect).toEqual(effect);
+
+    const next = snapshot(2);
+    next.roomData.gameStatus = 'draw';
+    rerender({ data: next });
+
+    expect(result.current.panel).toBe('private');
+    expect(result.current.privateEffect).toEqual(effect);
+
+    act(() => result.current.closePrivateEffect());
+    expect(result.current.panel).toBeUndefined();
+    expect(result.current.privateEffect).toBeUndefined();
+  });
 });
