@@ -250,9 +250,9 @@ export function Battle({
         backLabel="退出对局"
         kicker={`房间 ${roomID} · ROUND ${game.round}`}
         title={roomName}
-        status={!end && game.turnDeadline
+        status={!end && myTurn && game.turnDeadline
           ? <TurnCountdown bare secondsOnly deadline={game.turnDeadline} />
-          : end ? '已结束' : '--'}
+          : undefined}
         actions={<>
           <button className="icon-button" type="button" aria-label="查看对局规则"
             title="查看对局规则"

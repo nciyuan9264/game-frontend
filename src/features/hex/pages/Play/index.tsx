@@ -108,9 +108,9 @@ export function Play({
       backLabel="返回大厅"
       kicker={`HEX · 第 ${data.roomData.roundNo} 局`}
       title={data.roomID}
-      status={!ended && data.roomData.turnDeadline
+      status={!ended && myTurn && data.roomData.turnDeadline
         ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-        : ended ? '已结束' : '--'}
+        : undefined}
       actions={<>
         <button type="button" className="header-help" aria-label="玩法指南"
           title="玩法指南" onClick={() => ui.setPanel('rules')}>

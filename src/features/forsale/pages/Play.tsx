@@ -82,8 +82,12 @@ export const Play = ({
   const phase = data.roomData.gameStatus;
   const self = data.playerData[data.playerId];
   const actionDeadline = self?.actionDeadline;
+  const transitionActive = phase === 'buyResult'
+    || phase === 'bridge'
+    || phase === 'sellLocked'
+    || phase === 'sellReveal';
   const countdown = useCountdown(actionDeadline
-    ?? data.roomData.transitionDeadline);
+    ?? (transitionActive ? data.roomData.transitionDeadline : undefined));
   const purchase = latestPurchase(data);
   const sale = latestSale(data);
   const enabled = interaction.enabled;
@@ -112,7 +116,9 @@ export const Play = ({
       backLabel="离开对局"
       kicker={`THE SUNDAY AUCTION · ${data.roomData.playerOrder.length} 人经典局`}
       title={data.roomID}
-      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
+      status={countdown
+        ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown>
+        : undefined}
       actions={<>
         <button type="button" aria-label="公开记录" title="公开记录"
           onClick={() => setPanel('log')}><History size={18} /></button>

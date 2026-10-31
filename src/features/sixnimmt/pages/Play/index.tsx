@@ -261,6 +261,7 @@ export function Play({
   const countdown = useCountdown(data.roomData.turnDeadline);
   const roundCountdown = useCountdown(data.roomData.roundTransitionDeadline);
   const self = data.playerData[data.playerId];
+  const countdownActive = phase === 'selecting' || isMyRowChoice(data);
   const hand = useMemo(() => [...data.privateData.hand].sort((a, b) => a - b),
     [data.privateData.hand]);
 
@@ -309,7 +310,9 @@ export function Play({
       backLabel="离开对局"
       kicker="6 NIMMT! · 经典 66 分制"
       title={`第 ${data.roomData.roundNo} 局 · 第 ${data.roomData.turnNo} / 10 轮`}
-      status={countdown ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown> : undefined}
+      status={countdownActive && countdown
+        ? <GameMobileTopbarCountdown>{countdown}</GameMobileTopbarCountdown>
+        : undefined}
       actions={<>
         <button type="button" aria-label="打开记分板" title="打开记分板"
           onClick={() => setPanel('scores')}><Trophy size={18} /></button>

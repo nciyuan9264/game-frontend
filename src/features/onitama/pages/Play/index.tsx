@@ -364,9 +364,9 @@ export function Play({
       backLabel="返回大厅"
       kicker={`ONITAMA · 第 ${data.roomData.roundNo} 局`}
       title={data.roomID}
-      status={!ended
+      status={!ended && myTurn && data.roomData.turnDeadline
         ? <TurnCountdown deadline={data.roomData.turnDeadline} secondsOnly bare />
-        : '已结束'}
+        : undefined}
       actions={<>
         <button type="button" className="icon-button" aria-label="查看行棋记录"
           title="查看行棋记录"

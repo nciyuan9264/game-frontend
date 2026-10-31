@@ -168,11 +168,9 @@ export function Play({
       backLabel="离开对局"
       kicker={`SPLENDOR · ${playerIDs.length} 人 · ${roundTitle}`}
       title={data.roomID}
-      status={data.roomData.gameStatus === 'end'
-        ? '已结束'
-        : data.roomData.turnDeadline && playable && myTurn
-          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-          : '--'}
+      status={data.roomData.turnDeadline && playable && myTurn
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : undefined}
       actions={<>
         <button type="button" aria-label="商会动态" title="商会动态"
           onClick={() => ui.openPanel('activity')}><History size={18} /></button>
@@ -226,7 +224,8 @@ export function Play({
         })}
       </section>
 
-      <section className={styles.market} data-testid="splendor-market">
+      <section className={styles.market} data-testid="splendor-market"
+        data-compact-mobile={playerIDs.length > 2 ? 'true' : undefined}>
         <div className={styles.nobleArea}><header><Crown size={14} /><span>贵族的青睐</span>
           <small>只计算永久折扣 · 自动结算</small></header>
           <div data-testid="splendor-noble-track">{nobles.map(noble => <NobleTile key={noble.id} noble={noble}

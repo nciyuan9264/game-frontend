@@ -89,7 +89,9 @@ describe('YINSH play', () => {
       connection: { status: 'connected' },
       submit,
     } as unknown as YinshSession;
-    const { rerender } = render(<Play session={session} data={snapshot()} onLeave={vi.fn()} />);
+    const { container, rerender } = render(
+      <Play session={session} data={snapshot()} onLeave={vi.fn()} />
+    );
     expect(screen.getAllByText('30s')).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', { name: '选择白环 E4' }));
     fireEvent.click(screen.getByRole('button', { name: '移动到 E7' }));
@@ -97,6 +99,7 @@ describe('YINSH play', () => {
 
     rerender(<Play session={session} data={snapshot('ai_2')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
+    expect(container.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
     expect(screen.getAllByText('--').length).toBeGreaterThan(0);
   });
 

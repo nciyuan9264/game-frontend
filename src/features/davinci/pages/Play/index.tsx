@@ -102,11 +102,11 @@ export function Play({
       backLabel="离开对局"
       kicker={`ROOM ${data.roomID}`}
       title={phaseTitle}
-      status={data.roomData.gameStatus === 'end'
-        ? undefined
-        : data.roomData.turnDeadline && (initializing || playerTurn)
-          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-          : '--'}
+      status={data.roomData.gameStatus !== 'end'
+        && data.roomData.turnDeadline
+        && (initializing ? !initialHandReady : playerTurn)
+        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+        : undefined}
       actions={<>
         {data.roomData.gameStatus === 'end' && <ActionButton
           aria-label="打开终局结算" title="查看结算"

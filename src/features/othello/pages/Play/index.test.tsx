@@ -94,7 +94,9 @@ describe('OTHELLO play', () => {
       connection: { status: 'connected' },
       submit,
     } as unknown as OthelloSession;
-    const { rerender } = render(<Play session={session} data={snapshot()} onLeave={vi.fn()} />);
+    const { container, rerender } = render(
+      <Play session={session} data={snapshot()} onLeave={vi.fn()} />
+    );
     expect(screen.getAllByText('30s')).toHaveLength(2);
     fireEvent.click(screen.getByRole('button', {
       name: 'D3，可落子，翻转 1 枚',
@@ -102,7 +104,8 @@ describe('OTHELLO play', () => {
     expect(submit).toHaveBeenCalledWith('game_place_disc', { index: 19 });
 
     rerender(<Play session={session} data={snapshot('ai_2')} onLeave={vi.fn()} />);
-    expect(screen.getAllByText('30s')).toHaveLength(2);
+    expect(screen.getAllByText('30s')).toHaveLength(1);
+    expect(container.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
   });
 
   it('submits an explicit pass only in the server pass phase', () => {

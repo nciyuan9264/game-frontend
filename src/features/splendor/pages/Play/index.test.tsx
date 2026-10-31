@@ -9,7 +9,7 @@ afterEach(() => {
   vi.useRealTimers();
 });
 
-function snapshot(currentPlayer: string): GameSnapshot {
+function snapshot(currentPlayer: string, playerCount = 2): GameSnapshot {
   const playerState = {
     normalCard: [],
     nobleCard: [],
@@ -17,6 +17,15 @@ function snapshot(currentPlayer: string): GameSnapshot {
     gem: {},
     score: 0,
   };
+  const playerIDs = ['me', 'guest', 'third', 'fourth'].slice(0, playerCount);
+  const playerData = Object.fromEntries(playerIDs.map(id => [id, playerState]));
+  const players = Object.fromEntries(playerIDs.map(id => [id, {
+    playerID: id,
+    name: id,
+    online: true,
+    ai: false,
+    ready: true,
+  }]));
   return {
     type: 'ROOM_SYNC',
     roomID: 'room',
@@ -27,18 +36,15 @@ function snapshot(currentPlayer: string): GameSnapshot {
     ownerID: 'me',
     visibility: 'public',
     playerId: 'me',
-    playerData: { me: playerState, guest: playerState },
+    playerData,
     roomData: {
       card: {},
       gems: { White: 4, Blue: 4, Green: 4, Red: 4, Black: 4, Gold: 5 },
       nobles: [],
       currentPlayer,
       gameStatus: 'playing',
-      players: {
-        me: { playerID: 'me', name: 'Me', online: true, ai: false, ready: true },
-        guest: { playerID: 'guest', name: 'Guest', online: true, ai: false, ready: true },
-      },
-      playerOrder: ['me', 'guest'],
+      players,
+      playerOrder: playerIDs,
       turnDeadline: '2026-10-25T10:00:30Z',
     },
   } as unknown as GameSnapshot;
@@ -54,12 +60,31 @@ describe('Splendor turn countdown', () => {
       submit: vi.fn(),
     } as unknown as SplendorSession;
 
-    const { rerender } = render(<Play session={session} data={snapshot('me')} onLeave={vi.fn()} />);
+    const { container, rerender } = render(
+      <Play session={session} data={snapshot('me')} onLeave={vi.fn()} />
+    );
     expect(screen.getAllByText('30s')).toHaveLength(2);
     expect(screen.getAllByRole('group', { name: '宝石银行与我的资源对照' })).toHaveLength(2);
 
     rerender(<Play session={session} data={snapshot('guest')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
+    expect(container.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
     expect(screen.getAllByText('--').length).toBeGreaterThan(0);
+  });
+});
+
+describe('Splendor mobile market density', () => {
+  it('enables compact headings only for games with more than two players', () => {
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit: vi.fn(),
+    } as unknown as SplendorSession;
+
+    const { rerender } = render(<Play session={session} data={snapshot('me', 3)} onLeave={vi.fn()} />);
+    expect(screen.getByTestId('splendor-market').getAttribute('data-compact-mobile')).toBe('true');
+
+    rerender(<Play session={session} data={snapshot('me', 2)} onLeave={vi.fn()} />);
+    expect(screen.getByTestId('splendor-market').getAttribute('data-compact-mobile')).toBeNull();
   });
 });

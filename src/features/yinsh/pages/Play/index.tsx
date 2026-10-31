@@ -245,7 +245,7 @@ export function Play({
       title={data.roomID}
       status={!ended && data.roomData.turnDeadline && myTurn
         ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-        : ended ? '已结束' : '--'}
+        : undefined}
       actions={<>
         <button type="button" aria-label="查看棋谱" title="查看棋谱"
           onClick={() => ui.setPanel('activity')}><History size={18} /></button>

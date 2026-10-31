@@ -26,4 +26,16 @@ describe('live game mobile topbar contract', () => {
     expect(source).toContain('GameMobileTopbar');
     expect(source).toContain('<GameMobileTopbar');
   });
+
+  it.each(liveGameEntries)('%s omits inactive countdown placeholders', entry => {
+    const source = readFileSync(new URL(entry, import.meta.url), 'utf8');
+    const statusPrefix = source.match(
+      /<GameMobileTopbar[\s\S]*?status=\{[\s\S]*?actions=/,
+    )?.[0];
+
+    expect(statusPrefix).toBeDefined();
+    expect(statusPrefix).toContain('undefined');
+    expect(statusPrefix).not.toContain("'--'");
+    expect(statusPrefix).not.toContain("'已结束'");
+  });
 });

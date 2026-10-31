@@ -22,6 +22,11 @@ const ai = {
   ai: true,
   ready: true,
 };
+const secondAI = {
+  ...ai,
+  playerID: 'ai_3',
+  seatIndex: 2,
+};
 
 const cards = [
   { level: 1, bonus: 'White', points: 0, cost: { Blue: 2, Green: 2 } },
@@ -55,7 +60,7 @@ const nobles = [
   { id: 'N5', cost: { Red: 4, Black: 4 }, points: 3, state: 1 },
 ];
 
-function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
+function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing', playerCount: 2 | 3 = 2) {
   const emptyPlayer = {
     normalCard: [],
     nobleCard: [],
@@ -63,6 +68,7 @@ function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
     gem: { White: 0, Blue: 0, Green: 0, Red: 0, Black: 0, Gold: 0 },
     score: 0,
   };
+  const roomPlayers = playerCount === 3 ? [human, ai, secondAI] : [human, ai];
   return {
     schemaVersion: 2,
     type: 'ROOM_SYNC',
@@ -78,10 +84,7 @@ function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
           [human.playerID]: { score: 17, cards: 19, nobles: 2 },
           [ai.playerID]: { score: 3, cards: 11, nobles: 0 },
         } : undefined,
-        playerData: {
-          [human.playerID]: emptyPlayer,
-          [ai.playerID]: emptyPlayer,
-        },
+        playerData: Object.fromEntries(roomPlayers.map(player => [player.playerID, emptyPlayer])),
         roomData: {
           card: {
             1: cards.filter(card => card.level === 1),
@@ -97,11 +100,8 @@ function gameSnapshot(gameStatus: 'playing' | 'end' = 'playing') {
             ? new Date(Date.now() + 60_000).toISOString()
             : undefined,
           turnTimeoutMs: '60000',
-          players: {
-            [human.playerID]: human,
-            [ai.playerID]: ai,
-          },
-          playerOrder: [human.playerID, ai.playerID],
+          players: Object.fromEntries(roomPlayers.map(player => [player.playerID, player])),
+          playerOrder: roomPlayers.map(player => player.playerID),
         },
       },
     },
@@ -112,6 +112,7 @@ async function mockSession(
   page: Page,
   snapshot: ReturnType<typeof gameSnapshot> = gameSnapshot(),
 ) {
+  const roomPlayers = Object.values(snapshot.view.splendor.roomData.players);
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 0,
@@ -135,7 +136,7 @@ async function mockSession(
         ownerUserID: human.userID,
         ownerPlayerID: human.playerID,
         maxPlayers: 4,
-        playerCount: 2,
+        playerCount: roomPlayers.length,
         currentMatchID: matchID,
         currentMatchStatus: 'running',
         nextRoundNo: 1,
@@ -143,7 +144,7 @@ async function mockSession(
         updatedAt: '2026-10-28T00:00:00Z',
         displayName: '珠宝商会',
         turnTimeoutSeconds: 60,
-        players: [human, ai],
+        players: roomPlayers,
         metrics: {
           splendor: { maxScore: 0, progressCurrent: 0, progressTotal: 15 },
         },
@@ -155,14 +156,35 @@ async function mockSession(
   });
 }
 
+test('Splendor mobile hides the countdown outside the local turn', async ({
+  page,
+}, testInfo: TestInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const snapshot = gameSnapshot();
+  snapshot.view.splendor.roomData.currentPlayer = ai.playerID;
+  await mockSession(page, snapshot);
+  await page.goto(`/game/splendor/match?roomID=${roomID}`);
+
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  await expect(topbar).toBeVisible();
+  await expect(topbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
+  await expect(topbar.getByText('--', { exact: true })).toHaveCount(0);
+  await page.screenshot({
+    path: testInfo.outputPath('splendor-mobile-waiting-turn.png'),
+    fullPage: true,
+  });
+});
+
 test('Splendor mobile market gives nobles, cards, and gem bank enough space', async ({
   page,
 }, testInfo: TestInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
-  await mockSession(page);
+  await mockSession(page, gameSnapshot('playing', 3));
   await page.goto(`/game/splendor/match?roomID=${roomID}`);
 
   const market = page.getByTestId('splendor-market');
+  const nobleHeading = page.getByText('贵族的青睐', { exact: true });
+  const marketHeading = page.getByText('发展卡市场', { exact: true });
   const nobleTrack = page.getByTestId('splendor-noble-track');
   const nobleTiles = page.getByTestId('splendor-noble');
   const cardMarket = page.getByTestId('splendor-card-market');
@@ -170,6 +192,9 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
   const mobileBank = page.getByTestId('splendor-mobile-bank');
 
   await expect(market).toBeVisible();
+  await expect(market).toHaveAttribute('data-compact-mobile', 'true');
+  await expect(nobleHeading).toBeHidden();
+  await expect(marketHeading).toBeHidden();
   await expect(page.locator('header').first()).toHaveCSS('height', '57px');
   await expect(nobleTiles).toHaveCount(5);
   await expect(boardCards).toHaveCount(12);
@@ -270,6 +295,8 @@ test('Splendor mobile market gives nobles, cards, and gem bank enough space', as
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 
   await page.setViewportSize({ width: 1024, height: 800 });
+  await expect(nobleHeading).toBeVisible();
+  await expect(marketHeading).toBeVisible();
   await expect(page.getByTestId('splendor-deck').first()).toBeVisible();
   await expect(page.getByTestId('splendor-card-name').first()).toBeVisible();
   await expect(costList).toHaveCSS('flex-direction', 'row');
@@ -324,7 +351,7 @@ test('Splendor mobile results keep the ranking and board return chrome orderly',
   const resultsButton = mobileTopbar.getByRole('button', { name: '查看结算' });
   await expect(resultsButton).toBeVisible();
   await expect(mobileTopbar.locator('[data-game-mobile-topbar-status]'))
-    .toHaveText('已结束');
+    .toHaveCount(0);
   await page.screenshot({
     path: testInfo.outputPath('splendor-mobile-board-return.png'),
     fullPage: true,

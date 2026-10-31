@@ -169,6 +169,11 @@
   .layout { display:block; }
   .sidebar { display:none; }
   .market { padding:6px; border-radius:6px; box-shadow:inset 0 0 0 4px #f6f0e34a; }
+  .market[data-compact-mobile='true'] {
+    padding-block:3px;
+    .nobleArea>header,.marketArea>header { display:none; }
+    .nobleArea>div { margin-top:0; padding-top:0; }
+  }
   .nobleArea {
     >header { height:20px; padding:0 1px; font-size:10px; }
     >header svg { width:12px; }

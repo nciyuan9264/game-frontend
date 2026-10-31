@@ -110,11 +110,14 @@ describe('DaVinci turn countdown', () => {
       submit: vi.fn(),
     } as unknown as DavinciSession;
 
-    const { rerender } = render(<Play session={session} data={snapshot('me')} onLeave={vi.fn()} />);
+    const { container, rerender } = render(
+      <Play session={session} data={snapshot('me')} onLeave={vi.fn()} />
+    );
     expect(screen.getAllByText('30s')).toHaveLength(2);
 
     rerender(<Play session={session} data={snapshot('guest')} onLeave={vi.fn()} />);
     expect(screen.queryByText('30s')).toBeNull();
+    expect(container.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
     expect(screen.getAllByText('--').length).toBeGreaterThan(0);
   });
 
@@ -135,6 +138,7 @@ describe('DaVinci turn countdown', () => {
 
     rerender(<Play session={session} data={initializationSnapshot(true)} onLeave={vi.fn()} />);
     expect(screen.queryByRole('button', { name: /确认牌序/ })).toBeNull();
+    expect(document.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
     expect(screen.getAllByText('牌序已确认，等待对手').length).toBeGreaterThan(0);
   });
 

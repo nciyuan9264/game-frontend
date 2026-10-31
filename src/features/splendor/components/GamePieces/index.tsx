@@ -136,8 +136,8 @@ export function DevelopmentCardView({
   const className = `${styles.card} ${styles[`card${density}`]} ${affordable ? styles.affordable : ''}
     ${selected ? styles.cardSelected : ''}`;
   const content = <><span className={styles.cardImage}><Artwork index={display.art} />
-    <i className={styles.cardShade} /><span className={styles.cardPoints}>
-      {card.points > 0 ? card.points : '—'}</span>
+    <i className={styles.cardShade} />
+    {card.points > 0 && <span className={styles.cardPoints}>{card.points}</span>}
     <span className={styles.cardBonus}><GemIcon color={card.bonus} size={26} /></span>
     <span className={styles.cardName} data-testid="splendor-card-name">{display.name}</span>
     {affordable && <span className={styles.canBuy}><Check size={11} /><i>可购</i></span>}</span>
