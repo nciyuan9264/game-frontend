@@ -1,18 +1,37 @@
+import type { ReactNode } from 'react';
 import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
+import { playGameSound } from '@/components/GameUI/GameAudio';
 import type { DavinciSession } from '../../hooks/useDavinciSession';
 import type { GameSnapshot } from '../../model/session';
 import { Play } from '.';
 
+vi.mock('@/components/GameUI/GameAudio', () => ({
+  playGameSound: vi.fn(),
+}));
+
+vi.mock('@/components/GameUI/ResponsiveDialog', () => ({
+  ResponsiveDialog: ({ title, children }: { title: string; children: ReactNode }) =>
+    <div role="dialog" aria-label={title}>{children}</div>,
+}));
+
 vi.mock('../../components/GameCanvas', async () => {
   const { forwardRef } = await import('react');
   return {
-    GameCanvas: forwardRef(() => <div data-testid="game-canvas" />),
+    GameCanvas: forwardRef(({
+      onTileClick,
+    }: {
+      onTileClick: (tileID: string) => void;
+    }, _ref) => <div data-testid="game-canvas">
+      <button type="button" onClick={() => onTileClick('opponent-card')}>opponent card</button>
+      <button type="button" onClick={() => onTileClick('empty-position')}>empty position</button>
+    </div>),
   };
 });
 
 afterEach(() => {
   cleanup();
+  vi.clearAllMocks();
   vi.useRealTimers();
 });
 
@@ -57,6 +76,30 @@ function initializationSnapshot(ready = false): GameSnapshot {
   } as GameSnapshot;
 }
 
+function guessSnapshot(): GameSnapshot {
+  return {
+    ...snapshot('me'),
+    cardData: {
+      self: [],
+      opponents: [{ id: 'opponent-card', color: 1, index: 0, isRevealed: false }],
+    },
+    roomData: {
+      ...snapshot('me').roomData,
+      gameStatus: 'guessCard',
+    },
+  } as GameSnapshot;
+}
+
+function endedSnapshot(): GameSnapshot {
+  return {
+    ...snapshot('me'),
+    roomData: {
+      ...snapshot('me').roomData,
+      gameStatus: 'end',
+    },
+  } as GameSnapshot;
+}
+
 describe('DaVinci turn countdown', () => {
   it('shows the countdown only during the local player turn', () => {
     vi.useFakeTimers();
@@ -93,5 +136,38 @@ describe('DaVinci turn countdown', () => {
     rerender(<Play session={session} data={initializationSnapshot(true)} onLeave={vi.fn()} />);
     expect(screen.queryByRole('button', { name: /确认牌序/ })).toBeNull();
     expect(screen.getAllByText('牌序已确认，等待对手').length).toBeGreaterThan(0);
+  });
+
+  it('hides the mobile status after returning to the final board', () => {
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit: vi.fn(),
+    } as unknown as DavinciSession;
+
+    const { container } = render(<Play session={session} data={endedSnapshot()} onLeave={vi.fn()} />);
+    fireEvent.click(screen.getByRole('button', { name: '查看终局牌面' }));
+
+    expect(container.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
+  });
+});
+
+describe('DaVinci opponent card selection', () => {
+  it('plays the selection sound only for a valid opponent card', () => {
+    const session = {
+      pending: undefined,
+      connection: { status: 'connected' },
+      submit: vi.fn(),
+    } as unknown as DavinciSession;
+
+    render(<Play session={session} data={guessSnapshot()} onLeave={vi.fn()} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'empty position' }));
+    expect(playGameSound).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'opponent card' }));
+    expect(playGameSound).toHaveBeenCalledOnce();
+    expect(playGameSound).toHaveBeenCalledWith('game-select');
+    expect(screen.getByRole('dialog', { name: '猜测这张密码牌' })).not.toBeNull();
   });
 });

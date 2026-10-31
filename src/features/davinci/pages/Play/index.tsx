@@ -2,6 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from 'react';
 import { ArrowLeft, CircleHelp, Eye, Hash, ShieldCheck } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
+import { playGameSound } from '@/components/GameUI/GameAudio';
 import { GameMobileTopbar } from '@/components/GameUI/GameMobileTopbar';
 import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { GameCanvas, type GameCanvasHandle } from '../../components/GameCanvas';
@@ -74,6 +75,7 @@ export function Play({
     if (!interactive) return;
     const opponent = data.cardData.opponents.find(card => card.id === tileID);
     if (opponent && (data.roomData.gameStatus === 'guessCard' || data.roomData.gameStatus === 'setCard')) {
+      playGameSound('game-select');
       setSelectedGuess(opponent);
       return;
     }
@@ -100,10 +102,11 @@ export function Play({
       backLabel="离开对局"
       kicker={`ROOM ${data.roomID}`}
       title={phaseTitle}
-      status={data.roomData.turnDeadline
-        && (initializing || playerTurn) && data.roomData.gameStatus !== 'end'
-        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-        : '--'}
+      status={data.roomData.gameStatus === 'end'
+        ? undefined
+        : data.roomData.turnDeadline && (initializing || playerTurn)
+          ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+          : '--'}
       actions={<>
         {data.roomData.gameStatus === 'end' && <ActionButton
           aria-label="打开终局结算" title="查看结算"

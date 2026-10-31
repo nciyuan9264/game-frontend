@@ -29,6 +29,7 @@ import {
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
+import { GameTabs } from '@/components/GameUI/GameTabs';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -261,11 +262,12 @@ export function Rankings() {
     <div className="page-title"><div><Eyebrow>THE FIELD COMMANDERS</Eyebrow>
       <h1>每一次调遣，都留下判断。</h1><p>按胜率或完成场次，看见稳定的指挥官。</p></div><Trophy size={41} /></div>
     <section className="record-list-panel"><div className="section-heading"><h2>指挥官排行</h2>
-      <div className="tabs" role="tablist" aria-label="排行榜模式">
-        <button role="tab" type="button" aria-selected={mode === 'winRate'} className={mode === 'winRate' ? 'active' : ''}
-          onClick={() => setMode('winRate')}>胜率榜</button>
-        <button role="tab" type="button" aria-selected={mode === 'games'} className={mode === 'games' ? 'active' : ''}
-          onClick={() => setMode('games')}>场次榜</button></div></div>
+      <GameTabs className="tabs" activeClassName="active"
+        ariaLabel="排行榜模式" value={mode} onChange={setMode}
+        items={[
+          { value: 'winRate', label: '胜率榜' },
+          { value: 'games', label: '场次榜' },
+        ]} /></div>
       {leaderboard.loading && !leaderboard.entries.length && <Loading text="正在整理指挥官名册。" />}
       {leaderboard.error && <Notice error>{leaderboard.error}
         <button type="button" className="text-button" onClick={leaderboard.retry}>重试</button></Notice>}

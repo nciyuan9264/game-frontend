@@ -1,0 +1,35 @@
+.item {
+  transition: transform .08s ease, filter .08s ease;
+}
+
+.pressed {
+  animation: gameTabPress 140ms ease-out;
+}
+
+.list[data-game-tabs-pressing='true'] {
+  .item:not(.pressed),
+  .item:not(.pressed)::before,
+  .item:not(.pressed)::after {
+    transition: none !important;
+    animation: none !important;
+    transform: none !important;
+    filter: none !important;
+  }
+}
+
+@keyframes gameTabPress {
+  0%, 100% {
+    transform: none;
+    filter: none;
+  }
+  45% {
+    transform: translateY(1px) scale(.98);
+    filter: brightness(.94);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pressed {
+    animation: none;
+  }
+}

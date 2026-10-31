@@ -11,6 +11,7 @@ import {
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
+import { GameTabs } from '@/components/GameUI/GameTabs';
 import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
@@ -92,9 +93,12 @@ export function Rankings() {
       <h1>每一条路，都留下判断。</h1><p>按胜率或完成场次，看见稳定的棋手。</p></header>
     <section className={styles.rankHero} data-testid="quoridor-rank-hero"><BrandMark size={58} /><div><small>QUORIDOR LEADERBOARD</small><h2>QUORIDOR 棋手榜</h2>
       <p>我的排名 {myIndex >= 0 ? `#${myIndex + 1}` : '—'}</p></div></section>
-    <section className={styles.panel}><div className={styles.tabs} role="tablist" aria-label="排行榜模式"><button type="button"
-      role="tab" aria-selected={mode === 'winRate'} className={mode === 'winRate' ? styles.active : ''} onClick={() => setMode('winRate')}>胜率榜</button>
-      <button type="button" role="tab" aria-selected={mode === 'games'} className={mode === 'games' ? styles.active : ''} onClick={() => setMode('games')}>场次榜</button></div>
+    <section className={styles.panel}><GameTabs className={styles.tabs}
+      activeClassName={styles.active} ariaLabel="排行榜模式"
+      value={mode} onChange={setMode} items={[
+        { value: 'winRate', label: '胜率榜' },
+        { value: 'games', label: '场次榜' },
+      ]} />
       {leaderboard.loading && !leaderboard.entries.length && <QuoridorLoading title="正在整理棋手名册。" description="载入排行榜记录" />}
       {leaderboard.error && <Feedback error>{leaderboard.error}<ActionButton onClick={leaderboard.retry}>重试</ActionButton></Feedback>}
       <div className={`${styles.rankRow} ${styles.rankHead}`}><span>名次</span><span>棋手</span><span>完成对局</span><span>胜场</span><span>胜率</span></div>
