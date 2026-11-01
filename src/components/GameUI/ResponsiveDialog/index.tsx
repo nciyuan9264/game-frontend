@@ -10,6 +10,7 @@ export interface ResponsiveDialogProps {
   children: ReactNode;
   footer?: ReactNode;
   onClose: () => void;
+  dismissible?: boolean;
   wide?: boolean;
   className?: string;
   themeClassName?: string;
@@ -21,6 +22,7 @@ export function ResponsiveDialog({
   children,
   footer,
   onClose,
+  dismissible = true,
   wide,
   className = '',
   themeClassName = '',
@@ -43,10 +45,14 @@ export function ResponsiveDialog({
 
   return <dialog ref={dialogRef} aria-labelledby={titleId} tabIndex={-1}
     className={`${rootStyles.root} ${themeClassName} ${styles.dialog} ${wide ? styles.wide : ''} ${className}`}
-    onCancel={event => { event.preventDefault(); closeRef.current(); }}>
+    onCancel={event => {
+      event.preventDefault();
+      if (dismissible) closeRef.current();
+    }}>
     <header className={styles.header}>
       <div>{eyebrow && <small>{eyebrow}</small>}<h2 id={titleId}>{title}</h2></div>
-      <button type="button" aria-label="关闭面板" onClick={onClose}><X size={21} /></button>
+      {dismissible && <button type="button" aria-label="关闭面板"
+        onClick={onClose}><X size={21} /></button>}
     </header>
     <div className={styles.body}>{children}</div>
     {footer && <footer className={styles.footer}>{footer}</footer>}

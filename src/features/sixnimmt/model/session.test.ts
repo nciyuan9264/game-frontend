@@ -33,13 +33,14 @@ describe('Six Nimmt realtime model', () => {
           },
           privateData: { hand: [55, 88], legalCards: [55, 88], lockedCard: 55 },
           roomData: {
-            gameStatus: 'selecting', roundNo: 1, turnNo: 9,
+            gameStatus: 'revealing', roundNo: 1, turnNo: 9,
             rows: [
               { index: 0, cards: [12, 23], bullheads: 2 },
               { index: 1, cards: [30, 44], bullheads: 8 },
               { index: 2, cards: [61, 64], bullheads: 2 },
               { index: 3, cards: [79, 90], bullheads: 4 },
             ],
+            revealDeadline: '2026-11-01T12:00:15.000Z',
             lockedPlayerIDs: ['p1', 'p2'], activityLog: [], turnTimeoutMs: '60000',
             players: {
               p1: { playerID: 'p1', displayName: 'Alice', seatIndex: 0, online: true, ai: false, ready: true },
@@ -53,6 +54,8 @@ describe('Six Nimmt realtime model', () => {
     expect(parsed?.type).toBe('ROOM_SYNC');
     if (parsed?.type !== 'ROOM_SYNC') throw new Error('room sync expected');
     expect(parsed.seq).toBe(8);
+    expect(parsed.roomData.gameStatus).toBe('revealing');
+    expect(parsed.roomData.revealDeadline).toBe('2026-11-01T12:00:15.000Z');
     expect(parsed.roomData.turnTimeoutMs).toBe(60000);
     expect(parsed.privateData).toEqual({ hand: [55, 88], legalCards: [55, 88], lockedCard: 55 });
     expect(parsed.playerData.p2).not.toHaveProperty('hand');

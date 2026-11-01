@@ -6,6 +6,7 @@ import {
   Check,
   ChevronRight,
   CircleHelp,
+  Clock3,
   Grid2X2,
   Hand,
   History,
@@ -57,6 +58,7 @@ function phaseText(data: GameSnapshot) {
   const phase = data.roomData.gameStatus;
   const self = data.playerData[data.playerId];
   if (phase === 'waiting') return '正在同步所有玩家';
+  if (phase === 'revealing') return '全员出牌已公开，等待按序入列';
   if (phase === 'chooseRow') {
     return isMyRowChoice(data) ? '牌太小，选择一行收取' : '等待玩家选择收行';
   }
@@ -67,6 +69,7 @@ function phaseText(data: GameSnapshot) {
 }
 
 function PlayerBar({ data }: { data: GameSnapshot }) {
+  const revealing = data.roomData.gameStatus === 'revealing';
   return <section className={`sn-players-bar ${
     data.roomData.playerOrder.length > 4 ? 'many' : ''}`}>
     {data.roomData.playerOrder.map(id => {
@@ -78,7 +81,8 @@ function PlayerBar({ data }: { data: GameSnapshot }) {
           avatar={player?.avatar} ai={player?.ai} size={34} />
         <div><b>{playerName(id, data.roomData.players)}
           {player?.ai && <small>AI</small>}</b>
-          <span>{score?.locked ? '已锁定'
+          <span>{revealing ? '已出牌'
+            : score?.locked ? '已锁定'
             : player?.online ? '正在选牌' : '暂时离线'}</span></div>
         <BullScore value={score?.totalPenalty ?? 0} />
       </article>;
@@ -100,6 +104,43 @@ function ResolutionQueue({ data }: { data: GameSnapshot }) {
       </div>;
     })}
     <small>小 <ArrowRight size={12} /> 大</small></section>;
+}
+
+function RevealDialog({
+  data,
+  countdown,
+}: {
+  data: GameSnapshot;
+  countdown: string;
+}) {
+  const seatIndex = new Map(data.roomData.playerOrder.map((id, index) => [id, index]));
+  const selections = [...(data.roomData.lastResolution?.selections ?? [])]
+    .sort((left, right) => (seatIndex.get(left.playerID) ?? Number.MAX_SAFE_INTEGER)
+      - (seatIndex.get(right.playerID) ?? Number.MAX_SAFE_INTEGER));
+
+  return <Dialog title="所有人的牌，公开了。"
+    eyebrow="CARDS REVEALED / 统一公开"
+    wide dismissible={false} className="sn-reveal-dialog"
+    footer={<div className="sn-reveal-countdown" aria-live="polite">
+      <Clock3 size={20} />
+      <div><b role="timer">{countdown || '0s'}</b>
+        <span>后自动按数字从小到大结算</span></div>
+    </div>}>
+    <div className="sn-reveal-grid" data-testid="sixnimmt-reveal">
+      {selections.map(selection => {
+        const player = data.roomData.players[selection.playerID];
+        const name = playerName(selection.playerID, data.roomData.players);
+        return <article key={selection.playerID}
+          data-player-id={selection.playerID}>
+          <PlayerAvatar name={name} avatar={player?.avatar}
+            ai={player?.ai} size={38} />
+          <div><b>{name}</b><small>{player?.ai ? 'AI 玩家' : '已出牌'}</small></div>
+          <NumberCard value={selection.card} compact />
+        </article>;
+      })}
+      {!selections.length && <p className="sn-reveal-empty">正在同步公开结果...</p>}
+    </div>
+  </Dialog>;
 }
 
 function Table({
@@ -258,10 +299,13 @@ export function Play({
   const key = turnKey(data);
   const phase = data.roomData.gameStatus;
   const enabled = session.connection.status === 'connected' && !session.pending;
-  const countdown = useCountdown(data.roomData.turnDeadline);
+  const turnCountdown = useCountdown(data.roomData.turnDeadline);
+  const revealCountdown = useCountdown(data.roomData.revealDeadline);
+  const countdown = phase === 'revealing' ? revealCountdown : turnCountdown;
   const roundCountdown = useCountdown(data.roomData.roundTransitionDeadline);
   const self = data.playerData[data.playerId];
-  const countdownActive = phase === 'selecting' || isMyRowChoice(data);
+  const countdownActive = phase === 'selecting' || phase === 'revealing'
+    || isMyRowChoice(data);
   const hand = useMemo(() => [...data.privateData.hand].sort((a, b) => a - b),
     [data.privateData.hand]);
 
@@ -344,7 +388,8 @@ export function Play({
       <PlayerBar data={data} />
       <div className="sn-phase-track"><span className={phase === 'selecting' ? 'active' : ''}>
         <i>1</i>同时选牌</span><b />
-        <span className={data.roomData.lastResolution ? 'complete' : ''}>
+        <span className={phase === 'revealing' ? 'active'
+          : data.roomData.lastResolution ? 'complete' : ''}>
           <i>2</i>统一公开</span><b />
         <span className={phase === 'chooseRow' ? 'active' : ''}>
           <i>3</i>从小到大入列</span></div>
@@ -412,6 +457,9 @@ export function Play({
             : <ActionButton onClick={() => setPanel('rules')}>
               玩法速查<BookOpen size={14} /></ActionButton>}
     </footer>
+
+    {phase === 'revealing'
+      && <RevealDialog data={data} countdown={revealCountdown} />}
 
     {panel === 'scores' && <Dialog title="记分板 · 牛头越少越好"
       onClose={() => setPanel(undefined)}>

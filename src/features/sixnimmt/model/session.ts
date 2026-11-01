@@ -76,7 +76,7 @@ export type ServerMessage =
   | RealtimeErrorMessage;
 
 const statuses = new Set<GameStatus>([
-  'match', 'waiting', 'selecting', 'chooseRow', 'roundEnd', 'end',
+  'match', 'waiting', 'selecting', 'revealing', 'chooseRow', 'roundEnd', 'end',
 ]);
 
 const arrayOrEmpty = <T>(value: T[] | null | undefined): T[] =>

@@ -7,6 +7,7 @@ export function Dialog({
   children,
   footer,
   onClose = () => {},
+  dismissible,
   wide,
   className,
 }: {
@@ -15,6 +16,7 @@ export function Dialog({
   children: ReactNode;
   footer?: ReactNode;
   onClose?: () => void;
+  dismissible?: boolean;
   wide?: boolean;
   className?: string;
 }) {
@@ -23,6 +25,7 @@ export function Dialog({
     eyebrow={eyebrow}
     footer={footer}
     onClose={onClose}
+    dismissible={dismissible}
     wide={wide}
     className={className}
   >{children}</ResponsiveDialog>;

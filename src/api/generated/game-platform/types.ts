@@ -1452,6 +1452,7 @@ export interface SixNimmtRoomData {
   roundTransitionDeadline?: string;
   players: Record<string, RoomPlayer>;
   playerOrder: string[];
+  revealDeadline?: string;
 }
 
 export interface SixNimmtRoomView {

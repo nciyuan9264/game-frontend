@@ -8,6 +8,7 @@ export type GameStatus =
   | 'match'
   | 'waiting'
   | 'selecting'
+  | 'revealing'
   | 'chooseRow'
   | 'roundEnd'
   | 'end';

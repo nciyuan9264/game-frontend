@@ -1,0 +1,144 @@
+.sn-reveal-dialog {
+  --game-dialog-border: #c8ad83;
+  --game-dialog-bg: #faf7ed;
+  --game-dialog-line: #ded6c5;
+  --game-dialog-footer-bg: #f0eadc;
+  --game-dialog-backdrop: #243128b8;
+  --game-dialog-shadow: 0 24px 80px #34423652;
+  --game-text: #405044;
+  --game-eyebrow: #a55f3d;
+}
+
+.sn-reveal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.sn-reveal-grid article {
+  display: grid;
+  min-width: 0;
+  min-height: 92px;
+  align-items: center;
+  grid-template-columns: 38px minmax(0, 1fr) 50px;
+  gap: 10px;
+  border: 1px solid #d9ddcf;
+  border-radius: 8px;
+  padding: 9px 10px;
+  background: #fffdf7;
+}
+
+.sn-reveal-grid article > div {
+  min-width: 0;
+}
+
+.sn-reveal-grid article > div b,
+.sn-reveal-grid article > div small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sn-reveal-grid article > div b {
+  color: #45594a;
+  font-size: 11px;
+}
+
+.sn-reveal-grid article > div small {
+  margin-top: 5px;
+  color: #8d9589;
+  font-size: 8px;
+}
+
+.sn-reveal-grid .sn-number-card {
+  width: 50px;
+  height: 68px;
+  --number-size: 27px;
+}
+
+.sn-reveal-grid .sn-card-pips {
+  display: none;
+}
+
+.sn-reveal-countdown {
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  color: #8e593d;
+}
+
+.sn-reveal-countdown > div {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sn-reveal-countdown b {
+  min-width: 38px;
+  color: #a24e2f;
+  font-size: 23px;
+  line-height: 1;
+  text-align: right;
+}
+
+.sn-reveal-countdown span {
+  color: #758078;
+  font-size: 10px;
+}
+
+.sn-reveal-empty {
+  grid-column: 1 / -1;
+  margin: 20px 0;
+  color: #78857a;
+  text-align: center;
+}
+
+@media (max-width: 767px) {
+  .sn-reveal-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .sn-reveal-grid article {
+    min-height: 78px;
+    grid-template-columns: 32px minmax(0, 1fr) 44px;
+    gap: 7px;
+    padding: 7px 8px;
+  }
+
+  .sn-reveal-grid article > .sn-avatar {
+    width: 32px !important;
+    height: 32px !important;
+  }
+
+  .sn-reveal-grid .sn-number-card {
+    width: 44px;
+    height: 59px;
+    --number-size: 24px;
+  }
+
+  .sn-reveal-countdown > div {
+    align-items: flex-start;
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .sn-reveal-countdown b {
+    min-width: 0;
+    font-size: 20px;
+    text-align: left;
+  }
+
+  .sn-reveal-countdown span {
+    font-size: 9px;
+  }
+}
+
+@media (max-width: 350px) {
+  .sn-reveal-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

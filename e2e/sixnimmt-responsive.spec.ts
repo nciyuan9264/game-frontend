@@ -34,6 +34,34 @@ function gameSnapshot(status = 'selecting') {
   };
 }
 
+function revealingSnapshot() {
+  const snapshot = gameSnapshot('revealing');
+  return {
+    ...snapshot,
+    seq: 13,
+    view: { sixnimmt: {
+      ...snapshot.view.sixnimmt,
+      roomData: {
+        ...snapshot.view.sixnimmt.roomData,
+        revealDeadline: new Date(Date.now() + 15_000).toISOString(),
+        lastResolution: {
+          resolutionID: 'round-2-turn-1',
+          roundNo: 2,
+          turnNo: 1,
+          rowsBefore: rows,
+          selections: [
+            { playerID: human.playerID, card: 55 },
+            { playerID: ai.playerID, card: 88, automationKind: 'ai' },
+          ],
+          placements: [],
+          rowsAfter: rows,
+          complete: false,
+        },
+      },
+    } },
+  };
+}
+
 function roomSnapshot() {
   return {
     schemaVersion: 2, type: 'MATCH_SYNC', roomID, matchID, seq: 3,
@@ -58,8 +86,11 @@ async function mockPublicData(page: Page) {
   await page.route('**/pam-api/platform/history/games?**', route => route.fulfill({ json: { status_code: 0, message: 'ok', data: { games: [], page: { limit: 20, offset: 0, hasMore: false, total: 0 } } } }));
 }
 
-async function mockSession(page: Page, snapshot: ReturnType<typeof gameSnapshot> | ReturnType<typeof roomSnapshot> = gameSnapshot()) {
+async function mockSession(page: Page, snapshot: ReturnType<typeof gameSnapshot>
+  | ReturnType<typeof revealingSnapshot>
+  | ReturnType<typeof roomSnapshot> = gameSnapshot()) {
   const commands: string[] = [];
+  let sendSnapshot: (next: unknown) => void = () => {};
   await mockProfile(page);
   await page.route(`**/pam-api/platform/rooms/${roomID}?**`, route => route.fulfill({ json: {
     status_code: 0, message: 'ok', data: {
@@ -71,10 +102,11 @@ async function mockSession(page: Page, snapshot: ReturnType<typeof gameSnapshot>
     },
   } }));
   await page.routeWebSocket('**/ws?**', socket => {
-    socket.send(JSON.stringify(snapshot));
+    sendSnapshot = next => socket.send(JSON.stringify(next));
+    sendSnapshot(snapshot);
     socket.onMessage(message => commands.push(String(message)));
   });
-  return commands;
+  return { commands, publish: (next: unknown) => sendSnapshot(next) };
 }
 
 async function expectNoOverflow(page: Page) {
@@ -136,7 +168,7 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   const pageErrors: Error[] = [];
   page.on('pageerror', error => pageErrors.push(error));
   await page.setViewportSize({ width: 390, height: 844 });
-  const commands = await mockSession(page);
+  const { commands } = await mockSession(page);
   await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
   await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
   const topbar = page.locator('[data-game-mobile-topbar]');
@@ -211,6 +243,49 @@ test('Six Nimmt mobile locks one selected card atomically', async ({ page }, tes
   expect(dock!.y + dock!.height).toBeLessThanOrEqual(844);
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-play');
+  expect(pageErrors).toEqual([]);
+});
+
+test('Six Nimmt reveal dialog holds every played card until the next snapshot', async ({ page }, testInfo) => {
+  const pageErrors: Error[] = [];
+  page.on('pageerror', error => pageErrors.push(error));
+  await page.setViewportSize({ width: 390, height: 844 });
+  const { publish } = await mockSession(page, revealingSnapshot());
+  await page.goto(`/game/sixnimmt/match?roomID=${roomID}`);
+
+  const dialog = page.getByRole('dialog', { name: '所有人的牌，公开了。' });
+  const grid = dialog.getByTestId('sixnimmt-reveal');
+  await expect(dialog).toBeVisible();
+  await expect(dialog.getByText(human.displayName, { exact: true })).toBeVisible();
+  await expect(dialog.getByText(ai.displayName, { exact: true })).toBeVisible();
+  await expect(dialog.locator('.sn-number-card[aria-label^="55，"]')).toHaveCount(1);
+  await expect(dialog.locator('.sn-number-card[aria-label^="88，"]')).toHaveCount(1);
+  await expect(dialog.getByRole('timer')).toHaveText(/^\d+s$/);
+  await expect(dialog.getByRole('button', { name: '关闭面板' })).toHaveCount(0);
+
+  for (const viewport of [
+    { width: 390, height: 844, columns: 2 },
+    { width: 320, height: 700, columns: 1 },
+  ]) {
+    await page.setViewportSize(viewport);
+    const box = await dialog.boundingBox();
+    expect(box).not.toBeNull();
+    expect(box!.x).toBeGreaterThanOrEqual(0);
+    expect(box!.x + box!.width).toBeLessThanOrEqual(viewport.width);
+    expect(box!.y + box!.height).toBeLessThanOrEqual(viewport.height);
+    expect(await grid.evaluate(element => getComputedStyle(element)
+      .gridTemplateColumns.split(/\s+/).length)).toBe(viewport.columns);
+    await expectNoOverflow(page);
+    await capture(page, testInfo, `reveal-${viewport.width}x${viewport.height}`);
+  }
+
+  const nextTurn = gameSnapshot('selecting');
+  nextTurn.seq = 14;
+  nextTurn.view.sixnimmt.roomData.turnNo = 2;
+  publish(nextTurn);
+
+  await expect(dialog).toHaveCount(0);
+  await expect(page.getByTestId('sixnimmt-play')).toBeVisible();
   expect(pageErrors).toEqual([]);
 });
 
