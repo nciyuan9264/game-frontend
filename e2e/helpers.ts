@@ -173,6 +173,13 @@ export async function expectMobileFinalResultLayout(
     expect(Math.abs(heroBox!.y - 8)).toBeLessThanOrEqual(1);
     expect(Math.abs(leftGutter - 8)).toBeLessThanOrEqual(1);
     expect(Math.abs(rightGutter - 8)).toBeLessThanOrEqual(1);
+    for (const sectionBox of [standingsBox!, summaryBox!, actionsBox!]) {
+      const sectionRightGutter = viewport!.width
+        - sectionBox.x
+        - sectionBox.width;
+      expect(Math.abs(sectionBox.x - leftGutter)).toBeLessThanOrEqual(1);
+      expect(Math.abs(sectionRightGutter - rightGutter)).toBeLessThanOrEqual(1);
+    }
 
     const hasFooterNote = await footerNote.count() > 0;
     if (hasFooterNote) {
