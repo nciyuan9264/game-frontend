@@ -11,7 +11,7 @@ export const createForSaleRoom = (
 ) => createGameRoom('forsale', {
   visibility,
   maxPlayers: 6,
-  turnTimeoutSeconds: 60,
+  turnTimeoutSeconds: 15,
 }, { signal, authFailure: 'redirect' });
 
 export const listForSaleRooms = (signal?: AbortSignal) =>

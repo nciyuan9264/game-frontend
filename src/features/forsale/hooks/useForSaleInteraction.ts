@@ -8,13 +8,23 @@ export const useForSaleInteraction = (
 ) => {
   const [bid, setBid] = useState(data.roomData.highestBid + 1);
   const [property, setProperty] = useState<number>();
-  const key = `${data.matchID}:${data.seq}:${data.roomData.gameStatus}:${
-    data.roomData.currentPlayer}`;
+  const self = data.playerData[data.playerId];
   useEffect(() => {
     setBid(data.roomData.highestBid + 1);
+  }, [
+    data.matchID,
+    data.roomData.currentPlayer,
+    data.roomData.gameStatus,
+    data.roomData.highestBid,
+  ]);
+  useEffect(() => {
     setProperty(undefined);
-  }, [key, data.roomData.highestBid]);
-  const self = data.playerData[data.playerId];
+  }, [
+    data.matchID,
+    data.roomData.gameStatus,
+    data.roomData.round,
+    self?.locked,
+  ]);
   const enabled = session.connection.status === 'connected' && !session.pending;
   const canBid = enabled
     && data.roomData.gameStatus === 'auction'

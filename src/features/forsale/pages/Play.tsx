@@ -80,13 +80,16 @@ export const Play = ({
   const [reviewing, setReviewing] = useState(false);
   const phase = data.roomData.gameStatus;
   const self = data.playerData[data.playerId];
+  const isAuction = phase === 'auction';
   const actionDeadline = self?.actionDeadline;
   const transitionActive = phase === 'buyResult'
     || phase === 'bridge'
     || phase === 'sellLocked'
     || phase === 'sellReveal';
-  const countdown = useCountdown(actionDeadline
-    ?? (transitionActive ? data.roomData.transitionDeadline : undefined));
+  const countdown = useCountdown(isAuction
+    ? data.roomData.turnDeadline
+    : actionDeadline
+      ?? (transitionActive ? data.roomData.transitionDeadline : undefined));
   const purchase = latestPurchase(data);
   const sale = latestSale(data);
   const enabled = interaction.enabled;
@@ -104,10 +107,12 @@ export const Play = ({
     : data.roomData.propertyMarket;
   const saleTrades = sale?.trades ?? [];
   const mySale = saleTrades.find(trade => trade.playerID === data.playerId);
-  const isAuction = phase === 'auction';
   const myTurn = isAuction && data.roomData.currentPlayer === data.playerId;
   const canPass = enabled && myTurn;
   const maxBid = (self?.coins ?? 0) + (self?.bid ?? 0);
+  const pendingSalePlayers = data.roomData.playerOrder.filter(
+    id => !data.playerData[id]?.locked,
+  );
 
   return <div className="fs-play" data-testid="forsale-play">
     <GameMobileTopbar
@@ -189,7 +194,7 @@ export const Play = ({
               ai={data.roomData.players[id]?.ai} size={25} />
             <b>{id === data.playerId ? '你' : playerLabel(id, data.roomData.players)}</b>
             <small>{phase.startsWith('sell')
-              ? value?.locked ? '已锁定' : '待选择'
+              ? value?.locked ? '已确认' : '待确认'
               : value?.passed ? `获 ${value.wonProperty ?? '—'} 号`
                 : `${value?.bid ?? 0} 枚`}</small></div>;
         })}</div>
@@ -265,13 +270,13 @@ export const Play = ({
           <p><Check size={16} />你获得 <b>{self?.wonProperty ?? '—'} 号 · {
             self?.wonProperty ? propertyName(self.wonProperty) : ''}</b>，实际支出 {
             self?.roundCost ?? 0} 枚。</p>
-          <ActionButton variant="primary" disabled={!enabled}
-            onClick={() => session.submit('game_next_round')}>
-            {data.roomData.round < data.roomData.totalRounds
-              ? '下一轮拍卖' : '进入出售阶段'}<ArrowRight size={15} /></ActionButton>
+          <span className="fs-auto-advance"><ArrowRight size={15} />{
+            countdown ? `${countdown} 后自动` : '即将自动'}{
+            data.roomData.round < data.roomData.totalRounds
+              ? '开始下一轮拍卖' : '进入出售阶段'}</span>
         </section>}
 
-        {phase === 'sellSelect' && <section className="fs-sale-select">
+        {phase === 'sellSelect' && !self?.locked && <section className="fs-sale-select">
           <header><div><h3>这轮，你想卖哪一处？</h3>
             <p><EyeOff size={13} />手牌仅自己可见 · 锁定前可以更换</p></div>
             <span>{self?.propertyCount ?? 0} 张可选</span></header>
@@ -290,9 +295,32 @@ export const Play = ({
               onClick={interaction.lockSale}>锁定这张房产</ActionButton></footer>
         </section>}
 
+        {phase === 'sellSelect' && self?.locked && <section
+          className="fs-locked fs-sale-waiting"
+          data-testid="forsale-sale-waiting">
+          <header><LockKeyhole size={25} /><div>
+            <h3>你的房产已确认，等待其他玩家。</h3>
+            <p>{data.roomData.lockedCount} / {
+              data.roomData.playerOrder.length} 位玩家已确认</p>
+          </div></header><div>{data.roomData.playerOrder.map(id => {
+            const locked = data.playerData[id]?.locked;
+            return <article className={locked ? 'confirmed' : 'pending'} key={id}>
+              <span><Home size={28} /><b>For Sale.</b>
+                <small>{locked ? 'PROPERTY CONFIRMED' : 'WAITING FOR PICK'}</small></span>
+              <p><PlayerAvatar name={playerName(id, data.roomData.players)}
+                ai={data.roomData.players[id]?.ai} size={22} />
+                <b>{id === data.playerId
+                  ? '你' : playerLabel(id, data.roomData.players)}</b>
+                <small>{locked ? '已确认' : '待确认'}</small></p>
+            </article>;
+          })}</div>
+          <footer><ShieldCheck size={14} />还有 {pendingSalePlayers.length} 位玩家未确认，
+            全部确认后自动揭晓。</footer>
+        </section>}
+
         {phase === 'sellLocked' && <section className="fs-locked">
           <header><LockKeyhole size={25} /><div><h3>每个人，都做出了选择。</h3>
-            <p>{data.roomData.lockedCount} / {data.roomData.playerOrder.length} 已锁定</p>
+            <p>正在揭晓本轮出售结果</p>
           </div></header><div>{data.roomData.playerOrder.map(id =>
             <article key={id}><span><Home size={28} /><b>For Sale.</b>
               <small>SEALED PROPERTY</small></span>
@@ -301,10 +329,7 @@ export const Play = ({
                 id === data.playerId && data.playerData[id]?.lockedProperty
                   ? `你 · ${data.playerData[id].lockedProperty} 号`
                   : playerLabel(id, data.roomData.players)}</p></article>)}</div>
-          <footer><ShieldCheck size={14} />揭晓前不会显示其他玩家的房产。
-            <ActionButton variant="primary" disabled={!enabled}
-              onClick={() => session.submit('game_reveal_sale')}>
-              <Sparkles size={15} />一起揭晓</ActionButton></footer>
+          <footer><Sparkles size={14} />全部玩家已确认，正在自动揭晓。</footer>
         </section>}
 
         {phase === 'sellReveal' && <section className="fs-reveal">
@@ -331,10 +356,10 @@ export const Play = ({
               <strong>{chequeMoney(trade.amount)}</strong>
             </article>)}</div><footer><Coins size={17} />你本轮获得 <b>{
               chequeMoney(mySale?.amount ?? 0)}</b>
-            <ActionButton variant="primary" disabled={!enabled}
-              onClick={() => session.submit('game_next_round')}>
-              {data.roomData.round < data.roomData.totalRounds
-                ? '下一轮出售' : '查看最终结算'}<ArrowRight size={15} /></ActionButton></footer>
+            <span className="fs-auto-advance"><ArrowRight size={15} />{
+              countdown ? `${countdown} 后自动` : '即将自动'}{
+              data.roomData.round < data.roomData.totalRounds
+                ? '开始下一轮出售' : '展示最终结算'}</span></footer>
         </section>}
 
         <button className="fs-assets-strip" type="button"
@@ -354,7 +379,7 @@ export const Play = ({
             ai={data.roomData.players[id]?.ai} size={34} />
           <span><b>{playerLabel(id, data.roomData.players)}</b>
             <small>{phase.startsWith('sell')
-              ? data.playerData[id]?.locked ? '已锁定' : '正在选择'
+              ? data.playerData[id]?.locked ? '已确认' : '待确认'
               : data.playerData[id]?.passed ? '已获得房产' : '仍在竞价'}</small></span>
           <strong>{phase.startsWith('sell')
             ? <LockKeyhole size={15} /> : `${data.playerData[id]?.bid ?? 0} 枚`}</strong>

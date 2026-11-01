@@ -72,6 +72,8 @@ describe('for sale protocol', () => {
             players: { '7': player },
             playerOrder: ['7'],
             transitionTimeoutMs: '8000',
+            turnDeadline: '2026-10-27T00:00:15Z',
+            turnTimeoutMs: '15000',
           },
         },
       },
@@ -80,6 +82,7 @@ describe('for sale protocol', () => {
     if (room?.type !== 'ROOM_SYNC') throw new Error('missing room snapshot');
     expect(room.playerData['7'].actionTimeoutMs).toBe(60000);
     expect(room.roomData.transitionTimeoutMs).toBe(8000);
+    expect(room.roomData.turnTimeoutMs).toBe(15000);
   });
 
   it('parses the production lowercase forsale room view while waiting for game ready', () => {

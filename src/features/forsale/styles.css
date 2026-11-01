@@ -502,6 +502,8 @@
 .fs-round-outcome p, .fs-reveal > footer { color: #718666; font-size: 10px; }
 .fs-round-outcome p { display: flex; align-items: center; gap: 6px; }
 .fs-round-outcome b, .fs-reveal > footer b { color: #57744b; }
+.fs-auto-advance { display: inline-flex; align-items: center; gap: 5px; color: #718666;
+  font-size: 9px; white-space: nowrap; }
 .fs-sale-select > header { display: flex; justify-content: space-between; align-items: center;
   padding: 22px 22px 8px; }
 .fs-sale-select h3 { font-size: 16px; font-weight: 500; }
@@ -528,6 +530,10 @@
 .fs-locked article > span small { font-size: 5px; letter-spacing: 1px; }
 .fs-locked article p { display: flex; align-items: center; justify-content: center; gap: 5px;
   margin-top: 10px; color: #718565; font-size: 8px; }
+.fs-sale-waiting article.pending > span { opacity: .58; }
+.fs-sale-waiting article p b { overflow: hidden; font-weight: 500; text-overflow: ellipsis;
+  white-space: nowrap; }
+.fs-sale-waiting article p small { color: var(--fs-muted); white-space: nowrap; }
 .fs-locked > footer { display: flex; align-items: center; justify-content: center; gap: 12px;
   padding: 18px 20px; color: var(--fs-muted); font-size: 8px; }
 .fs-locked > footer button { margin-left: 20px; }
@@ -990,6 +996,7 @@
     background: #f5f5eaf7; backdrop-filter: blur(12px); }
   .fs-round-outcome { flex-direction: column; align-items: stretch; }
   .fs-round-outcome p { font-size: 9px; }
+  .fs-auto-advance { justify-content: flex-end; font-size: 8px; }
   .fs-sale-hand { min-height: 188px; padding: 12px 12px 18px; }
   .fs-sale-hand .fs-property { width: 130px; flex-basis: 130px; }
   .fs-sale-select > header { padding: 19px 12px 6px; }

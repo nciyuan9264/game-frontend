@@ -98,6 +98,11 @@ const gameSnapshot = (count = 3) => {
           actionLog: [],
           players: roomPlayers,
           playerOrder: order,
+          turnDeadline: new Date(Date.now() + 15_000).toISOString() as
+            string | undefined,
+          turnTimeoutMs: '15000' as string | undefined,
+          transitionDeadline: undefined as string | undefined,
+          transitionTimeoutMs: undefined as string | undefined,
         },
       },
     },
@@ -140,6 +145,8 @@ const saleSnapshot = (status: 'sellSelect' | 'sellLocked' | 'sellReveal' | 'end'
   view.roomData.round = 4;
   view.roomData.propertyMarket = [];
   view.roomData.currentPlayer = '';
+  view.roomData.turnDeadline = undefined;
+  view.roomData.turnTimeoutMs = undefined;
   view.roomData.chequeMarket = status === 'sellReveal' || status === 'end'
     ? [] : [0, 8, 15];
   view.playerData['110'] = {
@@ -150,18 +157,27 @@ const saleSnapshot = (status: 'sellSelect' | 'sellLocked' | 'sellReveal' | 'end'
     coins: 7,
     properties: status === 'sellReveal' || status === 'end' ? [4, 27] : [4, 12, 27],
     cheques: status === 'end' ? [2, 4, 5, 7, 8, 10, 12, 15] : [4, 7, 12],
-    locked: status === 'sellLocked',
-    lockedProperty: status === 'sellLocked' ? 12 : undefined,
+    locked: status === 'sellLocked' || status === 'sellReveal',
+    lockedProperty: status === 'sellLocked' || status === 'sellReveal'
+      ? 12 : undefined,
     actionDeadline: status === 'sellSelect'
       ? new Date(Date.now() + 60_000).toISOString() : undefined,
   };
-  if (status === 'sellLocked') {
+  if (status === 'sellLocked' || status === 'sellReveal') {
     view.roomData.lockedCount = 3;
     for (const id of ['ai_2', 'ai_3']) {
-      view.playerData[id] = { ...view.playerData[id], locked: true };
+      view.playerData[id] = {
+        ...view.playerData[id],
+        locked: true,
+        lockedProperty: id === 'ai_2' ? 6 : 23,
+      };
     }
   }
   if (status === 'sellReveal' || status === 'end') {
+    view.roomData.transitionDeadline = status === 'sellReveal'
+      ? new Date(Date.now() + 10_000).toISOString() : undefined;
+    view.roomData.transitionTimeoutMs = status === 'sellReveal'
+      ? '10000' : undefined;
     view.roomData.sales = [{
       round: 4,
       trades: [
@@ -219,11 +235,14 @@ async function mockSession(
       },
     }));
   const commands: string[] = [];
+  let pushSnapshot: (value: ReturnType<typeof gameSnapshot>) => void =
+    () => undefined;
   await page.routeWebSocket('**/ws?**', socket => {
+    pushSnapshot = value => socket.send(JSON.stringify(value));
     socket.send(JSON.stringify(snapshot));
     socket.onMessage(message => commands.push(String(message)));
   });
-  return commands;
+  return { commands, pushSnapshot };
 }
 
 async function mockMatchRoom(
@@ -429,7 +448,7 @@ test('For Sale start dialog centers AI avatar icons', async ({ page }, info) => 
 test('For Sale mobile auction keeps cards and actions usable',
   async ({ page }, info) => {
     await page.setViewportSize({ width: 358, height: 784 });
-    const commands = await mockSession(page, 3);
+    const { commands } = await mockSession(page, 3);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.getByTestId('forsale-play')).toBeVisible();
     await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
@@ -438,6 +457,7 @@ test('For Sale mobile auction keeps cards and actions usable',
     const countdown = mobileTopbar.getByRole('timer');
     const history = mobileTopbar.getByRole('button', { name: '公开记录' });
     const rules = mobileTopbar.getByRole('button', { name: '桌边规则' });
+    await expect(countdown).toHaveText(/1[45]s/);
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 360, height: 800 },
@@ -548,19 +568,64 @@ test('For Sale six-player desktop market remains stable',
 test('For Sale mobile sale selection locks only after confirmation',
   async ({ page }, info) => {
     await page.setViewportSize({ width: 390, height: 844 });
-    const commands = await mockSession(page, 3, saleSnapshot('sellSelect'));
+    const { commands, pushSnapshot } = await mockSession(
+      page,
+      3,
+      saleSnapshot('sellSelect'),
+    );
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
     await expect(page.locator('.fs-cheque-market .fs-cheque')).toHaveCount(3);
     await page.getByRole('button', { name: '选择27号房产' }).click();
     await expect(page.getByRole('button', {
       name: '锁定这张房产',
     })).toBeEnabled();
+    const concurrentSnapshot = saleSnapshot('sellSelect');
+    concurrentSnapshot.seq = '13';
+    concurrentSnapshot.view.forSale.roomData.lockedCount = 1;
+    concurrentSnapshot.view.forSale.playerData.ai_2 = {
+      ...concurrentSnapshot.view.forSale.playerData.ai_2,
+      locked: true,
+    };
+    pushSnapshot(concurrentSnapshot);
+    await expect(page.getByRole('button', {
+      name: '选择27号房产',
+    })).toHaveAttribute('aria-pressed', 'true');
     await page.getByRole('button', { name: '锁定这张房产' }).click();
     await expect.poll(() => commands.some(command =>
       command.includes('"game_lock_sale"')
       && command.includes('"property":27'))).toBe(true);
     await expectNoOverflow(page);
     await capture(page, info, 'sale-select-mobile');
+  });
+
+test('For Sale sale waiting state shows players still choosing',
+  async ({ page }, info) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const snapshot = saleSnapshot('sellSelect');
+    snapshot.view.forSale.roomData.lockedCount = 2;
+    snapshot.view.forSale.playerData['110'] = {
+      ...snapshot.view.forSale.playerData['110'],
+      locked: true,
+      lockedProperty: 12,
+      actionDeadline: undefined,
+    };
+    snapshot.view.forSale.playerData.ai_2 = {
+      ...snapshot.view.forSale.playerData.ai_2,
+      locked: true,
+    };
+    await mockSession(page, 3, snapshot);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+
+    await expect(page.getByRole('heading', {
+      name: '你的房产已确认，等待其他玩家。',
+    })).toBeVisible();
+    const waiting = page.getByTestId('forsale-sale-waiting');
+    await expect(waiting.locator('article.confirmed')).toHaveCount(2);
+    await expect(waiting.locator('article.pending')).toHaveCount(1);
+    await expect(waiting.locator('article.pending')).toContainText('松子');
+    await expect(waiting.getByText('还有 1 位玩家未确认')).toBeVisible();
+    await expectNoOverflow(page);
+    await capture(page, info, 'sale-waiting-mobile');
   });
 
 test('For Sale mobile sale reveal aligns player and property details',
@@ -571,6 +636,8 @@ test('For Sale mobile sale reveal aligns player and property details',
     snapshot.view.forSale.roomData.players['110'].avatar = userAvatar;
     await mockSession(page, 3, snapshot);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
+    await expect(page.getByRole('timer')).toHaveText(/(9|10)s/);
+    await expect(page.getByRole('button', { name: '下一轮出售' })).toHaveCount(0);
 
     const reveal = page.locator('.fs-reveal');
     const rows = reveal.locator('article');
@@ -619,6 +686,41 @@ test('For Sale mobile sale reveal aligns player and property details',
     }
     await page.setViewportSize({ width: 390, height: 844 });
     await capture(page, info, 'sale-reveal-mobile');
+  });
+
+test('For Sale buy result keeps the automatic eight-second hold',
+  async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    const snapshot = gameSnapshot(3);
+    const view = snapshot.view.forSale;
+    view.roomData.gameStatus = 'buyResult';
+    view.roomData.currentPlayer = '';
+    view.roomData.propertyMarket = [];
+    view.roomData.turnDeadline = undefined;
+    view.roomData.turnTimeoutMs = undefined;
+    view.roomData.transitionDeadline = new Date(Date.now() + 8_000).toISOString();
+    view.roomData.transitionTimeoutMs = '8000';
+    view.roomData.purchases = [{
+      round: 2,
+      trades: [
+        { playerID: '110', property: 6, amount: 1 },
+        { playerID: 'ai_2', property: 11, amount: 2 },
+        { playerID: 'ai_3', property: 14, amount: 3 },
+      ],
+    }];
+    view.playerData['110'] = {
+      ...view.playerData['110'],
+      wonProperty: 6,
+      roundCost: 1,
+      actionDeadline: undefined,
+    };
+    await mockSession(page, 3, snapshot);
+    await page.goto(`/game/forsale/match?roomID=${roomID}`);
+
+    await expect(page.getByRole('timer')).toHaveText(/(7|8)s/);
+    await expect(page.getByText('本轮房产归属')).toBeVisible();
+    await expect(page.getByRole('button', { name: '下一轮拍卖' })).toHaveCount(0);
+    await expect(page.getByText(/自动开始下一轮拍卖/)).toBeVisible();
   });
 
 test('For Sale results support tied winners and final-table review',

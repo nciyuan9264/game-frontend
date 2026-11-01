@@ -45,10 +45,11 @@ export interface GameSnapshot extends
   playerData: Record<string, NormalizedPlayerState>;
   roomData: Omit<
     ForSaleRoomView['roomData'],
-    'gameStatus' | 'transitionTimeoutMs' | 'players'
+    'gameStatus' | 'transitionTimeoutMs' | 'turnTimeoutMs' | 'players'
   > & {
     gameStatus: GameStatus;
     transitionTimeoutMs?: number;
+    turnTimeoutMs?: number;
     players: Record<string, ForSalePlayer>;
   };
 }
@@ -160,6 +161,9 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
       transitionTimeoutMs: view.roomData.transitionTimeoutMs == null
         ? undefined
         : Number(view.roomData.transitionTimeoutMs),
+        turnTimeoutMs: view.roomData.turnTimeoutMs == null
+          ? undefined
+          : Number(view.roomData.turnTimeoutMs),
       players: normalizePlayers(view.roomData.players),
     },
   };

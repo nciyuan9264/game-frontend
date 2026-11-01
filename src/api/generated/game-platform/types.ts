@@ -1637,6 +1637,8 @@ export interface ForSaleRoomData {
   transitionTimeoutMs?: string;
   players: Record<string, RoomPlayer>;
   playerOrder: string[];
+  turnDeadline?: string;
+  turnTimeoutMs?: string;
 }
 
 export interface ForSalePlayerResult {
