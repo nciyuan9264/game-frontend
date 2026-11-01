@@ -774,6 +774,7 @@ export default function Home() {
           <Popover
             placement="bottomRight"
             trigger="click"
+            defaultOpen
             color="#151e2d"
             classNames={{ root: styles.communityPopover }}
             content={(
