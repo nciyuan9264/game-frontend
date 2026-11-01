@@ -65,6 +65,7 @@ export interface LoginShowcaseData {
   total_players: string;
   newly_joined_players: string;
   recent_players: LoginShowcasePlayer[];
+  total_games: string;
 }
 
 export interface LoginShowcaseResp {
