@@ -187,6 +187,22 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(page.getByText('用户增长与活跃')).toBeVisible();
   await expect(page.getByText('对局活跃时长（估算）')).toBeVisible();
   await expect(page.getByText('在线时长', { exact: true })).toHaveCount(0);
+  const desktopScroll = await page.locator('main').evaluate(main => {
+    const workspace = main.parentElement;
+    if (!workspace) return null;
+    const before = workspace.scrollTop;
+    workspace.scrollTo({ top: workspace.scrollHeight });
+    return {
+      before,
+      after: workspace.scrollTop,
+      clientHeight: workspace.clientHeight,
+      scrollHeight: workspace.scrollHeight,
+      overflowY: getComputedStyle(workspace).overflowY,
+    };
+  });
+  expect(desktopScroll?.overflowY).toBe('auto');
+  expect(desktopScroll?.scrollHeight).toBeGreaterThan(desktopScroll?.clientHeight ?? 0);
+  expect(desktopScroll?.after).toBeGreaterThan(desktopScroll?.before ?? 0);
 
   await page.getByRole('link', { name: '用户' }).click();
   await expect(page.getByRole('heading', { name: '用户活跃' })).toBeVisible();
@@ -221,6 +237,22 @@ test('admin navigation fits a narrow mobile viewport', async ({ page }) => {
   expect(layout.documentFits).toBe(true);
   expect(layout.navRect?.bottom).toBeLessThanOrEqual(layout.viewportHeight + 1);
   expect(layout.navRect?.top).toBeGreaterThan(500);
+
+  const mobileScroll = await page.locator('main').evaluate(main => {
+    const workspace = main.parentElement;
+    if (!workspace) return null;
+    workspace.scrollTo({ top: workspace.scrollHeight });
+    return {
+      scrollTop: workspace.scrollTop,
+      clientHeight: workspace.clientHeight,
+      scrollHeight: workspace.scrollHeight,
+      overflowY: getComputedStyle(workspace).overflowY,
+    };
+  });
+  expect(mobileScroll?.overflowY).toBe('auto');
+  expect(mobileScroll?.scrollHeight).toBeGreaterThan(mobileScroll?.clientHeight ?? 0);
+  expect(mobileScroll?.scrollTop).toBeGreaterThan(0);
+  await expect(page.getByRole('navigation', { name: '后台导航' })).toBeVisible();
 
   await page.getByRole('link', { name: '用户' }).click();
   await expect(page.getByRole('heading', { name: '用户活跃' })).toBeVisible();

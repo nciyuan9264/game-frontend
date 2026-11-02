@@ -3,8 +3,10 @@
   --admin-muted: #68717d;
   --admin-ink: #18202a;
   display: grid;
-  min-height: 100dvh;
+  height: 100dvh;
+  min-height: 0;
   grid-template-columns: 224px minmax(0, 1fr);
+  overflow: hidden;
   background: #f4f6f8;
   color: var(--admin-ink);
   font-family: "DM Sans Variable", "Noto Sans SC Variable", sans-serif;
@@ -97,7 +99,12 @@
 }
 
 .workspace {
+  height: 100%;
   min-width: 0;
+  min-height: 0;
+  overflow-x: hidden;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
 }
 
 .topbar {
@@ -913,7 +920,6 @@
 @media (max-width: 720px) {
   .adminRoot {
     display: block;
-    padding-bottom: calc(62px + env(safe-area-inset-bottom));
   }
 
   .sidebar {
@@ -972,7 +978,7 @@
   }
 
   .adminMain {
-    padding: 14px 10px 24px;
+    padding: 14px 10px calc(86px + env(safe-area-inset-bottom));
   }
 
   .pageStack {
