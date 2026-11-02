@@ -22,7 +22,7 @@ import type {
   LeaderboardSortDim,
 } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
-import { AppShell } from '../../components/AppShell';
+import { AppShell, ProfileMonogram } from '../../components/AppShell';
 import {
   Modal,
   roleName,
@@ -141,9 +141,11 @@ function RankingRoleSelect({
 
 function RankAvatar({
   name,
+  avatar,
   index,
 }: {
   name: string;
+  avatar?: string;
   index: number;
 }) {
   const variants = [
@@ -152,8 +154,10 @@ function RankAvatar({
     styles.avatarCopper,
     styles.avatarBlue,
   ];
-  return <span className={`${styles.rankAvatar} ${variants[index % variants.length]}`}
-    aria-hidden="true">{Array.from(name.trim() || '追')[0]}</span>;
+  return <ProfileMonogram
+    className={`${styles.rankAvatar} ${variants[index % variants.length]}`}
+    profile={{ name, avatar }}
+  />;
 }
 
 export default function Rankings() {
@@ -192,12 +196,13 @@ export default function Rankings() {
         entries={entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: `${Math.round(entry.winRate * 100)}%`,
           metricLabel: '胜率',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={entry => <RankAvatar name={entry.displayName}
+        renderAvatar={entry => <RankAvatar name={entry.displayName} avatar={entry.avatar}
           index={entries.findIndex(item =>
             String(item.userID) === String(entry.id))} />}
         controls={<RankingRoleSelect value={role} onChange={setRole} />}
@@ -277,7 +282,7 @@ export default function Rankings() {
             </span>
             <button className={styles.rankPlayer} type="button"
               onClick={() => setSelected(entry)}>
-              <RankAvatar name={entry.displayName} index={index} />
+              <RankAvatar name={entry.displayName} avatar={entry.avatar} index={index} />
               <span><b>{entry.displayName}{mine && <em>你</em>}</b>
                 <small>#{entry.playerID}</small></span>
             </button>
@@ -316,7 +321,8 @@ export default function Rankings() {
       footer={<button className="button secondary" type="button"
         onClick={() => setSelected(undefined)}><ArrowLeft size={14} />返回排行榜</button>}>
       <div className={styles.playerDossier}>
-        <RankAvatar name={selected.displayName} index={entries.indexOf(selected)} />
+        <RankAvatar name={selected.displayName} avatar={selected.avatar}
+          index={entries.indexOf(selected)} />
         <div><span>{boardName}</span><h3>线上追逃记录</h3>
           <p>{selected.totalGames} 场已完成对局</p></div>
       </div>

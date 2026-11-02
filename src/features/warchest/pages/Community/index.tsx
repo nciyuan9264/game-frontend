@@ -238,12 +238,14 @@ export function Rankings() {
         entries={leaderboard.entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: `${Math.round(entry.winRate * 100)}%`,
           metricLabel: '胜率',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={() => <Crest size={29} />}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName}
+          avatar={entry.avatar} size={29} />}
         state={<>{leaderboard.loading && !leaderboard.entries.length
           && <Loading text="正在整理指挥官名册。" />}
           {leaderboard.error && <Notice error>{leaderboard.error}
@@ -273,7 +275,9 @@ export function Rankings() {
         <button type="button" className="text-button" onClick={leaderboard.retry}>重试</button></Notice>}
       <div className="rank-row head"><span>名次</span><span>指挥官</span><span>完成对局</span><span>胜场</span><span>胜率</span></div>
       {leaderboard.entries.map((entry, index) => <div className="rank-row" key={entry.userID}>
-        <b>{String(index + 1).padStart(2, '0')}</b><span><Crest size={34} /><strong>{entry.displayName}</strong></span>
+        <b>{String(index + 1).padStart(2, '0')}</b><span><PlayerAvatar
+          name={entry.displayName} avatar={entry.avatar} size={34} />
+          <strong>{entry.displayName}</strong></span>
         <span>{entry.totalGames}</span><span>{entry.wins}</span><strong>{Math.round(entry.winRate * 100)}%</strong></div>)}
       {!leaderboard.loading && !leaderboard.entries.length && <div className="empty-state">
         <Trophy size={34} /><h3>名册还没有写下名字</h3><p>完成第一场对局后，排名会出现在这里。</p></div>}

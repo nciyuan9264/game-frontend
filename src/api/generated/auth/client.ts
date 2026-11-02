@@ -15,6 +15,7 @@ import type {
   VerifyTokenResp,
   UpdateUserReq,
   UploadAvatarResp,
+  ListAvatarPresetsResp,
   ListPasskeysResp,
   SendPasskeyManagementCodeReq,
   PasskeyManagementCodeResp,
@@ -141,7 +142,7 @@ export function GetProfile(options?: any): Promise<UserResp> {
 export function UpdateUser(req: UpdateUserReq, options?: any): Promise<UserResp> {
   const url = genAuthServiceBaseURL('/platform/auth/update');
   const method = 'POST';
-  const data = { email: req.email, name: req.name, avatar: req.avatar };
+  const data = { email: req.email, name: req.name, avatar: req.avatar, avatar_id: req.avatar_id };
   return AuthServiceOptions.request({ url, method, data }, options);
 }
 
@@ -151,6 +152,13 @@ export function UploadAvatar(req: FormData, options?: any): Promise<UploadAvatar
   const method = 'POST';
   const data = req;
   return AuthServiceOptions.request({ url, method, data }, options);
+}
+
+/** 获取预置头像目录 */
+export function ListAvatarPresets(options?: any): Promise<ListAvatarPresetsResp> {
+  const url = genAuthServiceBaseURL('/platform/auth/avatar-presets');
+  const method = 'GET';
+  return AuthServiceOptions.request({ url, method }, options);
 }
 
 /** 列出当前账号通行密钥 */

@@ -97,12 +97,13 @@ export function Rankings() {
         entries={entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: 'avgRank' in entry ? entry.avgRank.toFixed(2) : '—',
           metricLabel: '平均名次',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={29} />}
         state={<>{loading && !entries.length
           && <SplendorLoading title="正在整理皇家名册。" description="载入排行榜记录" />}
           {error && <Feedback error>{error}
@@ -128,7 +129,7 @@ export function Rankings() {
         const mine = String(entry.userID) === String(profile.data?.id);
         return <div className={`${styles.rankRow} ${mine ? styles.mine : ''}`} key={entry.userID}>
           <span className={styles.rankNumber}>{String(index + 1).padStart(2, '0')}</span>
-          <span className={styles.rankPlayer}><PlayerAvatar name={entry.displayName} size={37} />
+          <span className={styles.rankPlayer}><PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={37} />
             <strong>{entry.displayName}</strong>{mine && <em>你</em>}</span>
           <span>{entry.totalGames}</span><b>{'avgRank' in entry ? entry.avgRank.toFixed(2) : '—'}</b>
         </div>;

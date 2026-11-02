@@ -89,12 +89,13 @@ export function Rankings() {
         entries={entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: `${(entry.winRate * 100).toFixed(1)}%`,
           metricLabel: '胜率',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={29} />}
         state={<>{loading && !entries.length
           && <DavinciLoading title="正在整理破译记录。" description="读取排行榜" />}
           {error && <Feedback error>{error}</Feedback>}</>}
@@ -114,7 +115,7 @@ export function Rankings() {
       <header><span>名次</span><span>玩家</span><span>胜场</span><span>胜率</span><span>对局</span></header>
       {entries.map((entry, index) => <div key={entry.userID} className={String(entry.userID) === String(profile.data?.id) ? styles.mine : ''}>
         <span>{index === 0 ? <Trophy size={18} /> : String(index + 1).padStart(2, '0')}</span>
-        <span><PlayerAvatar name={entry.displayName} size={34} /><b>{entry.displayName}</b></span>
+        <span><PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={34} /><b>{entry.displayName}</b></span>
         <span>{entry.wins}</span><span>{(entry.winRate * 100).toFixed(1)}%</span><span>{entry.totalGames}</span>
       </div>)}
       {loading && !entries.length && <DavinciLoading title="正在整理破译记录。" description="读取排行榜" />}

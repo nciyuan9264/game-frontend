@@ -8,6 +8,7 @@ export interface UserIdentity {
   display_name?: string;
   avatar?: string;
   roles?: string[];
+  avatar_id?: string;
 }
 
 export interface EmptyData {}
@@ -117,6 +118,7 @@ export interface UpdateUserReq {
   email?: string;
   name?: string;
   avatar?: string;
+  avatar_id?: string;
 }
 
 export interface UploadAvatarReq {
@@ -132,6 +134,26 @@ export interface UploadAvatarResp {
   status_code: number;
   message: string;
   data: UploadAvatarData;
+}
+
+export interface AvatarPreset {
+  id: string;
+  name: string;
+  avatar: string;
+  thumbnail: string;
+}
+
+export interface ListAvatarPresetsReq {}
+
+export interface ListAvatarPresetsData {
+  version: string;
+  presets: AvatarPreset[];
+}
+
+export interface ListAvatarPresetsResp {
+  status_code: number;
+  message: string;
+  data: ListAvatarPresetsData;
 }
 
 export interface GetUserReq {

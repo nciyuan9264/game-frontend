@@ -120,6 +120,7 @@ export interface LeaderboardEntryBase {
   userID: GameID;
   playerID: string;
   displayName: string;
+  avatar?: string;
   totalGames: number;
 }
 
@@ -169,102 +170,79 @@ export interface LeaderboardData {
 export function toLeaderboardEntry(
   entry: GeneratedLeaderboardEntry,
 ): LeaderboardEntry {
+  const identity = {
+    userID: entry.userID,
+    playerID: entry.playerID,
+    displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
+    avatar: entry.avatar,
+    totalGames: entry.totalGames,
+  };
   if (entry.metric.davinci) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.davinci.wins,
       winRate: entry.metric.davinci.winRate,
     };
   }
   if (entry.metric.yinsh) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.yinsh.wins,
       winRate: entry.metric.yinsh.winRate,
     };
   }
   if (entry.metric.othello) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.othello.wins,
       winRate: entry.metric.othello.winRate,
     };
   }
   if (entry.metric.fugitive) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.fugitive.wins,
       winRate: entry.metric.fugitive.winRate,
     };
   }
   if (entry.metric.warchest) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.warchest.wins,
       winRate: entry.metric.warchest.winRate,
     };
   }
   if (entry.metric.quoridor) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.quoridor.wins,
       winRate: entry.metric.quoridor.winRate,
     };
   }
   if (entry.metric.hex) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.hex.wins,
       winRate: entry.metric.hex.winRate,
     };
   }
   if (entry.metric.cantstop) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.cantstop.wins,
       winRate: entry.metric.cantstop.winRate,
     };
   }
   if (entry.metric.onitama) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.onitama.wins,
       winRate: entry.metric.onitama.winRate,
     };
   }
   if (entry.metric.hive) {
     return {
-      userID: entry.userID,
-      playerID: entry.playerID,
-      displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-      totalGames: entry.totalGames,
+      ...identity,
       wins: entry.metric.hive.wins,
       winRate: entry.metric.hive.winRate,
     };
@@ -273,10 +251,7 @@ export function toLeaderboardEntry(
     throw new Error('排行榜指标类型不受支持');
   }
   return {
-    userID: entry.userID,
-    playerID: entry.playerID,
-    displayName: entry.displayName ?? `玩家 ${entry.playerID}`,
-    totalGames: entry.totalGames,
+    ...identity,
     avgRank: entry.metric.rank.avgRank,
   };
 }

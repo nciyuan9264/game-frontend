@@ -2120,6 +2120,7 @@ export interface LeaderboardEntry {
   totalGames: number;
   metric: LeaderboardMetric;
   displayName?: string;
+  avatar?: string;
 }
 
 export interface ListHistoryGamesReq {

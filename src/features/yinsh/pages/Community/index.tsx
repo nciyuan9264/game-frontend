@@ -69,12 +69,13 @@ export function Rankings() {
         entries={leaderboard.entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: `${Math.round(entry.winRate * 100)}%`,
           metricLabel: '胜率',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={29} />}
         state={<>{leaderboard.loading && !leaderboard.entries.length
           && <YinshLoading title="正在整理棋手名册。" description="载入排行榜记录" />}
           {leaderboard.error && <Feedback error>{leaderboard.error}
@@ -102,7 +103,7 @@ export function Rankings() {
       {leaderboard.error && <Feedback error>{leaderboard.error}<ActionButton onClick={leaderboard.retry}>重试</ActionButton></Feedback>}
       <div className={`${styles.rankRow} ${styles.rankHead}`}><span>名次</span><span>棋手</span><span>完成对局</span><span>胜场</span><span>胜率</span></div>
       {leaderboard.entries.map((entry, index) => <div className={`${styles.rankRow} ${String(entry.userID) === String(profile.data?.id) ? styles.mine : ''}`} key={entry.userID}>
-        <b>{String(index + 1).padStart(2, '0')}</b><span><PlayerAvatar name={entry.displayName} size={36} /><strong>{entry.displayName}</strong></span>
+        <b>{String(index + 1).padStart(2, '0')}</b><span><PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={36} /><strong>{entry.displayName}</strong></span>
         <span>{entry.totalGames}</span><span>{entry.wins}</span><strong>{Math.round(entry.winRate * 100)}%</strong></div>)}
       {!leaderboard.loading && !leaderboard.entries.length && <Feedback>暂时还没有排名记录。</Feedback>}
     </section>

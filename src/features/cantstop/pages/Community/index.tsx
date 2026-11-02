@@ -55,14 +55,14 @@ export function Rankings() {
         entries={leaderboard.entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: `${(entry.winRate * 100).toFixed(1)}%`,
           metricLabel: '胜率',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
         renderAvatar={entry => <PlayerAvatar name={entry.displayName}
-          avatar={String(entry.id) === String(profile.data?.id)
-            ? profile.data?.avatar : undefined} size={29} />}
+          avatar={entry.avatar} size={29} />}
         state={<>{leaderboard.loading && !leaderboard.entries.length
           && <CantStopLoading title="正在整理山路榜单。"
             description="同步最新完成对局" />}
@@ -96,7 +96,7 @@ export function Rankings() {
         return <div className={`cs-rank-row ${mine ? 'self' : ''}`} key={entry.userID}>
           <span>{index === 0 ? <Trophy size={20} /> : String(index + 1).padStart(2, '0')}</span>
           <span><PlayerAvatar name={entry.displayName}
-            avatar={mine ? profile.data?.avatar : undefined} size={36} />
+            avatar={entry.avatar} size={36} />
             <b>{entry.displayName}</b>{mine && <em>你</em>}</span>
           <span>{entry.wins}<small> / {entry.totalGames}</small></span><strong>{(entry.winRate * 100).toFixed(1)}%</strong></div>;
       })}

@@ -72,12 +72,13 @@ export function Rankings() {
         entries={leaderboard.entries.map(entry => ({
           id: String(entry.userID),
           displayName: entry.displayName,
+          avatar: entry.avatar,
           totalGames: entry.totalGames,
           metric: entry.avgRank.toFixed(2),
           metricLabel: '平均名次',
         }))}
         currentUserID={String(profile.data?.id ?? '')}
-        renderAvatar={entry => <PlayerAvatar name={entry.displayName} size={29} />}
+        renderAvatar={entry => <PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={29} />}
         state={<>{leaderboard.loading && !leaderboard.entries.length
           && <LoveLetterLoading title="正在整理宫廷名册。"
             description="同步最新完成对局" />}
@@ -120,7 +121,7 @@ export function Rankings() {
           const mine = String(entry.userID) === String(profile.data?.id);
           return <div className={`ll-rank-row ${mine ? 'self' : ''}`} key={entry.userID}>
             <span>{index === 0 ? <Trophy size={20} /> : String(index + 1).padStart(2, '0')}</span>
-            <span><PlayerAvatar name={entry.displayName} size={36} />
+            <span><PlayerAvatar name={entry.displayName} avatar={entry.avatar} size={36} />
               <b>{entry.displayName}</b>{mine && <em>你</em>}</span>
             <span>{entry.totalGames}<small>场</small></span>
             <strong>{entry.avgRank.toFixed(2)}</strong></div>;
