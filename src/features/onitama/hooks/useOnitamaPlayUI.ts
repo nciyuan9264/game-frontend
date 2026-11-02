@@ -15,7 +15,6 @@ import type {
 export type OnitamaPanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'zoom';
 

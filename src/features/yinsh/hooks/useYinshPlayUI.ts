@@ -4,7 +4,6 @@ import type { GameSnapshot } from '../model/session';
 export type YinshPanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'points';
 

@@ -9,7 +9,6 @@ import {
   Flag,
   History,
   Maximize2,
-  MoreHorizontal,
   Repeat2,
   ShieldCheck,
   Trophy,
@@ -379,8 +378,8 @@ export function Play({
           aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}><Trophy size={18} /></button>}
         {!ended && <button type="button" className="icon-button"
-          aria-label="对局菜单" title="对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={20} /></button>}
+          aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
       </>}
     />
     <header className="game-header" data-game-desktop-topbar>
@@ -402,8 +401,9 @@ export function Play({
         onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
       {ended && <button type="button" className="icon-button" aria-label="返回终局结算"
         onClick={() => ui.setShowResults(true)}><Trophy size={18} /></button>}
-      {!ended && <button type="button" className="icon-button" aria-label="对局菜单"
-        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={20} /></button>}
+      {!ended && <button type="button" className="icon-button"
+        aria-label="认输" title="认输"
+        onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
     </header>
 
     <div className="game-titlebar">
@@ -565,22 +565,6 @@ export function Play({
       <p className="rule-small-note">
         可以越过棋子，不能出界或叠在己方棋子上。只有两张手牌都无路可走时，才可换牌并跳过。
       </p>
-    </Dialog>}
-    {ui.panel === 'menu' && <Dialog title="停一停，也无妨。"
-      eyebrow="A MOMENT BETWEEN MOVES" onClose={() => ui.setPanel(undefined)}
-      footer={<button type="button" className="button primary full"
-        onClick={() => ui.setPanel(undefined)}>继续对弈</button>}>
-      <div className="menu-options">
-        <button type="button" onClick={() => ui.setPanel('activity')}>
-          <History size={21} /><span><strong>完整棋谱</strong>
-            <small>查看已经走过的每一式</small></span><ChevronRight size={18} /></button>
-        <button type="button" onClick={() => ui.setPanel('rules')}>
-          <BookOpen size={21} /><span><strong>规则速查</strong>
-            <small>招式流转与两条胜路</small></span><ChevronRight size={18} /></button>
-        <button type="button" onClick={() => ui.setPanel('resign')}>
-          <Flag size={21} /><span><strong>认输结束</strong>
-            <small>结束这盘棋，棋谱仍会保留</small></span><ChevronRight size={18} /></button>
-      </div>
     </Dialog>}
     {ui.panel === 'resign' && <Dialog title="确定结束这一局？"
       eyebrow="CONCEDE THE GAME" onClose={() => ui.setPanel(undefined)}

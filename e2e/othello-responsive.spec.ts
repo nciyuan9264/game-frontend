@@ -188,8 +188,16 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
     name: '黑白棋棋盘，8 行 8 列。方向键移动，回车落子。',
   });
   await expect(board).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  await expect(topbar).toBeVisible();
   await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
+  const commandsBeforeResign = commands.length;
+  await expect(topbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(topbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await topbar.getByRole('button', { name: '认输' }).click();
+  await expect(page.getByRole('dialog', { name: '这一局，要在这里停下吗？' })).toBeVisible();
+  expect(commands).toHaveLength(commandsBeforeResign);
+  await page.getByRole('button', { name: '关闭面板' }).click();
   await expect(page.getByRole('heading', { name: '轮到你了' })).toBeVisible();
   await expect(board.locator(':scope > i')).toHaveCount(0);
   await expect.poll(() => page.getByTestId('cell-A1').evaluate(element => ({
@@ -228,6 +236,9 @@ test('Othello desktop keeps board and sidebar visible at 1440x900', async ({ pag
   await page.setViewportSize({ width: 1440, height: 900 });
   await mockSession(page);
   await page.goto(`/game/othello/match?roomID=${roomID}`);
+  const desktopTopbar = page.locator('[data-game-desktop-topbar]');
+  await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: '黑白之间，一步转机。' })).toBeVisible();
   await expect(page.getByText('最后的多，', { exact: false })).toBeVisible();
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
@@ -256,6 +267,7 @@ test('Othello mobile final result returns through the timer slot', async ({
   await page.getByRole('button', { name: '回到棋盘' }).click();
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
   await expect(page.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '认输' })).toHaveCount(0);
   await expect(page.getByRole('button', {
     name: /选择棋盘上的合法位置|等待对手落子/,
   })).toHaveCount(0);

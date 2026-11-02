@@ -348,8 +348,16 @@ test('Hive mobile submits only service-provided placement and movement', async (
 
   const board = page.getByRole('group', { name: '无边界六边形棋盘' });
   await expect(board).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  await expect(topbar).toBeVisible();
   await expect(page.locator('.hive-game-header')).toBeHidden();
+  const commandsBeforeResign = commands.length;
+  await expect(topbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(topbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await topbar.getByRole('button', { name: '认输' }).click();
+  await expect(page.getByRole('dialog', { name: '这一巢，要停在这里吗？' })).toBeVisible();
+  expect(commands).toHaveLength(commandsBeforeResign);
+  await page.getByRole('button', { name: '关闭面板' }).click();
   expect((await board.boundingBox())?.width).toBeGreaterThanOrEqual(360);
   await page.getByTestId('cell--2,1').click();
   await expect(page.getByRole('button', { name: '确认部署' })).toBeEnabled();
@@ -403,6 +411,7 @@ test('Hive mobile results return to a compact final board', async ({
   expect((await board.boundingBox())?.width).toBeGreaterThanOrEqual(360);
   await expect(page.getByRole('button', { name: '打开对局菜单' }))
     .toHaveCount(0);
+  await expect(page.getByRole('button', { name: '认输' })).toHaveCount(0);
   await expectNoOverflow(page);
   await capture(page, testInfo, 'mobile-final-board');
   expect(pageErrors).toEqual([]);
@@ -414,6 +423,9 @@ test('Hive desktop keeps the board, actions, and journal visible', async ({
   await page.setViewportSize({ width: 1440, height: 900 });
   await mockSession(page);
   await page.goto(`/game/hive/match?roomID=${roomID}`);
+  const desktopTopbar = page.locator('[data-game-desktop-topbar]');
+  await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
 
   await expect(page.getByRole('heading', {
     name: '一片蜂巢，等你布局。',

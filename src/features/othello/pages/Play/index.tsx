@@ -9,7 +9,6 @@ import {
   Info,
   Lightbulb,
   Maximize2,
-  MoreHorizontal,
   ShieldCheck,
   SkipForward,
   Trophy,
@@ -201,8 +200,8 @@ export function Play({
           onClick={() => ui.setPanel('activity')}><History size={18} /></button>
         <button type="button" aria-label="玩法指南" title="玩法指南"
           onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-        {!ended && <button type="button" aria-label="打开对局菜单" title="打开对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
+        {!ended && <button type="button" aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
         {ended && <button type="button" aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}><Trophy size={17} /></button>}
       </>}
@@ -215,8 +214,8 @@ export function Play({
       <span className={styles.spacer} />
       <button type="button" aria-label="查看棋谱" onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南" onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-      {!ended && <button type="button" aria-label="打开对局菜单"
-        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
+      {!ended && <button type="button" aria-label="认输" title="认输"
+        onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
       {ended
         ? <button type="button" className={styles.resultReturn}
           aria-label="返回终局结算" onClick={() => ui.setShowResults(true)}>
@@ -325,16 +324,6 @@ export function Play({
         {guideSections.map((section, index) => <article key={section[0]}>
           <span>0{index + 1}</span><div><h3>{section[0]}</h3><p>{section[1]}</p></div></article>)}
         <p><Info size={15} />线上对局不提供撤回或策略推荐；合法落点提示不改变服务端判定。</p>
-      </div></Dialog>}
-    {!ended && ui.panel === 'menu' && <Dialog title="落子之外" eyebrow="YOUR GAME, YOUR PACE"
-      onClose={() => ui.setPanel(undefined)}><div className={styles.menu}>
-        <button type="button" onClick={() => ui.setPanel('activity')}><History size={20} />
-          <span><b>查看棋谱</b><small>回看当前对局的每一步</small></span><ChevronRight size={16} /></button>
-        <button type="button" onClick={() => ui.setPanel('rules')}><BookOpen size={20} />
-          <span><b>玩法指南</b><small>经典规则、跳过与终局计分</small></span><ChevronRight size={16} /></button>
-        <button type="button" className={styles.danger} disabled={ended}
-          onClick={() => ui.setPanel('resign')}><Flag size={19} />
-          <span><b>结束并认输</b><small>对局会立即结束并由对方获胜</small></span><ChevronRight size={16} /></button>
       </div></Dialog>}
     {ui.panel === 'resign' && <Dialog title="这一局，要在这里停下吗？" eyebrow="END THIS GAME"
       onClose={() => ui.setPanel(undefined)}

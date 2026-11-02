@@ -4,7 +4,6 @@ import type { GameSnapshot } from '../model/session';
 export type OthelloPanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'zoom';
 

@@ -584,11 +584,6 @@
   .move-swatch { background: #819faa; }
   .modal-footnote { margin-top: 13px; color: #a4a089; font-size: 8px; line-height: 1.9; text-align: center; }
   .modal-copy { color: #8c9180; font-size: 12px; line-height: 2; }
-  .menu-options { display: flex; flex-direction: column; gap: 10px; }
-  .menu-options > button { display: flex; align-items: center; gap: 14px; padding: 16px; border: 1px solid var(--line) !important; border-radius: 4px; text-align: left; }
-  .menu-options > button > span { flex: 1; }
-  .menu-options strong { display: block; font-size: 12px; font-weight: 500; }
-  .menu-options small { display: block; margin-top: 5px; color: #a0a18d; font-size: 9px; }
   .quick-rules { display: flex; margin: 0 0 20px; padding: 0; flex-direction: column; gap: 20px; list-style: none; }
   .quick-rules > li { display: flex; align-items: flex-start; gap: 14px; }
   .quick-rules > li > span { display: grid; width: 27px; height: 27px; place-items: center; flex: none; border: 1px solid #c5cbb9; border-radius: 50%; color: #8a9781; font: 13px Georgia,serif; }

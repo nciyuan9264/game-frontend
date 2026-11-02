@@ -207,8 +207,22 @@ async function mockSession(
     socket.send(JSON.stringify(snapshot));
     socket.onMessage(message => commands.push(String(message)));
   });
+
   return commands;
 }
+
+test('Hex direct resign submits only after confirmation', async ({ page }) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  const commands = await mockSession(page, gameSnapshot());
+  await page.goto(`/game/hex/match?roomID=${roomID}`);
+
+  await page.locator('[data-game-mobile-topbar]')
+    .getByRole('button', { name: '认输' }).click();
+  expect(commands).toHaveLength(0);
+  await page.getByRole('button', { name: '确认认输' }).click();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"game_resign"'))).toBe(true);
+});
 
 async function expectNoOverflow(page: Page) {
   await expect.poll(() => page.evaluate(() =>
@@ -283,8 +297,16 @@ test('Hex mobile preselects and confirms an authoritative legal move', async ({
     name: '十一乘十一连边棋棋盘，陶红连接南北，湖绿连接东西',
   });
   await expect(board).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  await expect(topbar).toBeVisible();
   await expect(page.locator('.playing-page > .top-shell .app-header')).toBeHidden();
+  const commandsBeforeResign = commands.length;
+  await expect(topbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(topbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await topbar.getByRole('button', { name: '认输' }).click();
+  await expect(page.getByRole('dialog', { name: '确定结束这一局吗？' })).toBeVisible();
+  expect(commands).toHaveLength(commandsBeforeResign);
+  await page.getByRole('button', { name: '关闭面板' }).click();
   await expect(board.locator('[data-cell]')).toHaveCount(121);
   await page.getByTestId('cell-E5').click();
   await expect(page.getByRole('button', { name: /确认落子 E5/ })).toBeEnabled();
@@ -327,6 +349,9 @@ test('Hex desktop keeps board, actions, and journal visible', async ({
   await expect(page.getByRole('heading', {
     name: '落子之间，两岸相连。',
   })).toBeVisible();
+  const desktopTopbar = page.locator('[data-game-desktop-topbar]');
+  await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('group', {
     name: '十一乘十一连边棋棋盘，陶红连接南北，湖绿连接东西',
   })).toBeVisible();

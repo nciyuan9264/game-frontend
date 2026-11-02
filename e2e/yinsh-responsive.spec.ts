@@ -177,8 +177,16 @@ test('YINSH mobile board and action dock fit 390x844', async ({ page }) => {
   const board = page.getByRole('group', { name: 'YINSH 棋盘，85 个交点' });
   const turnStatus = page.getByTestId('turn-status');
   await expect(board).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const topbar = page.locator('[data-game-mobile-topbar]');
+  await expect(topbar).toBeVisible();
   await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
+  const commandsBeforeResign = commands.length;
+  await expect(topbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(topbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await topbar.getByRole('button', { name: '认输' }).click();
+  await expect(page.getByRole('dialog', { name: '这一步，想好了吗？' })).toBeVisible();
+  expect(commands).toHaveLength(commandsBeforeResign);
+  await page.getByRole('button', { name: '关闭面板' }).click();
   await expect(turnStatus).toHaveCSS('height', '100px');
   await expect.poll(() => board.evaluate(element =>
     getComputedStyle(element).colorScheme)).toBe('light only');
@@ -251,6 +259,9 @@ test('YINSH desktop keeps board and sidebar visible at 1440x900', async ({ page 
   await page.setViewportSize({ width: 1440, height: 900 });
   await mockSession(page);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
+  const desktopTopbar = page.locator('[data-game-desktop-topbar]');
+  await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await expect(page.getByRole('heading', { name: '进退之间，胜负无声。' })).toBeVisible();
   await expect(page.getByText('取三环，赢一局。')).toBeVisible();
   await expect(page.getByText('公共棋子池')).toBeVisible();

@@ -16,7 +16,6 @@ import type {
 export type QuoridorPanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'zoom'
   | 'wall-picker';

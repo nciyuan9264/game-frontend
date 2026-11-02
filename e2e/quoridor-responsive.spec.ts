@@ -321,8 +321,16 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
 
   const board = page.getByRole('group', { name: 'Quoridor 九乘九棋盘' });
   await expect(board).toBeVisible();
-  await expect(page.locator('[data-game-mobile-topbar]')).toBeVisible();
+  const mobileTopbar = page.locator('[data-game-mobile-topbar]');
+  await expect(mobileTopbar).toBeVisible();
   await expect(page.locator('.playing-page > .top-shell > .app-header')).toBeHidden();
+  const commandsBeforeResign = commands.length;
+  await expect(mobileTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(mobileTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
+  await mobileTopbar.getByRole('button', { name: '认输' }).click();
+  await expect(page.getByRole('dialog', { name: '这一程，要在这里停下吗？' })).toBeVisible();
+  expect(commands).toHaveLength(commandsBeforeResign);
+  await page.getByRole('button', { name: '关闭面板' }).click();
   await expect(board.getByTestId(/^cell-/)).toHaveCount(81);
   const dock = page.getByTestId('quoridor-mobile-dock');
   const cancelButton = dock.getByRole('button', { name: '取消选择' });
@@ -436,6 +444,7 @@ test('Quoridor mobile results and final board keep a compact usable shell', asyn
   await expect(page.getByRole('button', {
     name: '打开对局菜单',
   })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '认输' })).toHaveCount(0);
   await expect(page.locator('[data-game-mobile-topbar-identity] strong'))
     .toHaveCSS('white-space', 'nowrap');
   await expectNoOverflow(page);
@@ -469,7 +478,7 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
   await expectNoOverflow(page);
   await capture(page, testInfo, 'game-1440x900');
-  await expect(page.getByRole('button', {
-    name: '打开对局菜单',
-  })).toBeVisible();
+  const desktopTopbar = page.locator('[data-game-desktop-topbar]');
+  await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
 });

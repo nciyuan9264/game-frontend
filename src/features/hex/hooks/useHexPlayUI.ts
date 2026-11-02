@@ -5,7 +5,6 @@ import type { Cell } from '../model/types';
 export type HexPanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'swap'
   | 'zoom';

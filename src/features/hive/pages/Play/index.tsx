@@ -10,7 +10,6 @@ import {
   Layers,
   Lightbulb,
   Maximize2,
-  MoreHorizontal,
   ShieldCheck,
   Trophy,
   X,
@@ -303,9 +302,8 @@ export function Play({
           onClick={() => ui.setPanel('activity')}><History size={18} /></button>
         <button type="button" aria-label="玩法指南" title="玩法指南"
           onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-        {!ended && <button type="button" aria-label="打开对局菜单"
-          title="打开对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
+        {!ended && <button type="button" aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
         {ended && <button type="button" aria-label="返回终局结算"
           title="返回终局结算"
           onClick={() => ui.setShowResults(true)}><Trophy size={17} /></button>}
@@ -324,8 +322,8 @@ export function Play({
         onClick={() => ui.setPanel('activity')}><History size={18} /></button>
       <button type="button" aria-label="玩法指南"
         onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-      {!ended && <button type="button" aria-label="打开对局菜单"
-        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={21} /></button>}
+      {!ended && <button type="button" aria-label="认输" title="认输"
+        onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
       {ended
         ? <button type="button" className="hive-result-return"
           onClick={() => ui.setShowResults(true)}><Trophy size={15} />
@@ -515,24 +513,6 @@ export function Play({
           <h3>{title}</h3><p>{copy}</p></div></article>)}
         <p><ShieldCheck size={16} />
           客户端只展示服务端确认的合法行动，不自行重算规则。</p>
-      </div>
-    </Dialog>}
-    {!ended && ui.panel === 'menu' && <Dialog title="落子之外。"
-      eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
-      <div className="hive-menu">
-        <button type="button" onClick={() => ui.setPanel('activity')}>
-          <History size={21} /><span><b>行棋记录</b>
-            <small>查看本局每一次部署、移动与过手</small></span>
-          <ChevronRight size={16} /></button>
-        <button type="button" onClick={() => ui.setPanel('rules')}>
-          <BookOpen size={21} /><span><b>玩法指南</b>
-            <small>蜂巢、部署、虫群步法与胜负</small></span>
-          <ChevronRight size={16} /></button>
-        <button type="button" className="danger"
-          onClick={() => ui.setPanel('resign')}>
-          <Flag size={21} /><span><b>结束并认输</b>
-            <small>需要再次确认，本局立即结束</small></span>
-          <ChevronRight size={16} /></button>
       </div>
     </Dialog>}
     {!ended && ui.panel === 'resign' && <Dialog title="这一巢，要停在这里吗？"

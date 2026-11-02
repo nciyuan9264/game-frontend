@@ -13,7 +13,6 @@ import {
   History,
   Info,
   Maximize2,
-  MoreHorizontal,
   RotateCw,
   Route,
   ShieldCheck,
@@ -301,6 +300,9 @@ export function Play({
         <button type="button" className="header-help" aria-label="玩法指南"
           title="玩法指南" onClick={() => ui.setPanel('rules')}>
           <BookOpen size={19} /><span data-game-mobile-action-label>玩法指南</span></button>
+        {!ended && <button type="button" className="icon-button"
+          aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={20} /></button>}
         {ended && <button type="button" className="header-help"
           aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}>
@@ -322,8 +324,8 @@ export function Play({
           onClick={() => ui.setPanel('rules')}><BookOpen size={19} />
           <span>玩法指南</span></button>
         {!ended && <button type="button" className="icon-button"
-          aria-label="打开对局菜单" onClick={() => ui.setPanel('menu')}>
-          <MoreHorizontal size={23} /></button>}
+          aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={20} /></button>}
         {ended
           ? <button type="button" className="header-help"
             onClick={() => ui.setShowResults(true)}>
@@ -566,24 +568,6 @@ export function Play({
           <h3>{title}</h3><p>{copy}</p></div></article>)}
         <p><ShieldCheck size={16} />
           客户端只展示服务端确认的合法落点、墙位与参考通路。</p>
-      </div>
-    </Dialog>}
-    {!ended && ui.panel === 'menu' && <Dialog title="落步之外。"
-      eyebrow="YOUR GAME, YOUR PACE" onClose={() => ui.setPanel(undefined)}>
-      <div className="menu-list" data-testid="quoridor-game-menu">
-        <button type="button" onClick={() => ui.setPanel('activity')}>
-          <History size={21} /><span><b>行棋记录</b>
-            <small>查看本局每一次移动与放墙</small></span>
-          <ChevronRight size={16} /></button>
-        <button type="button" onClick={() => ui.setPanel('rules')}>
-          <BookOpen size={21} /><span><b>玩法指南</b>
-            <small>目标、围墙、跳跃与胜负</small></span>
-          <ChevronRight size={16} /></button>
-        <button type="button" className="danger"
-          onClick={() => ui.setPanel('resign')}>
-          <Flag size={21} /><span><b>结束并认输</b>
-            <small>需要再次确认，本局立即结束</small></span>
-          <ChevronRight size={16} /></button>
       </div>
     </Dialog>}
     {!ended && ui.panel === 'resign' && <Dialog title="这一程，要在这里停下吗？"

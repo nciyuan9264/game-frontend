@@ -1,6 +1,6 @@
 import {
   ArrowLeft, ArrowLeftRight, BookOpen, Check, Flag, History,
-  Maximize2, MoreHorizontal, ShieldCheck, Trophy, X,
+  Maximize2, ShieldCheck, Trophy, X,
 } from 'lucide-react';
 import TurnCountdown from '@/components/TurnCountdown';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -117,8 +117,8 @@ export function Play({
           title="玩法指南" onClick={() => ui.setPanel('rules')}>
           <BookOpen size={19} /><span data-game-mobile-action-label>玩法指南</span></button>
         {!ended && <button type="button" className="icon-button"
-          aria-label="打开对局菜单" title="打开对局菜单"
-          onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>}
+          aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={20} /></button>}
         {ended && <button type="button" className="header-help"
           aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}>
@@ -133,8 +133,8 @@ export function Play({
       <span className="header-space" /><span className="local-tag"><i />服务端权威</span>
       <button className="header-help" aria-label="玩法指南"
         onClick={() => ui.setPanel('rules')}><BookOpen size={19} /><span>玩法指南</span></button>
-      {!ended && <button className="icon-button" aria-label="打开对局菜单"
-        onClick={() => ui.setPanel('menu')}><MoreHorizontal size={23} /></button>}
+      {!ended && <button className="icon-button" aria-label="认输" title="认输"
+        onClick={() => ui.setPanel('resign')}><Flag size={20} /></button>}
       {ended ? <button className="header-help" onClick={() => ui.setShowResults(true)}>
         <Trophy size={17} /><span>结算</span></button>
         : <span className="header-context turn-context"><strong>
@@ -203,16 +203,6 @@ export function Play({
       onClose={() => ui.setPanel(undefined)}><div className="checks-list">
         {rules.map(([title, copy]) => <section key={title}>
           <h3>{title}</h3><p>{copy}</p></section>)}
-      </div></Dialog>}
-    {ui.panel === 'menu' && <Dialog title="这一局，慢慢来" eyebrow="A QUIET MOMENT"
-      onClose={() => ui.setPanel(undefined)}><div className="menu-list">
-        <button onClick={() => ui.setPanel('activity')}>
-          <History size={18} /><span>行棋记录</span></button>
-        <button onClick={() => ui.setPanel('rules')}>
-          <BookOpen size={18} /><span>玩法指南</span></button>
-        <button onClick={onLeave}><ArrowLeft size={18} /><span>离开对局</span></button>
-        <button className="danger" onClick={() => ui.setPanel('resign')}>
-          <Flag size={18} /><span>认输</span></button>
       </div></Dialog>}
     {ui.panel === 'resign' && <Dialog title="确定结束这一局吗？" eyebrow="RESIGN"
       onClose={() => ui.setPanel(undefined)}

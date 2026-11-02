@@ -564,19 +564,6 @@
 
   /* Dialog content */
   .dialog-paragraph { padding: 4px 0 10px; color: #768278; font-size: 12px; line-height: 1.9; }
-  .menu-list { display: flex; flex-direction: column; }
-  .menu-list > button {
-    display: flex;
-    align-items: center;
-    gap: 13px;
-    padding: 17px 3px;
-    border-bottom: 1px solid #e1e3d6;
-    color: #687b70;
-    text-align: left;
-  }
-  .menu-list > button:last-child { border-bottom: 0; }
-  .menu-list > button span { font-size: 12px; }
-  .menu-list .danger { color: #a35d52; }
   .checks-list { display: grid; gap: 0; }
   .checks-list section { padding: 13px 0; border-bottom: 1px solid #e2e4d7; }
   .checks-list section:last-child { border-bottom: 0; }

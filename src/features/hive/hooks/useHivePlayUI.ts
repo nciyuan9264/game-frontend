@@ -18,7 +18,6 @@ import type {
 export type HivePanel =
   | 'activity'
   | 'rules'
-  | 'menu'
   | 'resign'
   | 'zoom'
   | 'insect'
