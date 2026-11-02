@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { toBlob } from 'html-to-image';
+import { getFontEmbedCSS, toBlob } from 'html-to-image';
 import type { GameType } from '@/hooks/useGameType';
 import { getResultCard } from './api';
 import { resultImageFilename } from './format';
@@ -19,8 +19,29 @@ interface BlobCache {
   blob: Blob;
 }
 
-function abortError(): DOMException {
-  return new DOMException('Operation aborted', 'AbortError');
+interface BlobTask {
+  key: string;
+  promise: Promise<Blob>;
+}
+
+interface ModelCache {
+  key: string;
+  model: ResultCardModel;
+}
+
+let resultCardFontCSS: Promise<string> | undefined;
+let resultCardModelCache: ModelCache | undefined;
+let resultCardBlobCache: BlobCache | undefined;
+let resultCardBlobTask: BlobTask | undefined;
+
+export function warmResultCardFonts(node: HTMLElement): Promise<string> {
+  if (!resultCardFontCSS) {
+    resultCardFontCSS = getFontEmbedCSS(node).catch(reason => {
+      resultCardFontCSS = undefined;
+      throw reason;
+    });
+  }
+  return resultCardFontCSS;
 }
 
 export function supportsFileShare(): boolean {
@@ -45,23 +66,31 @@ export function useResultCardShare({
   const [status, setStatus] = useState<ShareStatus>('closed');
   const [model, setModel] = useState<ResultCardModel>();
   const [error, setError] = useState('');
+  const [imageReady, setImageReady] = useState(false);
+  const [imagePreparing, setImagePreparing] = useState(false);
   const requestIDRef = useRef(0);
-  const operationIDRef = useRef(0);
   const abortRef = useRef<AbortController>();
-  const blobCacheRef = useRef<BlobCache>();
 
   const load = useCallback(async () => {
     const requestID = ++requestIDRef.current;
     abortRef.current?.abort();
     const controller = new AbortController();
     abortRef.current = controller;
-    blobCacheRef.current = undefined;
+    const modelKey = `${gameType}:${matchID}`;
+    setImageReady(false);
+    setImagePreparing(false);
     setStatus('loading');
     setError('');
     try {
-      const next = await getResultCard(gameType, matchID, controller.signal);
+      const next = resultCardModelCache?.key === modelKey
+        ? resultCardModelCache.model
+        : await getResultCard(gameType, matchID, controller.signal);
       if (requestID !== requestIDRef.current) return;
+      resultCardModelCache = { key: modelKey, model: next };
       setModel(next);
+      setImageReady(
+        resultCardBlobCache?.key === `${modelKey}:${next.endedAt}`,
+      );
       setStatus('ready');
     } catch (reason) {
       if (
@@ -82,58 +111,77 @@ export function useResultCardShare({
 
   useEffect(() => () => {
     requestIDRef.current++;
-    operationIDRef.current++;
     abortRef.current?.abort();
-    blobCacheRef.current = undefined;
   }, []);
 
   const open = useCallback(() => setVisible(true), []);
   const close = useCallback(() => {
     requestIDRef.current++;
-    operationIDRef.current++;
     abortRef.current?.abort();
-    blobCacheRef.current = undefined;
+    setImageReady(false);
+    setImagePreparing(false);
     setVisible(false);
     setModel(undefined);
     setError('');
     setStatus('closed');
   }, []);
 
-  const generateBlob = useCallback(async (
-    node: HTMLElement,
-    actionStatus: 'exporting' | 'sharing',
-  ) => {
+  const generateBlob = useCallback(async (node: HTMLElement) => {
     if (!model) throw new Error('战绩卡片尚未准备完成');
     const cacheKey = `${gameType}:${matchID}:${model.endedAt}`;
-    if (blobCacheRef.current?.key === cacheKey) {
-      return blobCacheRef.current.blob;
+    if (resultCardBlobCache?.key === cacheKey) {
+      return resultCardBlobCache.blob;
     }
-    const operationID = ++operationIDRef.current;
-    setStatus(actionStatus);
-    setError('');
-    await document.fonts?.ready;
-    await new Promise<void>(resolve =>
-      requestAnimationFrame(() => resolve()));
-    if (operationID !== operationIDRef.current) throw abortError();
-    const blob = await toBlob(node, {
-      cacheBust: true,
-      pixelRatio: 2,
-      width: 540,
-      height: 720,
-      backgroundColor: resultCardTheme(gameType).paper,
-    });
-    if (operationID !== operationIDRef.current) throw abortError();
-    if (!blob) throw new Error('浏览器未能生成战绩图片');
-    blobCacheRef.current = { key: cacheKey, blob };
-    setStatus('ready');
-    return blob;
+    if (resultCardBlobTask?.key === cacheKey) {
+      return resultCardBlobTask.promise;
+    }
+    const promise = (async () => {
+      const fontEmbedCSS = await warmResultCardFonts(node);
+      await new Promise<void>(resolve =>
+        requestAnimationFrame(() => resolve()));
+      const blob = await toBlob(node, {
+        pixelRatio: 2,
+        width: 540,
+        height: 720,
+        backgroundColor: resultCardTheme(gameType).paper,
+        fontEmbedCSS,
+      });
+      if (!blob) throw new Error('浏览器未能生成战绩图片');
+      resultCardBlobCache = { key: cacheKey, blob };
+      return blob;
+    })();
+    resultCardBlobTask = { key: cacheKey, promise };
+    try {
+      return await promise;
+    } finally {
+      if (resultCardBlobTask?.promise === promise) {
+        resultCardBlobTask = undefined;
+      }
+    }
   }, [gameType, matchID, model]);
+
+  const prepare = useCallback(async (node: HTMLElement) => {
+    if (!model || imageReady) return;
+    setImagePreparing(true);
+    setError('');
+    try {
+      await generateBlob(node);
+      setImageReady(true);
+    } catch (reason) {
+      if (reason instanceof DOMException && reason.name === 'AbortError') return;
+      setStatus('error');
+      setError(reason instanceof Error ? reason.message : '战绩图片生成失败');
+    } finally {
+      setImagePreparing(false);
+    }
+  }, [generateBlob, imageReady, model]);
 
   const save = useCallback(async (node: HTMLElement) => {
     if (!model) return;
     try {
       setStatus('exporting');
-      const blob = await generateBlob(node, 'exporting');
+      const blob = await generateBlob(node);
+      setImageReady(true);
       const url = URL.createObjectURL(blob);
       const anchor = document.createElement('a');
       anchor.href = url;
@@ -152,22 +200,39 @@ export function useResultCardShare({
     }
   }, [gameType, generateBlob, model]);
 
-  const share = useCallback(async (node: HTMLElement) => {
+  const share = useCallback((node: HTMLElement) => {
     if (!model || !supportsFileShare()) return;
+    const cacheKey = `${gameType}:${matchID}:${model.endedAt}`;
+    const blob = resultCardBlobCache?.key === cacheKey
+      ? resultCardBlobCache.blob
+      : undefined;
+    if (!blob) {
+      void prepare(node);
+      return;
+    }
+    const file = new File(
+      [blob],
+      resultImageFilename(gameType, model.self.displayName, model.endedAt),
+      { type: 'image/png' },
+    );
+    setStatus('sharing');
     try {
-      setStatus('sharing');
-      const blob = await generateBlob(node, 'sharing');
-      const file = new File(
-        [blob],
-        resultImageFilename(gameType, model.self.displayName, model.endedAt),
-        { type: 'image/png' },
-      );
-      await navigator.share({
+      const sharing = navigator.share({
         files: [file],
         title: `${resultCardTheme(gameType).title}战绩`,
         text: '来 GameBus 再开一局',
       });
-      setStatus('ready');
+      void sharing.then(() => setStatus('ready')).catch(reason => {
+        if (
+          reason instanceof DOMException
+          && (reason.name === 'AbortError' || reason.name === 'NotAllowedError')
+        ) {
+          setStatus('ready');
+          return;
+        }
+        setStatus('error');
+        setError(reason instanceof Error ? reason.message : '战绩图片分享失败');
+      });
     } catch (reason) {
       if (
         reason instanceof DOMException
@@ -179,17 +244,21 @@ export function useResultCardShare({
       setStatus('error');
       setError(reason instanceof Error ? reason.message : '战绩图片分享失败');
     }
-  }, [gameType, generateBlob, model]);
+  }, [gameType, matchID, model, prepare]);
 
   return {
     visible,
     status,
     model,
     error,
+    imageReady,
+    imagePreparing,
     fileShareSupported: supportsFileShare(),
     open,
     close,
     retry: load,
+    preload: load,
+    prepare,
     save,
     share,
   };

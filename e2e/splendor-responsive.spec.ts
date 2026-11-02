@@ -213,10 +213,30 @@ test('Splendor result card previews and downloads an exact 1080x1440 PNG', async
   page,
 }, testInfo: TestInfo) => {
   await page.setViewportSize({ width: 390, height: 844 });
+  await page.addInitScript(() => {
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: ({ files }: ShareData) => !!files?.length,
+    });
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: async ({ files }: ShareData) => {
+        const state = window as Window & {
+          __resultShare?: { invokedAt: number; fileSize: number };
+        };
+        state.__resultShare = {
+          invokedAt: performance.now(),
+          fileSize: files?.[0]?.size ?? 0,
+        };
+      },
+    });
+  });
   await mockSession(page, gameSnapshot('end'));
   await mockResultCard(page, 10);
   await page.goto(`/game/splendor/match?roomID=${roomID}`);
 
+  await expect(page.locator('[data-result-share-prepared="true"]'))
+    .toHaveCount(1);
   await page.getByRole('button', { name: '分享战绩' }).click();
   const dialog = page.getByRole('dialog', { name: '分享 璀璨宝石 战绩' });
   await expect(dialog).toBeVisible();
@@ -227,6 +247,19 @@ test('Splendor result card previews and downloads an exact 1080x1440 PNG', async
   await expect(card.locator('[data-qr-value]'))
     .toHaveAttribute('data-qr-value', 'https://board.gamebus.online');
   await expect(card.locator('[data-qr-value] svg')).toBeVisible();
+  const nativeShare = dialog.getByRole('button', { name: '分享图片' });
+  await expect(nativeShare).toBeEnabled();
+  const shareClickAt = await page.evaluate(() => performance.now());
+  await nativeShare.click();
+  const nativeShareResult = await page.evaluate(() => {
+    const state = window as Window & {
+      __resultShare?: { invokedAt: number; fileSize: number };
+    };
+    return state.__resultShare;
+  });
+  expect(nativeShareResult?.fileSize).toBeGreaterThan(0);
+  expect((nativeShareResult?.invokedAt ?? Infinity) - shareClickAt)
+    .toBeLessThan(500);
   await expect.poll(() => page.evaluate(() =>
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
   await page.screenshot({
@@ -240,9 +273,9 @@ test('Splendor result card previews and downloads an exact 1080x1440 PNG', async
   expect(download.suggestedFilename()).toBe(
     'splendor-N次元-20261102.png',
   );
-  const path = await download.path();
-  expect(path).not.toBeNull();
-  const png = await readFile(path!);
+  const exportedPath = testInfo.outputPath('splendor-result-card-export.png');
+  await download.saveAs(exportedPath);
+  const png = await readFile(exportedPath);
   expect(png.subarray(1, 4).toString()).toBe('PNG');
   expect(png.readUInt32BE(16)).toBe(1080);
   expect(png.readUInt32BE(20)).toBe(1440);

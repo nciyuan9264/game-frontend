@@ -39,15 +39,45 @@ const soundDefinitions: Record<GameSound, SoundDefinition> = {
 
 const audioCache = new Map<string, HTMLAudioElement>();
 
+const canUseAudio = () => (
+  typeof Audio !== 'undefined'
+  && !(typeof navigator !== 'undefined' && navigator.userAgent.includes('jsdom'))
+);
+
+const getOrCreateAudio = (definition: SoundDefinition) => {
+  const cachedAudio = audioCache.get(definition.url);
+  if (cachedAudio) return cachedAudio;
+
+  const audio = new Audio();
+  audio.preload = 'auto';
+  audio.src = definition.url;
+  audio.volume = definition.volume;
+  audioCache.set(definition.url, audio);
+  audio.load();
+  return audio;
+};
+
+const preloadGameSounds = () => {
+  if (!canUseAudio()) return;
+
+  const definitionsByUrl = new Map(
+    Object.values(soundDefinitions).map((definition) => [definition.url, definition]),
+  );
+  definitionsByUrl.forEach((definition) => {
+    try {
+      getOrCreateAudio(definition);
+    } catch {
+      // A failed preload should not prevent the application from starting.
+    }
+  });
+};
+
 export const playGameSound: ClickSoundPlayer = (sound: ClickSound) => {
-  if (typeof Audio === 'undefined') return;
-  if (typeof navigator !== 'undefined' && navigator.userAgent.includes('jsdom')) return;
+  if (!canUseAudio()) return;
   const definition = soundDefinitions[sound as GameSound];
   if (!definition) return;
   try {
-    const audio = audioCache.get(definition.url) ?? new Audio(definition.url);
-    audioCache.set(definition.url, audio);
-    audio.preload = 'auto';
+    const audio = getOrCreateAudio(definition);
     audio.volume = definition.volume;
     audio.currentTime = 0;
     const result = audio.play();
@@ -63,6 +93,8 @@ export function GameAudio({
   soundPlayer?: ClickSoundPlayer;
 }) {
   useEffect(() => {
+    preloadGameSounds();
+
     const handleClick = (event: Event) => {
       const sound = resolveClickEventSound(event);
       if (sound) soundPlayer(sound);

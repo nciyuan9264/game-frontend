@@ -4,6 +4,7 @@ import { Share2 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import type { GameType } from '@/hooks/useGameType';
 import { ResultShareDialog } from './ResultShareDialog';
+import { ResultSharePreloader } from './ResultSharePreloader';
 
 export function ResultShareAction({
   gameType,
@@ -14,6 +15,7 @@ export function ResultShareAction({
 }) {
   const [open, setOpen] = useState(false);
   return <>
+    <ResultSharePreloader gameType={gameType} matchID={matchID} />
     <ActionButton
       data-game-final-result-action="share"
       onClick={() => setOpen(true)}

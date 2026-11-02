@@ -1,15 +1,19 @@
 import { act, renderHook, waitFor } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { getFontEmbedCSS, toBlob } from 'html-to-image';
 import type { ResultCardModel } from './model';
 import { getResultCard } from './api';
 import { supportsFileShare, useResultCardShare } from './useResultCardShare';
 
 vi.mock('./api', () => ({ getResultCard: vi.fn() }));
 vi.mock('html-to-image', () => ({
+  getFontEmbedCSS: vi.fn().mockResolvedValue('@font-face {}'),
   toBlob: vi.fn().mockResolvedValue(new Blob(['png'], { type: 'image/png' })),
 }));
 
 const mockedGetResultCard = vi.mocked(getResultCard);
+const mockedGetFontEmbedCSS = vi.mocked(getFontEmbedCSS);
+const mockedToBlob = vi.mocked(toBlob);
 
 function model(matchID: string): ResultCardModel {
   const self = {
@@ -37,6 +41,10 @@ function model(matchID: string): ResultCardModel {
 describe('useResultCardShare', () => {
   beforeEach(() => {
     mockedGetResultCard.mockReset();
+    mockedGetFontEmbedCSS.mockResolvedValue('@font-face {}');
+    mockedToBlob.mockReset().mockResolvedValue(
+      new Blob(['png'], { type: 'image/png' }),
+    );
   });
 
   it('ignores a stale match response using an explicit request id', async () => {
@@ -75,5 +83,46 @@ describe('useResultCardShare', () => {
       value: vi.fn().mockReturnValue(false),
     });
     expect(supportsFileShare()).toBe(false);
+  });
+
+  it('prepares one cached image before invoking native share', async () => {
+    const share = vi.fn().mockResolvedValue(undefined);
+    Object.defineProperty(navigator, 'share', {
+      configurable: true,
+      value: share,
+    });
+    Object.defineProperty(navigator, 'canShare', {
+      configurable: true,
+      value: vi.fn().mockReturnValue(true),
+    });
+    mockedGetResultCard.mockResolvedValue(model('match-1'));
+    const hook = renderHook(() =>
+      useResultCardShare({ gameType: 'hive', matchID: 'match-1' }));
+    const node = document.createElement('div');
+
+    act(() => hook.result.current.open());
+    await waitFor(() => expect(hook.result.current.model).toBeTruthy());
+    await act(async () => {
+      await Promise.all([
+        hook.result.current.prepare(node),
+        hook.result.current.prepare(node),
+      ]);
+    });
+
+    expect(mockedToBlob).toHaveBeenCalledTimes(1);
+    expect(mockedToBlob).toHaveBeenCalledWith(node, expect.objectContaining({
+      fontEmbedCSS: '@font-face {}',
+      pixelRatio: 2,
+    }));
+    expect(mockedToBlob.mock.calls[0][1]?.cacheBust).toBeUndefined();
+    expect(hook.result.current.imageReady).toBe(true);
+
+    act(() => {
+      hook.result.current.share(node);
+      expect(share).toHaveBeenCalledTimes(1);
+    });
+    await waitFor(() => expect(hook.result.current.status).toBe('ready'));
+    expect(mockedToBlob).toHaveBeenCalledTimes(1);
+    expect(share.mock.calls[0][0].files[0]).toBeInstanceOf(File);
   });
 });

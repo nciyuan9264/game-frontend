@@ -28,6 +28,11 @@ export function ResultShareDialog({
     share.open();
   }, [share.open]);
 
+  useEffect(() => {
+    if (!share.model || !exportRef.current) return;
+    void share.prepare(exportRef.current);
+  }, [share.model, share.prepare]);
+
   const close = () => {
     share.close();
     onClose();
@@ -56,13 +61,13 @@ export function ResultShareDialog({
       </ActionButton>
       {share.fileShareSupported && <ActionButton
         variant="primary"
-        disabled={!share.model || busy}
-        pending={share.status === 'sharing'}
+        disabled={!share.model || !share.imageReady || busy}
+        pending={share.status === 'sharing' || share.imagePreparing}
         onClick={() => {
           if (exportRef.current) void share.share(exportRef.current);
         }}
       >
-        <Send size={16} />分享图片
+        <Send size={16} />{share.imagePreparing ? '准备图片' : '分享图片'}
       </ActionButton>}
     </>}
   >
