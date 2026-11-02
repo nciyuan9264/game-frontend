@@ -87,6 +87,7 @@ import {
 import React, { lazy } from "react";
 import { Navigate } from "react-router-dom";
 const Home = lazy(() => import("@/features/home/pages/Home"));
+const AdminApp = lazy(() => import("@/features/admin/AdminApp"));
 const AcquireSession = lazy(() => import("@/features/acquire/pages/Session"));
 const AcquireReplayPage = lazy(() => import("@/features/acquire/pages/Replay"));
 const SplendorSession = lazy(() => import("@/features/splendor/pages/Session"));
@@ -124,6 +125,10 @@ export interface AppRoute {
 }
 
 export const routes: AppRoute[] = [
+  {
+    path: "/admin/*",
+    element: <AdminApp />
+  },
   {
     path: "/game/acquire",
     element: <AcquireLobby />

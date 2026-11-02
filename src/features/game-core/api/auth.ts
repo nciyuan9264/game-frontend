@@ -10,6 +10,7 @@ export interface AuthProfile {
   name: string;
   displayName: string;
   avatar: string;
+  roles: string[];
 }
 
 export async function refreshToken() {
@@ -25,6 +26,7 @@ export async function getProfile(): Promise<AuthProfile> {
     name: displayName,
     displayName,
     avatar: response.data.avatar ?? '',
+    roles: response.data.roles ?? [],
   };
 }
 
