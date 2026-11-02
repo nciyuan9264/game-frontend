@@ -75,40 +75,50 @@ async function mockAdminAPI(page: Page) {
       },
     });
   });
-  await page.route('**/pam-api/platform/admin/analytics/users?*', route => route.fulfill({
-    json: {
-      status_code: 200,
-      message: 'ok',
-      data: {
-        window: windowData,
-        page: 1,
-        page_size: 20,
-        total: '2',
-        users: [
-          {
-            user_id: '7',
-            display_name: '北海玩家',
-            email: 'player@example.com',
-            created_at_unix: '1793376000',
-            first_active_date: '2026-10-30',
-            last_active_at_unix: '1793545200',
-            active_days: '3',
-            games_played: '8',
-            player_duration_seconds: '14400',
-            favorite_game_type: 'splendor',
-          },
-          {
-            user_id: '8',
-            display_name: '江城玩家',
-            created_at_unix: '1793289600',
-            active_days: '0',
-            games_played: '0',
-            player_duration_seconds: '0',
-          },
-        ],
-      },
+  const adminUsers = [
+    {
+      user_id: '7',
+      display_name: '北海玩家',
+      email: 'player@example.com',
+      created_at_unix: '1793376000',
+      first_active_date: '2026-10-30',
+      last_active_at_unix: '1793545200',
+      active_days: '3',
+      games_played: '8',
+      player_duration_seconds: '14400',
+      favorite_game_type: 'splendor',
     },
-  }));
+    {
+      user_id: '8',
+      display_name: '江城玩家',
+      created_at_unix: '1793289600',
+      active_days: '0',
+      games_played: '0',
+      player_duration_seconds: '0',
+    },
+  ];
+  await page.route('**/pam-api/platform/admin/analytics/users?*', route => {
+    const url = new URL(route.request().url());
+    const users = [...adminUsers];
+    if (url.searchParams.get('sort_by') === 'games_played') {
+      const direction = url.searchParams.get('sort_order') === 'desc' ? -1 : 1;
+      users.sort((left, right) =>
+        (Number(left.games_played) - Number(right.games_played)) * direction);
+    }
+    return route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          window: windowData,
+          page: Number(url.searchParams.get('page') || 1),
+          page_size: 20,
+          total: '2',
+          users,
+        },
+      },
+    });
+  });
   await page.route('**/pam-api/platform/admin/analytics/users/7', route => route.fulfill({
     json: {
       status_code: 200,
@@ -181,6 +191,21 @@ async function mockAdminAPI(page: Page) {
           human_players: '2',
           online_players: '2',
           started_at_unix: '1793545200',
+          players: [
+            {
+              user_id: '7',
+              display_name: '北海玩家',
+              avatar: 'https://example.com/avatar.png',
+              online: true,
+              is_owner: true,
+            },
+            {
+              user_id: '8',
+              display_name: '江城玩家',
+              online: true,
+              is_owner: false,
+            },
+          ],
         }],
       },
     },
@@ -260,9 +285,25 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(page.getByRole('heading', { name: '用户活跃' })).toBeVisible();
   await expect(page.getByText('北海玩家')).toBeVisible();
   const usersTable = page.getByRole('table');
+  const ascendingSortRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/users')
+      && url.searchParams.get('page') === '1'
+      && url.searchParams.get('sort_by') === 'games_played'
+      && url.searchParams.get('sort_order') === 'asc';
+  });
   await page.getByRole('button', { name: '按参与对局升序排序' }).click();
+  await ascendingSortRequest;
   await expect(usersTable.locator('tbody tr').first()).toContainText('江城玩家');
+  const descendingSortRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/users')
+      && url.searchParams.get('page') === '1'
+      && url.searchParams.get('sort_by') === 'games_played'
+      && url.searchParams.get('sort_order') === 'desc';
+  });
   await page.getByRole('button', { name: '按参与对局降序排序' }).click();
+  await descendingSortRequest;
   await expect(usersTable.locator('tbody tr').first()).toContainText('北海玩家');
   await page.getByRole('link', { name: /北海玩家/ }).click();
   await expect(page.getByRole('heading', { name: '用户详情' })).toBeVisible();
@@ -276,7 +317,16 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
 
   await page.getByRole('link', { name: '实时' }).click();
   await expect(page.getByRole('heading', { name: '实时概况' })).toBeVisible();
-  await expect(page.getByText('SP-1042')).toBeVisible();
+  const liveRooms = page.getByRole('region', { name: '实时房间列表' });
+  await expect(liveRooms.getByText('SP-1042')).toBeVisible();
+  await expect(liveRooms.getByText('北海玩家')).toBeVisible();
+  await expect(liveRooms.getByText('江城玩家')).toBeVisible();
+  await expect(liveRooms.getByLabel('房主')).toBeVisible();
+  const liveRefresh = page.waitForResponse(response =>
+    response.url().endsWith('/pam-api/platform/admin/analytics/live'));
+  await liveRefresh;
+  await expect(liveRooms.getByText('北海玩家')).toBeVisible();
+  await expect(liveRooms.getByText('江城玩家')).toBeVisible();
   assertClean();
 });
 

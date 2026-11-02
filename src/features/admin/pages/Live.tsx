@@ -1,6 +1,14 @@
 import { useCallback, useEffect } from 'react';
 import type { LucideIcon } from 'lucide-react';
-import { Activity, CircleDot, Gamepad2, Radio, Users } from 'lucide-react';
+import {
+  Activity,
+  CircleDot,
+  Crown,
+  Gamepad2,
+  Radio,
+  UserRound,
+  Users,
+} from 'lucide-react';
 import { GetAdminAnalyticsLive } from '@/api/generated/game-admin';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ErrorState, LoadingState } from '../components/ResourceState';
@@ -53,7 +61,7 @@ export default function Live() {
         ))}
       </section>
 
-      <section className={styles.tablePanel} aria-label="实时房间列表">
+      <section className={`${styles.tablePanel} ${styles.liveTable}`} aria-label="实时房间列表">
         <div className={styles.tableScroller}>
           <table>
             <thead>
@@ -72,7 +80,32 @@ export default function Live() {
                   <td><strong>{room.room_id}</strong><small>{room.match_id}</small></td>
                   <td>{gameName(room.game_type)}</td>
                   <td><span className={styles.statusDot}>{room.status}</span></td>
-                  <td>{formatCount(room.human_players)}</td>
+                  <td>
+                    <div className={styles.livePlayerList}>
+                      {(room.players ?? []).map(player => (
+                        <span
+                          className={styles.livePlayer}
+                          key={player.user_id}
+                          title={`${player.display_name} · ${player.online ? '在线' : '离线'}`}
+                        >
+                          <i data-online={player.online}>
+                            {player.avatar
+                              ? <img src={player.avatar} alt="" />
+                              : <UserRound size={14} aria-hidden="true" />}
+                          </i>
+                          <b>{player.display_name}</b>
+                          {player.is_owner && (
+                            <Crown size={13} aria-label="房主" />
+                          )}
+                        </span>
+                      ))}
+                      {(room.players ?? []).length === 0 && (
+                        <span className={styles.noLivePlayers}>
+                          {formatCount(room.human_players)} 名玩家
+                        </span>
+                      )}
+                    </div>
+                  </td>
                   <td>{formatCount(room.online_players)}</td>
                   <td>{formatDateTime(room.started_at_unix)}</td>
                 </tr>

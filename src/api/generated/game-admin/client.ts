@@ -56,7 +56,13 @@ export function GetAdminAnalyticsOverview(req: OverviewReq, options?: any): Prom
 export function ListAdminAnalyticsUsers(req: ListUsersReq, options?: any): Promise<UsersResp> {
   const url = genGameAdminServiceBaseURL('/platform/admin/analytics/users');
   const method = 'GET';
-  const params = { page: req.page, page_size: req.page_size, query: req.query };
+  const params = {
+    page: req.page,
+    page_size: req.page_size,
+    query: req.query,
+    sort_by: req.sort_by,
+    sort_order: req.sort_order,
+  };
   return GameAdminServiceOptions.request({ url, method, params }, options);
 }
 

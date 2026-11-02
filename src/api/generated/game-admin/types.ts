@@ -66,6 +66,8 @@ export interface ListUsersReq {
   page?: number;
   page_size?: number;
   query?: string;
+  sort_by?: string;
+  sort_order?: string;
 }
 
 export interface AdminUserSummary {
@@ -158,6 +160,14 @@ export interface LiveGameSummary {
   online_players: string;
 }
 
+export interface LivePlayerSummary {
+  user_id: string;
+  display_name: string;
+  avatar?: string;
+  online: boolean;
+  is_owner: boolean;
+}
+
 export interface LiveRoomSummary {
   room_id: string;
   match_id: string;
@@ -166,6 +176,7 @@ export interface LiveRoomSummary {
   human_players: string;
   online_players: string;
   started_at_unix: string;
+  players: LivePlayerSummary[];
 }
 
 export interface LiveData {

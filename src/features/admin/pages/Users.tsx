@@ -11,7 +11,6 @@ import {
 import { Link } from 'react-router-dom';
 import {
   ListAdminAnalyticsUsers,
-  type AdminUserSummary,
 } from '@/api/generated/game-admin';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ErrorState, LoadingState } from '../components/ResourceState';
@@ -19,7 +18,6 @@ import { formatCount, formatDateTime, formatHours, gameName, toNumber } from '..
 import styles from '../index.module.less';
 
 const pageSize = 20;
-const nameCollator = new Intl.Collator('zh-CN', { numeric: true, sensitivity: 'base' });
 
 type SortKey =
   | 'user'
@@ -32,48 +30,22 @@ type SortKey =
 type SortDirection = 'ascending' | 'descending';
 type SortState = { key: SortKey; direction: SortDirection };
 
-const sortValue = (user: AdminUserSummary, key: SortKey): string | number | undefined => {
-  switch (key) {
-    case 'user': return user.display_name;
-    case 'created_at': return toNumber(user.created_at_unix);
-    case 'last_active_at': return user.last_active_at_unix
-      ? toNumber(user.last_active_at_unix)
-      : undefined;
-    case 'active_days': return toNumber(user.active_days);
-    case 'games_played': return toNumber(user.games_played);
-    case 'player_duration': return toNumber(user.player_duration_seconds);
-    case 'favorite_game': return user.favorite_game_type
-      ? gameName(user.favorite_game_type)
-      : undefined;
-  }
-};
-
-const compareUsers = (left: AdminUserSummary, right: AdminUserSummary, sort: SortState) => {
-  const leftValue = sortValue(left, sort.key);
-  const rightValue = sortValue(right, sort.key);
-  const leftMissing = leftValue === undefined || leftValue === '';
-  const rightMissing = rightValue === undefined || rightValue === '';
-
-  if (leftMissing !== rightMissing) return leftMissing ? 1 : -1;
-
-  let result = 0;
-  if (!leftMissing && !rightMissing) {
-    result = typeof leftValue === 'number' && typeof rightValue === 'number'
-      ? leftValue - rightValue
-      : nameCollator.compare(String(leftValue), String(rightValue));
-  }
-  if (result === 0) result = nameCollator.compare(left.user_id, right.user_id);
-  return sort.direction === 'ascending' ? result : -result;
-};
-
 export default function Users() {
   const [page, setPage] = useState(1);
   const [input, setInput] = useState('');
   const [query, setQuery] = useState('');
   const [sort, setSort] = useState<SortState>();
   const load = useCallback(async () => (
-    await ListAdminAnalyticsUsers({ page, page_size: pageSize, query: query || undefined })
-  ).data, [page, query]);
+    await ListAdminAnalyticsUsers({
+      page,
+      page_size: pageSize,
+      query: query || undefined,
+      sort_by: sort?.key,
+      sort_order: sort
+        ? sort.direction === 'ascending' ? 'asc' : 'desc'
+        : undefined,
+    })
+  ).data, [page, query, sort]);
   const { data, loading, error, retry } = useAsyncResource(load);
 
   const submit = (event: FormEvent) => {
@@ -87,9 +59,6 @@ export default function Users() {
 
   const total = toNumber(data.total);
   const pages = Math.max(1, Math.ceil(total / pageSize));
-  const sortedUsers = sort
-    ? [...data.users].sort((left, right) => compareUsers(left, right, sort))
-    : data.users;
   const ariaSort = (key: SortKey): SortDirection | 'none' =>
     sort?.key === key ? sort.direction : 'none';
   const sortHeader = (key: SortKey, label: string) => {
@@ -103,7 +72,10 @@ export default function Users() {
     return (
       <button
         type="button"
-        onClick={() => setSort({ key, direction: nextDirection })}
+        onClick={() => {
+          setPage(1);
+          setSort({ key, direction: nextDirection });
+        }}
         aria-label={`按${label}${directionLabel}排序`}
         title={`按${label}${directionLabel}排序`}
       >
@@ -148,7 +120,7 @@ export default function Users() {
               </tr>
             </thead>
             <tbody>
-              {sortedUsers.map(user => (
+              {data.users.map(user => (
                 <tr key={user.user_id}>
                   <td>
                     <Link className={styles.userCell} to={`/admin/users/${user.user_id}`}>
