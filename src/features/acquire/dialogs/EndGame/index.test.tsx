@@ -79,7 +79,8 @@ describe('Acquire end game dialog', () => {
     };
     render(<EndGameDialog data={data} enabled pending={false} onClose={vi.fn()} onVote={() => true} />);
 
-    expect(screen.getByText('所有已成立公司')).toBeTruthy();
-    expect(screen.getByText('均已达到至少 11 块地')).toBeTruthy();
+    expect(screen.getByText('七家公司均已成立')).toBeTruthy();
+    expect(screen.getByText('每家公司均已达到至少 11 块地')).toBeTruthy();
+    expect(screen.getByText(/棋盘全部铺满时会强制结算/)).toBeTruthy();
   });
 });

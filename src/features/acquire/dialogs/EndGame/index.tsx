@@ -39,8 +39,8 @@ export function EndGameDialog({ data, enabled, pending, onClose, onVote }: Props
         {endGame.condition === 'company_size' && company
           ? <><b>{company}</b><strong>{endGame.tileCount}<small> 块地</small></strong>
             <span><Check size={14} />已达到 41 块地的终局条件</span></>
-          : <><b>所有已成立公司</b><strong>安全<small> 状态</small></strong>
-            <span><Check size={14} />均已达到至少 11 块地</span></>}
+          : <><b>七家公司均已成立</b><strong>全部<small> 安全</small></strong>
+            <span><Check size={14} />每家公司均已达到至少 11 块地</span></>}
       </div>
     </div>
 
@@ -57,7 +57,7 @@ export function EndGameDialog({ data, enabled, pending, onClose, onVote }: Props
     </div>
 
     <p className={styles.hint}><ShieldCheck size={16} />
-      <span>全部真人玩家同意后，将在当前玩家完整结束本回合时结算。若未全员同意，对局会继续到棋盘全部铺满。</span>
+      <span>全部真人玩家同意后，将在当前玩家完整结束本回合时结算。未全员同意则继续对局，之后仍可更改选择；棋盘全部铺满时会强制结算。</span>
     </p>
   </ResponsiveDialog>;
 }

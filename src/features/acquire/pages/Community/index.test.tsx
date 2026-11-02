@@ -196,6 +196,9 @@ describe('Acquire guide', () => {
 
     fireEvent.click(screen.getByRole('button', { name: /下一步/ }));
     expect(screen.getByRole('tab', { name: '04 结束' }).getAttribute('aria-selected')).toBe('true');
+    expect(screen.getByText('任一公司达到至少 41 块地时，可以提议结束对局。')).toBeTruthy();
+    expect(screen.getByText('七家公司全部成立且每家至少有 11 块地时，可以提议结束对局。')).toBeTruthy();
+    expect(screen.getByText('棋盘全部铺满时会强制结算；终局资产为现金与股票价值之和。')).toBeTruthy();
 
     fireEvent.click(screen.getByRole('button', { name: /创建房间/ }));
     expect(screen.getByText('游戏大厅')).toBeTruthy();
