@@ -9,6 +9,21 @@ export const toNumber = (value: string | number): number => {
   return Number.isFinite(parsed) ? parsed : 0;
 };
 
+export const cumulativeUserTotals = (
+  endingTotal: string | number,
+  dailyNewUsers: Array<string | number>,
+): number[] => {
+  let total = Math.max(0, toNumber(endingTotal));
+  const totals = new Array<number>(dailyNewUsers.length);
+
+  for (let index = dailyNewUsers.length - 1; index >= 0; index -= 1) {
+    totals[index] = total;
+    total = Math.max(0, total - Math.max(0, toNumber(dailyNewUsers[index])));
+  }
+
+  return totals;
+};
+
 export const formatCount = (value: string | number): string =>
   new Intl.NumberFormat('zh-CN').format(toNumber(value));
 

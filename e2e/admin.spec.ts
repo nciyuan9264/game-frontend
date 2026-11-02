@@ -214,6 +214,7 @@ async function mockAdminAPI(page: Page) {
 }
 
 test.beforeEach(async ({ page }) => {
+  await page.clock.setFixedTime(new Date('2026-11-02T04:00:00Z'));
   await mockAdminAPI(page);
 });
 
@@ -230,13 +231,17 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(page.getByText('截至 2026-11-02 的累计未注销账号')).toBeVisible();
   await expect(page.getByText('区间真人累计对局时长 / 区间活跃用户数（估算）')).toBeVisible();
   await expect(page.getByText('在线时长', { exact: true })).toHaveCount(0);
-  await page
-    .getByRole('img', { name: '所选日期范围新增用户和活跃用户趋势' })
-    .locator('svg')
-    .hover({ position: { x: 360, y: 140 } });
+  const growthChart = page.getByRole('img', { name: '所选日期范围累计用户和活跃用户趋势' });
+  await expect(growthChart.locator('title').filter({
+    hasText: '2026-10-04 · 累计用户 1108',
+  })).toHaveCount(1);
+  await expect(growthChart.locator('title').filter({
+    hasText: '2026-11-02 · 累计用户 1280',
+  })).toHaveCount(1);
+  await growthChart.locator('svg').hover({ position: { x: 360, y: 140 } });
   const chartTooltip = page.locator('[data-chart-tooltip]');
   await expect(chartTooltip).toBeVisible();
-  await expect(chartTooltip).toContainText('新增用户');
+  await expect(chartTooltip).toContainText('累计用户');
   await expect(chartTooltip).toContainText('活跃用户');
 
   await page.getByRole('button', { name: /选择数据日期范围/ }).click();

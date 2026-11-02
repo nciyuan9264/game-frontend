@@ -17,6 +17,7 @@ import { LineChart } from '../components/LineChart';
 import { ErrorState, LoadingState } from '../components/ResourceState';
 import { useOverviewDateRange } from '../hooks/useOverviewDateRange';
 import {
+  cumulativeUserTotals,
   formatCount,
   formatDuration,
   formatHours,
@@ -37,6 +38,10 @@ export default function Overview() {
   if (!data) return <ErrorState message={error} retry={retry} />;
 
   const metrics = data.metrics;
+  const userTotals = cumulativeUserTotals(
+    metrics.total_users,
+    data.daily.map(item => item.new_users),
+  );
   const windowLabel = `${data.window.start_date} 至 ${data.window.end_date}`;
   const metricItems = [
     {
@@ -148,10 +153,10 @@ export default function Overview() {
             <span>北京时间</span>
           </header>
           <LineChart
-            ariaLabel="所选日期范围新增用户和活跃用户趋势"
+            ariaLabel="所选日期范围累计用户和活跃用户趋势"
             labels={data.daily.map(item => item.date)}
             series={[
-              { label: '新增用户', color: '#2563eb', values: data.daily.map(item => toNumber(item.new_users)) },
+              { label: '累计用户', color: '#2563eb', values: userTotals },
               { label: '活跃用户', color: '#0f766e', values: data.daily.map(item => toNumber(item.active_users)) },
             ]}
           />

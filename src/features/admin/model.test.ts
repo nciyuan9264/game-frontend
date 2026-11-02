@@ -1,5 +1,11 @@
 import { describe, expect, it } from 'vitest';
-import { chartPoints, formatDuration, formatPercent, toNumber } from './model';
+import {
+  chartPoints,
+  cumulativeUserTotals,
+  formatDuration,
+  formatPercent,
+  toNumber,
+} from './model';
 
 describe('admin analytics presentation', () => {
   it('normalizes generated int64 strings', () => {
@@ -10,6 +16,12 @@ describe('admin analytics presentation', () => {
   it('formats duration and rates for operators', () => {
     expect(formatDuration('5400')).toBe('1 小时 30 分');
     expect(formatPercent(0.375)).toBe('37.5%');
+  });
+
+  it('reconstructs daily cumulative users from the ending total', () => {
+    expect(cumulativeUserTotals('100', ['2', '3', '5'])).toEqual([92, 95, 100]);
+    expect(cumulativeUserTotals('2', ['3', '1'])).toEqual([1, 2]);
+    expect(cumulativeUserTotals('10', [])).toEqual([]);
   });
 
   it('builds stable chart coordinates', () => {
