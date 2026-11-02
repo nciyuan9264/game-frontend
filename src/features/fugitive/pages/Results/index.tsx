@@ -115,6 +115,7 @@ export function Results({
         <p className="result-explanation">{reasonText(result.reason, result.winnerRole)}</p>
       </>}
       actions={<GameFinalResultActions mode="live"
+        share={{ gameType: 'fugitive', matchID: data.matchID }}
         onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
         onLeave={onExit} canRestart={data.ownerID === data.playerId}
         onRestart={onRematch} restartPending={rematchPending} />}

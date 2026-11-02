@@ -1,5 +1,7 @@
 import type { CSSProperties, ReactNode } from 'react';
 import { ArrowLeft, Eye, RotateCcw } from 'lucide-react';
+import type { GameType } from '@/hooks/useGameType';
+import { ResultShareAction } from '@/features/game-core/result-share/ResultShareAction';
 import { ActionButton } from '../ActionButton';
 import styles from './index.module.less';
 
@@ -94,6 +96,10 @@ interface ReplayActionsProps {
 
 interface LiveActionsProps {
   mode: 'live';
+  share: {
+    gameType: GameType;
+    matchID: string;
+  };
   onViewBoard: () => void;
   viewBoardLabel: string;
   onLeave: () => void;
@@ -123,6 +129,7 @@ export function GameFinalResultActions(props: GameFinalResultActionsProps) {
     : '等待房主再来一局';
 
   return <>
+    <ResultShareAction {...props.share} />
     {viewBoard}
     <ActionButton
       data-game-final-result-action="leave"

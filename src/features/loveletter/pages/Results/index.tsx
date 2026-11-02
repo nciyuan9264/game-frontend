@@ -102,6 +102,7 @@ export function Results({
       standings={players}
       summary={letter}
       actions={<GameFinalResultActions mode="live"
+        share={{ gameType: 'loveletter', matchID: data.matchID }}
         onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
         onLeave={onExit} canRestart={owner} onRestart={onRematch}
         restartPending={rematchPending} restartDisabled={!enabled} />}

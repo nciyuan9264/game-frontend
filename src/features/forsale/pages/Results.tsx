@@ -88,6 +88,7 @@ export const Results = ({
       <ActionButton onClick={onReview}><Coins size={15} />查看终局牌桌</ActionButton>
     </>}
     actions={<GameFinalResultActions mode="live"
+      share={{ gameType: 'forsale', matchID: data.matchID }}
       onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
       onLeave={onExit} canRestart={!!onRematch} onRestart={onRematch}
       restartPending={rematchPending} restartDisabled={!enabled} />}

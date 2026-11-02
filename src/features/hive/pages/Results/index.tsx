@@ -118,7 +118,9 @@ export function Results({
     actions={readOnly
       ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
           viewBoardLabel="回到回放棋盘" />
-      : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+      : <GameFinalResultActions mode="live"
+          share={{ gameType: 'hive', matchID: data.matchID }}
+          onViewBoard={onViewBoard}
           viewBoardLabel="回看终局蜂巢" onLeave={onLeave ?? onViewBoard}
           canRestart={owner} onRestart={onRestart}
           restartPending={restarting} />}

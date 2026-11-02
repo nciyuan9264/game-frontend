@@ -89,7 +89,7 @@ function Session({ roomID }: { roomID: string }) {
         onLeave={leave.request} />
     </Shell>}
     {snapshot?.type === 'ROOM_SYNC' && <Battle
-      game={toBattleGame(snapshot)} roomID={roomID}
+      game={toBattleGame(snapshot)} matchID={snapshot.matchID} roomID={roomID}
       roomName={roomID}
       interactive={connection.status === 'connected'}
       commandPending={!!session.pending}

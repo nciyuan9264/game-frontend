@@ -1,0 +1,361 @@
+.card {
+  width: 540px;
+  height: 720px;
+  overflow: hidden;
+  color: var(--result-ink);
+  background: var(--result-paper);
+  border: 1px solid color-mix(in srgb, var(--result-primary) 30%, transparent);
+  font-family: 'DM Sans Variable', 'Noto Sans SC Variable', 'PingFang SC', sans-serif;
+  letter-spacing: 0;
+}
+
+.card,
+.card * {
+  box-sizing: border-box;
+}
+
+.header {
+  display: flex;
+  height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 28px;
+  color: var(--result-paper);
+  background: var(--result-primary);
+  font-size: 10px;
+  font-weight: 700;
+}
+
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 13px;
+}
+
+.hero {
+  position: relative;
+  display: grid;
+  height: 132px;
+  grid-template-columns: 0.82fr 1.18fr;
+  align-items: center;
+  gap: 20px;
+  padding: 21px 28px;
+  border-bottom: 4px solid var(--result-secondary);
+  background: color-mix(in srgb, var(--result-primary) 10%, var(--result-paper));
+}
+
+.hero::after {
+  position: absolute;
+  top: 0;
+  right: 28px;
+  width: 70px;
+  height: 5px;
+  background: var(--result-accent);
+  content: '';
+}
+
+.hero small,
+.standings header small {
+  color: color-mix(in srgb, var(--result-primary) 70%, var(--result-ink));
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.hero h1 {
+  margin-top: 6px;
+  font-family: 'Noto Serif SC Variable', 'Noto Serif SC', serif;
+  font-size: 27px;
+  line-height: 1.2;
+}
+
+.outcome {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 12px;
+  padding-left: 17px;
+  border-left: 1px solid color-mix(in srgb, var(--result-primary) 25%, transparent);
+}
+
+.outcome > div {
+  min-width: 0;
+}
+
+.outcome small,
+.outcome strong,
+.outcome p {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.outcome small {
+  color: var(--result-accent);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.outcome strong {
+  margin-top: 2px;
+  font-family: 'Noto Serif SC Variable', 'Noto Serif SC', serif;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.outcome p {
+  margin-top: 5px;
+  color: color-mix(in srgb, var(--result-ink) 66%, transparent);
+  font-size: 9px;
+}
+
+.trophy {
+  display: grid;
+  width: 49px;
+  height: 49px;
+  flex: 0 0 auto;
+  place-items: center;
+  border: 1px solid var(--result-secondary);
+  border-radius: 50%;
+  color: var(--result-primary);
+}
+
+.metrics {
+  display: grid;
+  height: 76px;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  padding: 13px 20px;
+  border-bottom: 1px solid color-mix(in srgb, var(--result-primary) 20%, transparent);
+}
+
+.metrics.threeMetrics {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.metrics > div {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  justify-content: center;
+  padding: 0 10px;
+  border-right: 1px solid color-mix(in srgb, var(--result-primary) 16%, transparent);
+}
+
+.metrics > div:last-child {
+  border-right: 0;
+}
+
+.metrics small {
+  color: color-mix(in srgb, var(--result-ink) 60%, transparent);
+  font-size: 8px;
+}
+
+.metrics b {
+  overflow: hidden;
+  margin-top: 3px;
+  font-size: 15px;
+  line-height: 1.2;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.standings {
+  height: 356px;
+  padding: 18px 28px 15px;
+}
+
+.standings > header {
+  display: flex;
+  height: 39px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.standings h2 {
+  margin-top: 1px;
+  font-size: 16px;
+  line-height: 1.25;
+}
+
+.standings > header > span {
+  padding-top: 5px;
+  color: color-mix(in srgb, var(--result-ink) 55%, transparent);
+  font-size: 9px;
+}
+
+.playerList {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.playerRow {
+  display: grid;
+  height: 39px;
+  grid-template-columns: 27px 29px minmax(0, 1fr) auto 66px;
+  align-items: center;
+  gap: 8px;
+  padding: 0 10px;
+  border-left: 3px solid transparent;
+  background: color-mix(in srgb, var(--result-primary) 5%, transparent);
+}
+
+.playerRow.winner {
+  border-left-color: var(--result-secondary);
+  background: color-mix(in srgb, var(--result-secondary) 15%, var(--result-paper));
+}
+
+.playerRow.self {
+  box-shadow: inset 0 0 0 1px var(--result-primary);
+}
+
+.rank {
+  color: color-mix(in srgb, var(--result-primary) 70%, var(--result-ink));
+  font-size: 12px;
+  text-align: center;
+}
+
+.avatar {
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border-radius: 50%;
+  color: var(--result-paper);
+  background: var(--result-primary);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.playerName {
+  min-width: 0;
+}
+
+.playerName strong,
+.playerName small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.playerName strong {
+  font-size: 10px;
+}
+
+.playerName small {
+  margin-top: 1px;
+  color: color-mix(in srgb, var(--result-ink) 55%, transparent);
+  font-size: 7px;
+}
+
+.winnerTag {
+  display: flex;
+  align-items: center;
+  gap: 3px;
+  color: var(--result-accent);
+  font-size: 8px;
+  font-weight: 800;
+}
+
+.rowScore {
+  min-width: 0;
+  text-align: right;
+}
+
+.rowScore b,
+.rowScore small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.rowScore b {
+  font-size: 11px;
+}
+
+.rowScore small {
+  color: color-mix(in srgb, var(--result-ink) 50%, transparent);
+  font-size: 7px;
+}
+
+.footer {
+  display: flex;
+  height: 108px;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 28px;
+  color: var(--result-paper);
+  background: var(--result-primary);
+}
+
+.callout {
+  display: flex;
+  align-items: center;
+  gap: 11px;
+}
+
+.callout small,
+.callout strong {
+  display: block;
+}
+
+.callout small {
+  margin-bottom: 4px;
+  color: color-mix(in srgb, var(--result-paper) 70%, transparent);
+  font-size: 9px;
+}
+
+.callout strong {
+  font-size: 16px;
+}
+
+.qr {
+  padding: 3px;
+  background: var(--result-paper);
+  line-height: 0;
+}
+
+.compact .standings {
+  padding-top: 12px;
+}
+
+.compact .standings > header {
+  height: 32px;
+}
+
+.compact .playerList {
+  gap: 2px;
+}
+
+.compact .playerRow {
+  height: 27px;
+}
+
+.compact .avatar {
+  width: 22px;
+  height: 22px;
+  font-size: 9px;
+}
+
+.compact .playerName small {
+  display: none;
+}
+
+.preview {
+  position: relative;
+  width: min(100%, 405px);
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  margin: 0 auto;
+  background: #d8d3c8;
+}
+
+.previewCard {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform-origin: top left;
+}

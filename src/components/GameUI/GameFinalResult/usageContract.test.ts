@@ -26,5 +26,6 @@ describe('final result usage contract', () => {
     expect(source).toContain('GameFinalResult');
     expect(source).toContain('<GameFinalResult');
     expect(source).toContain('GameFinalResultActions');
+    expect(source).toContain('share={{');
   });
 });

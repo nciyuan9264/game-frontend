@@ -20,7 +20,7 @@ export function Results({
   canRestart = false,
   readOnly = false,
 }: {
-  data: DisplaySnapshot & { roomID?: string };
+  data: DisplaySnapshot & { roomID?: string; matchID?: string };
   onClose: () => void;
   onRestart?: () => void;
   onLeave?: () => void;
@@ -41,7 +41,9 @@ export function Results({
   const actions = readOnly
     ? <GameFinalResultActions mode="replay" onViewBoard={onClose}
         viewBoardLabel="回到回放棋盘" />
-    : <GameFinalResultActions mode="live" onViewBoard={onClose}
+    : <GameFinalResultActions mode="live"
+        share={{ gameType: 'acquire', matchID: data.matchID ?? '' }}
+        onViewBoard={onClose}
         viewBoardLabel="查看终局棋盘" onLeave={onLeave ?? onClose}
         canRestart={canRestart}
         onRestart={onRestart} restartPending={restartPending}

@@ -77,7 +77,9 @@ export function Results({ session, data, onViewBoard, onLeave, onRestart, restar
       actions={readOnly
         ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
             viewBoardLabel="回到回放牌面" />
-        : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+        : <GameFinalResultActions mode="live"
+            share={{ gameType: 'splendor', matchID: data.matchID }}
+            onViewBoard={onViewBoard}
             viewBoardLabel="查看终局牌面" onLeave={onLeave ?? onViewBoard}
             canRestart={owner} onRestart={onRestart}
             restartPending={restarting} restartDisabled={!!session?.pending} />}

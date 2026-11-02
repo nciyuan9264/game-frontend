@@ -148,7 +148,9 @@ export function Results({
       actions={readOnly
         ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
             viewBoardLabel="回到回放棋盘" />
-        : <GameFinalResultActions mode="live" onViewBoard={onViewBoard}
+        : <GameFinalResultActions mode="live"
+            share={{ gameType: 'onitama', matchID: data.matchID }}
+            onViewBoard={onViewBoard}
             viewBoardLabel="回看终局棋盘" onLeave={onLeave ?? onViewBoard}
             canRestart={owner} onRestart={onRestart}
             restartPending={restarting} />}

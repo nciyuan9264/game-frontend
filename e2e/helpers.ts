@@ -198,7 +198,7 @@ export async function expectMobileFinalResultLayout(
 
     await expect(actions).toHaveCSS('position', 'static');
     await expect(actions.locator('button')).toHaveCount(
-      options.actionCount ?? 3,
+      options.actionCount ?? 4,
     );
     await expect.poll(() => page.evaluate(() =>
       document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);

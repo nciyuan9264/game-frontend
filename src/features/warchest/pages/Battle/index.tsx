@@ -57,6 +57,7 @@ import {
 
 interface Props {
   game: Game;
+  matchID?: string;
   roomID: string;
   roomName: string;
   interactive?: boolean;
@@ -93,6 +94,7 @@ const startsWith = (values: string[], prefix: string[]) =>
 
 export function Battle({
   game,
+  matchID,
   roomID,
   roomName,
   interactive = true,
@@ -248,7 +250,8 @@ export function Battle({
 
   if (end && showResults) {
     return <div className="warchest-root">
-      <Results game={game} onViewBoard={() => setShowResults(false)}
+      <Results game={game} matchID={matchID} readOnly={!interactive}
+        onViewBoard={() => setShowResults(false)}
         onLeave={() => onLeave?.()} canRestart={canRematch}
         onRestart={onRematch} restartPending={rematchPending} />
     </div>;

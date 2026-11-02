@@ -88,6 +88,7 @@ export function Results({
         <p>获胜路线：{formatColumns(data.result?.claimedColumns ?? [])}。失手次数由服务端记录在历史结果中。</p>
       </>}
       actions={<GameFinalResultActions mode="live"
+        share={{ gameType: 'cantstop', matchID: data.matchID }}
         onViewBoard={onReview} viewBoardLabel="查看终局棋盘"
         onLeave={onExit} canRestart={owner} onRestart={onRematch}
         restartLabel="再来一场" restartPending={rematchPending}

@@ -10,6 +10,8 @@ import styles from './index.module.less';
 
 export function Results({
   game,
+  matchID,
+  readOnly = false,
   onViewBoard,
   onLeave,
   canRestart,
@@ -17,8 +19,10 @@ export function Results({
   restartPending = false,
 }: {
   game: Game;
+  matchID?: string;
+  readOnly?: boolean;
   onViewBoard: () => void;
-  onLeave: () => void;
+  onLeave?: () => void;
   canRestart: boolean;
   onRestart?: () => void;
   restartPending?: boolean;
@@ -65,9 +69,13 @@ export function Results({
       </div>
       <p><Flag size={14} />控局，而非歼灭。率先放完六枚控制标记即胜。</p>
     </>}
-    actions={<GameFinalResultActions mode="live"
-      onViewBoard={onViewBoard} viewBoardLabel="回到终局棋盘"
-      onLeave={onLeave} canRestart={canRestart} onRestart={onRestart}
-      restartPending={restartPending} />}
+    actions={readOnly
+      ? <GameFinalResultActions mode="replay" onViewBoard={onViewBoard}
+          viewBoardLabel="回到回放棋盘" />
+      : <GameFinalResultActions mode="live"
+          share={{ gameType: 'warchest', matchID: matchID ?? '' }}
+          onViewBoard={onViewBoard} viewBoardLabel="回到终局棋盘"
+          onLeave={onLeave ?? onViewBoard} canRestart={canRestart}
+          onRestart={onRestart} restartPending={restartPending} />}
   />;
 }

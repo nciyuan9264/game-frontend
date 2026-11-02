@@ -14,6 +14,8 @@ import type {
   HistoryListResp,
   GetHistoryDetailReq,
   HistoryDetailResp,
+  GetResultCardReq,
+  ResultCardResp,
   GetSnapshotReq,
   SnapshotResp,
   ListSnapshotsReq,
@@ -114,6 +116,16 @@ export function ListHistoryGames(req: ListHistoryGamesReq, options?: any): Promi
 /** 查询历史对局详情 */
 export function GetHistoryDetail(req: GetHistoryDetailReq, options?: any): Promise<HistoryDetailResp> {
   const url = genGamePlatformServiceBaseURL(`/platform/history/games/${encodeURIComponent(String(req.id))}`);
+  const method = 'GET';
+  const params = { gameType: req.game_type };
+  return GamePlatformServiceOptions.request({ url, method, params }, options);
+}
+
+/** 查询当前用户可分享的终局结果卡片数据 */
+export function GetResultCard(req: GetResultCardReq, options?: any): Promise<ResultCardResp> {
+  const url = genGamePlatformServiceBaseURL(
+    `/platform/history/matches/${encodeURIComponent(String(req.match_id))}/result-card`,
+  );
   const method = 'GET';
   const params = { gameType: req.game_type };
   return GamePlatformServiceOptions.request({ url, method, params }, options);

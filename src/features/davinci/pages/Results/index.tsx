@@ -50,6 +50,7 @@ export function Results({
     </article>)}
     summary={<><span><b>{duration}</b><small>回合</small></span><span><b>{26 - Object.keys(data.roomData.boardCards).length}</b><small>已抽牌</small></span><span><b>{players.length}</b><small>玩家</small></span></>}
     actions={<GameFinalResultActions mode="live"
+      share={{ gameType: 'davinci', matchID: data.matchID }}
       onViewBoard={onViewBoard} viewBoardLabel="查看终局牌面"
       onLeave={onLeave} canRestart={owner} onRestart={onRestart}
       restartPending={restarting} restartDisabled={!!session.pending} />}

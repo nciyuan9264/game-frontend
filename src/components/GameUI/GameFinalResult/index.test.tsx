@@ -52,6 +52,7 @@ describe('GameFinalResultActions', () => {
     const onRestart = vi.fn();
     render(<GameFinalResultActions
       mode="live"
+      share={{ gameType: 'splendor', matchID: 'match-1' }}
       onViewBoard={onViewBoard}
       viewBoardLabel="查看终局棋盘"
       onLeave={onLeave}
@@ -61,11 +62,12 @@ describe('GameFinalResultActions', () => {
 
     const buttons = screen.getAllByRole('button');
     expect(buttons.map(button => button.textContent)).toEqual([
+      '分享战绩',
       '查看终局棋盘',
       '回到大厅',
       '再来一局',
     ]);
-    buttons.forEach(button => fireEvent.click(button));
+    buttons.slice(1).forEach(button => fireEvent.click(button));
     expect(onViewBoard).toHaveBeenCalledTimes(1);
     expect(onLeave).toHaveBeenCalledTimes(1);
     expect(onRestart).toHaveBeenCalledTimes(1);
@@ -74,6 +76,7 @@ describe('GameFinalResultActions', () => {
   it('shows a disabled waiting action for non-owners', () => {
     render(<GameFinalResultActions
       mode="live"
+      share={{ gameType: 'splendor', matchID: 'match-1' }}
       onViewBoard={vi.fn()}
       viewBoardLabel="查看终局牌桌"
       onLeave={vi.fn()}

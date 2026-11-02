@@ -2133,6 +2133,11 @@ export interface GetHistoryDetailReq {
   game_type: GameType;
 }
 
+export interface GetResultCardReq {
+  match_id: string;
+  game_type: GameType;
+}
+
 export interface GetSnapshotReq {
   id: string;
   game_type: GameType;
@@ -2179,6 +2184,33 @@ export interface HistoryDetailResp {
   status_code: number;
   message: string;
   data: HistoryDetailData;
+}
+
+export interface ResultCardPlayer {
+  display_name: string;
+  seat_index: number;
+  is_ai: boolean;
+  final_score?: number;
+  final_money?: number;
+  final_stocks: number;
+  final_rank?: number;
+  is_winner: boolean;
+  game_role?: string;
+  is_self: boolean;
+}
+
+export interface ResultCardData {
+  game_type: GameType;
+  started_at: ISODateTime;
+  ended_at: ISODateTime;
+  duration_seconds: number;
+  players: ResultCardPlayer[];
+}
+
+export interface ResultCardResp {
+  status_code: number;
+  message: string;
+  data: ResultCardData;
 }
 
 export interface SnapshotResp {

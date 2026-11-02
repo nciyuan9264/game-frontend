@@ -1,4 +1,5 @@
 import { expect, test, type Page, type TestInfo } from '@playwright/test';
+import { readFile } from 'node:fs/promises';
 import { expectMobileFinalResultLayout } from './helpers';
 
 const roomID = 'splendor_mobile_layout';
@@ -157,6 +158,38 @@ async function mockSession(
   });
 }
 
+async function mockResultCard(page: Page, playerCount: number) {
+  await page.route(
+    `**/pam-api/platform/history/matches/${matchID}/result-card?**`,
+    route => route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          game_type: 'splendor',
+          started_at: '2026-11-02T10:00:00Z',
+          ended_at: '2026-11-02T10:24:05Z',
+          duration_seconds: 1445,
+          players: Array.from({ length: playerCount }, (_, index) => ({
+            display_name: index === 0
+              ? 'N次元'
+              : index === playerCount - 1
+                ? '一位昵称非常非常长的 AI 玩家'
+                : `收藏家 ${index + 1}`,
+            seat_index: index,
+            is_ai: index === playerCount - 1,
+            final_score: 17 - index,
+            final_stocks: 0,
+            final_rank: index + 1,
+            is_winner: index === 0,
+            is_self: index === 0,
+          })),
+        },
+      },
+    }),
+  );
+}
+
 test('Splendor mobile hides the countdown outside the local turn', async ({
   page,
 }, testInfo: TestInfo) => {
@@ -172,6 +205,54 @@ test('Splendor mobile hides the countdown outside the local turn', async ({
   await expect(topbar.getByText('--', { exact: true })).toHaveCount(0);
   await page.screenshot({
     path: testInfo.outputPath('splendor-mobile-waiting-turn.png'),
+    fullPage: true,
+  });
+});
+
+test('Splendor result card previews and downloads an exact 1080x1440 PNG', async ({
+  page,
+}, testInfo: TestInfo) => {
+  await page.setViewportSize({ width: 390, height: 844 });
+  await mockSession(page, gameSnapshot('end'));
+  await mockResultCard(page, 10);
+  await page.goto(`/game/splendor/match?roomID=${roomID}`);
+
+  await page.getByRole('button', { name: '分享战绩' }).click();
+  const dialog = page.getByRole('dialog', { name: '分享 璀璨宝石 战绩' });
+  await expect(dialog).toBeVisible();
+  const card = dialog.locator('[data-result-card]').first();
+  await expect(card).toBeVisible();
+  await expect(card).toContainText('N次元');
+  await expect(card).toContainText('10 位玩家');
+  await expect(card.locator('[data-qr-value]'))
+    .toHaveAttribute('data-qr-value', 'https://board.gamebus.online');
+  await expect(card.locator('[data-qr-value] svg')).toBeVisible();
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath('splendor-result-share-card.png'),
+    fullPage: true,
+  });
+
+  const downloadPromise = page.waitForEvent('download');
+  await dialog.getByRole('button', { name: '保存图片' }).click();
+  const download = await downloadPromise;
+  expect(download.suggestedFilename()).toBe(
+    'splendor-N次元-20261102.png',
+  );
+  const path = await download.path();
+  expect(path).not.toBeNull();
+  const png = await readFile(path!);
+  expect(png.subarray(1, 4).toString()).toBe('PNG');
+  expect(png.readUInt32BE(16)).toBe(1080);
+  expect(png.readUInt32BE(20)).toBe(1440);
+
+  await page.setViewportSize({ width: 320, height: 700 });
+  await expect(dialog).toBeVisible();
+  await expect.poll(() => page.evaluate(() =>
+    document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
+  await page.screenshot({
+    path: testInfo.outputPath('splendor-result-share-card-320.png'),
     fullPage: true,
   });
 });

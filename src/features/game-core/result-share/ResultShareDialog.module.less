@@ -1,0 +1,73 @@
+.dialog {
+  --game-dialog-bg: #14262c;
+  --game-dialog-footer-bg: #102027;
+  --game-dialog-border: #66777a;
+  width: min(92vw, 520px);
+}
+
+.loading {
+  display: grid;
+  min-height: 360px;
+  place-content: center;
+  text-align: center;
+}
+
+.loading > span {
+  width: 34px;
+  height: 34px;
+  margin: 0 auto 14px;
+  border: 2px solid #ffffff24;
+  border-top-color: #d2ae68;
+  border-radius: 50%;
+  animation: spin 0.8s linear infinite;
+}
+
+.loading b {
+  font-size: 15px;
+}
+
+.loading p,
+.error p {
+  margin-top: 5px;
+  color: #a9b7ba;
+  font-size: 11px;
+}
+
+.error {
+  display: grid;
+  min-height: 220px;
+  grid-template-columns: auto 1fr;
+  align-content: center;
+  gap: 5px 11px;
+  color: #e2c27e;
+}
+
+.error > button {
+  grid-column: 2;
+  justify-self: start;
+  margin-top: 12px;
+}
+
+.exportNode {
+  position: fixed;
+  top: 0;
+  left: -10000px;
+  width: 540px;
+  height: 720px;
+  pointer-events: none;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (max-width: 767px) {
+  .dialog {
+    width: 100%;
+  }
+
+  .dialog :global([class*='body']) {
+    padding-top: 14px;
+    padding-bottom: 14px;
+  }
+}

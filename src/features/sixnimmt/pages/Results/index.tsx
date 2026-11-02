@@ -113,6 +113,7 @@ export function Results({
       standings={board}
       summary={detail}
       actions={<GameFinalResultActions mode="live"
+        share={{ gameType: 'sixnimmt', matchID: data.matchID }}
         onViewBoard={onReview} viewBoardLabel="查看终局牌桌"
         onLeave={onExit} canRestart={owner} onRestart={onRematch}
         restartLabel="再来一场" restartPending={rematchPending}
