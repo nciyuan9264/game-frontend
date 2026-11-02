@@ -2,6 +2,7 @@
 /* eslint-disable */
 /* tslint:disable */
 import type {
+  OverviewReq,
   OverviewResp,
   ListUsersReq,
   UsersResp,
@@ -44,10 +45,11 @@ export function genGameAdminServiceBaseURL(path: string): string {
   return GameAdminServiceOptions.baseURL + path;
 }
 /** 查询平台数据总览 */
-export function GetAdminAnalyticsOverview(options?: any): Promise<OverviewResp> {
+export function GetAdminAnalyticsOverview(req: OverviewReq, options?: any): Promise<OverviewResp> {
   const url = genGameAdminServiceBaseURL('/platform/admin/analytics/overview');
   const method = 'GET';
-  return GameAdminServiceOptions.request({ url, method }, options);
+  const params = { start_date: req.start_date, end_date: req.end_date };
+  return GameAdminServiceOptions.request({ url, method, params }, options);
 }
 
 /** 查询用户活跃列表 */

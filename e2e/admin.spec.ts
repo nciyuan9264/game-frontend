@@ -28,43 +28,53 @@ async function mockAdminAPI(page: Page) {
       },
     },
   }));
-  await page.route('**/pam-api/platform/admin/analytics/overview', route => route.fulfill({
-    json: {
-      status_code: 200,
-      message: 'ok',
-      data: {
-        window: windowData,
-        metrics: {
-          total_users: '1280',
-          new_users: '140',
-          dau: '86',
-          wau: '310',
-          mau: '720',
-          dau_mau_rate: 0.119,
-          first_match_conversion_rate: 0.64,
-          d1_retention_rate: 0.42,
-          d7_retention_rate: 0.27,
-          d30_retention_rate: 0.12,
-          games_started: '930',
-          games_completed: '810',
-          completion_rate: 0.871,
-          game_duration_seconds: '972000',
-          player_duration_seconds: '1728000',
-          average_game_duration_seconds: '1200',
-          average_player_duration_seconds: '2400',
+  await page.route('**/pam-api/platform/admin/analytics/overview?*', route => {
+    const requestURL = new URL(route.request().url());
+    const startDate = requestURL.searchParams.get('start_date') || windowData.start_date;
+    const endDate = requestURL.searchParams.get('end_date') || windowData.end_date;
+    const firstDay = new Date(`${startDate}T00:00:00Z`);
+    const lastDay = new Date(`${endDate}T00:00:00Z`);
+    const days = Math.floor((lastDay.getTime() - firstDay.getTime()) / 86_400_000) + 1;
+    return route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          window: { ...windowData, start_date: startDate, end_date: endDate, days },
+          metrics: {
+            total_users: '1280',
+            new_users: '140',
+            dau: '86',
+            wau: '310',
+            mau: '720',
+            dau_mau_rate: 0.119,
+            first_match_conversion_rate: 0.64,
+            d1_retention_rate: 0.42,
+            d7_retention_rate: 0.27,
+            d30_retention_rate: 0.12,
+            games_started: '930',
+            games_completed: '810',
+            games_abandoned: '60',
+            completion_rate: 0.871,
+            game_duration_seconds: '972000',
+            player_duration_seconds: '1728000',
+            average_game_duration_seconds: '1200',
+            average_player_duration_seconds: '2400',
+          },
+          daily: Array.from({ length: days }, (_, index) => ({
+            date: new Date(firstDay.getTime() + index * 86_400_000).toISOString().slice(0, 10),
+            new_users: String(3 + index % 7),
+            active_users: String(35 + index * 2),
+            games_started: String(20 + index),
+            games_completed: String(18 + index),
+            games_abandoned: String(index % 3),
+            game_duration_seconds: String(12000 + index * 600),
+            player_duration_seconds: String(22000 + index * 900),
+          })),
         },
-        daily: Array.from({ length: 30 }, (_, index) => ({
-          date: dateAt(index),
-          new_users: String(3 + index % 7),
-          active_users: String(35 + index * 2),
-          games_started: String(20 + index),
-          games_completed: String(18 + index),
-          game_duration_seconds: String(12000 + index * 600),
-          player_duration_seconds: String(22000 + index * 900),
-        })),
       },
-    },
-  }));
+    });
+  });
   await page.route('**/pam-api/platform/admin/analytics/users?*', route => route.fulfill({
     json: {
       status_code: 200,
@@ -143,6 +153,7 @@ async function mockAdminAPI(page: Page) {
           active_users: '120',
           games_started: '260',
           games_completed: '240',
+          games_abandoned: '10',
           completion_rate: 0.923,
           game_duration_seconds: '288000',
           player_duration_seconds: '576000',
@@ -185,8 +196,49 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await page.goto('/admin', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: '数据总览' })).toBeVisible();
   await expect(page.getByText('用户增长与活跃')).toBeVisible();
+  await expect(page.getByText('对局开始、完成与废弃')).toBeVisible();
   await expect(page.getByText('对局活跃时长（估算）')).toBeVisible();
+  await expect(page.getByText('废弃对局', { exact: true }).first()).toBeVisible();
+  await expect(page.getByText('截至 2026-11-02 的累计未注销账号')).toBeVisible();
+  await expect(page.getByText('区间真人累计对局时长 / 区间活跃用户数（估算）')).toBeVisible();
   await expect(page.getByText('在线时长', { exact: true })).toHaveCount(0);
+  await page
+    .getByRole('img', { name: '所选日期范围新增用户和活跃用户趋势' })
+    .locator('svg')
+    .hover({ position: { x: 360, y: 140 } });
+  const chartTooltip = page.locator('[data-chart-tooltip]');
+  await expect(chartTooltip).toBeVisible();
+  await expect(chartTooltip).toContainText('新增用户');
+  await expect(chartTooltip).toContainText('活跃用户');
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  await expect(page.getByRole('dialog', { name: '选择数据日期范围' })).toBeVisible();
+  const rangeRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/overview')
+      && url.searchParams.get('start_date') === '2026-10-27'
+      && url.searchParams.get('end_date') === '2026-11-02';
+  });
+  await page.getByRole('button', { name: '最近 7 天' }).click();
+  await rangeRequest;
+  await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
+    .toContainText('2026-10-27 至 2026-11-02');
+  await expect(page.getByText('2026-10-27 至 2026-11-02 内注册的账号')).toBeVisible();
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  await page.getByLabel('开始日期').fill('2026-10-01');
+  await page.getByLabel('结束日期').fill('2026-10-15');
+  const customRangeRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/overview')
+      && url.searchParams.get('start_date') === '2026-10-01'
+      && url.searchParams.get('end_date') === '2026-10-15';
+  });
+  await page.getByRole('button', { name: '应用范围' }).click();
+  await customRangeRequest;
+  await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
+    .toContainText('2026-10-01 至 2026-10-15');
+
   const desktopScroll = await page.locator('main').evaluate(main => {
     const workspace = main.parentElement;
     if (!workspace) return null;
@@ -207,6 +259,11 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await page.getByRole('link', { name: '用户' }).click();
   await expect(page.getByRole('heading', { name: '用户活跃' })).toBeVisible();
   await expect(page.getByText('北海玩家')).toBeVisible();
+  const usersTable = page.getByRole('table');
+  await page.getByRole('button', { name: '按参与对局升序排序' }).click();
+  await expect(usersTable.locator('tbody tr').first()).toContainText('江城玩家');
+  await page.getByRole('button', { name: '按参与对局降序排序' }).click();
+  await expect(usersTable.locator('tbody tr').first()).toContainText('北海玩家');
   await page.getByRole('link', { name: /北海玩家/ }).click();
   await expect(page.getByRole('heading', { name: '用户详情' })).toBeVisible();
   await expect(page.getByText('游戏偏好')).toBeVisible();
@@ -237,6 +294,20 @@ test('admin navigation fits a narrow mobile viewport', async ({ page }) => {
   expect(layout.documentFits).toBe(true);
   expect(layout.navRect?.bottom).toBeLessThanOrEqual(layout.viewportHeight + 1);
   expect(layout.navRect?.top).toBeGreaterThan(500);
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  const datePickerLayout = await page.getByRole('dialog', { name: '选择数据日期范围' }).evaluate(dialog => {
+    const rect = dialog.getBoundingClientRect();
+    return {
+      left: rect.left,
+      right: rect.right,
+      viewportWidth: window.innerWidth,
+    };
+  });
+  expect(datePickerLayout.left).toBeGreaterThanOrEqual(0);
+  expect(datePickerLayout.right).toBeLessThanOrEqual(datePickerLayout.viewportWidth);
+  await page.keyboard.press('Escape');
+  await expect(page.getByRole('dialog', { name: '选择数据日期范围' })).toHaveCount(0);
 
   const mobileScroll = await page.locator('main').evaluate(main => {
     const workspace = main.parentElement;

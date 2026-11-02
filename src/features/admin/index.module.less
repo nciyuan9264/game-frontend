@@ -187,14 +187,151 @@
   }
 }
 
+.dateRangePicker {
+  position: relative;
+  min-width: 0;
+}
+
+.dateRangeTrigger {
+  display: inline-flex;
+  min-height: 36px;
+  align-items: center;
+  gap: 7px;
+  font-weight: 650;
+
+  span {
+    white-space: nowrap;
+  }
+}
+
+.dateRangePopover {
+  position: absolute;
+  z-index: 20;
+  top: calc(100% + 8px);
+  left: 0;
+  width: min(390px, calc(100vw - 48px));
+  border: 1px solid #cfd6dd;
+  border-radius: 7px;
+  background: white;
+  box-shadow: 0 12px 28px rgba(24, 32, 42, 0.14);
+  box-sizing: border-box;
+  padding: 14px;
+  color: var(--admin-ink);
+}
+
+.datePresetGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+
+  button {
+    display: flex;
+    min-height: 34px;
+    align-items: center;
+    justify-content: space-between;
+    border: 1px solid #dce2e7;
+    border-radius: 5px;
+    background: #f7f9fa;
+    padding: 0 9px;
+    color: #47525e;
+    font-size: 12px;
+    cursor: pointer;
+  }
+
+  button:hover {
+    border-color: #9bbcb5;
+    background: #f0f8f6;
+  }
+
+  button[aria-pressed="true"] {
+    border-color: #7eb3a8;
+    background: #e8f5f2;
+    color: #0f6b5d;
+    font-weight: 750;
+  }
+}
+
+.dateRangeInputs {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 14px;
+  border-top: 1px solid #e5e9ed;
+  padding-top: 13px;
+
+  label {
+    display: grid;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  label > span {
+    color: var(--admin-muted);
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  input {
+    min-width: 0;
+    height: 36px;
+    border: 1px solid #cfd6dd;
+    border-radius: 5px;
+    background: white;
+    box-sizing: border-box;
+    padding: 0 8px;
+    color: var(--admin-ink);
+    font: inherit;
+    font-size: 12px;
+  }
+
+  input:focus {
+    border-color: #0f766e;
+    outline: 2px solid rgba(15, 118, 110, 0.14);
+  }
+}
+
+.dateRangeError {
+  margin: 9px 0 0;
+  color: #a43f4b;
+  font-size: 11px;
+}
+
+.dateRangeActions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 7px;
+  margin-top: 13px;
+
+  button {
+    min-height: 34px;
+    border: 1px solid #cfd6dd;
+    border-radius: 5px;
+    background: white;
+    padding: 0 12px;
+    color: #46515c;
+    cursor: pointer;
+  }
+
+  button:last-child {
+    border-color: #0f766e;
+    background: #0f766e;
+    color: white;
+  }
+
+  button:disabled {
+    cursor: wait;
+    opacity: 0.55;
+  }
+}
+
 .metricGrid {
   display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
 
   article {
     display: grid;
-    min-height: 112px;
+    min-height: 132px;
     grid-template-columns: 34px 1fr;
     align-content: center;
     gap: 3px 10px;
@@ -208,8 +345,9 @@
     display: grid;
     width: 34px;
     height: 34px;
-    grid-row: 1 / span 2;
+    grid-row: 1 / span 3;
     place-items: center;
+    align-self: start;
     border-radius: 6px;
     background: #e9f6f3;
     color: #0f766e;
@@ -233,6 +371,14 @@
     overflow-wrap: anywhere;
     font-size: 21px;
     line-height: 1.25;
+  }
+
+  p {
+    margin: 2px 0 0;
+    color: #7b8490;
+    font-size: 10px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
   }
 }
 
@@ -333,6 +479,53 @@
 .chartAxis {
   fill: #7b8490;
   font-size: 10px;
+}
+
+.chartHitArea {
+  fill: transparent;
+  pointer-events: all;
+}
+
+.chartHover {
+  pointer-events: none;
+}
+
+.chartHoverLine {
+  stroke: #98a2ad;
+  stroke-dasharray: 3 3;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.chartHoverPoint {
+  stroke: white;
+  stroke-width: 2;
+  vector-effect: non-scaling-stroke;
+}
+
+.chartTooltip {
+  rect {
+    fill: rgba(24, 32, 42, 0.94);
+    stroke: rgba(255, 255, 255, 0.16);
+    stroke-width: 1;
+    vector-effect: non-scaling-stroke;
+  }
+}
+
+.chartTooltipDate,
+.chartTooltipLabel,
+.chartTooltipValue {
+  fill: white;
+  font-size: 10px;
+}
+
+.chartTooltipDate,
+.chartTooltipValue {
+  font-weight: 750;
+}
+
+.chartTooltipLabel {
+  fill: #d4dae0;
 }
 
 .retentionPanel > div {
@@ -473,6 +666,31 @@
     color: #66717c;
     font-size: 11px;
     font-weight: 750;
+
+    &[aria-sort="ascending"],
+    &[aria-sort="descending"] {
+      color: #0f766e;
+    }
+
+    button {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      border: 0;
+      background: transparent;
+      padding: 0;
+      color: inherit;
+      cursor: pointer;
+      font: inherit;
+      font-weight: inherit;
+      white-space: nowrap;
+    }
+
+    button:focus-visible {
+      border-radius: 3px;
+      outline: 2px solid #0f766e;
+      outline-offset: 3px;
+    }
   }
 
   td {
@@ -985,13 +1203,36 @@
     gap: 12px;
   }
 
+  .pageMeta {
+    gap: 8px;
+  }
+
+  .dateRangePicker {
+    flex: 1;
+  }
+
+  .dateRangeTrigger {
+    width: 100%;
+    justify-content: space-between;
+    padding: 7px 9px;
+    font-size: 11px;
+  }
+
+  .dateRangePopover {
+    width: calc(100vw - 20px);
+  }
+
+  .datePresetGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .metricGrid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 7px;
   }
 
   .metricGrid article {
-    min-height: 92px;
+    min-height: 118px;
     grid-template-columns: 28px 1fr;
     gap: 2px 7px;
     padding: 11px;

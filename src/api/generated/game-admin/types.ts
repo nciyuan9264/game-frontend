@@ -5,6 +5,11 @@ export type ISODate = string;
 
 export interface EmptyReq {}
 
+export interface OverviewReq {
+  start_date?: ISODate;
+  end_date?: ISODate;
+}
+
 export interface AnalyticsWindow {
   timezone: string;
   start_date: ISODate;
@@ -31,6 +36,7 @@ export interface OverviewMetrics {
   player_duration_seconds: string;
   average_game_duration_seconds: string;
   average_player_duration_seconds: string;
+  games_abandoned: string;
 }
 
 export interface DailyOverview {
@@ -41,6 +47,7 @@ export interface DailyOverview {
   games_completed: string;
   game_duration_seconds: string;
   player_duration_seconds: string;
+  games_abandoned: string;
 }
 
 export interface OverviewData {
@@ -130,6 +137,7 @@ export interface GameActivitySummary {
   player_duration_seconds: string;
   average_game_duration_seconds: string;
   average_human_players: number;
+  games_abandoned: string;
 }
 
 export interface GamesData {

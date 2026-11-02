@@ -45,7 +45,8 @@ export default function Games() {
                 <th>游戏</th>
                 <th>活跃玩家</th>
                 <th>开始对局</th>
-                <th>完成对局</th>
+                <th>正常完成</th>
+                <th>废弃对局</th>
                 <th>完成率</th>
                 <th>对局小时</th>
                 <th>玩家投入小时</th>
@@ -60,6 +61,7 @@ export default function Games() {
                   <td>{formatCount(game.active_users)}</td>
                   <td>{formatCount(game.games_started)}</td>
                   <td>{formatCount(game.games_completed)}</td>
+                  <td>{formatCount(game.games_abandoned)}</td>
                   <td>{formatPercent(game.completion_rate)}</td>
                   <td>{formatHours(game.game_duration_seconds)}</td>
                   <td>{formatHours(game.player_duration_seconds)}</td>

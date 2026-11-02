@@ -12,7 +12,7 @@ export default function Live() {
   const { data, loading, error, retry } = useAsyncResource(load);
 
   useEffect(() => {
-    const timer = window.setInterval(retry, 30_000);
+    const timer = window.setInterval(retry, 3_000);
     return () => window.clearInterval(timer);
   }, [retry]);
 
@@ -28,7 +28,7 @@ export default function Live() {
   return (
     <div className={styles.pageStack}>
       <div className={styles.liveHeader}>
-        <span><Radio size={16} />30 秒自动刷新</span>
+        <span><Radio size={16} />3 秒自动刷新</span>
         <small>更新于 {formatDateTime(data.generated_at_unix)}</small>
       </div>
 
