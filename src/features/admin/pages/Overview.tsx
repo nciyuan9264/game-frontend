@@ -1,6 +1,7 @@
 import { useCallback } from 'react';
 import {
   Activity,
+  CircleCheck,
   CircleOff,
   Clock3,
   Gamepad2,
@@ -46,6 +47,13 @@ export default function Overview() {
       tone: 'teal',
     },
     {
+      label: '对局总数',
+      value: formatCount(metrics.total_games),
+      definition: `截至 ${data.window.end_date} 的累计对局记录`,
+      icon: Gamepad2,
+      tone: 'blue',
+    },
+    {
       label: '区间新增',
       value: formatCount(metrics.new_users),
       definition: `${windowLabel} 内注册的账号`,
@@ -77,7 +85,7 @@ export default function Overview() {
       label: '对局完成率',
       value: formatPercent(metrics.completion_rate),
       definition: '区间正常完成对局数 / 开始对局数',
-      icon: Gamepad2,
+      icon: CircleCheck,
       tone: 'green',
     },
     {

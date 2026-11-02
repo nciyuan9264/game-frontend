@@ -43,6 +43,7 @@ async function mockAdminAPI(page: Page) {
           window: { ...windowData, start_date: startDate, end_date: endDate, days },
           metrics: {
             total_users: '1280',
+            total_games: '1042',
             new_users: '140',
             dau: '86',
             wau: '310',
@@ -220,6 +221,8 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   const assertClean = observePage(page);
   await page.goto('/admin', { waitUntil: 'domcontentloaded' });
   await expect(page.getByRole('heading', { name: '数据总览' })).toBeVisible();
+  await expect(page.getByText('对局总数', { exact: true })).toBeVisible();
+  await expect(page.getByText('1,042', { exact: true })).toBeVisible();
   await expect(page.getByText('用户增长与活跃')).toBeVisible();
   await expect(page.getByText('对局开始、完成与废弃')).toBeVisible();
   await expect(page.getByText('对局活跃时长（估算）')).toBeVisible();

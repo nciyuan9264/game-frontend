@@ -37,6 +37,7 @@ export interface OverviewMetrics {
   average_game_duration_seconds: string;
   average_player_duration_seconds: string;
   games_abandoned: string;
+  total_games: string;
 }
 
 export interface DailyOverview {
