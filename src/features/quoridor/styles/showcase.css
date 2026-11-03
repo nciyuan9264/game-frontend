@@ -89,10 +89,10 @@
   .quoridor-root .mobile-game-dock .button{position:relative}
   .quoridor-root .mobile-game-dock .button>svg:last-child{position:absolute;right:17px;margin-left:0}
 }
-.quoridor-root .wall-anchor{width:36px;height:36px;z-index:12;touch-action:manipulation}
+.quoridor-root .wall-anchor{--wall-anchor-size:36px;width:var(--wall-anchor-size);height:var(--wall-anchor-size);z-index:12;transform:none;touch-action:manipulation}
 .quoridor-root .wall-anchor:hover:not(:disabled){filter:none}
 .quoridor-root .wall-anchor>i{position:absolute;left:50%;top:50%;margin:0;transform:translate(-50%,-50%)}
 .quoridor-root .wall-anchor:hover>i,.quoridor-root .wall-anchor:focus-visible>i,.quoridor-root .wall-anchor:active>i{transform:translate(-50%,-50%)}
 @media(max-width:760px){
-  .quoridor-root .wall-anchor{width:38px;height:38px}
+  .quoridor-root .wall-anchor{--wall-anchor-size:38px}
 }

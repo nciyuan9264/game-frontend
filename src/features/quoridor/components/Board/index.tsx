@@ -295,8 +295,8 @@ export function Board({
           className={`wall-anchor ${option?.legal ? 'legal' : 'illegal'}`}
           tabIndex={sameCell(wallCursor, position) ? 0 : -1}
           style={{
-            left: `${(position.column + 1) / BOARD_SIZE * 100}%`,
-            top: `${(position.row + 1) / BOARD_SIZE * 100}%`,
+            left: `calc(${(position.column + 1) / BOARD_SIZE * 100}% - var(--wall-anchor-size, 36px) / 2)`,
+            top: `calc(${(position.row + 1) / BOARD_SIZE * 100}% - var(--wall-anchor-size, 36px) / 2)`,
           }}
           aria-label={`围墙位置 ${coordinate(position)}，${orientation === 'h' ? '横向' : '纵向'}${option?.legal ? '，可以放置' : '，当前不可放置'}`}
           data-click-sound="false"
