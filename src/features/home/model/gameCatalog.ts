@@ -517,4 +517,4 @@ export const gameCatalog = [
 export type GameCatalogItem = typeof gameCatalog[number];
 export type GameKey = GameCatalogItem['key'];
 
-export const featuredGameKey = 'acquire' satisfies GameKey;
+export const featuredGameKey = 'othello' satisfies GameKey;
