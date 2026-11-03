@@ -1,7 +1,9 @@
 import { useCallback } from 'react';
 import { ListAdminAnalyticsGames } from '@/api/generated/game-admin';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
+import { DateRangePicker } from '../components/DateRangePicker';
 import { ErrorState, LoadingState } from '../components/ResourceState';
+import { useOverviewDateRange } from '../hooks/useOverviewDateRange';
 import {
   formatCount,
   formatDuration,
@@ -13,7 +15,13 @@ import {
 import styles from '../index.module.less';
 
 export default function Games() {
-  const load = useCallback(async () => (await ListAdminAnalyticsGames()).data, []);
+  const dateRange = useOverviewDateRange();
+  const allTime = dateRange.preset === 'all_time';
+  const load = useCallback(async () => (await ListAdminAnalyticsGames({
+    start_date: allTime ? undefined : dateRange.range.start,
+    end_date: allTime ? undefined : dateRange.range.end,
+    all_time: allTime || undefined,
+  })).data, [allTime, dateRange.range.end, dateRange.range.start]);
   const { data, loading, error, retry } = useAsyncResource(load);
 
   if (loading && !data) return <LoadingState />;
@@ -23,8 +31,18 @@ export default function Games() {
   return (
     <div className={styles.pageStack}>
       <div className={styles.pageMeta}>
-        <span>{data.window.start_date} 至 {data.window.end_date}</span>
-        <button type="button" onClick={retry} disabled={loading}>刷新</button>
+        <DateRangePicker
+          value={dateRange.range}
+          today={dateRange.today}
+          allowAllTime
+          activePreset={dateRange.preset}
+          loading={loading}
+          onSelectPreset={dateRange.selectPreset}
+          onChange={dateRange.selectCustomRange}
+        />
+        <button type="button" onClick={retry} disabled={loading}>
+          {loading ? '刷新中' : '刷新'}
+        </button>
       </div>
 
       <section className={styles.gameBars} aria-label="各游戏玩家投入时长">

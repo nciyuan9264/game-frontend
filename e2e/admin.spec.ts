@@ -153,27 +153,35 @@ async function mockAdminAPI(page: Page) {
       },
     },
   }));
-  await page.route('**/pam-api/platform/admin/analytics/games', route => route.fulfill({
-    json: {
-      status_code: 200,
-      message: 'ok',
-      data: {
-        window: windowData,
-        games: [{
-          game_type: 'splendor',
-          active_users: '120',
-          games_started: '260',
-          games_completed: '240',
-          games_abandoned: '10',
-          completion_rate: 0.923,
-          game_duration_seconds: '288000',
-          player_duration_seconds: '576000',
-          average_game_duration_seconds: '1200',
-          average_human_players: 2.4,
-        }],
+  await page.route('**/pam-api/platform/admin/analytics/games?*', route => {
+    const requestURL = new URL(route.request().url());
+    const allTime = requestURL.searchParams.get('all_time') === 'true';
+    const startDate = allTime
+      ? '1970-01-01'
+      : requestURL.searchParams.get('start_date') || windowData.start_date;
+    const endDate = requestURL.searchParams.get('end_date') || windowData.end_date;
+    return route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          window: { ...windowData, start_date: startDate, end_date: endDate },
+          games: [{
+            game_type: 'splendor',
+            active_users: '120',
+            games_started: '260',
+            games_completed: '240',
+            games_abandoned: '10',
+            completion_rate: 0.923,
+            game_duration_seconds: '288000',
+            player_duration_seconds: '576000',
+            average_game_duration_seconds: '1200',
+            average_human_players: 2.4,
+          }],
+        },
       },
-    },
-  }));
+    });
+  });
   await page.route('**/pam-api/platform/admin/analytics/live', route => route.fulfill({
     json: {
       status_code: 200,
@@ -256,6 +264,7 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await rangeRequest;
   await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
     .toContainText('2026-10-27 至 2026-11-02');
+
   await expect(page.getByText('2026-10-27 至 2026-11-02 内注册的账号')).toBeVisible();
 
   await page.getByRole('button', { name: /选择数据日期范围/ }).click();
@@ -322,6 +331,32 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(
     page.getByRole('region', { name: '游戏活跃分析' }).getByText('璀璨宝石'),
   ).toBeVisible();
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  await expect(page.getByRole('dialog', { name: '选择数据日期范围' })).toBeVisible();
+  const gamesRangeRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/games')
+      && url.searchParams.get('start_date') === '2026-10-27'
+      && url.searchParams.get('end_date') === '2026-11-02';
+  });
+  await page.getByRole('button', { name: '最近 7 天' }).click();
+  await gamesRangeRequest;
+  await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
+    .toContainText('2026-10-27 至 2026-11-02');
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  const allTimeRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/games')
+      && url.searchParams.get('all_time') === 'true'
+      && !url.searchParams.has('start_date')
+      && !url.searchParams.has('end_date');
+  });
+  await page.getByRole('button', { name: '全部时间' }).click();
+  await allTimeRequest;
+  await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
+    .toContainText('全部时间');
 
   await page.getByRole('link', { name: '实时' }).click();
   await expect(page.getByRole('heading', { name: '实时概况' })).toBeVisible();

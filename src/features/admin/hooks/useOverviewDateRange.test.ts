@@ -1,7 +1,9 @@
+import { act, renderHook } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 import {
   beijingToday,
   getPresetRange,
+  useOverviewDateRange,
   rangeDays,
   validateDateRange,
 } from './useOverviewDateRange';
@@ -18,6 +20,14 @@ describe('overview date ranges', () => {
     expect(getPresetRange('this_month', today)).toEqual({ start: '2026-11-01', end: today });
     expect(getPresetRange('last_7_days', today)).toEqual({ start: '2026-10-27', end: today });
     expect(getPresetRange('last_30_days', today)).toEqual({ start: '2026-10-04', end: today });
+  });
+
+  it('selects all time without replacing the reusable custom range', () => {
+    const { result } = renderHook(useOverviewDateRange);
+    const initialRange = result.current.range;
+    act(() => result.current.selectPreset('all_time'));
+    expect(result.current.preset).toBe('all_time');
+    expect(result.current.range).toEqual(initialRange);
   });
 
   it('validates custom ranges and inclusive day counts', () => {

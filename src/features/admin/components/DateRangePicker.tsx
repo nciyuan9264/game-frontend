@@ -3,7 +3,7 @@ import { CalendarDays, Check, ChevronDown } from 'lucide-react';
 import {
   datePresets,
   validateDateRange,
-  type DatePresetKey,
+  type AnalyticsDatePresetKey,
   type DateRange,
 } from '../hooks/useOverviewDateRange';
 import styles from '../index.module.less';
@@ -11,15 +11,17 @@ import styles from '../index.module.less';
 interface DateRangePickerProps {
   value: DateRange;
   today: string;
-  activePreset: DatePresetKey | 'custom';
+  allowAllTime?: boolean;
+  activePreset: AnalyticsDatePresetKey | 'custom';
   loading: boolean;
-  onSelectPreset: (preset: DatePresetKey) => void;
+  onSelectPreset: (preset: AnalyticsDatePresetKey) => void;
   onChange: (range: DateRange) => void;
 }
 
 export function DateRangePicker({
   value,
   today,
+  allowAllTime = false,
   activePreset,
   loading,
   onSelectPreset,
@@ -54,7 +56,7 @@ export function DateRangePicker({
     setOpen(current => !current);
   };
 
-  const choosePreset = (preset: DatePresetKey) => {
+  const choosePreset = (preset: AnalyticsDatePresetKey) => {
     onSelectPreset(preset);
     setOpen(false);
   };
@@ -67,6 +69,13 @@ export function DateRangePicker({
     setOpen(false);
   };
 
+  const presets = allowAllTime
+    ? [{ key: 'all_time' as const, label: '全部时间' }, ...datePresets]
+    : datePresets;
+  const rangeLabel = activePreset === 'all_time'
+    ? '全部时间'
+    : [value.start, value.end].join(' 至 ');
+
   return (
     <div className={styles.dateRangePicker} ref={root}>
       <button
@@ -75,20 +84,21 @@ export function DateRangePicker({
         onClick={toggle}
         aria-expanded={open}
         aria-haspopup="dialog"
-        aria-label={`选择数据日期范围，当前 ${value.start} 至 ${value.end}`}
+        aria-label={'选择数据日期范围，当前 ' + rangeLabel}
       >
         <CalendarDays size={16} aria-hidden="true" />
-        <span>{value.start} 至 {value.end}</span>
+        <span>{rangeLabel}</span>
         <ChevronDown size={14} aria-hidden="true" />
       </button>
 
       {open && (
         <div className={styles.dateRangePopover} role="dialog" aria-label="选择数据日期范围">
           <div className={styles.datePresetGrid} aria-label="快捷日期范围">
-            {datePresets.map(option => (
+            {presets.map(option => (
               <button
                 type="button"
                 key={option.key}
+                data-full-width={option.key === 'all_time' || undefined}
                 onClick={() => choosePreset(option.key)}
                 aria-pressed={activePreset === option.key}
               >

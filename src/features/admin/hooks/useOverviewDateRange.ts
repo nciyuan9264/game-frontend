@@ -13,6 +13,8 @@ export type DatePresetKey =
   | 'last_30_days'
   | 'last_90_days';
 
+export type AnalyticsDatePresetKey = DatePresetKey | 'all_time';
+
 export const datePresets: ReadonlyArray<{ key: DatePresetKey; label: string }> = [
   { key: 'this_week', label: '本周' },
   { key: 'this_biweek', label: '本双周' },
@@ -78,10 +80,10 @@ export const validateDateRange = (range: DateRange, today: string): string => {
 export function useOverviewDateRange() {
   const [today] = useState(beijingToday);
   const [range, setRange] = useState<DateRange>(() => getPresetRange('last_30_days', today));
-  const [preset, setPreset] = useState<DatePresetKey | 'custom'>('last_30_days');
+  const [preset, setPreset] = useState<AnalyticsDatePresetKey | 'custom'>('last_30_days');
 
-  const selectPreset = useCallback((key: DatePresetKey) => {
-    setRange(getPresetRange(key, today));
+  const selectPreset = useCallback((key: AnalyticsDatePresetKey) => {
+    if (key !== 'all_time') setRange(getPresetRange(key, today));
     setPreset(key);
   }, [today]);
 

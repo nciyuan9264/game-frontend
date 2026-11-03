@@ -130,6 +130,12 @@ export interface UserActivityResp {
   data: UserActivityData;
 }
 
+export interface GamesReq {
+  start_date?: ISODate;
+  end_date?: ISODate;
+  all_time?: boolean;
+}
+
 export interface GameActivitySummary {
   game_type: string;
   active_users: string;

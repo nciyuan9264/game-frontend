@@ -8,6 +8,7 @@ import type {
   UsersResp,
   GetUserActivityReq,
   UserActivityResp,
+  GamesReq,
   GamesResp,
   LiveResp,
 } from './types';
@@ -74,10 +75,11 @@ export function GetAdminAnalyticsUserActivity(req: GetUserActivityReq, options?:
 }
 
 /** 查询游戏活跃分析 */
-export function ListAdminAnalyticsGames(options?: any): Promise<GamesResp> {
+export function ListAdminAnalyticsGames(req: GamesReq, options?: any): Promise<GamesResp> {
   const url = genGameAdminServiceBaseURL('/platform/admin/analytics/games');
   const method = 'GET';
-  return GameAdminServiceOptions.request({ url, method }, options);
+  const params = { start_date: req.start_date, end_date: req.end_date, all_time: req.all_time };
+  return GameAdminServiceOptions.request({ url, method, params }, options);
 }
 
 /** 查询平台实时概况 */
