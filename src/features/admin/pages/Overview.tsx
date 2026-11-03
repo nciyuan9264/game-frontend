@@ -28,10 +28,12 @@ import styles from '../index.module.less';
 
 export default function Overview() {
   const dateRange = useOverviewDateRange();
+  const allTime = dateRange.preset === 'all_time';
   const load = useCallback(async () => (await GetAdminAnalyticsOverview({
-    start_date: dateRange.range.start,
-    end_date: dateRange.range.end,
-  })).data, [dateRange.range.end, dateRange.range.start]);
+    start_date: allTime ? undefined : dateRange.range.start,
+    end_date: allTime ? undefined : dateRange.range.end,
+    all_time: allTime || undefined,
+  })).data, [allTime, dateRange.range.end, dateRange.range.start]);
   const { data, loading, error, retry } = useAsyncResource(load);
 
   if (loading && !data) return <LoadingState />;
@@ -122,6 +124,7 @@ export default function Overview() {
         <DateRangePicker
           value={dateRange.range}
           today={dateRange.today}
+          allowAllTime
           activePreset={dateRange.preset}
           loading={loading}
           onSelectPreset={dateRange.selectPreset}

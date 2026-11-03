@@ -8,6 +8,7 @@ export interface EmptyReq {}
 export interface OverviewReq {
   start_date?: ISODate;
   end_date?: ISODate;
+  all_time?: boolean;
 }
 
 export interface AnalyticsWindow {

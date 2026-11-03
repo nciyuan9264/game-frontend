@@ -30,7 +30,10 @@ async function mockAdminAPI(page: Page) {
   }));
   await page.route('**/pam-api/platform/admin/analytics/overview?*', route => {
     const requestURL = new URL(route.request().url());
-    const startDate = requestURL.searchParams.get('start_date') || windowData.start_date;
+    const allTime = requestURL.searchParams.get('all_time') === 'true';
+    const startDate = allTime
+      ? '2026-01-01'
+      : requestURL.searchParams.get('start_date') || windowData.start_date;
     const endDate = requestURL.searchParams.get('end_date') || windowData.end_date;
     const firstDay = new Date(`${startDate}T00:00:00Z`);
     const lastDay = new Date(`${endDate}T00:00:00Z`);
@@ -266,6 +269,19 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
     .toContainText('2026-10-27 至 2026-11-02');
 
   await expect(page.getByText('2026-10-27 至 2026-11-02 内注册的账号')).toBeVisible();
+
+  await page.getByRole('button', { name: /选择数据日期范围/ }).click();
+  const overviewAllTimeRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/overview')
+      && url.searchParams.get('all_time') === 'true'
+      && !url.searchParams.has('start_date')
+      && !url.searchParams.has('end_date');
+  });
+  await page.getByRole('button', { name: '全部时间' }).click();
+  await overviewAllTimeRequest;
+  await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
+    .toContainText('全部时间');
 
   await page.getByRole('button', { name: /选择数据日期范围/ }).click();
   await page.getByLabel('开始日期').fill('2026-10-01');

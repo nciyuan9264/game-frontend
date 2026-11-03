@@ -49,7 +49,7 @@ export function genGameAdminServiceBaseURL(path: string): string {
 export function GetAdminAnalyticsOverview(req: OverviewReq, options?: any): Promise<OverviewResp> {
   const url = genGameAdminServiceBaseURL('/platform/admin/analytics/overview');
   const method = 'GET';
-  const params = { start_date: req.start_date, end_date: req.end_date };
+  const params = { start_date: req.start_date, end_date: req.end_date, all_time: req.all_time };
   return GameAdminServiceOptions.request({ url, method, params }, options);
 }
 
