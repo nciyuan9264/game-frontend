@@ -299,7 +299,7 @@ export function Board({
             top: `calc(${(position.row + 1) / BOARD_SIZE * 100}% - var(--wall-anchor-size, 36px) / 2)`,
           }}
           aria-label={`围墙位置 ${coordinate(position)}，${orientation === 'h' ? '横向' : '纵向'}${option?.legal ? '，可以放置' : '，当前不可放置'}`}
-          data-click-sound="false"
+          data-click-sound={option?.legal ? 'button' : 'false'}
           onPointerDown={event => {
             if (event.pointerType === 'mouse' && event.button !== 0) return;
             onSelect?.({ kind: 'wall', wall });
