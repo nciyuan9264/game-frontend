@@ -161,6 +161,50 @@ export interface GamesResp {
   data: GamesData;
 }
 
+export interface ListMatchesReq {
+  page?: number;
+  page_size?: number;
+  query?: string;
+  game_type?: string;
+  end_reason?: string;
+}
+
+export interface MatchPlayerSummary {
+  user_id?: string;
+  player_id: string;
+  display_name: string;
+  seat_index: number;
+  is_ai: boolean;
+  final_rank?: number;
+  is_winner: boolean;
+}
+
+export interface MatchSummary {
+  game_id: string;
+  room_id: string;
+  match_id?: string;
+  game_type: string;
+  started_at_unix: string;
+  ended_at_unix: string;
+  duration_seconds: string;
+  end_reason: string;
+  max_players: number;
+  players: MatchPlayerSummary[];
+}
+
+export interface MatchesData {
+  matches: MatchSummary[];
+  page: number;
+  page_size: number;
+  total: string;
+}
+
+export interface MatchesResp {
+  status_code: number;
+  message: string;
+  data: MatchesData;
+}
+
 export interface LiveGameSummary {
   game_type: string;
   active_rooms: string;

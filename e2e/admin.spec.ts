@@ -185,6 +185,85 @@ async function mockAdminAPI(page: Page) {
       },
     });
   });
+  const matches = [
+    {
+      game_id: '42',
+      room_id: 'SP-1042',
+      match_id: 'match-7',
+      game_type: 'splendor',
+      started_at_unix: '1793541600',
+      ended_at_unix: '1793545200',
+      duration_seconds: '3600',
+      end_reason: 'completed',
+      max_players: 4,
+      players: [
+        {
+          user_id: '7',
+          player_id: 'player-7',
+          display_name: '北海玩家',
+          seat_index: 0,
+          is_ai: false,
+          final_rank: 1,
+          is_winner: true,
+        },
+        {
+          user_id: '8',
+          player_id: 'player-8',
+          display_name: '江城玩家',
+          seat_index: 1,
+          is_ai: false,
+          final_rank: 2,
+          is_winner: false,
+        },
+      ],
+    },
+    {
+      game_id: '41',
+      room_id: 'AQ-881',
+      match_id: 'match-6',
+      game_type: 'acquire',
+      started_at_unix: '1793534400',
+      ended_at_unix: '1793536200',
+      duration_seconds: '1800',
+      end_reason: 'abandoned',
+      max_players: 6,
+      players: [{
+        user_id: '7',
+        player_id: 'player-7',
+        display_name: '北海玩家',
+        seat_index: 0,
+        is_ai: false,
+        is_winner: false,
+      }],
+    },
+  ];
+  await page.route('**/pam-api/platform/admin/analytics/matches?*', route => {
+    const url = new URL(route.request().url());
+    const query = (url.searchParams.get('query') || '').toLowerCase();
+    const gameType = url.searchParams.get('game_type') || '';
+    const endReason = url.searchParams.get('end_reason') || '';
+    const filtered = matches.filter(match =>
+      (!gameType || match.game_type === gameType)
+      && (!endReason || match.end_reason === endReason)
+      && (!query || [
+        match.room_id,
+        match.match_id,
+        match.game_id,
+        ...match.players.flatMap(player => [player.user_id, player.player_id, player.display_name]),
+      ].some(value => value?.toLowerCase().includes(query))));
+    return route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          matches: filtered,
+          page: Number(url.searchParams.get('page') || 1),
+          page_size: Number(url.searchParams.get('page_size') || 20),
+          total: String(filtered.length),
+        },
+      },
+    });
+  });
   await page.route('**/pam-api/platform/admin/analytics/live', route => route.fulfill({
     json: {
       status_code: 200,
@@ -227,6 +306,23 @@ async function mockAdminAPI(page: Page) {
 test.beforeEach(async ({ page }) => {
   await page.clock.setFixedTime(new Date('2026-11-02T04:00:00Z'));
   await mockAdminAPI(page);
+});
+
+test('public home silently hides the admin shortcut when signed out', async ({ page }) => {
+  await page.unroute('**/pam-api/platform/auth/profile');
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    status: 401,
+    json: { status_code: 401, message: 'unauthorized' },
+  }));
+  await page.route('**/pam-api/platform/auth/refresh', route => route.fulfill({
+    status: 401,
+    json: { status_code: 401, message: 'unauthorized' },
+  }));
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await expect(page.getByRole('heading', { name: '桌游广场' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '打开对局记录' })).toHaveCount(0);
+  expect(new URL(page.url()).pathname).toBe('/');
 });
 
 test('admin analytics routes render and preserve duration semantics', async ({ page }) => {
@@ -374,6 +470,40 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(page.getByRole('button', { name: /选择数据日期范围/ }))
     .toContainText('全部时间');
 
+  await page.getByRole('link', { name: '对局', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '对局记录' })).toBeVisible();
+  const matchesTable = page.getByRole('region', { name: '历史对局列表' });
+  await expect(matchesTable.getByText('SP-1042')).toBeVisible();
+  await expect(matchesTable.getByText('match-7')).toBeVisible();
+  await expect(matchesTable.getByText('正常完成')).toBeVisible();
+  await expect(matchesTable.getByText('北海玩家').first()).toBeVisible();
+  await expect(matchesTable.getByLabel('胜者')).toBeVisible();
+
+  const gameFilterRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/matches')
+      && url.searchParams.get('game_type') === 'splendor';
+  });
+  await page.getByLabel('按游戏筛选').selectOption('splendor');
+  await gameFilterRequest;
+  const resultFilterRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/matches')
+      && url.searchParams.get('game_type') === 'splendor'
+      && url.searchParams.get('end_reason') === 'completed';
+  });
+  await page.getByLabel('按对局结果筛选').selectOption('completed');
+  await resultFilterRequest;
+  const matchSearchRequest = page.waitForRequest(request => {
+    const url = new URL(request.url());
+    return url.pathname.endsWith('/platform/admin/analytics/matches')
+      && url.searchParams.get('query') === '北海玩家';
+  });
+  await page.getByLabel('搜索历史对局').fill('北海玩家');
+  await page.getByRole('button', { name: '搜索', exact: true }).click();
+  await matchSearchRequest;
+  await expect(matchesTable.getByText('SP-1042')).toBeVisible();
+
   await page.getByRole('link', { name: '实时' }).click();
   await expect(page.getByRole('heading', { name: '实时概况' })).toBeVisible();
   const liveRooms = page.getByRole('region', { name: '实时房间列表' });
@@ -386,6 +516,10 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await liveRefresh;
   await expect(liveRooms.getByText('北海玩家')).toBeVisible();
   await expect(liveRooms.getByText('江城玩家')).toBeVisible();
+
+  await page.goto('/', { waitUntil: 'domcontentloaded' });
+  await page.getByRole('button', { name: '打开对局记录' }).click();
+  await expect(page.getByRole('heading', { name: '对局记录' })).toBeVisible();
   assertClean();
 });
 
@@ -437,4 +571,8 @@ test('admin navigation fits a narrow mobile viewport', async ({ page }) => {
   await page.getByRole('link', { name: '用户' }).click();
   await expect(page.getByRole('heading', { name: '用户活跃' })).toBeVisible();
   await expect(page.getByRole('table')).toBeVisible();
+
+  await page.getByRole('link', { name: '对局', exact: true }).click();
+  await expect(page.getByRole('heading', { name: '对局记录' })).toBeVisible();
+  await expect(page.getByRole('region', { name: '历史对局列表' })).toBeVisible();
 });

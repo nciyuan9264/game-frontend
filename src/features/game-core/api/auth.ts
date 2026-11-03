@@ -17,8 +17,8 @@ export async function refreshToken() {
   return Refresh();
 }
 
-export async function getProfile(): Promise<AuthProfile> {
-  const response = await GetProfile();
+export async function getProfile(options?: { suppressAuthRedirect?: boolean }): Promise<AuthProfile> {
+  const response = await GetProfile(options);
   const displayName = response.data.display_name ?? response.data.name ?? '';
   return {
     id: response.data.user_id,

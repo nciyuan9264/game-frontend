@@ -7,6 +7,7 @@ import { Refresh } from './generated/auth';
 
 interface RetryableRequestConfig extends InternalAxiosRequestConfig {
   _retry?: boolean;
+  suppressAuthRedirect?: boolean;
 }
 
 interface ErrorEnvelope {
@@ -44,8 +45,10 @@ apiInstance.interceptors.response.use(
         await Refresh();
         return apiInstance.request(original);
       } catch {
-        window.location.href = 'https://auth.gamebus.online/login?redirect='
-          + encodeURIComponent(window.location.href);
+        if (!original.suppressAuthRedirect) {
+          window.location.href = 'https://auth.gamebus.online/login?redirect='
+            + encodeURIComponent(window.location.href);
+        }
       }
     }
     const data = reason.response?.data;

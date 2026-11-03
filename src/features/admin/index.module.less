@@ -643,6 +643,39 @@
   }
 }
 
+.matchToolbar {
+  flex-wrap: wrap;
+
+  form {
+    flex: 1 1 360px;
+  }
+}
+
+.matchFilters {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  select {
+    min-height: 42px;
+    border: 1px solid #cdd4db;
+    border-radius: 6px;
+    background: white;
+    padding: 0 34px 0 11px;
+    color: #39434d;
+    cursor: pointer;
+    font: inherit;
+    font-size: 12px;
+  }
+
+  > span {
+    min-width: 104px;
+    color: var(--admin-muted);
+    font-size: 12px;
+    text-align: right;
+  }
+}
+
 .tableScroller {
   overflow-x: auto;
 }
@@ -713,6 +746,84 @@
   td > small {
     margin-top: 3px;
     color: #89919a;
+  }
+}
+
+.matchTable table {
+  min-width: 1180px;
+}
+
+.matchStatus {
+  display: inline-flex;
+  min-height: 24px;
+  align-items: center;
+  border: 1px solid #bedfd6;
+  border-radius: 999px;
+  background: #edf8f5;
+  padding: 0 8px;
+  color: #176b59;
+  font-size: 11px;
+  font-weight: 750;
+
+  &[data-reason="abandoned"] {
+    border-color: #e9c7cc;
+    background: #fff2f3;
+    color: #9a4652;
+  }
+}
+
+.matchPlayerList {
+  display: flex;
+  min-width: 300px;
+  flex-wrap: wrap;
+  gap: 5px;
+}
+
+.matchPlayer {
+  display: inline-flex;
+  min-height: 32px;
+  align-items: center;
+  gap: 6px;
+  border: 1px solid #dce2e7;
+  border-radius: 5px;
+  background: #f8fafb;
+  padding: 3px 7px;
+
+  > i {
+    display: grid;
+    width: 22px;
+    height: 22px;
+    flex: 0 0 auto;
+    place-items: center;
+    border-radius: 50%;
+    background: #e7efee;
+    color: #4c756e;
+  }
+
+  > span {
+    display: grid;
+    gap: 1px;
+  }
+
+  b {
+    max-width: 120px;
+    overflow: hidden;
+    font-size: 11px;
+    text-overflow: ellipsis;
+  }
+
+  small {
+    margin: 0;
+    font-size: 9px;
+  }
+
+  > svg {
+    color: #a56a00;
+  }
+
+  &[data-winner="true"] {
+    border-color: #dbc78f;
+    background: #fffaf0;
   }
 }
 
@@ -1246,7 +1357,7 @@
   .sidebar nav {
     display: grid;
     height: 57px;
-    grid-template-columns: repeat(4, 1fr);
+    grid-template-columns: repeat(5, 1fr);
     gap: 0;
     padding: 0;
   }
@@ -1365,6 +1476,22 @@
 
   .tableToolbar > span {
     text-align: right;
+  }
+
+  .matchFilters {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: 100%;
+
+    select {
+      min-width: 0;
+      width: 100%;
+    }
+
+    > span {
+      grid-column: 1 / -1;
+      text-align: right;
+    }
   }
 
   .pagination button span {

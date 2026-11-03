@@ -1,5 +1,5 @@
 import type { CSSProperties } from 'react';
-import { useMemo, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { Popover } from 'antd';
 import styles from './index.module.less';
 import wechatGroupQr from '../../assets/wechat-group-qr.jpg';
@@ -16,12 +16,15 @@ import {
   Flower2,
   Gavel,
   Heart,
+  History,
   Home as HomeIcon,
   Mail,
   MessageCircle,
   X,
 } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
+import { getProfile } from '@/features/game-core/api/auth';
+import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   featuredGameKey,
   gameCatalog,
@@ -735,6 +738,8 @@ function gameMatchesQuery(game: GameCatalogItem, query: string) {
 
 export default function Home() {
   const navigate = useNavigate();
+  const loadProfile = useCallback(() => getProfile({ suppressAuthRedirect: true }), []);
+  const { data: profile } = useAsyncResource(loadProfile);
   const [activeKey, setActiveKey] = useState<GameKey>(featuredGameKey);
   const [selectedCategory, setSelectedCategory] = useState<GameCategoryFilter>('all');
   const [query, setQuery] = useState('');
@@ -750,6 +755,7 @@ export default function Home() {
   );
   const ActiveVisual = gameVisuals[activeGame.key];
   const activeThemeStyle = gameThemeStyle(activeGame);
+  const isAdmin = profile?.roles.some(role => role.toLowerCase() === 'admin') ?? false;
   const clearFilters = () => {
     setQuery('');
     setSelectedCategory('all');
@@ -771,35 +777,49 @@ export default function Home() {
             <span>GameBus Online</span>
             <b>{gameCatalog.length} 款游戏</b>
           </div>
-          <Popover
-            placement="bottomRight"
-            trigger="click"
-            defaultOpen
-            color="#151e2d"
-            classNames={{ root: styles.communityPopover }}
-            content={(
-              <div className={styles.communityPopoverContent}>
-                <div className={styles.communityPopoverTitle}>
-                  <span>微信玩家群</span>
-                  <strong>桌游线上版</strong>
-                </div>
-                <a
-                  href={wechatGroupQr}
-                  target="_blank"
-                  rel="noreferrer"
-                  aria-label="查看桌游线上版玩家群二维码原图"
-                >
-                  <img src={wechatGroupQr} alt="桌游线上版微信玩家群二维码" />
-                </a>
-                <p>约局、反馈与版本更新</p>
-              </div>
+          <div className={styles.topActions}>
+            {isAdmin && (
+              <button
+                type="button"
+                className={styles.communityTrigger}
+                onClick={() => navigate('/admin/matches')}
+                aria-label="打开对局记录"
+                title="对局记录"
+              >
+                <History size={17} />
+                <span>对局记录</span>
+              </button>
             )}
-          >
-            <button type="button" className={styles.communityTrigger}>
-              <MessageCircle size={17} />
-              <span>玩家群</span>
-            </button>
-          </Popover>
+            <Popover
+              placement="bottomRight"
+              trigger="click"
+              defaultOpen
+              color="#151e2d"
+              classNames={{ root: styles.communityPopover }}
+              content={(
+                <div className={styles.communityPopoverContent}>
+                  <div className={styles.communityPopoverTitle}>
+                    <span>微信玩家群</span>
+                    <strong>桌游线上版</strong>
+                  </div>
+                  <a
+                    href={wechatGroupQr}
+                    target="_blank"
+                    rel="noreferrer"
+                    aria-label="查看桌游线上版玩家群二维码原图"
+                  >
+                    <img src={wechatGroupQr} alt="桌游线上版微信玩家群二维码" />
+                  </a>
+                  <p>约局、反馈与版本更新</p>
+                </div>
+              )}
+            >
+              <button type="button" className={styles.communityTrigger}>
+                <MessageCircle size={17} />
+                <span>玩家群</span>
+              </button>
+            </Popover>
+          </div>
         </header>
 
         <section className={styles.heroSection}>

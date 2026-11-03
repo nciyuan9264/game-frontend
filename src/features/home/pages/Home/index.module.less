@@ -93,6 +93,13 @@
   gap: 12px;
 }
 
+.topActions {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 8px;
+}
+
 .heroSection {
   display: grid;
   grid-template-columns: minmax(260px, 0.68fr) minmax(0, 1.32fr);
@@ -136,6 +143,21 @@
   &:focus-visible {
     outline: 2px solid var(--accent-primary);
     outline-offset: 2px;
+  }
+}
+
+@media (max-width: 640px) {
+  .topActions {
+    gap: 6px;
+  }
+
+  .topActions .communityTrigger {
+    width: 40px;
+    padding: 0;
+
+    span {
+      display: none;
+    }
   }
 }
 

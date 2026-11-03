@@ -3,6 +3,7 @@ import {
   Activity,
   BarChart3,
   Gamepad2,
+  History,
   LayoutDashboard,
   LogOut,
   UserRound,
@@ -16,6 +17,7 @@ const navigation = [
   { to: '/admin', label: '总览', icon: LayoutDashboard, end: true },
   { to: '/admin/users', label: '用户', icon: Users },
   { to: '/admin/games', label: '游戏', icon: BarChart3 },
+  { to: '/admin/matches', label: '对局', icon: History },
   { to: '/admin/live', label: '实时', icon: Activity },
 ] as const;
 
@@ -23,6 +25,7 @@ const titles: Record<string, string> = {
   '/admin': '数据总览',
   '/admin/users': '用户活跃',
   '/admin/games': '游戏分析',
+  '/admin/matches': '对局记录',
   '/admin/live': '实时概况',
 };
 

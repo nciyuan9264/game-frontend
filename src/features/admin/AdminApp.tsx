@@ -7,6 +7,7 @@ import { AdminLayout } from './components/Layout';
 import { ErrorState, LoadingState } from './components/ResourceState';
 import Games from './pages/Games';
 import Live from './pages/Live';
+import Matches from './pages/Matches';
 import Overview from './pages/Overview';
 import UserDetail from './pages/UserDetail';
 import Users from './pages/Users';
@@ -39,6 +40,7 @@ export default function AdminApp() {
         <Route path="users" element={<Users />} />
         <Route path="users/:userID" element={<UserDetail />} />
         <Route path="games" element={<Games />} />
+        <Route path="matches" element={<Matches />} />
         <Route path="live" element={<Live />} />
         <Route path="*" element={<Navigate to="/admin" replace />} />
       </Routes>

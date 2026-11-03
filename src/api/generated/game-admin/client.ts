@@ -10,6 +10,8 @@ import type {
   UserActivityResp,
   GamesReq,
   GamesResp,
+  ListMatchesReq,
+  MatchesResp,
   LiveResp,
 } from './types';
 export interface RequestParams {
@@ -79,6 +81,20 @@ export function ListAdminAnalyticsGames(req: GamesReq, options?: any): Promise<G
   const url = genGameAdminServiceBaseURL('/platform/admin/analytics/games');
   const method = 'GET';
   const params = { start_date: req.start_date, end_date: req.end_date, all_time: req.all_time };
+  return GameAdminServiceOptions.request({ url, method, params }, options);
+}
+
+/** 查询历史对局列表 */
+export function ListAdminAnalyticsMatches(req: ListMatchesReq, options?: any): Promise<MatchesResp> {
+  const url = genGameAdminServiceBaseURL('/platform/admin/analytics/matches');
+  const method = 'GET';
+  const params = {
+    page: req.page,
+    page_size: req.page_size,
+    query: req.query,
+    game_type: req.game_type,
+    end_reason: req.end_reason,
+  };
   return GameAdminServiceOptions.request({ url, method, params }, options);
 }
 
