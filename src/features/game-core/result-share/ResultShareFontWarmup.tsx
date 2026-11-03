@@ -1,16 +1,26 @@
 import { useEffect, useRef } from 'react';
 import { useLocation } from 'react-router-dom';
+import {
+  isResultCardGameType,
+  preloadResultCardArtwork,
+} from './themes';
 import { warmResultCardFonts } from './useResultCardShare';
 
 export function ResultShareFontWarmup() {
   const location = useLocation();
   const probeRef = useRef<HTMLDivElement>(null);
   const matchPage = location.pathname.endsWith('/match');
+  const gameType = location.pathname
+    .split('/')
+    .find(isResultCardGameType);
 
   useEffect(() => {
-    if (!matchPage || !probeRef.current) return;
-    void warmResultCardFonts(probeRef.current).catch(() => undefined);
-  }, [matchPage]);
+    if (!matchPage || !gameType || !probeRef.current) return;
+    void Promise.all([
+      warmResultCardFonts(probeRef.current),
+      preloadResultCardArtwork(gameType),
+    ]).catch(() => undefined);
+  }, [gameType, matchPage]);
 
   if (!matchPage) return null;
   return <div
@@ -26,7 +36,6 @@ export function ResultShareFontWarmup() {
       pointerEvents: 'none',
     }}
   >
-    <span style={{ fontFamily: "'DM Sans Variable'" }}>GAMEBUS FINAL RESULT</span>
     <span style={{ fontFamily: "'Noto Sans SC Variable'" }}>玩家战绩最终排名</span>
     <span style={{ fontFamily: "'Noto Serif SC Variable'" }}>荣耀胜利再来一局</span>
   </div>;

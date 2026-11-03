@@ -4,7 +4,7 @@ import type { GameType } from '@/hooks/useGameType';
 import { getResultCard } from './api';
 import { resultImageFilename } from './format';
 import type { ResultCardModel } from './model';
-import { resultCardTheme } from './themes';
+import { preloadResultCardArtwork, resultCardTheme } from './themes';
 
 type ShareStatus =
   | 'closed'
@@ -53,6 +53,22 @@ export function supportsFileShare(): boolean {
   } catch {
     return false;
   }
+}
+
+async function waitForResultCardImages(node: HTMLElement): Promise<void> {
+  const images = Array.from(node.querySelectorAll('img'))
+    .filter(image => !image.hidden);
+  await Promise.all(images.map(async image => {
+    if (!image.complete) {
+      await new Promise<void>(resolve => {
+        image.addEventListener('load', () => resolve(), { once: true });
+        image.addEventListener('error', () => resolve(), { once: true });
+      });
+    }
+    if (typeof image.decode === 'function') {
+      await image.decode().catch(() => undefined);
+    }
+  }));
 }
 
 export function useResultCardShare({
@@ -136,7 +152,11 @@ export function useResultCardShare({
       return resultCardBlobTask.promise;
     }
     const promise = (async () => {
-      const fontEmbedCSS = await warmResultCardFonts(node);
+      const [fontEmbedCSS] = await Promise.all([
+        warmResultCardFonts(node),
+        preloadResultCardArtwork(gameType),
+        waitForResultCardImages(node),
+      ]);
       await new Promise<void>(resolve =>
         requestAnimationFrame(() => resolve()));
       const blob = await toBlob(node, {

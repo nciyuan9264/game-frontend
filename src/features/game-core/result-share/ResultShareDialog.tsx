@@ -74,7 +74,11 @@ export function ResultShareDialog({
     {share.status === 'loading' && <div className={styles.loading}>
       <span /><b>正在整理本局战绩</b><p>排名、比分与时长正在生成卡片。</p>
     </div>}
-    {share.model && <ResultCardPreview model={share.model} />}
+    {share.model && <div
+      className={` ` }
+    >
+      <ResultCardPreview model={share.model} />
+    </div>}
     {share.error && <div className={styles.error}>
       <AlertCircle size={19} /><div><b>战绩卡片暂时无法生成</b>
         <p>{share.error}</p></div>

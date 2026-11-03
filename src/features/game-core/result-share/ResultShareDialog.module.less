@@ -71,3 +71,63 @@
     padding-bottom: 14px;
   }
 }
+
+.previewStage {
+  opacity: .72;
+  transform: translateY(5px);
+  transition: opacity .2s ease, transform .2s ease;
+}
+
+.previewReady {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.dialog > :global([class*='header']) {
+  padding: 18px 24px 14px;
+}
+
+.dialog > :global([class*='header']) h2 {
+  font-size: 18px;
+}
+
+.dialog > :global([class*='body']) {
+  padding: 14px 24px;
+}
+
+.dialog > :global([class*='footer']) {
+  gap: 8px;
+  padding: 12px 20px 14px;
+}
+
+.dialog > :global([class*='footer']) > button {
+  min-width: 126px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .previewStage {
+    transition: none;
+  }
+}
+
+@media (max-width: 767px) {
+  .dialog > :global([class*='header']) {
+    padding: 25px 20px 13px;
+  }
+
+  .dialog > :global([class*='header']) h2 {
+    font-size: 18px;
+  }
+
+  .dialog > :global([class*='body']) {
+    padding: 10px 20px 12px;
+  }
+
+  .dialog > :global([class*='footer']) {
+    padding: 12px 20px max(14px, env(safe-area-inset-bottom));
+  }
+
+  .dialog > :global([class*='footer']) > button {
+    min-width: 0;
+  }
+}

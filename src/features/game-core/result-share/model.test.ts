@@ -35,6 +35,8 @@ function data(players: ResultCardData['players']): ResultCardData {
 describe('result card model', () => {
   it('defines a distinct complete theme for every supported game', () => {
     expect(Object.keys(resultCardThemes).sort()).toEqual([...gameTypes].sort());
+    expect(new Set(Object.values(resultCardThemes).map(theme => theme.family)))
+      .toEqual(new Set(['commerce', 'abstract', 'deduction', 'festival']));
     for (const theme of Object.values(resultCardThemes)) {
       expect(new Set([
         theme.primary,

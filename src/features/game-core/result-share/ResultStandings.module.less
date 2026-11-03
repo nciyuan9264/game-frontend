@@ -1,0 +1,286 @@
+.standings {
+  min-height: 0;
+  padding: 14px 27px 10px;
+}
+
+.header {
+  display: flex;
+  height: 38px;
+  align-items: flex-start;
+  justify-content: space-between;
+}
+
+.header small {
+  color: var(--result-accent);
+  font-size: 7px;
+  font-weight: 800;
+}
+
+.header h2 {
+  margin: 1px 0 0;
+  font-family: 'Noto Serif SC Variable', 'Noto Serif SC', serif;
+  font-size: 15px;
+  font-weight: 750;
+  line-height: 1.2;
+}
+
+.header > span {
+  padding-top: 5px;
+  color: var(--result-muted);
+  font-size: 8px;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+}
+
+.row {
+  display: grid;
+  height: 42px;
+  grid-template-columns: 28px 29px minmax(0, 1fr) 58px 80px;
+  align-items: center;
+  gap: 8px;
+  border-bottom: 1px solid color-mix(in srgb, var(--result-ink) 12%, transparent);
+}
+
+.row:first-child {
+  border-top: 1px solid color-mix(in srgb, var(--result-ink) 12%, transparent);
+}
+
+.row.winner {
+  color: var(--result-ink);
+  background: color-mix(in srgb, var(--result-winner) 12%, transparent);
+}
+
+.row.self {
+  box-shadow: inset 3px 0 0 var(--result-self);
+}
+
+.rank {
+  color: var(--result-muted);
+  font-size: 10px;
+  text-align: center;
+}
+
+.badge {
+  position: relative;
+  display: grid;
+  width: 27px;
+  height: 27px;
+  place-items: center;
+  border: 1px solid color-mix(in srgb, var(--result-primary) 30%, transparent);
+  border-radius: 50%;
+  color: var(--result-paper);
+  background: var(--result-primary);
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.badge small {
+  position: absolute;
+  right: -4px;
+  bottom: -3px;
+  min-width: 13px;
+  padding: 1px 2px;
+  border: 1px solid var(--result-paper);
+  color: var(--result-paper);
+  background: var(--result-accent);
+  font-size: 5px;
+  line-height: 1;
+  text-align: center;
+}
+
+.name {
+  min-width: 0;
+}
+
+.name strong,
+.name small,
+.score b,
+.score small {
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.name strong {
+  font-size: 10px;
+}
+
+.name small {
+  margin-top: 2px;
+  color: var(--result-muted);
+  font-size: 6px;
+}
+
+.state {
+  display: flex;
+  min-width: 0;
+  align-items: center;
+  gap: 3px;
+  color: var(--result-accent);
+  font-size: 7px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.score {
+  min-width: 0;
+  text-align: right;
+}
+
+.score b {
+  font-size: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.score small {
+  margin-top: 1px;
+  color: var(--result-muted);
+  font-size: 6px;
+}
+
+.compact {
+  padding-top: 10px;
+}
+
+.compact .header {
+  height: 40px;
+}
+
+.compact .row {
+  height: 28px;
+  grid-template-columns: 25px 22px minmax(0, 1fr) 52px 82px;
+  gap: 7px;
+}
+
+.compact .badge {
+  width: 20px;
+  height: 20px;
+  font-size: 7px;
+}
+
+.compact .badge small {
+  right: -5px;
+  font-size: 4px;
+}
+
+.compact .name strong,
+.compact .score b {
+  font-size: 8px;
+}
+
+.compact .name small,
+.compact .score small {
+  display: none;
+}
+
+.compact .state {
+  font-size: 6px;
+}
+
+.duelGrid {
+  display: grid;
+  min-height: 218px;
+  grid-template-columns: minmax(0, 1fr) 34px minmax(0, 1fr);
+  align-items: stretch;
+  border-top: 1px solid color-mix(in srgb, var(--result-ink) 14%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--result-ink) 14%, transparent);
+}
+
+.versus {
+  align-self: center;
+  color: var(--result-muted);
+  font-size: 8px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.duelPlayer {
+  position: relative;
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 18px 10px;
+  text-align: center;
+}
+
+.duelPlayer:first-child {
+  border-right: 1px solid color-mix(in srgb, var(--result-ink) 10%, transparent);
+}
+
+.duelPlayer:last-child {
+  border-left: 1px solid color-mix(in srgb, var(--result-ink) 10%, transparent);
+}
+
+.duelPlayer.self {
+  box-shadow: inset 0 -3px 0 var(--result-self);
+}
+
+.duelPlayer.winner {
+  background: color-mix(in srgb, var(--result-winner) 12%, transparent);
+}
+
+.duelPlayer .badge {
+  width: 42px;
+  height: 42px;
+  border-width: 2px;
+  font-size: 15px;
+}
+
+.duelRank {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  color: var(--result-muted);
+  font-family: 'Noto Serif SC Variable', 'Noto Serif SC', serif;
+  font-size: 10px;
+}
+
+.duelName {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 10px;
+  font-family: 'Noto Serif SC Variable', 'Noto Serif SC', serif;
+  font-size: 12px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.duelRole {
+  overflow: hidden;
+  width: 100%;
+  margin-top: 4px;
+  color: var(--result-muted);
+  font-size: 7px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.duelScore {
+  overflow: hidden;
+  max-width: 100%;
+  margin-top: 14px;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.duelScoreLabel {
+  margin-top: 4px;
+  color: var(--result-muted);
+  font-size: 6px;
+}
+
+.crown {
+  position: absolute;
+  top: 8px;
+  right: 9px;
+  color: var(--result-winner);
+}
