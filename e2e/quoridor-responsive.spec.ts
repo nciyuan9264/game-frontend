@@ -258,15 +258,58 @@ async function mockSession(
         },
       },
     }));
+  await page.route(
+    `**/pam-api/platform/history/matches/${matchID}/result-card?**`,
+    route => route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          game_type: 'quoridor',
+          started_at: '2026-10-26T00:00:00Z',
+          ended_at: '2026-10-26T00:18:00Z',
+          duration_seconds: 1080,
+          players: [
+            {
+              display_name: human.displayName,
+              seat_index: human.seatIndex,
+              is_ai: false,
+              final_score: 1,
+              final_stocks: 8,
+              final_rank: 1,
+              is_winner: true,
+              game_role: 'south',
+              is_self: true,
+            },
+            {
+              display_name: ai.displayName,
+              seat_index: ai.seatIndex,
+              is_ai: true,
+              final_score: 0,
+              final_stocks: 8,
+              final_rank: 2,
+              is_winner: false,
+              game_role: 'north',
+              is_self: false,
+            },
+          ],
+        },
+      },
+    }),
+  );
   await page.routeWebSocket('**/ws?**', socket => {
+    let seq = snapshot.seq;
     socket.send(JSON.stringify(snapshot));
     socket.onMessage(message => {
       const command = String(message);
       commands.push(command);
-      if (command.includes('"game_move_pawn"')) {
+      if (
+        command.includes('"game_move_pawn"')
+        || command.includes('"game_place_wall"')
+      ) {
         socket.send(JSON.stringify({
           ...gameSnapshot(),
-          seq: 13,
+          seq: ++seq,
         }));
       }
     });
@@ -298,14 +341,21 @@ test('Quoridor public pages stay stable across target viewports', async ({
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/quoridor');
-    await expect(page.getByTestId('quoridor-lobby-hero')).toBeVisible();
-    await expect(page.getByTestId('quoridor-lobby-facts')
+    const mobile = viewport.width <= 760;
+    await expect(mobile
+      ? page.locator('[data-game-mobile-lobby-hero]')
+      : page.getByTestId('quoridor-lobby-hero')).toBeVisible();
+    await expect((mobile
+      ? page.locator('[data-game-mobile-lobby-facts]')
+      : page.getByTestId('quoridor-lobby-facts'))
       .locator(':scope > span')).toHaveCount(3);
     await expectNoOverflow(page);
     await capture(page, testInfo, `lobby-${viewport.width}x${viewport.height}`);
 
     await page.goto('/game/quoridor/guide');
-    await expect(page.getByTestId('quoridor-guide-visual')).toBeVisible();
+    await expect(mobile
+      ? page.locator('[data-game-mobile-guide-visual]')
+      : page.getByTestId('quoridor-guide-visual')).toBeVisible();
     await expectNoOverflow(page);
   }
 });
@@ -398,6 +448,24 @@ test('Quoridor mobile confirms moves and exposes precise wall placement', async 
   expect(wallOpponentBox).toEqual(moveOpponentBox);
   expect(wallSelfBox).toEqual(moveSelfBox);
   await capture(page, testInfo, 'mobile-wall-mode');
+  await expect.poll(() => page.getByTestId('wall-D4').evaluate(anchor => {
+    const dot = anchor.querySelector('i');
+    const anchorBox = anchor.getBoundingClientRect();
+    const dotBox = dot?.getBoundingClientRect();
+    if (!dotBox) return Number.POSITIVE_INFINITY;
+    return Math.max(
+      Math.abs(anchorBox.left + anchorBox.width / 2 - (dotBox.left + dotBox.width / 2)),
+      Math.abs(anchorBox.top + anchorBox.height / 2 - (dotBox.top + dotBox.height / 2)),
+    );
+  })).toBeLessThanOrEqual(0.5);
+  await page.getByTestId('wall-D4').click();
+  await expect(page.getByRole('button', { name: '确认放墙' })).toBeEnabled();
+  await page.getByRole('button', { name: '确认放墙' }).click();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"game_place_wall"')
+    && command.includes('"row":3')
+    && command.includes('"column":3')
+    && command.includes('"orientation":"h"'))).toBe(true);
   await page.getByRole('button', { name: '精确选择墙槽' }).click();
   await expect(page.getByTestId('wall-slot-picker')).toBeVisible();
   await page.getByRole('button', { name: '选择第 D 列' }).click();
@@ -465,7 +533,7 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   page,
 }, testInfo) => {
   await page.setViewportSize({ width: 1440, height: 900 });
-  await mockSession(page);
+  const commands = await mockSession(page);
   await page.goto(`/game/quoridor/match?roomID=${roomID}`);
 
   await expect(page.getByRole('heading', {
@@ -478,6 +546,26 @@ test('Quoridor desktop keeps board, actions, and journal visible', async ({
   await expect(page.getByRole('heading', { name: '行棋记录' })).toBeVisible();
   await expectNoOverflow(page);
   await capture(page, testInfo, 'game-1440x900');
+  await page.getByRole('button', { name: '放置围墙' }).click();
+  await expect.poll(() => page.getByTestId('wall-D4').evaluate(anchor => {
+    const dot = anchor.querySelector('i');
+    const anchorBox = anchor.getBoundingClientRect();
+    const dotBox = dot?.getBoundingClientRect();
+    if (!dotBox) return Number.POSITIVE_INFINITY;
+    return Math.max(
+      Math.abs(anchorBox.left + anchorBox.width / 2 - (dotBox.left + dotBox.width / 2)),
+      Math.abs(anchorBox.top + anchorBox.height / 2 - (dotBox.top + dotBox.height / 2)),
+    );
+  })).toBeLessThanOrEqual(0.5);
+  await page.getByTestId('wall-D4').click();
+  await expect(page.getByRole('button', { name: '确认放墙' })).toBeEnabled();
+  expect(commands.some(command => command.includes('"game_place_wall"'))).toBe(false);
+  await page.getByRole('button', { name: '确认放墙' }).click();
+  await expect.poll(() => commands.some(command =>
+    command.includes('"game_place_wall"')
+    && command.includes('"row":3')
+    && command.includes('"column":3')
+    && command.includes('"orientation":"h"'))).toBe(true);
   const desktopTopbar = page.locator('[data-game-desktop-topbar]');
   await expect(desktopTopbar.getByRole('button', { name: '认输' })).toBeVisible();
   await expect(desktopTopbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);

@@ -300,6 +300,10 @@ export function Board({
           }}
           aria-label={`围墙位置 ${coordinate(position)}，${orientation === 'h' ? '横向' : '纵向'}${option?.legal ? '，可以放置' : '，当前不可放置'}`}
           data-click-sound="false"
+          onPointerDown={event => {
+            if (event.pointerType === 'mouse' && event.button !== 0) return;
+            onSelect?.({ kind: 'wall', wall });
+          }}
           onFocus={() => {
             setWallCursor(position);
             onHover?.({ kind: 'wall', wall });
