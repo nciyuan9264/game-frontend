@@ -21,6 +21,7 @@ import { Board } from '../../components/Board';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Brand, Disc } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
+import { PositionAnalysis } from '../../components/PositionAnalysis';
 import type { OthelloSession } from '../../hooks/useOthelloSession';
 import { useOthelloPlayUI } from '../../hooks/useOthelloPlayUI';
 import { coordinate } from '../../model/board';
@@ -257,6 +258,8 @@ export function Play({
               <button type="button" aria-label="放大棋盘" onClick={() => ui.setPanel('zoom')}>
                 <Maximize2 size={15} /></button>
             </div></header>
+            {data.roomData.analysis
+              && <PositionAnalysis analysis={data.roomData.analysis} />}
             <div className={styles.boardStage}>
               <span className={styles.boardCorner}>O / 02<br /><i />THE QUIET<br />COLLECTION</span>
               {board()}
@@ -323,7 +326,7 @@ export function Play({
       wide onClose={() => ui.setPanel(undefined)}><div className={styles.rules}>
         {guideSections.map((section, index) => <article key={section[0]}>
           <span>0{index + 1}</span><div><h3>{section[0]}</h3><p>{section[1]}</p></div></article>)}
-        <p><Info size={15} />线上对局不提供撤回或策略推荐；合法落点提示不改变服务端判定。</p>
+        <p><Info size={15} />仅展示双方局面胜率，不提供推荐落点或变化路线；合法落点提示不改变服务端判定。</p>
       </div></Dialog>}
     {ui.panel === 'resign' && <Dialog title="这一局，要在这里停下吗？" eyebrow="END THIS GAME"
       onClose={() => ui.setPanel(undefined)}

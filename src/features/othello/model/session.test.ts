@@ -80,6 +80,18 @@ describe('othello protocol', () => {
               },
             },
             playerOrder: ['7', 'ai_2'],
+            analysis: {
+              requestID: 'analysis-4',
+              status: 'ready',
+              blackWinRate: 0.62,
+              drawRate: 0.08,
+              whiteWinRate: 0.3,
+              score: 4,
+              depth: 12,
+              elapsedMs: '418',
+              exact: false,
+              engineVersion: 'edax-4.7',
+            },
           },
         },
       },
@@ -91,6 +103,18 @@ describe('othello protocol', () => {
     expect(snapshot.roomData.lastData?.index).toBe(19);
     expect(snapshot.roomData.legalMoves[0].lines).toEqual([[19]]);
     expect(snapshot.roomData.turnTimeoutMs).toBe(60_000);
+    expect(snapshot.roomData.analysis).toEqual({
+      requestID: 'analysis-4',
+      status: 'ready',
+      blackWinRate: 0.62,
+      drawRate: 0.08,
+      whiteWinRate: 0.3,
+      score: 4,
+      depth: 12,
+      elapsedMs: 418,
+      exact: false,
+      engineVersion: 'edax-4.7',
+    });
   });
 
   it('normalizes nullable transport lists after a forced pass', () => {

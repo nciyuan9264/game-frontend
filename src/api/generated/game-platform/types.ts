@@ -863,6 +863,19 @@ export interface OthelloPlayerState {
   discCount: number;
 }
 
+export interface OthelloPositionAnalysis {
+  requestID: string;
+  status: string;
+  blackWinRate?: number;
+  drawRate?: number;
+  whiteWinRate?: number;
+  score?: number;
+  depth?: number;
+  elapsedMs?: string;
+  exact: boolean;
+  engineVersion: string;
+}
+
 export interface OthelloRoomData {
   board: OthelloDisc[];
   currentPlayer: string;
@@ -878,6 +891,7 @@ export interface OthelloRoomData {
   turnTimeoutMs?: string;
   players: Record<string, RoomPlayer>;
   playerOrder: string[];
+  analysis?: OthelloPositionAnalysis;
 }
 
 export interface OthelloResult {

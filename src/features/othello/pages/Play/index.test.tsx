@@ -80,6 +80,26 @@ function snapshot(
       },
       playerOrder: ['me', 'ai_2'],
       roundNo: 1,
+      analysis: status === 'end'
+        ? {
+            requestID: 'final-11',
+            status: 'ready',
+            blackWinRate: 1,
+            drawRate: 0,
+            whiteWinRate: 0,
+            exact: true,
+            engineVersion: 'platform-result',
+          }
+        : {
+            requestID: 'analysis-11',
+            status: 'ready',
+            blackWinRate: 0.55,
+            drawRate: 0.1,
+            whiteWinRate: 0.35,
+            depth: 11,
+            exact: false,
+            engineVersion: 'edax-4.7',
+          },
     },
   };
 }
@@ -102,6 +122,9 @@ describe('OTHELLO play', () => {
       name: 'D3，可落子，翻转 1 枚',
     }));
     expect(submit).toHaveBeenCalledWith('game_place_disc', { index: 19 });
+    expect(screen.getByLabelText(
+      '黑方胜率 55%，和棋 10%，白方胜率 35%',
+    )).toBeTruthy();
 
     rerender(<Play session={session} data={snapshot('ai_2')} onLeave={vi.fn()} />);
     expect(screen.getAllByText('30s')).toHaveLength(1);

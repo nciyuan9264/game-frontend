@@ -46,6 +46,21 @@ export interface PlayerState {
   discCount: number;
 }
 
+export type AnalysisStatus = 'pending' | 'ready' | 'unavailable';
+
+export interface PositionAnalysis {
+  requestID: string;
+  status: AnalysisStatus;
+  blackWinRate?: number;
+  drawRate?: number;
+  whiteWinRate?: number;
+  score?: number;
+  depth?: number;
+  elapsedMs?: number;
+  exact: boolean;
+  engineVersion: string;
+}
+
 export interface Result {
   winnerID?: string;
   winnerSide?: Side;

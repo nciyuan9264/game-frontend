@@ -10,6 +10,7 @@ import {
 } from '@/features/game-core/model/realtime';
 import type {
   OthelloMoveEntry,
+  OthelloPositionAnalysis,
   OthelloRoomData,
   RoomPlayer,
 } from '@/api/generated/game-platform';
@@ -20,6 +21,7 @@ import type {
   MoveEntry,
   OthelloPlayer,
   PlayerState,
+  PositionAnalysis,
   Result,
   Side,
   Visibility,
@@ -58,6 +60,7 @@ export interface GameSnapshot extends SessionSnapshotBase {
     turnTimeoutMs?: number;
     players: Record<string, OthelloPlayer>;
     playerOrder: string[];
+    analysis?: PositionAnalysis;
   };
 }
 
@@ -112,6 +115,53 @@ function move(entry: OthelloMoveEntry): MoveEntry {
   };
 }
 
+function analysis(
+  value?: OthelloPositionAnalysis,
+): PositionAnalysis | undefined {
+  if (!value || !value.requestID) return;
+  const base = {
+    requestID: value.requestID,
+    exact: value.exact === true,
+    engineVersion: value.engineVersion,
+  };
+  if (value.status === 'pending' || value.status === 'unavailable') {
+    return { ...base, status: value.status };
+  }
+  if (value.status !== 'ready') {
+    return { ...base, status: 'unavailable' };
+  }
+  const rates = [
+    value.blackWinRate,
+    value.drawRate,
+    value.whiteWinRate,
+  ];
+  if (rates.some(rate =>
+    typeof rate !== 'number'
+    || !Number.isFinite(rate)
+    || rate < 0
+    || rate > 1
+  )) {
+    return { ...base, status: 'unavailable' };
+  }
+  const total = rates.reduce<number>((sum, rate) => sum + (rate ?? 0), 0);
+  if (Math.abs(total - 1) > 1e-6) {
+    return { ...base, status: 'unavailable' };
+  }
+  const elapsedMs = value.elapsedMs == null
+    ? undefined
+    : Number(value.elapsedMs);
+  return {
+    ...base,
+    status: 'ready',
+    blackWinRate: rates[0],
+    drawRate: rates[1],
+    whiteWinRate: rates[2],
+    score: value.score,
+    depth: value.depth,
+    elapsedMs: Number.isFinite(elapsedMs) ? elapsedMs : undefined,
+  };
+}
+
 function roomData(room: OthelloRoomData): GameSnapshot['roomData'] {
   return {
     board: (room.board ?? []).map(value =>
@@ -135,6 +185,7 @@ function roomData(room: OthelloRoomData): GameSnapshot['roomData'] {
       : Number(room.turnTimeoutMs),
     players: normalizePlayers(room.players),
     playerOrder: room.playerOrder,
+    analysis: analysis(room.analysis),
   };
 }
 
