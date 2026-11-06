@@ -39,6 +39,11 @@ describe('othello protocol', () => {
             '7': { side: 'black', discCount: 4 },
             ai_2: { side: 'white', discCount: 1 },
           },
+          hint: {
+            remaining: 0,
+            pending: false,
+            index: 18,
+          },
           roomData: {
             board: opening().map((disc, index) => index === 19 ? 'black' : disc),
             currentPlayer: 'ai_2',
@@ -103,6 +108,11 @@ describe('othello protocol', () => {
     expect(snapshot.roomData.lastData?.index).toBe(19);
     expect(snapshot.roomData.legalMoves[0].lines).toEqual([[19]]);
     expect(snapshot.roomData.turnTimeoutMs).toBe(60_000);
+    expect(snapshot.hint).toEqual({
+      remaining: 0,
+      pending: false,
+      index: 18,
+    });
     expect(snapshot.roomData.analysis).toEqual({
       requestID: 'analysis-4',
       status: 'ready',
@@ -189,6 +199,19 @@ describe('othello protocol', () => {
       .toEqual({ othello: { pass: {} } });
     expect(createClientCommand('othello', 'match-1', 'cmd-3', 'game_resign', {}).payload)
       .toEqual({ othello: { resign: {} } });
+    expect(createClientCommand('othello', 'match-1', 'cmd-4', 'game_request_hint', {}).payload)
+      .toEqual({ othello: { requestHint: {} } });
+    expect(createClientCommand('othello', 'match-1', 'cmd-5', 'match_add_ai', {
+      seatIndex: 1,
+      aiDifficulty: 'hard',
+    }).payload).toEqual({
+      common: {
+        matchSeat: {
+          seatIndex: 1,
+          aiDifficulty: 'hard',
+        },
+      },
+    });
   });
 
   it('confirms a game command only after sequence advancement', () => {

@@ -1,8 +1,8 @@
-import { Info, LoaderCircle } from 'lucide-react';
+import { Info } from 'lucide-react';
 import type { PositionAnalysis as PositionAnalysisValue } from '../../model/types';
 import styles from './index.module.less';
 
-const explanation = '由 Edax 盘差和误差模型换算，不是历史胜率；不提供推荐落点。';
+const explanation = '由 Edax 盘差和误差模型换算，不是历史胜率；推荐点仅在主动使用提示后显示。';
 
 function integerRates(analysis: PositionAnalysisValue) {
   const values = [
@@ -27,37 +27,18 @@ function integerRates(analysis: PositionAnalysisValue) {
 
 export function PositionAnalysis({
   analysis,
+  stale = false,
 }: {
   analysis: PositionAnalysisValue;
+  stale?: boolean;
 }) {
-  if (analysis.status === 'pending') {
-    return <section className={styles.analysis}
-      data-testid="othello-position-analysis"
-      data-status="pending"
-      aria-live="polite">
-      <div className={styles.state}>
-        <LoaderCircle size={14} />
-        <span>Edax 正在分析当前局面</span>
-      </div>
-    </section>;
-  }
-  if (analysis.status === 'unavailable') {
-    return <section className={styles.analysis}
-      data-testid="othello-position-analysis"
-      data-status="unavailable"
-      aria-live="polite">
-      <div className={styles.state}>
-        <span className={styles.unavailableMark} />
-        <span>局面分析暂不可用</span>
-      </div>
-    </section>;
-  }
+  if (analysis.status !== 'ready') return null;
 
   const [black, draw, white] = integerRates(analysis);
   const label = `黑方胜率 ${black}%，和棋 ${draw}%，白方胜率 ${white}%`;
   return <section className={styles.analysis}
     data-testid="othello-position-analysis"
-    data-status="ready"
+    data-status={stale ? 'stale' : 'ready'}
     aria-label={label}>
     <div className={styles.summary}>
       <strong>黑 {black}%</strong>
@@ -79,4 +60,3 @@ export function PositionAnalysis({
     </div>
   </section>;
 }
-

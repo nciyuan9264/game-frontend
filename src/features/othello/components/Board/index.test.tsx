@@ -18,6 +18,7 @@ describe('OTHELLO board', () => {
       currentSide="black"
       legalMoves={[{ index: 19, flips: [27], lines: [[27]] }]}
       preview={{ index: 19, flips: [27], lines: [[27]] }}
+      recommendedIndex={19}
       interactive
       coordinates
       hints
@@ -29,7 +30,7 @@ describe('OTHELLO board', () => {
     })).toBeTruthy();
     expect(screen.getAllByTestId(/^cell-/)).toHaveLength(64);
     fireEvent.click(screen.getByRole('button', {
-      name: 'D3，可落子，翻转 1 枚',
+      name: 'D3，推荐落点，可落子，翻转 1 枚',
     }));
     expect(onCell).toHaveBeenCalledWith(19);
     fireEvent.click(screen.getByRole('button', { name: 'A1，不可落子' }));

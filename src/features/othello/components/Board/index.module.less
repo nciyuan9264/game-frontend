@@ -90,6 +90,22 @@
   box-shadow:0 0 0 4px #eee2c60b;
   &::after { position:absolute; inset:3px; border-radius:50%; background:#f0e3b9; content:''; }
 }
+.recommendedMark {
+  position:absolute;
+  width:62%;
+  height:62%;
+  border:2px solid #f5d481;
+  border-radius:50%;
+  box-shadow:0 0 0 3px #6e4e5547,0 0 13px #f1d078a3;
+}
+.recommended .legalDot {
+  width:7px;
+  height:7px;
+  border-color:#fff0bd;
+  background:#f5d481;
+  box-shadow:0 0 0 4px #6e4e5540;
+  &::after { display:none; }
+}
 .lastMark {
   position:absolute;
   top:calc(50% - 3px);
@@ -149,6 +165,7 @@
   .coordinates { font-size:8px; }
   .boardDisc { width:77%; height:77%; }
   .legalDot { width:8px; height:8px; box-shadow:0 0 0 3px #eee2c609; &::after { inset:2px; } }
+  .recommendedMark { border-width:1.5px; box-shadow:0 0 0 2px #6e4e5547,0 0 8px #f1d0788c; }
   .targetCorners { inset:2px; }
   .flipBadge { right:0; bottom:0; min-width:13px; height:13px; font-size:8px; }
   .lastMark { top:calc(50% - 2.5px); left:calc(50% - 2.5px); width:5px; height:5px; }

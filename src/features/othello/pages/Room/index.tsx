@@ -2,8 +2,11 @@ import { useState } from 'react';
 import {
   ArrowLeft,
   ArrowRight,
+  Brain,
   Check,
   Copy,
+  Cpu,
+  Dices,
   Globe,
   Info,
   Lock,
@@ -18,11 +21,37 @@ import type { OthelloSession } from '../../hooks/useOthelloSession';
 import { useOthelloViewport } from '../../hooks/useOthelloViewport';
 import { othelloRoomInviteURL } from '../../model/adapters';
 import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
-import type { Visibility } from '../../model/types';
+import type { AIDifficulty, Visibility } from '../../model/types';
 import rootStyles from '../../styles/root.module.less';
 import { RoomDesktop } from './RoomDesktop';
 import { RoomMobile } from './RoomMobile';
 import styles from './index.module.less';
+
+const difficultyOptions: Array<{
+  value: AIDifficulty;
+  label: string;
+  description: string;
+  icon: typeof Dices;
+}> = [
+  {
+    value: 'easy',
+    label: '简单',
+    description: '从合法落点中随机选择',
+    icon: Dices,
+  },
+  {
+    value: 'medium',
+    label: '中等',
+    description: '使用位置与行动力评估',
+    icon: Brain,
+  },
+  {
+    value: 'hard',
+    label: '困难',
+    description: '使用 Edax 引擎分析',
+    icon: Cpu,
+  },
+];
 
 export function Room({
   session,
@@ -35,9 +64,11 @@ export function Room({
 }) {
   const { isMobile } = useOthelloViewport();
   const [panel, setPanel] = useState<
-    'invite' | 'settings' | 'remove' | 'start'
+    'invite' | 'settings' | 'remove' | 'start' | 'ai'
   >();
   const [target, setTarget] = useState('');
+  const [targetSeat, setTargetSeat] = useState<number>();
+  const [aiDifficulty, setAIDifficulty] = useState<AIDifficulty>('medium');
   const [visibility, setVisibility] = useState<Visibility>(data.visibility);
   const [copyMessage, setCopyMessage] = useState('');
   const enabled = session.connection.status === 'connected' && !session.pending;
@@ -58,10 +89,9 @@ export function Room({
     enabled,
     pending: !!session.pending,
     onAddAI: (seatIndex?: number) => {
-      session.submit(
-        'match_add_ai',
-        typeof seatIndex === 'number' ? { seatIndex } : {},
-      );
+      setTargetSeat(seatIndex);
+      setAIDifficulty('medium');
+      setPanel('ai');
     },
     onRemove: (playerID: string) => {
       setTarget(playerID);
@@ -82,6 +112,32 @@ export function Room({
       setPanel('settings' as const);
     },
   };
+  const aiDialog = panel === 'ai' && <Dialog
+    title="选择人机难度"
+    eyebrow="CHOOSE AI LEVEL"
+    onClose={close}
+    footer={<><ActionButton onClick={close}>取消</ActionButton>
+      <ActionButton variant="primary" disabled={!enabled}
+        onClick={() => {
+          if (session.submit('match_add_ai', {
+            seatIndex: targetSeat,
+            aiDifficulty,
+          })) close();
+        }}>添加人机</ActionButton></>}>
+    <div className={styles.difficultyOptions}>
+      {difficultyOptions.map(option => {
+        const Icon = option.icon;
+        return <button type="button" key={option.value}
+          disabled={!enabled}
+          aria-pressed={aiDifficulty === option.value}
+          onClick={() => setAIDifficulty(option.value)}>
+          <Icon size={20} />
+          <span><b>{option.label}</b><small>{option.description}</small></span>
+          {aiDifficulty === option.value && <Check size={15} />}
+        </button>;
+      })}
+    </div>
+  </Dialog>;
   if (isMobile) {
     const renderAvatar = (
       player: { name: string; avatar?: string; ai: boolean },
@@ -91,7 +147,7 @@ export function Room({
     return <div className={styles.page}>
       <RoomMobile {...roomProps} onLeave={onLeave} />
       <StandardGameMobileRoomDialogs
-        panel={panel}
+        panel={panel === 'ai' ? undefined : panel}
         data={data}
         targetID={target}
         visibility={visibility}
@@ -123,6 +179,7 @@ export function Room({
         }}
         onClose={close}
       />
+      {aiDialog}
     </div>;
   }
 
@@ -211,5 +268,6 @@ export function Room({
       <p className={styles.startCopy}>标准中心四子开局，黑方先行。每回合 60 秒，
         超时由服务端自动代下；双方均无合法落点时按盘面实际子数结算。</p>
     </Dialog>}
+    {aiDialog}
   </div>;
 }

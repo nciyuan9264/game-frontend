@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useMemo, useState } from 'react';
 import type { GameSnapshot } from '../model/session';
+import { useLastReadyPositionAnalysis } from './useLastReadyPositionAnalysis';
 
 export type OthelloPanel =
   | 'activity'
@@ -17,6 +18,10 @@ export function useOthelloPlayUI(data: GameSnapshot) {
     () => data.roomData.legalMoves.find(move =>
       move.index === hoveredIndex),
     [data.roomData.legalMoves, hoveredIndex],
+  );
+  const positionAnalysis = useLastReadyPositionAnalysis(
+    data.roomData.analysis,
+    `${data.roomID}:${data.matchID}:${data.roomData.roundNo}`,
   );
 
   const clearSelection = useCallback(() => {
@@ -37,6 +42,7 @@ export function useOthelloPlayUI(data: GameSnapshot) {
     hoveredIndex,
     setHoveredIndex,
     preview,
+    positionAnalysis,
     clearSelection,
     showResults,
     setShowResults,

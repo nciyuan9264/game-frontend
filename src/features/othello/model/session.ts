@@ -12,11 +12,13 @@ import type {
   OthelloMoveEntry,
   OthelloPositionAnalysis,
   OthelloRoomData,
+  OthelloHintState,
   RoomPlayer,
 } from '@/api/generated/game-platform';
 import type {
   Disc,
   GameStatus,
+  HintState,
   LegalMove,
   MoveEntry,
   OthelloPlayer,
@@ -44,6 +46,7 @@ export interface GameSnapshot extends SessionSnapshotBase {
   visibility: Visibility;
   playerId: string;
   playerData: Record<string, PlayerState>;
+  hint?: HintState;
   result?: Result;
   roomData: {
     board: Disc[];
@@ -74,7 +77,8 @@ export type CommandType =
   | 'game_ready'
   | 'game_place_disc'
   | 'game_pass'
-  | 'game_resign';
+  | 'game_resign'
+  | 'game_request_hint';
 
 export type PendingCommand = SessionPendingCommand<
   Snapshot,
@@ -162,6 +166,22 @@ function analysis(
   };
 }
 
+function hint(value?: OthelloHintState): HintState | undefined {
+  if (!value) return;
+  const remaining = Number(value.remaining);
+  const index = value.index == null ? undefined : Number(value.index);
+  return {
+    remaining: Number.isFinite(remaining) ? Math.max(0, remaining) : 0,
+    pending: value.pending === true,
+    index: typeof index === 'number'
+      && Number.isInteger(index)
+      && index >= 0
+      && index < 64
+      ? index
+      : undefined,
+  };
+}
+
 function roomData(room: OthelloRoomData): GameSnapshot['roomData'] {
   return {
     board: (room.board ?? []).map(value =>
@@ -230,6 +250,7 @@ export function parseServerMessage(value: string): ServerMessage | undefined {
         { side: side(state.side), discCount: state.discCount },
       ]),
     ),
+    hint: hint(view.hint),
     result: view.result
       ? {
           blackCount: view.result.blackCount,

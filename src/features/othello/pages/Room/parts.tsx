@@ -29,6 +29,17 @@ export interface RoomProps {
   onSettings: () => void;
 }
 
+export function aiDifficultyLabel(value?: string) {
+  switch (value) {
+    case 'easy':
+      return '简单人机';
+    case 'hard':
+      return '困难人机';
+    default:
+      return '中等人机';
+  }
+}
+
 export function roomReadiness(data: MatchSnapshot) {
   const players = Object.values(data.players);
   const ready = players.filter(player =>
@@ -92,7 +103,7 @@ export function Seats(props: RoomProps) {
         <span className={player.ready ? styles.ready : styles.muted}>
           {player.ready ? <Check size={12} /> : <Clock size={12} />}
           {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}
-          {player.ai && ' · 人机'}</span>
+          {player.ai && ` · ${aiDifficultyLabel(player.aiDifficulty)}`}</span>
         {owner && id !== data.ownerID && <button type="button"
           className={styles.remove} disabled={!enabled}
           aria-label={`管理席位 ${index + 1}`}

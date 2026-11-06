@@ -22,26 +22,21 @@ describe('Othello position analysis', () => {
     expect(screen.getByText('Edax · 深度 12 · 局面估计')).toBeTruthy();
   });
 
-  it('does not retain percentages while the next request is pending', () => {
+  it('does not render loading or unavailable placeholders', () => {
     const { rerender } = render(<PositionAnalysis analysis={{
-      requestID: 'request-1',
-      status: 'ready',
-      blackWinRate: 0.6,
-      drawRate: 0.1,
-      whiteWinRate: 0.3,
-      depth: 10,
-      exact: false,
-      engineVersion: 'edax-4.7',
-    }} />);
-    expect(screen.getByText('黑 60%')).toBeTruthy();
-    rerender(<PositionAnalysis analysis={{
       requestID: 'request-2',
       status: 'pending',
       exact: false,
       engineVersion: 'edax-4.7',
     }} />);
-    expect(screen.queryByText('黑 60%')).toBeNull();
-    expect(screen.getByText('Edax 正在分析当前局面')).toBeTruthy();
+    expect(screen.queryByTestId('othello-position-analysis')).toBeNull();
+    rerender(<PositionAnalysis analysis={{
+      requestID: 'request-3',
+      status: 'unavailable',
+      exact: false,
+      engineVersion: 'edax-4.7',
+    }} />);
+    expect(screen.queryByTestId('othello-position-analysis')).toBeNull();
   });
 
   it('labels terminal probabilities as the final result', () => {

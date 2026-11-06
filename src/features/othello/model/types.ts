@@ -47,6 +47,13 @@ export interface PlayerState {
 }
 
 export type AnalysisStatus = 'pending' | 'ready' | 'unavailable';
+export type AIDifficulty = 'easy' | 'medium' | 'hard';
+
+export interface HintState {
+  remaining: number;
+  pending: boolean;
+  index?: number;
+}
 
 export interface PositionAnalysis {
   requestID: string;

@@ -123,6 +123,30 @@
     small { display:block; margin-top:5px; color:#a08b77; font-size:10px; }
   }
 }
+.difficultyOptions {
+  display:grid;
+  overflow:hidden;
+  border:1px solid #ded3c4;
+  border-radius:6px;
+  button {
+    display:grid;
+    min-height:68px;
+    align-items:center;
+    grid-template-columns:28px minmax(0,1fr) 18px;
+    gap:11px;
+    padding:11px 14px;
+    border-bottom:1px solid #e7ddd0!important;
+    border-radius:0;
+    background:#fffaf3!important;
+    color:#9c8061;
+    text-align:left;
+    &:last-child { border-bottom:0!important; }
+    &[aria-pressed=true] { background:#f4e9e8!important; color:var(--wine); }
+    span { min-width:0; }
+    b { display:block; color:#70524a; font-size:12px; }
+    small { display:block; margin-top:5px; color:#a08b77; font-size:10px; }
+  }
+}
 .startPlayers { display:flex; align-items:flex-start; justify-content:center; flex-wrap:wrap; gap:24px; padding:5px 0 24px;
   > span { display:flex; min-width:80px; align-items:center; flex-direction:column; gap:7px; }
   b { color:#665249; font-size:11px; font-weight:500; }

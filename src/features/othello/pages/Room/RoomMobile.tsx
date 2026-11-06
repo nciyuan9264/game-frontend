@@ -3,7 +3,7 @@ import { StandardGameMobileRoom } from '@/components/GameUI/GameRoomMobile';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Brand, Disc } from '../../components/Artwork';
 import { playerName } from '../../model/session';
-import { type RoomProps } from './parts';
+import { aiDifficultyLabel, type RoomProps } from './parts';
 import styles from './index.module.less';
 
 export function RoomMobile(props: RoomProps & { onLeave: () => void }) {
@@ -14,6 +14,9 @@ export function RoomMobile(props: RoomProps & { onLeave: () => void }) {
     enabled={props.enabled}
     pending={props.pending}
     getPlayerName={id => playerName(id, data.players)}
+    getPlayerRole={(_id, player) => player.ai
+      ? aiDifficultyLabel(player.aiDifficulty)
+      : undefined}
     renderAvatar={(player, size) => <PlayerAvatar name={player.name}
       avatar={player.avatar} ai={player.ai} size={size} />}
     renderSeatDecoration={(_player, index) => <Disc

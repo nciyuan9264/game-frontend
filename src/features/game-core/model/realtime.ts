@@ -116,6 +116,9 @@ function commonPayload(
             seatIndex: typeof payload.seatIndex === 'number'
               ? payload.seatIndex
               : undefined,
+            aiDifficulty: typeof payload.aiDifficulty === 'string'
+              ? payload.aiDifficulty
+              : undefined,
           },
         },
       };
@@ -289,6 +292,8 @@ function gamePayload(
         return { othello: { pass: {} } };
       case 'game_resign':
         return { othello: { resign: {} } };
+      case 'game_request_hint':
+        return { othello: { requestHint: {} } };
     }
   }
   if (gameType === 'fugitive') {

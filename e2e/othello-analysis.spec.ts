@@ -127,23 +127,22 @@ async function mockSession(page: Page) {
       engineVersion: 'edax-4.7',
     }));
   });
-  return (value: object) => {
-    if (!sendSnapshot) throw new Error('WebSocket is not connected');
-    sendSnapshot(value);
+  return async (value: object) => {
+    await expect.poll(() => Boolean(sendSnapshot)).toBe(true);
+    sendSnapshot!(value);
   };
 }
 
-test('Othello replaces pending analysis without showing stale rates', async ({ page }) => {
+test('Othello keeps the last rates while the next analysis is pending', async ({ page }) => {
   await page.setViewportSize({ width: 390, height: 844 });
   const send = await mockSession(page);
   await page.goto(`/game/othello/match?roomID=${roomID}`);
 
   const analysis = page.getByTestId('othello-position-analysis');
-  await expect(analysis).toHaveAttribute('data-status', 'pending');
-  await expect(page.getByText('Edax 正在分析当前局面')).toBeVisible();
-  const pendingBox = await analysis.boundingBox();
+  await expect(analysis).toHaveCount(0);
+  await expect(page.getByText('Edax 正在分析当前局面')).toHaveCount(0);
 
-  send(snapshot(13, {
+  await send(snapshot(13, {
     requestID: 'analysis-12',
     status: 'ready',
     blackWinRate: 0.613,
@@ -160,17 +159,16 @@ test('Othello replaces pending analysis without showing stale rates', async ({ p
     'aria-label',
     '黑方胜率 61%，和棋 6%，白方胜率 33%',
   );
-  const readyBox = await analysis.boundingBox();
-  expect(readyBox?.height).toBe(pendingBox?.height);
 
-  send(snapshot(14, {
+  await send(snapshot(14, {
     requestID: 'analysis-14',
     status: 'pending',
     exact: false,
     engineVersion: 'edax-4.7',
   }));
-  await expect(analysis).toHaveAttribute('data-status', 'pending');
-  await expect(page.getByText('黑 61%')).toHaveCount(0);
+  await expect(analysis).toHaveAttribute('data-status', 'stale');
+  await expect(page.getByText('黑 61%')).toBeVisible();
+  await expect(page.getByText('Edax 正在分析当前局面')).toHaveCount(0);
 });
 
 test('Othello analysis stays between the header and board at target sizes', async ({
@@ -179,9 +177,8 @@ test('Othello analysis stays between the header and board at target sizes', asyn
   const send = await mockSession(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/game/othello/match?roomID=${roomID}`);
-  await expect(page.getByTestId('othello-position-analysis'))
-    .toHaveAttribute('data-status', 'pending');
-  send(snapshot(13, {
+  await expect(page.getByTestId('othello-position-analysis')).toHaveCount(0);
+  await send(snapshot(13, {
     requestID: 'analysis-12',
     status: 'ready',
     blackWinRate: 0.55,

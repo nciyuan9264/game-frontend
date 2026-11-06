@@ -44,28 +44,6 @@
 .black { background:#343638; }
 .draw { background:#a38e6b; }
 .white { background:#fffdf7; }
-.state {
-  display:flex;
-  min-height:30px;
-  align-items:center;
-  justify-content:center;
-  gap:8px;
-  color:#8e7a5d;
-  font-size:10px;
-  svg { color:#8a7658; }
-}
-.unavailableMark {
-  width:7px;
-  height:7px;
-  border:1px solid #a99577;
-  border-radius:50%;
-}
-@media (prefers-reduced-motion:no-preference) {
-  .state svg { animation:analysisSpin 900ms linear infinite; }
-}
-@keyframes analysisSpin {
-  to { transform:rotate(360deg); }
-}
 @media(max-width:767px) {
   .analysis {
     height:38px;
@@ -79,6 +57,4 @@
   }
   .engine,.info { display:none; }
   .bar { height:6px; }
-  .state { min-height:26px; font-size:9px; }
 }
-

@@ -11,6 +11,7 @@ export interface LobbyPlayerLike {
   avatar?: string;
   seatIndex?: number;
   gameRole?: string;
+  aiDifficulty?: string;
   online: boolean;
   ai: boolean;
   ready: boolean;

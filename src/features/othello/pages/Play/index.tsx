@@ -131,6 +131,19 @@ export function Play({
     && myTurn
     && !session.pending
     && session.connection.status === 'connected';
+  const showHintAction = playable
+    && myTurn
+    && !data.roomData.players[data.playerId]?.ai
+    && data.hint != null;
+  const hintEnabled = showHintAction
+    && interactive
+    && !data.hint?.pending
+    && (data.hint?.remaining ?? 0) > 0;
+  const hintLabel = data.hint?.pending
+    ? '分析中'
+    : (data.hint?.remaining ?? 0) > 0
+      ? `提示 ${data.hint?.remaining}`
+      : '提示已用';
   const [phaseTitle, phaseDescription] = phaseCopy(data);
   const blackID = playerForSide(data, 'black');
   const whiteID = playerForSide(data, 'white');
@@ -162,12 +175,18 @@ export function Play({
     disabled={!actionEnabled}
     onClick={mainAction}
   >{actionLabel}{mustPass ? <SkipForward size={17} /> : <ArrowRight size={17} />}</ActionButton>;
+  const hintButton = showHintAction && <ActionButton
+    className={styles.hintAction}
+    disabled={!hintEnabled}
+    onClick={() => session.submit('game_request_hint')}
+  ><Lightbulb size={16} />{hintLabel}</ActionButton>;
 
   const board = (zoom = false) => <Board
     board={data.roomData.board}
     currentSide={data.roomData.currentSide}
     legalMoves={data.roomData.legalMoves}
     preview={interactive ? ui.preview : undefined}
+    recommendedIndex={data.hint?.index}
     lastData={data.roomData.lastData}
     interactive={interactive && playable}
     coordinates
@@ -258,8 +277,11 @@ export function Play({
               <button type="button" aria-label="放大棋盘" onClick={() => ui.setPanel('zoom')}>
                 <Maximize2 size={15} /></button>
             </div></header>
-            {data.roomData.analysis
-              && <PositionAnalysis analysis={data.roomData.analysis} />}
+            {ui.positionAnalysis
+              && <PositionAnalysis
+                analysis={ui.positionAnalysis}
+                stale={data.roomData.analysis?.status !== 'ready'}
+              />}
             <div className={styles.boardStage}>
               <span className={styles.boardCorner}>O / 02<br /><i />THE QUIET<br />COLLECTION</span>
               {board()}
@@ -298,7 +320,10 @@ export function Play({
                   <small>{ui.preview ? '枚' : sideName(data.roomData.currentSide)}</small></strong></div>
               {ui.preview && <small>{ui.preview.lines.length} 个方向</small>}
             </div>
-            {actionButton}
+            <div className={styles.turnActions}>
+              {hintButton}
+              {actionButton}
+            </div>
           </section>
           <section className={styles.goal}><Trophy size={17} />
             <span className={styles.eyebrow}>THINK BEYOND THIS TURN</span>
@@ -318,7 +343,10 @@ export function Play({
         </aside>
       </div>
     </main>
-    {!ended && <div className={styles.mobileDock}>{actionButton}</div>}
+    {!ended && <div className={styles.mobileDock}>
+      {hintButton}
+      {actionButton}
+    </div>}
 
     {ui.panel === 'activity' && <Dialog title="这一局的每一步" eyebrow="THE GAME JOURNAL"
       wide onClose={() => ui.setPanel(undefined)}><Journal data={data} full /></Dialog>}
@@ -326,7 +354,7 @@ export function Play({
       wide onClose={() => ui.setPanel(undefined)}><div className={styles.rules}>
         {guideSections.map((section, index) => <article key={section[0]}>
           <span>0{index + 1}</span><div><h3>{section[0]}</h3><p>{section[1]}</p></div></article>)}
-        <p><Info size={15} />仅展示双方局面胜率，不提供推荐落点或变化路线；合法落点提示不改变服务端判定。</p>
+        <p><Info size={15} />每位玩家每局有一次 Edax 落点提示，仅本人可见；合法落点与最终结果仍由服务端判定。</p>
       </div></Dialog>}
     {ui.panel === 'resign' && <Dialog title="这一局，要在这里停下吗？" eyebrow="END THIS GAME"
       onClose={() => ui.setPanel(undefined)}

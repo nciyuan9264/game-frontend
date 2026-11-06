@@ -20,6 +20,7 @@ export function Board({
   currentSide,
   legalMoves,
   preview,
+  recommendedIndex,
   lastData,
   interactive,
   coordinates,
@@ -32,6 +33,7 @@ export function Board({
   currentSide: Side;
   legalMoves: LegalMove[];
   preview?: LegalMove;
+  recommendedIndex?: number;
   lastData?: MoveEntry;
   interactive: boolean;
   coordinates: boolean;
@@ -98,7 +100,10 @@ export function Board({
           const target = preview?.index === index;
           const affected = previewFlips.has(index);
           const last = lastData?.kind === 'move' && lastData.index === index;
-          const label = `${coordinate(index)}，${cell
+          const recommended = recommendedIndex === index && !!move;
+          const label = `${coordinate(index)}，${recommended
+            ? `推荐落点，可落子，翻转 ${move.flips.length} 枚`
+            : cell
             ? `${cell === 'black' ? '黑' : '白'}子`
             : move
               ? `可落子，翻转 ${move.flips.length} 枚`
@@ -114,6 +119,7 @@ export function Board({
               affected ? styles.wouldFlip : '',
               last ? styles.lastMove : '',
               recentlyFlipped.has(index) ? styles.justFlipped : '',
+              recommended ? styles.recommended : '',
             ].filter(Boolean).join(' ')}
             aria-label={label}
             data-testid={`${testPrefix}-${coordinate(index)}`}
@@ -141,6 +147,7 @@ export function Board({
                   ? <span className={styles.legalDot} />
                   : null}
             {last && cell && <span className={styles.lastMark} />}
+            {recommended && <span className={styles.recommendedMark} />}
             {affected && <span className={styles.flipOutline} />}
             {target && <><span className={styles.targetCorners} />
               <span className={styles.flipBadge}>{preview.flips.length}</span></>}

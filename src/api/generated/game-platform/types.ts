@@ -47,6 +47,7 @@ export interface RoomPlayer {
   ai: boolean;
   ready: boolean;
   gameRole?: string;
+  aiDifficulty?: string;
 }
 
 export interface AcquireRoomMetrics {
@@ -903,6 +904,12 @@ export interface OthelloResult {
   reason: string;
 }
 
+export interface OthelloHintState {
+  remaining: number;
+  pending: boolean;
+  index?: number;
+}
+
 export interface OthelloRoomView {
   playerId: string;
   ownerID: string;
@@ -910,6 +917,7 @@ export interface OthelloRoomView {
   playerData: Record<string, OthelloPlayerState>;
   roomData: OthelloRoomData;
   result?: OthelloResult;
+  hint?: OthelloHintState;
 }
 
 export interface OthelloReplaySnapshot {
@@ -926,9 +934,10 @@ export interface OthelloPlaceDiscPayload {
 }
 
 export type OthelloCommandPayload =
-  | { placeDisc: OthelloPlaceDiscPayload; pass?: never; resign?: never }
-  | { placeDisc?: never; pass: EmptyPayload; resign?: never }
-  | { placeDisc?: never; pass?: never; resign: EmptyPayload };
+  | { placeDisc: OthelloPlaceDiscPayload; pass?: never; resign?: never; requestHint?: never }
+  | { placeDisc?: never; pass: EmptyPayload; resign?: never; requestHint?: never }
+  | { placeDisc?: never; pass?: never; resign: EmptyPayload; requestHint?: never }
+  | { placeDisc?: never; pass?: never; resign?: never; requestHint: EmptyPayload };
 
 export type WarChestSide = string;
 
@@ -2836,6 +2845,7 @@ export interface MatchReadyPayload {
 
 export interface MatchSeatPayload {
   seatIndex?: number;
+  aiDifficulty?: string;
 }
 
 export interface MatchRemovePlayerPayload {
