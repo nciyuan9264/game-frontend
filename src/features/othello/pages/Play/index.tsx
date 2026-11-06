@@ -138,9 +138,12 @@ export function Play({
   const hintEnabled = showHintAction
     && interactive
     && !data.hint?.pending
+    && data.hint?.index == null
     && (data.hint?.remaining ?? 0) > 0;
   const hintLabel = data.hint?.pending
     ? '分析中'
+    : data.hint?.index != null
+      ? `已提示 · 余 ${data.hint?.remaining ?? 0}`
     : (data.hint?.remaining ?? 0) > 0
       ? `提示 ${data.hint?.remaining}`
       : '提示已用';

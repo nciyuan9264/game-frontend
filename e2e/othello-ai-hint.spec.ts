@@ -186,7 +186,7 @@ test('Othello hint command reveals a private recommended cell', async ({
   const commands: Array<Record<string, unknown>> = [];
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(gameSnapshot(12, {
-      remaining: 1,
+      remaining: 3,
       pending: false,
     })));
     socket.onMessage(message => {
@@ -194,7 +194,7 @@ test('Othello hint command reveals a private recommended cell', async ({
       commands.push(command);
       if (command.type === 'game_request_hint') {
         socket.send(JSON.stringify(gameSnapshot(13, {
-          remaining: 0,
+          remaining: 2,
           pending: false,
           index: 19,
         })));
@@ -203,9 +203,11 @@ test('Othello hint command reveals a private recommended cell', async ({
   });
 
   await page.goto(`/game/othello/match?roomID=${roomID}`);
-  await page.getByRole('button', { name: '提示 1' }).click();
+  await page.getByRole('button', { name: '提示 3' }).click();
 
-  await expect(page.getByRole('button', { name: '提示已用' })).toBeDisabled();
+  await expect(page.getByRole('button', {
+    name: '已提示 · 余 2',
+  })).toBeDisabled();
   await expect(page.getByRole('button', {
     name: 'D3，推荐落点，可落子，翻转 1 枚',
   })).toBeVisible();
