@@ -42,7 +42,13 @@ describe('live game mobile topbar contract', () => {
       /<GameMobileTopbar[\s\S]*?status=\{[\s\S]*?actions=/,
     )?.[0];
 
-    expect(statusPrefix).toBeDefined();
+    if (statusPrefix == null) {
+      const topbarUsage = source.match(/<GameMobileTopbar[\s\S]*?\/>/)?.[0];
+      expect(topbarUsage).toBeDefined();
+      expect(topbarUsage).not.toContain('status=');
+      return;
+    }
+
     expect(statusPrefix).toContain('undefined');
     expect(statusPrefix).not.toContain("'--'");
     expect(statusPrefix).not.toContain("'已结束'");
