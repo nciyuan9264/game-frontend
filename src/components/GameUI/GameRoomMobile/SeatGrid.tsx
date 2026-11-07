@@ -38,7 +38,9 @@ export function GameMobileSeatGrid({
     data-game-mobile-room-seats>
     {seats.map((player, index) => player
       ? <article className={`${styles.seat} ${player.self ? styles.selfSeat : ''} ${seatClassName}`}
-        data-game-mobile-room-seat key={player.id}>
+        data-game-mobile-room-seat data-occupied="true"
+        data-ai={player.ai || undefined}
+        data-self={player.self || undefined} key={player.id}>
         <span className={styles.seatNumber}>
           SEAT {String(index + 1).padStart(2, '0')}</span>
         {renderDecoration?.(player, index)}
@@ -56,7 +58,8 @@ export function GameMobileSeatGrid({
           onClick={() => onRemove(player.id)}><MoreHorizontal size={17} /></button>}
       </article>
       : <button type="button" className={`${styles.seat} ${styles.emptySeat} ${seatClassName}`}
-        data-game-mobile-room-seat key={`empty-${index}`} disabled={!enabled}
+        data-game-mobile-room-seat data-occupied="false"
+        key={`empty-${index}`} disabled={!enabled}
         aria-label={owner ? `在席位 ${index + 1} 添加人机` : `邀请玩家加入席位 ${index + 1}`}
         onClick={owner ? () => onAddAI(index) : onInvite}>
         <span className={styles.seatNumber}>

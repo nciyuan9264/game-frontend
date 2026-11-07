@@ -14,9 +14,12 @@ export function RoomMobile(props: RoomProps & { onLeave: () => void }) {
     enabled={props.enabled}
     pending={props.pending}
     getPlayerName={id => playerName(id, data.players)}
-    getPlayerRole={(_id, player) => player.ai
-      ? aiDifficultyLabel(player.aiDifficulty)
-      : undefined}
+    getPlayerRole={(id, player, index) => <>
+      {id === data.ownerID ? '房主' : player.ai
+        ? aiDifficultyLabel(player.aiDifficulty) : '棋手'}
+      <i aria-hidden="true"> · </i>
+      {index === 0 ? '执黑' : '执白'}
+    </>}
     renderAvatar={(player, size) => <PlayerAvatar name={player.name}
       avatar={player.avatar} ai={player.ai} size={size} />}
     renderSeatDecoration={(_player, index) => <Disc
@@ -44,6 +47,10 @@ export function RoomMobile(props: RoomProps & { onLeave: () => void }) {
     }}
     media={<><div className={styles.boardPattern} aria-hidden="true" />
       <Brand small /></>}
+    classNames={{
+      seatGrid: styles.mobileSeats,
+      seat: styles.mobileSeat,
+    }}
     onLeave={props.onLeave}
     onSettings={props.onSettings}
     onInvite={props.onInvite}

@@ -2,6 +2,7 @@ import {
   Bot,
   Check,
   Clock,
+  Crown,
   Globe,
   Grid3X3,
   Lock,
@@ -14,7 +15,7 @@ import {
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { PlayerAvatar } from '../../components/AppShell';
 import { Brand, Disc } from '../../components/Artwork';
-import { playerLabel, playerName, type MatchSnapshot } from '../../model/session';
+import { playerName, type MatchSnapshot } from '../../model/session';
 import styles from './index.module.less';
 
 export interface RoomProps {
@@ -32,11 +33,11 @@ export interface RoomProps {
 export function aiDifficultyLabel(value?: string) {
   switch (value) {
     case 'easy':
-      return '简单人机';
+      return '简单模式';
     case 'hard':
-      return '困难人机';
+      return '困难模式';
     default:
-      return '中等人机';
+      return '中等模式';
   }
 }
 
@@ -91,23 +92,49 @@ export function Seats(props: RoomProps) {
   return <div className={styles.seats}>{roomSeatOrder(data).map((id, index) => {
     const player = id ? data.players[id] : undefined;
     const side = index === 0 ? 'black' : 'white';
+    const sideLabel = side === 'black' ? '执黑' : '执白';
     return player && id
       ? <article className={`${styles.seat} ${id === data.playerID ? styles.self : ''}`}
         data-testid="othello-room-seat" key={id}>
-        <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
-        <Disc side={side} className={styles.sideDisc} />
-        <PlayerAvatar name={playerName(id, data.players)}
-          avatar={player.avatar} ai={player.ai} size={54} />
-        <strong>{playerLabel(id, data.players)}
-          {id === data.playerID && <em>你</em>}</strong>
-        <span className={player.ready ? styles.ready : styles.muted}>
-          {player.ready ? <Check size={12} /> : <Clock size={12} />}
-          {player.ready ? '准备就绪' : player.online ? '等待准备' : '暂时离线'}
-          {player.ai && ` · ${aiDifficultyLabel(player.aiDifficulty)}`}</span>
-        {owner && id !== data.ownerID && <button type="button"
-          className={styles.remove} disabled={!enabled}
-          aria-label={`管理席位 ${index + 1}`}
-          onClick={() => props.onRemove(id)}><MoreHorizontal size={17} /></button>}
+        <header className={styles.seatHeader}>
+          <span className={styles.seatNumber}>
+            SEAT {String(index + 1).padStart(2, '0')}
+          </span>
+          {owner && id !== data.ownerID
+            ? <button type="button" className={styles.remove} disabled={!enabled}
+              aria-label={`管理席位 ${index + 1}`}
+              onClick={() => props.onRemove(id)}>
+              <MoreHorizontal size={19} />
+            </button>
+            : <span className={styles.seatHeaderSpacer} aria-hidden="true" />}
+        </header>
+        <div className={styles.seatPlayer}>
+          <div className={styles.avatarWrap}>
+            <PlayerAvatar name={playerName(id, data.players)}
+              avatar={player.avatar} ai={player.ai} size={72} />
+            <Disc side={side} className={styles.sideDisc} />
+          </div>
+          <div className={styles.nameRow}>
+            <strong>{playerName(id, data.players)}</strong>
+            {id === data.playerID && <em>你</em>}
+            {player.ai && <em className={styles.aiTag}>人机</em>}
+          </div>
+          <span className={styles.seatMeta}>
+            {id === data.ownerID && <Crown size={13} />}
+            <span>{player.ai
+              ? aiDifficultyLabel(player.aiDifficulty)
+              : id === data.ownerID ? '房主' : '棋手'}</span>
+            <i>·</i>
+            <span>{sideLabel}</span>
+          </span>
+        </div>
+        <footer className={player.ready ? styles.ready : styles.muted}>
+          {player.ready ? <Check size={15} /> : <Clock size={15} />}
+          <span>{player.ready
+            ? '准备就绪'
+            : player.online ? '等待准备' : '暂时离线'}</span>
+          {player.ai && <><i>·</i><span>人机</span></>}
+        </footer>
       </article>
       : <button type="button" className={`${styles.seat} ${styles.empty}`}
         data-testid="othello-room-seat" key={`empty-${index}`} disabled={!enabled}
@@ -115,11 +142,19 @@ export function Seats(props: RoomProps) {
           ? `在席位 ${index + 1} 添加人机`
           : `邀请对手加入席位 ${index + 1}`}
         onClick={owner ? () => props.onAddAI(index) : props.onInvite}>
-        <span className={styles.seatNumber}>SEAT {String(index + 1).padStart(2, '0')}</span>
-        <span className={styles.emptyAvatar}>
-          {owner ? <Bot size={23} /> : <Plus size={23} />}</span>
-        <strong>{owner ? '添加人机' : '等待对手'}</strong>
-        <small>{owner ? '点击入座 · 自动准备' : '邀请朋友加入'}</small>
+        <span className={styles.seatNumber}>
+          SEAT {String(index + 1).padStart(2, '0')}
+        </span>
+        <span className={styles.emptyContent}>
+          <span className={styles.emptyAvatar}>
+            {owner ? <Bot size={25} /> : <Plus size={25} />}
+          </span>
+          <strong>{owner ? '添加人机' : '等待对手'}</strong>
+          <small>{owner ? '点击入座 · 自动准备' : '邀请朋友加入'}</small>
+        </span>
+        <span className={styles.emptyStatus}>
+          {owner ? '选择难度后立即就绪' : '席位空闲'}
+        </span>
       </button>;
   })}</div>;
 }

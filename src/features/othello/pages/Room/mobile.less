@@ -40,19 +40,29 @@
     mask-image:radial-gradient(circle,#000 40%,transparent 78%);
   }
   .seats { position:relative; z-index:1; display:grid; width:100%; grid-template-columns:repeat(2,minmax(0,1fr)); gap:8px; }
-  .seat { width:100%; min-height:132px; padding:12px 7px 9px; gap:5px;
-    &:not(.empty)>span:nth-child(3) { width:45px!important; height:45px!important; }
-    > strong { gap:3px; font-size:10px; }
-    .sideDisc { top:7px; right:34px; width:16px; height:16px; }
+  .mobileSeats { gap:10px; }
+  .mobileSeat { height:190px; justify-content:flex-start; gap:0; padding:16px 9px 0; overflow:hidden; border-color:#e0d6c6; background:#eee6d9;
+    &[data-self='true'] { border-color:#8b5060; }
+    > span:first-child { top:8px; left:10px; color:#796b5f; font:500 6px/16px Georgia,serif; letter-spacing:1.3px; }
+    > div { display:block; margin-top:10px;
+      > span { width:62px!important; height:62px!important; }
+    }
+    > strong { display:flex; min-width:0; height:25px; align-items:center; justify-content:center; gap:5px; margin-top:9px; color:#4e403a; font-size:13px; font-weight:600; white-space:nowrap;
+      em { height:18px; padding:0 5px; border-radius:4px; background:#e4d3d0; color:var(--wine); line-height:18px; }
+    }
+    &[data-ai='true']>strong::after { height:18px; padding:0 5px; border-radius:4px; background:#e4dbcd; color:#695e53; content:'人机'; font-size:7px; font-weight:400; line-height:18px; }
+    > small { height:17px; margin-top:2px; color:#75695e; font-size:8px;
+      i { color:#a79a8a; font-style:normal; }
+    }
+    > div~span:last-of-type { position:absolute; right:0; bottom:0; left:0; height:35px; justify-content:center; gap:4px; border-top:1px solid #ded4c4; color:#617b5a; font-size:9px; font-weight:500; }
+    .sideDisc { top:60px; right:calc(50% - 39px); bottom:auto; left:auto; width:24px; height:24px; border:3px solid #eee6d9; border-radius:50%; }
+    > button { top:4px; right:5px; width:28px; height:28px; color:#5b514b; }
+    &[data-occupied='false'] { justify-content:center; gap:7px; padding-bottom:20px; border-style:dashed; background:#f2eadf!important;
+      > span:nth-child(2) { position:static; width:48px; height:48px; color:#8e765e; }
+      > strong { height:auto; margin-top:0; font-size:11px; }
+      > small { height:auto; margin-top:0; color:#8f7d6b; }
+    }
   }
-  .seatNumber { position:absolute; top:5px; left:7px; font-size:5px; }
-  .ready,.muted { gap:2px; font-size:7px; svg { width:10px; height:10px; } }
-  .remove { top:2px; right:2px; width:24px; height:24px; }
-  .empty { min-height:132px; gap:8px;
-    > strong { font-size:10px; }
-    > small { font-size:7px; }
-  }
-  .emptyAvatar { width:36px; height:36px; margin-top:2px; svg { width:19px; } }
   .coordinates { display:none; }
   .facts { display:block; padding:19px 17px;
     h2 { margin-top:9px; font-size:18px; }
