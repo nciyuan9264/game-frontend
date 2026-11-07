@@ -22,21 +22,25 @@ describe('Othello position analysis', () => {
     expect(screen.getByText('Edax · 深度 12 · 局面估计')).toBeTruthy();
   });
 
-  it('does not render loading or unavailable placeholders', () => {
+  it('keeps an empty analysis row before rates are available', () => {
     const { rerender } = render(<PositionAnalysis analysis={{
       requestID: 'request-2',
       status: 'pending',
       exact: false,
       engineVersion: 'edax-4.7',
     }} />);
-    expect(screen.queryByTestId('othello-position-analysis')).toBeNull();
+    expect(screen.getByTestId('othello-position-analysis')
+      .getAttribute('data-status')).toBe('empty');
+    expect(screen.getByLabelText('形势参考，暂无分析数据')).toBeTruthy();
+    expect(screen.getByText('黑 --')).toBeTruthy();
     rerender(<PositionAnalysis analysis={{
       requestID: 'request-3',
       status: 'unavailable',
       exact: false,
       engineVersion: 'edax-4.7',
     }} />);
-    expect(screen.queryByTestId('othello-position-analysis')).toBeNull();
+    expect(screen.getByTestId('othello-position-analysis')
+      .getAttribute('data-status')).toBe('empty');
   });
 
   it('labels terminal probabilities as the final result', () => {

@@ -193,12 +193,18 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
   await expect(page.locator('[data-game-desktop-topbar]')).toBeHidden();
   const commandsBeforeResign = commands.length;
   await expect(topbar.getByRole('button', { name: '认输' })).toBeVisible();
+  await expect(topbar.locator('[data-game-mobile-topbar-actions] > button'))
+    .toHaveCount(1);
+  await expect(topbar.locator('[data-game-mobile-topbar-status]')).toHaveCount(0);
+  await expect(topbar.getByRole('button', { name: '查看棋谱' })).toHaveCount(0);
+  await expect(topbar.getByRole('button', { name: '玩法指南' })).toHaveCount(0);
   await expect(topbar.getByRole('button', { name: '打开对局菜单' })).toHaveCount(0);
   await topbar.getByRole('button', { name: '认输' }).click();
   await expect(page.getByRole('dialog', { name: '这一局，要在这里停下吗？' })).toBeVisible();
   expect(commands).toHaveLength(commandsBeforeResign);
   await page.getByRole('button', { name: '关闭面板' }).click();
   await expect(page.getByRole('heading', { name: '轮到你了' })).toBeVisible();
+  await expect(page.getByTestId('turn-status').getByRole('timer')).toBeVisible();
   await expect(board.locator(':scope > i')).toHaveCount(0);
   await expect.poll(() => page.getByTestId('cell-A1').evaluate(element => ({
     right: getComputedStyle(element).borderRightWidth,
@@ -271,12 +277,10 @@ test('Othello mobile final result returns through the timer slot', async ({
   await expect(page.getByRole('button', {
     name: /选择棋盘上的合法位置|等待对手落子/,
   })).toHaveCount(0);
-  await page.getByRole('button', { name: '查看棋谱' }).click();
-  await expect(page.getByRole('dialog', { name: '这一局的每一步' })).toBeVisible();
-  await page.getByRole('button', { name: '关闭面板' }).click();
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toHaveCount(0);
   await expectNoOverflow(page);
   await page.setViewportSize({ width: 360, height: 800 });
-  await expect(page.getByRole('button', { name: '查看棋谱' })).toBeVisible();
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toHaveCount(0);
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
   await expectNoOverflow(page);
 

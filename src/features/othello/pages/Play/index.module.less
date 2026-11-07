@@ -192,6 +192,7 @@
   h2 { color:var(--wine); font-size:23px; line-height:1.5; }
   p { margin-top:5px; color:#ac8995; font-size:10px; line-height:1.75; }
 }
+.mobileTurnTimer { display:none; }
 .movePreview {
   display:flex;
   position:relative;
@@ -371,13 +372,35 @@
   .boardStage { min-height:0; aspect-ratio:1.025; padding:4px; }
   .boardCorner,.boardEdition,.footnote { display:none; }
   .sidebar { display:contents; }
-  .actionCard { grid-column:1/-1; order:1; width:100%; min-height:63px; padding:10px 12px; border-color:#e7d2d9; border-radius:6px; background:#faf2f3;
+  .actionCard { display:flex; grid-column:1/-1; order:1; width:100%; min-height:78px; align-items:center; gap:10px; padding:10px 12px; border-color:#e7d2d9; border-radius:7px; background:#faf2f3;
     .turnActions,.actionEyebrow,.movePreview { display:none; }
   }
-  .turnCopy { gap:11px; margin:0;
+  .turnCopy { min-width:0; flex:1; gap:11px; margin:0;
     > span { display:inline-block; width:25px; height:25px; }
+    > div { min-width:0; }
     h2 { font-size:16px; line-height:1.45; }
     p { margin-top:4px; font-size:10px; line-height:1.6; }
+  }
+  .mobileTurnTimer {
+    display:flex;
+    min-width:62px;
+    flex:0 0 62px;
+    align-items:flex-end;
+    flex-direction:column;
+    gap:4px;
+    color:#9b7d86;
+    > span { font-size:9px; line-height:1; white-space:nowrap; }
+    :global([data-game-turn-countdown]) {
+      height:auto;
+      min-width:0;
+      padding:0;
+      border:0;
+      border-radius:0;
+      background:transparent;
+      color:#393431;
+      font:600 28px/1 var(--serif);
+      animation:none;
+    }
   }
   .goal,.journalCard { display:none; }
   .mobileDock {

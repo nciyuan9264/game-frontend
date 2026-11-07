@@ -139,7 +139,8 @@ test('Othello keeps the last rates while the next analysis is pending', async ({
   await page.goto(`/game/othello/match?roomID=${roomID}`);
 
   const analysis = page.getByTestId('othello-position-analysis');
-  await expect(analysis).toHaveCount(0);
+  await expect(analysis).toHaveAttribute('data-status', 'empty');
+  await expect(analysis).toHaveAttribute('aria-label', '形势参考，暂无分析数据');
   await expect(page.getByText('Edax 正在分析当前局面')).toHaveCount(0);
 
   await send(snapshot(13, {
@@ -177,7 +178,8 @@ test('Othello analysis stays between the header and board at target sizes', asyn
   const send = await mockSession(page);
   await page.setViewportSize({ width: 390, height: 844 });
   await page.goto(`/game/othello/match?roomID=${roomID}`);
-  await expect(page.getByTestId('othello-position-analysis')).toHaveCount(0);
+  await expect(page.getByTestId('othello-position-analysis'))
+    .toHaveAttribute('data-status', 'empty');
   await send(snapshot(13, {
     requestID: 'analysis-12',
     status: 'ready',

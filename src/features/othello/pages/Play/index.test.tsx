@@ -118,6 +118,12 @@ describe('OTHELLO play', () => {
       <Play session={session} data={snapshot()} onLeave={vi.fn()} />
     );
     expect(screen.getAllByText('30s')).toHaveLength(2);
+    const mobileTopbar = container.querySelector('[data-game-mobile-topbar]');
+    expect(mobileTopbar?.querySelector('[data-game-mobile-topbar-status]')).toBeNull();
+    expect(mobileTopbar?.querySelector('[aria-label="查看棋谱"]')).toBeNull();
+    expect(mobileTopbar?.querySelector('[aria-label="玩法指南"]')).toBeNull();
+    expect(mobileTopbar?.querySelectorAll('[data-game-mobile-topbar-actions] button'))
+      .toHaveLength(1);
     fireEvent.click(screen.getByRole('button', {
       name: 'D3，可落子，翻转 1 枚',
     }));

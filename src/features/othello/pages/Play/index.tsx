@@ -215,19 +215,11 @@ export function Play({
       backLabel="离开对局"
       kicker={`OTHELLO · 第 ${data.roomData.roundNo} 局`}
       title={data.roomID}
-      status={!ended && myTurn && data.roomData.turnDeadline
-        ? <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
-        : undefined}
-      actions={<>
-        <button type="button" aria-label="查看棋谱" title="查看棋谱"
-          onClick={() => ui.setPanel('activity')}><History size={18} /></button>
-        <button type="button" aria-label="玩法指南" title="玩法指南"
-          onClick={() => ui.setPanel('rules')}><BookOpen size={18} /></button>
-        {!ended && <button type="button" aria-label="认输" title="认输"
-          onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>}
-        {ended && <button type="button" aria-label="返回终局结算" title="返回终局结算"
+      actions={!ended
+        ? <button type="button" aria-label="认输" title="认输"
+          onClick={() => ui.setPanel('resign')}><Flag size={19} /></button>
+        : <button type="button" aria-label="返回终局结算" title="返回终局结算"
           onClick={() => ui.setShowResults(true)}><Trophy size={17} /></button>}
-      </>}
     />
     <header className={styles.topbar} data-game-desktop-topbar>
       <button type="button" aria-label="离开对局" onClick={onLeave}><ArrowLeft size={20} /></button>
@@ -280,11 +272,10 @@ export function Play({
               <button type="button" aria-label="放大棋盘" onClick={() => ui.setPanel('zoom')}>
                 <Maximize2 size={15} /></button>
             </div></header>
-            {ui.positionAnalysis
-              && <PositionAnalysis
-                analysis={ui.positionAnalysis}
-                stale={data.roomData.analysis?.status !== 'ready'}
-              />}
+            <PositionAnalysis
+              analysis={ui.positionAnalysis}
+              stale={data.roomData.analysis?.status !== 'ready'}
+            />
             <div className={styles.boardStage}>
               <span className={styles.boardCorner}>O / 02<br /><i />THE QUIET<br />COLLECTION</span>
               {board()}
@@ -313,6 +304,11 @@ export function Play({
             </span><i /></div>
             <div className={styles.turnCopy}><Disc side={data.roomData.currentSide} />
               <div><h2>{phaseTitle}</h2><p>{phaseDescription}</p></div></div>
+            {!ended && myTurn && data.roomData.turnDeadline
+              && <div className={styles.mobileTurnTimer}>
+                <span>剩余时间</span>
+                <TurnCountdown bare secondsOnly deadline={data.roomData.turnDeadline} />
+              </div>}
             <div className={styles.movePreview}>
               <div><span>{ui.preview ? '预览落点' : '可落位置'}</span>
                 <strong>{ui.preview ? coordinate(ui.preview.index) : data.roomData.legalMoves.length}
