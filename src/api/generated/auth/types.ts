@@ -121,6 +121,32 @@ export interface UpdateUserReq {
   avatar_id?: string;
 }
 
+export interface GetAcquisitionSurveyReq {}
+
+export interface AcquisitionSourceOption {
+  value: string;
+  label: string;
+}
+
+export interface AcquisitionSurveyData {
+  completed: boolean;
+  source?: string;
+  submitted_at_unix?: string;
+  options: AcquisitionSourceOption[];
+  other_detail?: string;
+}
+
+export interface AcquisitionSurveyResp {
+  status_code: number;
+  message: string;
+  data: AcquisitionSurveyData;
+}
+
+export interface SubmitAcquisitionSurveyReq {
+  source: string;
+  other_detail?: string;
+}
+
 export interface UploadAvatarReq {
   content: File;
 }

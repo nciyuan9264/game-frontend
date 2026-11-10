@@ -52,10 +52,17 @@ export interface DailyOverview {
   games_abandoned: string;
 }
 
+export interface AcquisitionSourceMetric {
+  source: string;
+  label: string;
+  users: string;
+}
+
 export interface OverviewData {
   window: AnalyticsWindow;
   metrics: OverviewMetrics;
   daily: DailyOverview[];
+  acquisition_sources: AcquisitionSourceMetric[];
 }
 
 export interface OverviewResp {

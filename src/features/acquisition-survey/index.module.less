@@ -1,0 +1,157 @@
+.dialog {
+  --game-dialog-bg: #17282b;
+  --game-dialog-border: #506b67;
+  --game-dialog-line: rgba(137, 167, 158, 0.24);
+  --game-dialog-footer-bg: #122225;
+  --game-dialog-backdrop: rgba(5, 10, 13, 0.76);
+  --game-eyebrow: #d7b66f;
+  --game-accent: #e6bc7d;
+  --game-primary: #e0b36f;
+  --game-primary-gradient: linear-gradient(120deg, #efd093, #dca75e);
+  --game-primary-border: #f2cf94;
+  --game-primary-text: #302416;
+}
+
+.options {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.options label {
+  position: relative;
+  display: grid;
+  min-width: 0;
+  min-height: 48px;
+  grid-template-columns: 1fr 22px;
+  align-items: center;
+  gap: 10px;
+  border: 1px solid #48605f;
+  border-radius: 7px;
+  background: #1d3335;
+  padding: 0 12px 0 14px;
+  color: #dce7e3;
+  cursor: pointer;
+  transition: border-color 150ms ease, background-color 150ms ease;
+}
+
+.options label:hover {
+  border-color: #78958d;
+  background: #233c3d;
+}
+
+.options label.selected {
+  border-color: #dbb46f;
+  background: #32423b;
+  color: #fff4dd;
+}
+
+.options input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.options span {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  font-size: 13px;
+  font-weight: 600;
+}
+
+.options i {
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  border: 1px solid #68807b;
+  border-radius: 50%;
+  color: #2d281d;
+  font-style: normal;
+}
+
+.options label.selected i {
+  border-color: #e7c27f;
+  background: #e7c27f;
+}
+
+.options label:focus-within {
+  outline: 2px solid #e6bc7d;
+  outline-offset: 2px;
+}
+
+.options label:has(input:disabled) {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.detail {
+  position: relative;
+  display: grid;
+  gap: 7px;
+  margin-top: 12px;
+}
+
+.detail > span {
+  color: #dce7e3;
+  font-size: 13px;
+  font-weight: 650;
+}
+
+.detail textarea {
+  width: 100%;
+  min-height: 76px;
+  resize: vertical;
+  border: 1px solid #56706d;
+  border-radius: 7px;
+  outline: none;
+  background: #13282a;
+  padding: 10px 12px 24px;
+  color: #f0f5f2;
+  font: inherit;
+  font-size: 13px;
+  line-height: 1.5;
+  transition: border-color 150ms ease, box-shadow 150ms ease;
+}
+
+.detail textarea:focus {
+  border-color: #e6bc7d;
+  box-shadow: 0 0 0 2px rgba(230, 188, 125, 0.18);
+}
+
+.detail textarea::placeholder {
+  color: #829995;
+}
+
+.detail textarea:disabled {
+  cursor: wait;
+  opacity: 0.72;
+}
+
+.detail small {
+  position: absolute;
+  right: 10px;
+  bottom: 8px;
+  color: #829995;
+  font-size: 11px;
+}
+
+.error {
+  min-height: 20px;
+  padding-top: 8px;
+  color: #f1a79a;
+  font-size: 12px;
+}
+
+@media (max-width: 767px) {
+  .options {
+    grid-template-columns: 1fr;
+    gap: 8px;
+  }
+
+  .options label {
+    min-height: 46px;
+  }
+}

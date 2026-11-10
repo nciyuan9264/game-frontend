@@ -14,6 +14,8 @@ import type {
   LoginByCodeReq,
   VerifyTokenResp,
   UpdateUserReq,
+  AcquisitionSurveyResp,
+  SubmitAcquisitionSurveyReq,
   UploadAvatarResp,
   ListAvatarPresetsResp,
   ListPasskeysResp,
@@ -143,6 +145,24 @@ export function UpdateUser(req: UpdateUserReq, options?: any): Promise<UserResp>
   const url = genAuthServiceBaseURL('/platform/auth/update');
   const method = 'POST';
   const data = { email: req.email, name: req.name, avatar: req.avatar, avatar_id: req.avatar_id };
+  return AuthServiceOptions.request({ url, method, data }, options);
+}
+
+/** 查询玩家来源问卷状态 */
+export function GetAcquisitionSurvey(options?: any): Promise<AcquisitionSurveyResp> {
+  const url = genAuthServiceBaseURL('/platform/auth/acquisition-survey');
+  const method = 'GET';
+  return AuthServiceOptions.request({ url, method }, options);
+}
+
+/** 提交玩家来源问卷 */
+export function SubmitAcquisitionSurvey(
+  req: SubmitAcquisitionSurveyReq,
+  options?: any,
+): Promise<AcquisitionSurveyResp> {
+  const url = genAuthServiceBaseURL('/platform/auth/acquisition-survey');
+  const method = 'POST';
+  const data = { source: req.source, other_detail: req.other_detail };
   return AuthServiceOptions.request({ url, method, data }, options);
 }
 

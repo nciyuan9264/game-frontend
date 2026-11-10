@@ -8,6 +8,7 @@ export default defineConfig({
     include: [
       'src/components/GameUI/**/*.test.{ts,tsx}',
       'src/features/game-core/**/*.test.{ts,tsx}',
+      'src/features/acquisition-survey/**/*.test.{ts,tsx}',
       'src/features/admin/**/*.test.{ts,tsx}',
       'src/features/{acquire,davinci,splendor,yinsh,othello,fugitive,warchest,quoridor,hex,hive,loveletter,sixnimmt,forsale,onitama,cantstop}/**/*.test.{ts,tsx}',
     ],

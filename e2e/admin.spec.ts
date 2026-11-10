@@ -15,6 +15,17 @@ const dateAt = (offset: number) => {
 };
 
 async function mockAdminAPI(page: Page) {
+  await page.route('**/pam-api/platform/auth/acquisition-survey', route => route.fulfill({
+    json: {
+      status_code: 200,
+      message: 'ok',
+      data: {
+        completed: true,
+        source: 'friend',
+        options: [],
+      },
+    },
+  }));
   await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
     json: {
       status_code: 200,
@@ -75,6 +86,12 @@ async function mockAdminAPI(page: Page) {
             game_duration_seconds: String(12000 + index * 600),
             player_duration_seconds: String(22000 + index * 900),
           })),
+          acquisition_sources: [
+            { source: 'friend', label: '朋友推荐', users: '46' },
+            { source: 'wechat_qq', label: '微信群 / QQ 群', users: '38' },
+            { source: 'board_game_community', label: '桌游社区 / 论坛', users: '21' },
+            { source: 'unanswered', label: '未回答', users: '35' },
+          ],
         },
       },
     });
@@ -334,6 +351,9 @@ test('admin analytics routes render and preserve duration semantics', async ({ p
   await expect(page.getByText('用户增长与活跃')).toBeVisible();
   await expect(page.getByText('对局开始、完成与废弃')).toBeVisible();
   await expect(page.getByText('对局活跃时长（估算）')).toBeVisible();
+  await expect(page.getByText('新增玩家来源')).toBeVisible();
+  await expect(page.getByText('105 / 140 已回答')).toBeVisible();
+  await expect(page.getByText('微信群 / QQ 群', { exact: true })).toBeVisible();
   await expect(page.getByText('废弃对局', { exact: true }).first()).toBeVisible();
   await expect(page.getByText('截至 2026-11-02 的累计未注销账号')).toBeVisible();
   await expect(page.getByText('区间真人累计对局时长 / 区间活跃用户数（估算）')).toBeVisible();

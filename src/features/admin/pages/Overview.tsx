@@ -44,6 +44,17 @@ export default function Overview() {
     metrics.total_users,
     data.daily.map(item => item.new_users),
   );
+  const acquisitionSources = [...data.acquisition_sources]
+    .filter(item => toNumber(item.users) > 0)
+    .sort((left, right) => {
+      if (left.source === 'unanswered') return 1;
+      if (right.source === 'unanswered') return -1;
+      return toNumber(right.users) - toNumber(left.users);
+    });
+  const answeredUsers = data.acquisition_sources
+    .filter(item => item.source !== 'unanswered')
+    .reduce((total, item) => total + toNumber(item.users), 0);
+  const maxSourceUsers = Math.max(1, ...acquisitionSources.map(item => toNumber(item.users)));
   const windowLabel = `${data.window.start_date} 至 ${data.window.end_date}`;
   const metricItems = [
     {
@@ -205,6 +216,28 @@ export default function Overview() {
           />
         </section>
       </div>
+
+      <section className={styles.sourcePanel}>
+        <header>
+          <div><small>ACQUISITION SOURCES</small><h2>新增玩家来源</h2></div>
+          <span>{formatCount(answeredUsers)} / {formatCount(metrics.new_users)} 已回答</span>
+        </header>
+        {acquisitionSources.length > 0
+          ? (
+            <div className={styles.sourceBars}>
+              {acquisitionSources.map(item => {
+                const users = toNumber(item.users);
+                return (
+                  <article key={item.source} data-unanswered={item.source === 'unanswered' || undefined}>
+                    <span><b>{item.label}</b><strong>{formatCount(users)}</strong></span>
+                    <i><em style={{ width: `${users / maxSourceUsers * 100}%` }} /></i>
+                  </article>
+                );
+              })}
+            </div>
+          )
+          : <p className={styles.emptySource}>所选区间暂无新增用户</p>}
+      </section>
 
       <section className={styles.retentionPanel}>
         <header>
