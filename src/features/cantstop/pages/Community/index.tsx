@@ -1,18 +1,16 @@
 import { useCallback, useRef, useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Check, ChevronRight, Clock3, Info, Layers3,
-  Lightbulb, LogOut, Pencil, ShieldCheck, Trophy, Users,
+  ArrowLeft, ArrowRight, Check, Clock3, Layers3,
+  Lightbulb, LogOut, Pencil, Trophy, Users,
 } from 'lucide-react';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { Feedback } from '@/components/GameUI/Panel';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -193,7 +191,7 @@ export function My() {
   const stats = useGameStats('cantstop');
   const history = useGameHistory({ gameType: 'cantstop', pageSize: 20 });
   const logout = useGameLogout();
-  const [panel, setPanel] = useState<'logout' | 'about'>();
+  const [panel, setPanel] = useState<'logout'>();
   const handleLogout = useCallback(async () => { await logout.run(); }, [logout]);
   const loading = profile.loading && !profile.data || stats.loading && !stats.data || history.loading && !history.games.length;
   if (isMobile) {
@@ -237,12 +235,7 @@ export function My() {
           </ActionButton>}
           logoutPending={logout.pending} logoutError={logout.error}
           onLogout={() => setPanel('logout')}
-          onAbout={() => setPanel('about')}
         />}
-      {panel === 'about' && <GameMobileAboutDialog gameName="CAN'T STOP"
-        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        themeClassName="cantstop-root"
-        onClose={() => setPanel(undefined)} />}
       {panel === 'logout' && <Dialog title="离开当前账号？"
         eyebrow="SIGN OUT" onClose={() => setPanel(undefined)}
         footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
@@ -279,15 +272,8 @@ export function My() {
           <Link to="/game/cantstop">进入大厅<ArrowRight size={14} /></Link></div>}
         {history.hasMore && <ActionButton disabled={history.loading} onClick={history.loadMore}>{history.loading ? '载入中…' : '加载更多对局'}</ActionButton>}
       </section></div>}
-    <button className="cs-about-entry" type="button" onClick={() => setPanel('about')}><span><Info size={16} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ChevronRight size={16} /></button>
     {panel === 'logout' && <Dialog title="离开当前账号？" eyebrow="SIGN OUT" onClose={() => setPanel(undefined)}
       footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton><ActionButton variant="danger" pending={logout.pending} onClick={handleLogout}>退出登录</ActionButton></>}>
       <p>退出不会删除线上战绩与历史回放，下次登录后仍可查看。</p></Dialog>}
-    {panel === 'about' && <Dialog title="关于 CAN'T STOP Online" eyebrow="ABOUT & CONTACT" onClose={() => setPanel(undefined)}
-      footer={<ActionButton onClick={() => setPanel(undefined)}>知道了<Check size={14} /></ActionButton>}>
-      <ProjectContact gameName="CAN'T STOP" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        classes={{ intro: 'cs-contact-intro', links: 'cs-contact-links', legal: 'cs-contact-legal' }} />
-      <p className="cs-legal-note"><ShieldCheck size={13} />规则设计：Sid Sackson · 本站仅为在线规则实现</p></Dialog>}
   </div></AppShell>;
 }

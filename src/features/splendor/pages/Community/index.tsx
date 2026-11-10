@@ -1,16 +1,14 @@
 import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowRight, Bookmark, ChevronRight, Clock, Crown, Gem, Info,
+  ArrowLeft, ArrowRight, Bookmark, Clock, Crown, Gem,
   Layers, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
@@ -30,7 +28,6 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { Artwork, Eyebrow, GemIcon } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { SplendorLoading } from '../../components/LoadingState';
-import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -226,7 +223,7 @@ export function My() {
     retry,
   } = useGameHistory({ gameType: 'splendor', pageSize: 20 });
   const logoutAction = useGameLogout();
-  const [panel, setPanel] = useState<'logout' | 'about'>();
+  const [panel, setPanel] = useState<'logout'>();
   const doLogout = async () => {
     await logoutAction.run();
   };
@@ -271,12 +268,7 @@ export function My() {
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => setPanel('logout')}
-          onAbout={() => setPanel('about')}
         />}
-      {panel === 'about' && <GameMobileAboutDialog gameName="Splendor"
-        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        themeClassName={rootStyles.root}
-        onClose={() => setPanel(undefined)} />}
       {panel === 'logout' && <Dialog title="退出当前收藏家账号？"
         eyebrow="UNTIL NEXT TIME" onClose={() => setPanel(undefined)}
         footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
@@ -324,16 +316,6 @@ export function My() {
           {hasMore && <ActionButton className={styles.more} pending={loading} onClick={loadMore}>加载更多</ActionButton>}
         </div>
       </section></div>}
-    <button className={styles.aboutEntry} data-testid="splendor-about-entry" type="button"
-      onClick={() => setPanel('about')}><span><Info size={17} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
-      <ChevronRight size={17} /></button>
-    {panel === 'about' && <Dialog title="关于 Splendor Online" eyebrow="ABOUT & CONTACT"
-      onClose={() => setPanel(undefined)}
-      footer={<ActionButton onClick={() => setPanel(undefined)}>知道了</ActionButton>}>
-      <ProjectContact gameName="Splendor" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
-    </Dialog>}
     {panel === 'logout' && <Dialog title="退出当前收藏家账号？" eyebrow="UNTIL NEXT TIME"
       onClose={() => setPanel(undefined)} footer={<><ActionButton onClick={() => setPanel(undefined)}>取消</ActionButton>
         <ActionButton variant="danger" pending={logoutAction.pending} onClick={() => void doLogout()}>确认退出</ActionButton></>}>

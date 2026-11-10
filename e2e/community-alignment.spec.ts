@@ -527,7 +527,7 @@ for (const item of cases) {
         .toBeVisible();
       await expect(page.getByText('PLAYER ID · mobile-profile')).toBeVisible();
       await expect(page.getByRole('link', { name: /编辑资料/ })).toBeVisible();
-      await expect(page.locator('[data-game-mobile-about-entry]')).toBeVisible();
+      await expect(page.locator('[data-game-mobile-about-entry]')).toHaveCount(0);
       await expectMobileShell(page, item.mobileNavigation);
       await expectNoOverflow(page);
     });
@@ -641,37 +641,8 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
       }));
 
     const profile = page.locator('[data-game-public-mobile="profile"]');
-    const about = page.locator('[data-game-mobile-about-entry]');
-    const aboutDialogMetrics = () => page.getByRole('dialog').evaluate(dialog => {
-      const header = dialog.querySelector('header');
-      const body = header?.nextElementSibling;
-      const footer = body?.nextElementSibling;
-      const intro = body?.children[0];
-      const links = body?.children[1];
-      const legal = body?.children[2];
-      const height = (target: Element | null | undefined) =>
-        Math.round((target?.getBoundingClientRect().height ?? 0) * 100) / 100;
-      const fontSize = (target: Element | null | undefined) =>
-        target ? getComputedStyle(target).fontSize : '';
-      return {
-        dialogHeight: height(dialog),
-        headerHeight: height(header),
-        bodyHeight: height(body),
-        introHeight: height(intro),
-        footerHeight: height(footer),
-        eyebrow: fontSize(header?.querySelector('small')),
-        title: fontSize(header?.querySelector('h2')),
-        introEyebrow: fontSize(intro?.querySelector('small')),
-        author: fontSize(intro?.querySelector('h3')),
-        description: fontSize(intro?.querySelector('p')),
-        linkTitle: fontSize(links?.querySelector('b')),
-        linkDetail: fontSize(links?.querySelector('small')),
-        legal: fontSize(legal),
-        footerButton: fontSize(footer?.querySelector('button')),
-      };
-    });
     const profileTypography = () => profile.evaluate(element => {
-      const [card, history, aboutEntry] = Array.from(element.children);
+      const [card, history] = Array.from(element.children);
       const identity = card.children[0];
       const stats = card.children[2];
       const manage = card.children[3];
@@ -692,8 +663,6 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
         historyRow: fontSize(row),
         historyName: fontSize(rowContent?.querySelector('b')),
         historyDetail: fontSize(rowContent?.querySelector('small')),
-        aboutTitle: fontSize(aboutEntry.querySelector('b')),
-        aboutDetail: fontSize(aboutEntry.querySelector('small')),
       };
     });
 
@@ -702,12 +671,6 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
     const acquireTypography = await profileTypography();
     const acquireHistoryHeight = await profile.locator(':scope > section')
       .nth(1).evaluate(element => element.getBoundingClientRect().height);
-    await about.click();
-    await expect(page.getByRole('dialog', {
-      name: '关于 Acquire Online',
-    })).toBeVisible();
-    const acquireAboutDialog = await aboutDialogMetrics();
-    await page.getByRole('button', { name: '知道了' }).click();
 
     await page.goto('/game/fugitive/me', { waitUntil: 'domcontentloaded' });
     const navigation = page.getByRole('navigation', {
@@ -721,22 +684,14 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
       .evaluate(element => element.getBoundingClientRect().height))
       .toBe(acquireHistoryHeight);
 
-    const [profileBox, aboutBox, navigationBox] = await Promise.all([
+    const [profileBox, navigationBox] = await Promise.all([
       profile.boundingBox(),
-      about.boundingBox(),
       navigation.boundingBox(),
     ]);
     expect(profileBox).toMatchObject({ x: 14, width: 362 });
     expect((profileBox?.y ?? 0) + (profileBox?.height ?? 0))
       .toBe(navigationBox?.y);
-    expect((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0))
-      .toBe(navigationBox?.y);
-
-    await about.click();
-    await expect(page.getByRole('dialog', {
-      name: '关于 Fugitive Online',
-    })).toBeVisible();
-    expect(await aboutDialogMetrics()).toEqual(acquireAboutDialog);
+    await expect(page.locator('[data-game-mobile-about-entry]')).toHaveCount(0);
   });
 
 test('War Chest mobile public shell keeps the shared dark palette and frame',
@@ -772,14 +727,7 @@ test('War Chest mobile public shell keeps the shared dark palette and frame',
       });
     }
 
-    const [aboutBox, navigationBox] = await Promise.all([
-      page.locator('[data-game-mobile-about-entry]').boundingBox(),
-      page.getByRole('navigation', {
-        name: '战争之匣手机导航',
-      }).boundingBox(),
-    ]);
-    expect((aboutBox?.y ?? 0) + (aboutBox?.height ?? 0))
-      .toBe(navigationBox?.y);
+    await expect(page.locator('[data-game-mobile-about-entry]')).toHaveCount(0);
   });
 
 test('Fugitive preserves role ranking and card library extensions',

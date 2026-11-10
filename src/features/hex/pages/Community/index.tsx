@@ -1,18 +1,16 @@
 import { useState, type ReactNode } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
-  ArrowLeft, ArrowLeftRight, ArrowRight, ChevronRight, CircleDot, Clock, Flag,
-  Grid3X3, Hexagon, History, Info, LogOut, Mail, Pencil, Route, ShieldCheck,
+  ArrowLeft, ArrowLeftRight, ArrowRight, CircleDot, Clock, Flag,
+  Grid3X3, Hexagon, History, LogOut, Mail, Pencil, Route, ShieldCheck,
   Trophy, Users,
 } from 'lucide-react';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
@@ -31,7 +29,6 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { BrandMark, Stone } from '../../components/Artwork';
 import { Dialog } from '../../components/Dialog';
 import { HexLoading } from '../../components/LoadingState';
-import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const guideSteps = [
@@ -183,7 +180,6 @@ export function My() {
   const history = useGameHistory({ gameType: 'hex', pageSize: 20 });
   const logout = useGameLogout();
   const [logoutOpen, setLogoutOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
@@ -224,12 +220,7 @@ export function My() {
             pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}
           logoutPending={logout.pending} logoutError={logout.error}
           onLogout={() => setLogoutOpen(true)}
-          onAbout={() => setAboutOpen(true)}
         />}
-      {aboutOpen && <GameMobileAboutDialog gameName="Hex"
-        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        themeClassName={rootStyles.root}
-        onClose={() => setAboutOpen(false)} />}
       {logoutOpen && <Dialog title="离开当前账号？" eyebrow="SIGN OUT"
         onClose={() => setLogoutOpen(false)}
         footer={<><ActionButton onClick={() => setLogoutOpen(false)}>取消</ActionButton>
@@ -269,16 +260,6 @@ export function My() {
           {history.error && <Feedback error>{history.error}<ActionButton onClick={history.retry}>重试</ActionButton></Feedback>}
           {!history.loading && !history.games.length && <Feedback>还没有对局记录。<Link to="/game/hex">去大厅开始第一局</Link></Feedback>}
           {history.hasMore && <ActionButton pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}</section></div>}
-    <button className={styles.aboutEntry} data-testid="hex-about-entry" type="button"
-      onClick={() => setAboutOpen(true)}><span><Info size={17} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
-      <ChevronRight size={17} /></button>
-    {aboutOpen && <Dialog title="关于 Hex Online" eyebrow="ABOUT & CONTACT"
-      onClose={() => setAboutOpen(false)}
-      footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
-      <ProjectContact gameName="Hex" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
-    </Dialog>}
     {logoutOpen && <Dialog title="离开当前账号？" eyebrow="SIGN OUT" onClose={() => setLogoutOpen(false)}
       footer={<><ActionButton onClick={() => setLogoutOpen(false)}>取消</ActionButton>
         <ActionButton variant="danger" pending={logout.pending} onClick={() => void logout.run()}>退出登录</ActionButton></>}>

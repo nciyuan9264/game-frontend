@@ -73,11 +73,11 @@ describe('Splendor community', () => {
     expect(screen.getByRole('tab', { name: '01 拿取宝石' }).getAttribute('aria-selected')).toBe('true');
   });
 
-  it('opens the aligned project contact from the profile footer', async () => {
+  it('does not render the project contact entry', async () => {
     render(<MemoryRouter><My /></MemoryRouter>);
-    fireEvent.click(await screen.findByRole('button', { name: /关于与联系/ }));
 
-    expect(screen.getByRole('dialog', { name: '关于 Splendor Online' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /查看项目源码/ })).toBeTruthy();
+    await screen.findByText('PLAYER ID · 1');
+    expect(screen.queryByRole('button', { name: /关于与联系/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /查看项目源码/ })).toBeNull();
   });
 });

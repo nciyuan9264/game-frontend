@@ -1,15 +1,13 @@
 import { useCallback, useRef, useState, type RefObject } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { ArrowRight, Building2, ChevronRight, Clock, Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
+import { ArrowRight, Building2, Clock, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users } from 'lucide-react';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
   type GameMobileHistoryItem,
 } from '@/components/GameUI/GamePublicMobile';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -22,7 +20,6 @@ import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { Feedback } from '@/components/GameUI/Panel';
 import { AcquireLoading } from '../../components/LoadingState';
-import { ResponsiveDialog } from '../../components/ResponsiveDialog';
 import { StockPrices } from '../../dialogs/StockPrices';
 import { useAcquireResource } from '../../hooks/useAcquireResource';
 import { money } from '../../model/session';
@@ -174,7 +171,6 @@ export function My() {
     retry: retryHistory,
   } = useGameHistory({ gameType: 'acquire', pageSize: HISTORY_PAGE_SIZE });
   const logoutAction = useGameLogout();
-  const [aboutOpen, setAboutOpen] = useState(false);
   const sentinelRef = useRef<HTMLDivElement>(null);
   const handleLogout = useCallback(async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
@@ -223,11 +219,7 @@ export function My() {
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => void handleLogout()}
-          onAbout={() => setAboutOpen(true)}
         />}
-      {aboutOpen && <GameMobileAboutDialog gameName="Acquire"
-        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        onClose={() => setAboutOpen(false)} />}
     </AppShell>;
   }
   return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={styles.page + ' ' + styles.profilePage}>
@@ -248,17 +240,6 @@ export function My() {
       {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link className={styles.link} to="/game/acquire">去大厅开一桌</Link></Feedback>}
       {!!games.length && <InfiniteFooter loading={historyLoading} error={historyError} hasMore={hasMore} retry={retryHistory} anchorRef={sentinelRef} />}
     </section></div>}
-    <button type="button" className={styles.aboutEntry} data-testid="acquire-about-entry"
-      onClick={() => setAboutOpen(true)}>
-      <span className={styles.aboutEntryIcon}><Info size={17} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
-      <ChevronRight size={17} />
-    </button>
-    {aboutOpen && <ResponsiveDialog title="关于 Acquire Online" eyebrow="ABOUT & CONTACT" className={styles.aboutDialog}
-      onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
-      <ProjectContact gameName="Acquire" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
-    </ResponsiveDialog>}
   </div></AppShell>;
 }
 export function Guide() {

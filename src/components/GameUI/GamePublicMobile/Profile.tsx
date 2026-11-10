@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { ChevronRight, Info, LogOut, Mail, Pencil } from 'lucide-react';
+import { LogOut, Mail, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../ActionButton';
 import type {
@@ -23,7 +23,6 @@ export interface GameMobileProfileProps {
   logoutPending?: boolean;
   logoutError?: ReactNode;
   onLogout: () => void;
-  onAbout: () => void;
 }
 
 export function GameMobileProfile({
@@ -41,7 +40,6 @@ export function GameMobileProfile({
   logoutPending,
   logoutError,
   onLogout,
-  onAbout,
 }: GameMobileProfileProps) {
   return <div className={`${styles.mobileOnly} ${styles.profile}`}
     data-game-public-mobile="profile">
@@ -78,11 +76,5 @@ export function GameMobileProfile({
       {historyStatus && <footer className={styles.historyStatus}>
         {historyStatus}</footer>}
     </section>
-    <button type="button" className={styles.aboutEntry}
-      data-game-mobile-about-entry onClick={onAbout}>
-      <span><Info size={17} /></span><span><b>关于与联系</b>
-        <small>项目作者、源码与联系方式</small></span>
-      <ChevronRight size={17} />
-    </button>
   </div>;
 }

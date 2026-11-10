@@ -4,16 +4,13 @@ import {
   ArrowRight,
   ChevronRight,
   Footprints,
-  Info,
   LogOut,
   Mail,
   Pencil,
   Route,
   Shield,
 } from 'lucide-react';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import {
-  GameMobileAboutDialog,
   GameMobileProfile,
 } from '@/components/GameUI/GamePublicMobile';
 import { Feedback } from '@/components/GameUI/Panel';
@@ -26,7 +23,6 @@ import type { Game } from '@/features/game-core/model/history';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import {
   AppShell,
-  fugitiveDialogThemeClassName,
   ProfileMonogram,
 } from '../../components/AppShell';
 import { FugitiveLoading } from '../../components/LoadingState';
@@ -48,7 +44,7 @@ export default function Profile() {
   const stats = useGameStats('fugitive');
   const history = useGameHistory({ gameType: 'fugitive', pageSize: 20 });
   const logout = useGameLogout();
-  const [panel, setPanel] = useState<'logout' | 'record' | 'about'>();
+  const [panel, setPanel] = useState<'logout' | 'record'>();
   const [record, setRecord] = useState<Game>();
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
@@ -116,13 +112,7 @@ export default function Profile() {
           logoutPending={logout.pending}
           logoutError={logout.error}
           onLogout={() => setPanel('logout')}
-          onAbout={() => setPanel('about')}
         />}</main>
-      {panel === 'about' && <GameMobileAboutDialog gameName="Fugitive"
-        avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }}
-          className="contact-monogram" />}
-        themeClassName={fugitiveDialogThemeClassName}
-        onClose={() => setPanel(undefined)} />}
       {panel === 'logout' && <Modal title="离开当前账号？" kicker="SIGN OUT"
         onClose={() => setPanel(undefined)}
         footer={<><button className="button secondary" type="button"
@@ -228,20 +218,7 @@ export default function Profile() {
               {history.loading ? '载入中…' : '加载更多对局'}</button>}
           </section>
         </div>
-        <button className="profile-about" data-testid="fugitive-about-entry"
-          type="button" onClick={() => setPanel('about')}><span><Info size={17} /></span>
-          <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
-          <ChevronRight size={17} /></button>
       </main>}
-
-    {panel === 'about' && <Modal title="关于 Fugitive Online"
-      kicker="ABOUT & CONTACT" onClose={() => setPanel(undefined)}
-      footer={<button className="button secondary full" type="button"
-        onClick={() => setPanel(undefined)}>知道了</button>}>
-      <ProjectContact gameName="Fugitive"
-        avatar={<ProfileMonogram profile={{ name: 'nciyuan9264' }} className="contact-monogram" />}
-        classes={{ intro: 'project-contact-intro', links: 'project-contact-links', legal: 'project-contact-legal' }} />
-    </Modal>}
 
     {panel === 'logout' && <Modal title="离开当前账号？" kicker="SIGN OUT"
       onClose={() => setPanel(undefined)}

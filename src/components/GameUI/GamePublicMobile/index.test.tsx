@@ -69,8 +69,7 @@ describe('GamePublicMobile', () => {
         onPrimary={vi.fn()} />
       <GameMobileProfile avatar={<span>AVATAR</span>} eyebrow="PLAYER"
         name="Alice" playerID="1" stats={[{ label: '对局', value: 3 }]}
-        historyTitle="对局记录" historyItems={[]} onLogout={vi.fn()}
-        onAbout={vi.fn()} />
+        historyTitle="对局记录" historyItems={[]} onLogout={vi.fn()} />
     </MemoryRouter>);
 
     expect(screen.getByText('75%')).toBeTruthy();

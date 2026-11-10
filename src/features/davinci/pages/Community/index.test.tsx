@@ -66,11 +66,11 @@ describe('DaVinci community', () => {
     expect(screen.getByText('每一次抽牌，都会增加新的线索。')).toBeTruthy();
   });
 
-  it('opens the aligned project contact from the profile footer', async () => {
+  it('does not render the project contact entry', async () => {
     render(<MemoryRouter><My /></MemoryRouter>);
-    fireEvent.click(await screen.findByRole('button', { name: /关于与联系/ }));
 
-    expect(screen.getByRole('dialog', { name: '关于 DaVinci Code Online' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /查看项目源码/ })).toBeTruthy();
+    await screen.findByText('PLAYER ID · 1');
+    expect(screen.queryByRole('button', { name: /关于与联系/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /查看项目源码/ })).toBeNull();
   });
 });

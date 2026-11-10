@@ -1,4 +1,4 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, render, screen } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { My } from '.';
@@ -50,7 +50,7 @@ afterEach(() => {
 });
 
 describe('YINSH profile', () => {
-  it('shows Acquire-aligned identity actions and project contact', async () => {
+  it('shows identity actions without project contact', async () => {
     render(<MemoryRouter><My /></MemoryRouter>);
 
     expect(await screen.findByText('PLAYER ID · player-1')).toBeTruthy();
@@ -58,8 +58,7 @@ describe('YINSH profile', () => {
     expect(screen.getByRole('link', { name: /编辑资料/ }).getAttribute('href'))
       .toBe('https://auth.gamebus.online/profile');
 
-    fireEvent.click(screen.getByRole('button', { name: /关于与联系/ }));
-    expect(screen.getByRole('dialog', { name: '关于 YINSH Online' })).toBeTruthy();
-    expect(screen.getByRole('link', { name: /查看项目源码/ })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /关于与联系/ })).toBeNull();
+    expect(screen.queryByRole('link', { name: /查看项目源码/ })).toBeNull();
   });
 });

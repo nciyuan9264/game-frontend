@@ -3,7 +3,6 @@ import { Check, Copy, Globe, Lock, ShieldCheck } from 'lucide-react';
 import { useClipboardCopy } from '@/features/game-core/hooks/useClipboardCopy';
 import { ActionButton } from '../ActionButton';
 import { GameShareContent } from '../GameShareContent';
-import { ProjectContact } from '../ProjectContact';
 import { ResponsiveDialog } from '../ResponsiveDialog';
 import styles from './index.module.less';
 
@@ -110,32 +109,6 @@ export function GameMobileShareDialog({
         qr: styles.shareQr,
         address: styles.shareAddress,
         hint: styles.shareHint,
-      }} />
-  </ResponsiveDialog>;
-}
-
-export interface GameMobileAboutDialogProps {
-  gameName: string;
-  avatar: ReactNode;
-  onClose: () => void;
-  themeClassName?: string;
-}
-
-export function GameMobileAboutDialog({
-  gameName,
-  avatar,
-  onClose,
-  themeClassName,
-}: GameMobileAboutDialogProps) {
-  return <ResponsiveDialog title={`关于 ${gameName} Online`}
-    eyebrow="ABOUT & CONTACT" onClose={onClose}
-    themeClassName={themeClassName}
-    footer={<ActionButton onClick={onClose}>知道了</ActionButton>}>
-    <ProjectContact gameName={gameName} avatar={avatar}
-      classes={{
-        intro: styles.aboutIntro,
-        links: styles.aboutLinks,
-        legal: styles.aboutLegal,
       }} />
   </ResponsiveDialog>;
 }

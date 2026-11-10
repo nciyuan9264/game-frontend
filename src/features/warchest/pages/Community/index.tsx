@@ -7,7 +7,6 @@ import {
   Backpack,
   BookOpen,
   Check,
-  ChevronRight,
   Clock3,
   Flag,
   Heart,
@@ -24,13 +23,11 @@ import {
   Users,
 } from 'lucide-react';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
 import { getProfile } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -296,7 +293,6 @@ export function My() {
   const history = useGameHistory({ gameType: 'warchest', pageSize: 20 });
   const logout = useGameLogout();
   const [logoutOpen, setLogoutOpen] = useState(false);
-  const [aboutOpen, setAboutOpen] = useState(false);
   const loading = profile.loading && !profile.data
     || stats.loading && !stats.data
     || history.loading && !history.games.length;
@@ -345,12 +341,7 @@ export function My() {
           logoutPending={logout.pending}
           logoutError={logout.error}
           onLogout={() => setLogoutOpen(true)}
-          onAbout={() => setAboutOpen(true)}
         />}</main>
-      {aboutOpen && <GameMobileAboutDialog gameName="War Chest"
-        avatar={<Crest size={58} />}
-        themeClassName="warchest-root"
-        onClose={() => setAboutOpen(false)} />}
       {logoutOpen && <Modal title="离开当前账号？" eyebrow="SIGN OUT"
         onClose={() => setLogoutOpen(false)}
         footer={<><button className="button secondary" type="button"
@@ -402,17 +393,6 @@ export function My() {
         <div className="journal-quote"><span>“</span><p>最好的进攻，<br />是让对手追不上你的下一步。</p>
           <Link className="text-button" to="/game/warchest/army">认识兵种 <ArrowUpRight size={16} /></Link></div>
       </section></div>}
-    <button className="profile-about" data-testid="warchest-about-entry" type="button"
-      onClick={() => setAboutOpen(true)}><span><Info size={17} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span>
-      <ChevronRight size={17} /></button>
-    {aboutOpen && <Modal title="关于 War Chest Online" eyebrow="ABOUT & CONTACT"
-      onClose={() => setAboutOpen(false)}
-      footer={<button className="button secondary full" type="button"
-        onClick={() => setAboutOpen(false)}>知道了</button>}>
-      <ProjectContact gameName="War Chest" avatar={<Crest size={58} />}
-        classes={{ intro: 'project-contact-intro', links: 'project-contact-links', legal: 'project-contact-legal' }} />
-    </Modal>}
     {logoutOpen && <Modal title="离开当前账号？" eyebrow="SIGN OUT" onClose={() => setLogoutOpen(false)}
       footer={<><button className="button secondary" type="button" onClick={() => setLogoutOpen(false)}>取消</button>
         <button className="button primary" type="button" disabled={logout.pending} onClick={() => void logout.run()}>退出登录</button></>}>

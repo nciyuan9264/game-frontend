@@ -2,10 +2,9 @@ import { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import {
   ArrowRight, BookOpen, Clock, Fingerprint,
-  Info, LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
+  LogOut, Mail, Pencil, ShieldCheck, Trophy, Users,
 } from 'lucide-react';
 import {
-  GameMobileAboutDialog,
   GameMobileGuide,
   GameMobileProfile,
   GameMobileRankings,
@@ -15,8 +14,6 @@ import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
-import { ProjectContact } from '@/components/GameUI/ProjectContact';
-import { ResponsiveDialog } from '@/components/GameUI/ResponsiveDialog';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -30,7 +27,6 @@ import type {
 } from '@/features/game-core/model/history';
 import { AppShell, PlayerAvatar } from '../../components/AppShell';
 import { DavinciLoading } from '../../components/LoadingState';
-import rootStyles from '../../styles/root.module.less';
 import styles from './index.module.less';
 
 const PAGE_SIZE = 20;
@@ -194,7 +190,6 @@ export function My() {
     loading: historyLoading,
   } = useGameHistory({ gameType: 'davinci', pageSize: 20 });
   const logoutAction = useGameLogout();
-  const [aboutOpen, setAboutOpen] = useState(false);
   const handleLogout = async () => {
     if (!window.confirm('确定要退出登录吗？')) return;
     await logoutAction.run();
@@ -237,12 +232,7 @@ export function My() {
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => void handleLogout()}
-          onAbout={() => setAboutOpen(true)}
         />}
-      {aboutOpen && <GameMobileAboutDialog gameName="DaVinci Code"
-        avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        themeClassName={rootStyles.root}
-        onClose={() => setAboutOpen(false)} />}
     </AppShell>;
   }
   return <AppShell title="玩家档案" profile={profile.data} compactMobileFooter><div className={`${styles.page} ${styles.profilePage}`}>
@@ -274,14 +264,6 @@ export function My() {
         {!historyLoading && !historyError && !games.length && <Feedback>还没有对局记录。<Link to="/game/davinci">去大厅开始第一局</Link></Feedback>}
       </section>
     </div>}
-    <button className={styles.aboutEntry} data-testid="davinci-about-entry" type="button"
-      onClick={() => setAboutOpen(true)}><span className={styles.aboutEntryIcon}><Info size={17} /></span>
-      <span><b>关于与联系</b><small>项目作者、源码与联系方式</small></span><ArrowRight size={16} /></button>
-    {aboutOpen && <ResponsiveDialog title="关于 DaVinci Code Online" eyebrow="ABOUT & CONTACT" themeClassName={rootStyles.root}
-      onClose={() => setAboutOpen(false)} footer={<ActionButton onClick={() => setAboutOpen(false)}>知道了</ActionButton>}>
-      <ProjectContact gameName="DaVinci Code" avatar={<PlayerAvatar name="nciyuan9264" size={58} />}
-        classes={{ intro: styles.aboutIntro, links: styles.aboutLinks, legal: styles.aboutLegal }} />
-    </ResponsiveDialog>}
   </div></AppShell>;
 }
 

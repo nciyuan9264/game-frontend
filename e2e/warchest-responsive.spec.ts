@@ -546,11 +546,7 @@ test('War Chest desktop keeps primary actions, profile images, and footer conten
     'src',
     profileAvatar,
   );
-  const [aboutBox, footerBox] = await Promise.all([
-    page.getByTestId('warchest-about-entry').boundingBox(),
-    page.locator('.app-footer').boundingBox(),
-  ]);
-  expect(aboutBox!.y + aboutBox!.height).toBeLessThanOrEqual(footerBox!.y);
+  await expect(page.getByTestId('warchest-about-entry')).toHaveCount(0);
   await expectNoOverflow(page);
 });
 

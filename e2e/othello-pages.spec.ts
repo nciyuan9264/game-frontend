@@ -200,10 +200,9 @@ test('Othello public pages stay compact on mobile', async ({ page }) => {
   const identity = playerID.locator('xpath=ancestor::aside[1]');
   const history = page.getByRole('heading', { name: '过去的棋局' })
     .locator('xpath=ancestor::section[1]');
-  const about = page.getByTestId('othello-about-entry');
   expect((await identity.boundingBox())?.height).toBeCloseTo(324.58, 1);
   expect((await history.boundingBox())?.height).toBe(142);
-  expect((await about.boundingBox())?.height).toBe(55);
+  await expect(page.getByTestId('othello-about-entry')).toHaveCount(0);
   await expectNoOverflow(page);
 
   await page.setViewportSize({ width: 360, height: 800 });
