@@ -125,19 +125,28 @@
     > small { max-width:145px; color:var(--game-muted,#91a7b3);
       font-size:8px; line-height:1.4; overflow:hidden;
       text-overflow:ellipsis; white-space:nowrap; } }
-  .rankHero { position: relative; display: flex; min-height: 166px; align-items: center;
-    gap: 15px; overflow: hidden; margin-bottom: 18px; padding: 23px 18px;
-    border: 1px solid var(--game-public-line, var(--game-line, #3b515c));
-    border-radius: 9px; background: var(--game-public-hero-bg, var(--game-panel, #172a34));
-    > svg { position: absolute; top: 19px; right: 14px; width: 47px; height: 47px;
-      padding: 11px; color: var(--game-accent, #e6bc7d); opacity: .35; }
+  .rankHero { position: relative; display: flex; min-width: 0; min-height: 166px; align-items: center;
+    justify-content: space-between; gap: 18px; overflow: hidden;
+    margin-bottom: 18px; padding: 23px 18px;
+    border: 0; border-radius: 0; background: transparent; box-shadow: none;
+    > div { min-width: 0; }
     small { color: var(--game-eyebrow, #b2b993); font-size: 6px; letter-spacing: .14em; }
     h1 { margin-top: 10px; font-size: 24px; line-height: 1.45; }
-    p { max-width: 255px; margin-top: 9px; color: var(--game-muted, #90aba6);
+    p { max-width: 230px; margin-top: 9px; color: var(--game-muted, #90aba6);
       font-size: 10px; line-height: 1.9; } }
-  .rankPanel { min-width: 0; padding: 14px 10px 10px;
+  .rankHeroIcon { display: grid;
+    width: clamp(54px,18vw,72px); height: clamp(54px,18vw,72px);
+    flex: 0 0 auto; place-items: center;
     border: 1px solid var(--game-public-line, var(--game-line, #3b515c));
-    border-radius: 8px; background: var(--game-panel, #172a34); }
+    border-radius: 50%;
+    background: color-mix(in srgb,var(--game-panel,#172a34) 72%,transparent);
+    color: var(--game-accent, #e6bc7d);
+    > svg { width: 34px; height: 34px; }
+    > * { max-width: 100%; max-height: 100%; } }
+  .rankPanel { min-width: 0; padding: 14px 10px 10px;
+    border: 0;
+    border-top: 1px solid var(--game-public-line, var(--game-line, #3b515c));
+    border-radius: 0; background: transparent; box-shadow: none; }
   .rankControls { display: flex; align-items: center; gap: 10px; .rankTabs { flex: 1; } }
   .rankRow { display: grid; min-height: 63px; grid-template-columns: 26px minmax(0,1fr) 48px 48px;
     align-items: center; gap: 7px; padding: 0 5px;
@@ -171,9 +180,13 @@
       color: var(--game-muted, #acbbad); font-size: 9px; }
     svg { width: 16px; height: 16px; color: var(--game-accent, #b8a67e); }
     b { font-weight: 600; } small { overflow-wrap: anywhere; } }
-  .guidePanel { display: flex; min-height: 0; flex-direction: column; padding: 23px 19px;
+  .guidePanel { display: grid; min-height: 0;
+    grid-template-rows: minmax(0,1fr) auto auto; padding: 23px 19px;
     border: 1px solid var(--game-public-line, var(--game-line, #3b515c));
-    border-radius: 9px; background: var(--game-panel, #172a34);
+    border-radius: 9px; background: var(--game-panel, #172a34); }
+  .guideBody { min-height: 0; overflow-x: hidden; overflow-y: auto;
+    overscroll-behavior: contain; scrollbar-width: none;
+    &::-webkit-scrollbar { display: none; }
     > small { color: var(--game-eyebrow, #afad84); font-size: 7px; letter-spacing: .12em; }
     h1 { margin: 12px 0 15px; font-size: 22px; line-height: 1.6; }
     > p { color: var(--game-muted, #9db4be); font-size: 12px; line-height: 1.9; }
@@ -190,7 +203,7 @@
     color: var(--game-muted, #8ea6b4); font-size: 10px; line-height: 1.8;
     svg { flex: 0 0 auto; margin-top: 2px; } }
   .guideHint { margin-top: 16px; }
-  .guideActions { display: flex; gap: 10px; margin-top: auto; padding-top: 25px;
+  .guideActions { display: flex; gap: 10px; padding-top: 25px;
     > button, > a { min-height: 41px; flex: 1; padding: 0 12px; font-size: 11px; }
     > :first-child { flex: 1.6; } }
   .profile { display: flex; min-height: 0; flex-direction: column; }
@@ -340,10 +353,10 @@
     gap:var(--game-mobile-section-gap); overflow:hidden; }
   .rankHero { min-height:0; height:100%; margin-bottom:0;
     padding:var(--game-mobile-surface-padding);
-    border-radius:var(--game-mobile-surface-radius); }
+    border-radius:0; }
   .rankPanel { display:flex; min-height:0; flex-direction:column;
     padding:var(--game-mobile-surface-padding);
-    border-radius:var(--game-mobile-surface-radius); overflow:hidden; }
+    border-radius:0; overflow:hidden; }
   .rankControls { flex:0 0 auto; }
   .rankList { min-height:0; flex:1; overflow-x:hidden; overflow-y:auto;
     overscroll-behavior:contain; }
@@ -377,7 +390,7 @@
 @media (max-width:767px) and (max-height:760px) {
   .rankHero p { margin-top:5px; line-height:1.55; }
   .guideFacts { padding-top:9px; padding-bottom:9px; }
-  .guidePanel h1 { margin:8px 0 10px; line-height:1.4; }
+  .guideBody h1 { margin:8px 0 10px; line-height:1.4; }
   .guideTabs { margin-bottom:12px; }
   .guideHint { margin-top:10px; }
   .guideActions { padding-top:12px; }
@@ -397,10 +410,10 @@
   .guidePanel { padding:10px 14px; }
   .guideTabs { gap:15px; margin-bottom:5px; padding-bottom:2px; }
   .guideTabs button { min-height:28px; padding:3px 0; }
-  .guidePanel>small { display:none; }
-  .guidePanel h1 { margin:4px 0 6px; font-size:18px; line-height:1.3; }
-  .guidePanel>p { font-size:10px; line-height:1.5; }
-  .guidePanel ol { gap:5px; margin:6px 0; line-height:1.45; }
+  .guideBody>small { display:none; }
+  .guideBody h1 { margin:4px 0 6px; font-size:18px; line-height:1.3; }
+  .guideBody>p { font-size:10px; line-height:1.5; }
+  .guideBody ol { gap:5px; margin:6px 0; line-height:1.45; }
   .guideHint { margin-top:5px; padding:6px 8px; font-size:9px; line-height:1.45; }
   .guideActions { padding-top:6px; }
   .guideActions>button,.guideActions>a {

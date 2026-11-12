@@ -239,10 +239,33 @@ for (const game of games) {
         waitUntil: 'domcontentloaded',
       });
       const guide = page.locator('[data-game-public-mobile="guide"]');
+      const guideCopy = page.locator(
+        '[data-game-mobile-scroll-owner="guide"]',
+      );
       await expect(guide).toHaveCSS('overflow-y', 'hidden');
+      await expect(guideCopy).toHaveCSS('overflow-y', 'auto');
       const guideState = await readScrollState(guide);
       expect(guideState.scrollHeight).toBeLessThanOrEqual(
         guideState.clientHeight + 1,
+      );
+      const guideGeometry = await page.locator(
+        '[data-game-mobile-guide-panel]',
+      ).evaluate(panel => {
+        const actions = panel.lastElementChild;
+        const panelBox = panel.getBoundingClientRect();
+        const actionsBox = actions?.getBoundingClientRect();
+        return {
+          panelBottom: panelBox.bottom,
+          actionsBottom: actionsBox?.bottom ?? Number.POSITIVE_INFINITY,
+          actionsTop: actionsBox?.top ?? Number.NEGATIVE_INFINITY,
+          panelTop: panelBox.top,
+        };
+      });
+      expect(guideGeometry.actionsTop).toBeGreaterThanOrEqual(
+        guideGeometry.panelTop,
+      );
+      expect(guideGeometry.actionsBottom).toBeLessThanOrEqual(
+        guideGeometry.panelBottom,
       );
       await expectOuterShellLocked(page, guide);
 

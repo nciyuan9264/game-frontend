@@ -32,7 +32,8 @@ Each page has one vertical scroll owner:
 
 - Lobby: page root.
 - Rankings: ranking rows.
-- Guide: none.
+- Guide: chapter copy; the authority hint and actions stay outside the scroll
+  region.
 - Profile: page root; history rows stay in normal flow and expand naturally.
 - Waiting room: middle room content.
 - Replay and final result: page root, only when needed.
@@ -54,8 +55,9 @@ chapter, authority hint, and primary action visible without vertical scrolling.
 
 - Peer surfaces use the page gutter as their vertical gap.
 - Surface padding is equal on all four sides.
-- Profile identity and history are unframed page sections separated by one
-  horizontal rule; only individual history rows use internal dividers.
+- Profile identity/history and ranking intro/list are unframed page sections
+  separated by one horizontal rule; only individual list rows use internal
+  dividers.
 - Profile identity places the eyebrow, name, and email on the left with a
   prominent editable avatar on the right; player ID metadata stays hidden.
 - Profile stats use whitespace only: no top rule and no column dividers.
@@ -68,6 +70,8 @@ chapter, authority hint, and primary action visible without vertical scrolling.
 - Tabs use a short per-item background pulse on press and may transition color
   or border; the tab element itself never moves or scales.
 - Columns use `minmax(0, 1fr)`.
+- Guide actions remain pinned inside the copy panel. Long chapter copy scrolls
+  above the always-visible authority hint and actions.
 - Media uses fluid dimensions, `object-fit`, or `aspect-ratio`.
 - Lobby room cards use the Acquire hierarchy: room number, status, owner
   identity, visibility, capacity, and action. Do not render an owner label.

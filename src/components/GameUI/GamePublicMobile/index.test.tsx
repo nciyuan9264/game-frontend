@@ -111,6 +111,9 @@ describe('GamePublicMobile', () => {
     expect(screen.queryByRole('button', { name: /退出登录/ })).toBeNull();
     expect(container.querySelector('[data-game-mobile-rank-panel]')).toBeTruthy();
     expect(container.querySelector(
+      '[data-game-mobile-scroll-owner="guide"]',
+    )).toBeTruthy();
+    expect(container.querySelector(
       '[data-game-mobile-scroll-owner="profile"]',
     )).toBeTruthy();
     expect(container.querySelector(

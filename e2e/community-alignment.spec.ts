@@ -309,6 +309,29 @@ async function expectMobileBottomGutter(
   )).toBeLessThanOrEqual(1);
 }
 
+async function expectGuideActionsContained(page: Page) {
+  const panel = page.locator('[data-game-mobile-guide-panel]');
+  const actions = panel.locator(':scope > :last-child');
+  const primary = actions.locator('button, a').first();
+  await expect(primary).toBeVisible();
+  const [panelBox, actionsBox, primaryBox] = await Promise.all([
+    panel.boundingBox(),
+    actions.boundingBox(),
+    primary.boundingBox(),
+  ]);
+  expect(panelBox).not.toBeNull();
+  expect(actionsBox).not.toBeNull();
+  expect(primaryBox).not.toBeNull();
+  expect((actionsBox?.y ?? 0) + (actionsBox?.height ?? 0))
+    .toBeLessThanOrEqual(
+      (panelBox?.y ?? 0) + (panelBox?.height ?? 0) + 1,
+    );
+  expect((primaryBox?.y ?? 0) + (primaryBox?.height ?? 0))
+    .toBeLessThanOrEqual(
+      (panelBox?.y ?? 0) + (panelBox?.height ?? 0) + 1,
+    );
+}
+
 async function expectLobbyContentBaseline(page: Page, card: Locator) {
   const browser = page.locator('[data-game-mobile-lobby-browser]');
   const search = page.getByPlaceholder('搜索房间号 / 房主').locator('..');
@@ -378,6 +401,38 @@ test('mobile public heroes scale through all supported height tiers',
       expect(samples[2][key]).toBeGreaterThan(samples[3][key]);
     }
   });
+
+test('guide actions stay pinned across chapters and compact viewports',
+  async ({ page }) => {
+    await mockData(page, 'acquire');
+    for (const viewport of [
+      { width: 390, height: 667 },
+      { width: 320, height: 568 },
+    ]) {
+      await page.setViewportSize(viewport);
+      await page.goto('/game/acquire/guide', {
+        waitUntil: 'domcontentloaded',
+      });
+      const copy = page.locator('[data-game-mobile-scroll-owner="guide"]');
+      await expect(copy).toHaveCSS('overflow-y', 'auto');
+      const tabs = page.getByRole('tablist', { name: '玩法章节' })
+        .getByRole('tab');
+      for (let chapter = 0; chapter < await tabs.count(); chapter += 1) {
+        await tabs.nth(chapter).click();
+        const before = await page.locator('[data-game-mobile-guide-panel]')
+          .locator(':scope > :last-child').boundingBox();
+        await copy.evaluate(element => {
+          element.scrollTop = element.scrollHeight;
+        });
+        const after = await page.locator('[data-game-mobile-guide-panel]')
+          .locator(':scope > :last-child').boundingBox();
+        expect(Math.abs((after?.y ?? 0) - (before?.y ?? 0)))
+          .toBeLessThanOrEqual(1);
+        await expectGuideActionsContained(page);
+      }
+    }
+  });
+
 
 test('ranking tabs do not move sibling tabs while pressed or selected',
   async ({ page }) => {
@@ -647,9 +702,9 @@ for (const item of cases) {
         waitUntil: 'domcontentloaded',
       });
       const rankHero = page.locator('[data-game-mobile-rank-hero]');
+      const rankings = page.locator('[data-game-public-mobile="rankings"]');
       const rankPanel = page.locator('[data-game-mobile-rank-panel]');
-      await expect(page.locator('[data-game-public-mobile="rankings"]'))
-        .toBeVisible();
+      await expect(rankings).toBeVisible();
       await expect(page.getByRole('tablist', { name: '排行榜模式' }))
         .toBeVisible();
       const [rankHeroBox, rankPanelBox] = await Promise.all([
@@ -663,6 +718,33 @@ for (const item of cases) {
       expect(rankPanelBox?.y).toBe(
         (rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 14,
       );
+
+      const [rankIntroStyle, rankListStyle] = await rankings
+        .locator(':scope > section').evaluateAll(sections =>
+          sections.map(section => {
+            const style = getComputedStyle(section);
+            return {
+              background: style.backgroundColor,
+              borderTop: style.borderTopWidth,
+              borderRight: style.borderRightWidth,
+              radius: style.borderRadius,
+              shadow: style.boxShadow,
+            };
+          }));
+      expect(rankIntroStyle).toEqual({
+        background: 'rgba(0, 0, 0, 0)',
+        borderTop: '0px',
+        borderRight: '0px',
+        radius: '0px',
+        shadow: 'none',
+      });
+      expect(rankListStyle).toEqual({
+        background: 'rgba(0, 0, 0, 0)',
+        borderTop: '1px',
+        borderRight: '0px',
+        radius: '0px',
+        shadow: 'none',
+      });
 
       await page.goto(`/game/${item.gameType}/guide`, {
         waitUntil: 'domcontentloaded',
@@ -692,6 +774,7 @@ for (const item of cases) {
 
       for (let chapter = 0; chapter < await guideTabs.count(); chapter += 1) {
         await guideTabs.nth(chapter).click();
+        await expectGuideActionsContained(page);
         const mediaGeometry = await guideMedia.evaluate(element => {
           const media = element.getBoundingClientRect();
           return {

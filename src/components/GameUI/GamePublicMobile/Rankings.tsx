@@ -38,8 +38,10 @@ export function GameMobileRankings<TMode extends string>({
   return <div className={`${styles.mobileOnly} ${styles.rankings}`}
     data-game-public-mobile="rankings">
     <section className={styles.rankHero} data-game-mobile-rank-hero>
-      {icon}<div><small>{eyebrow}</small><h1>{title}</h1>
+      <div><small>{eyebrow}</small><h1>{title}</h1>
         <p>{description}</p></div>
+      <span className={styles.rankHeroIcon}
+        data-game-mobile-rank-icon aria-hidden="true">{icon}</span>
     </section>
     <section className={styles.rankPanel} data-game-mobile-rank-panel>
       <div className={styles.rankControls}>

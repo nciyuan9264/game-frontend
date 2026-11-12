@@ -51,13 +51,16 @@ export function GameMobileGuide({
       </div>
     </aside>
     <section className={styles.guidePanel} data-game-mobile-guide-panel>
-      <GameTabs items={tabs} value={index} onChange={onSelect}
-        ariaLabel="玩法章节" className={styles.guideTabs}
-        activeClassName={styles.activeTab} />
-      <small>{eyebrow}</small><h1>{title}</h1><p>{description}</p>
-      {points?.length && <ol>{points.map((point, pointIndex) =>
-        <li key={pointIndex}>{point}</li>)}</ol>}
-      {detail}
+      <div className={styles.guideBody}
+        data-game-mobile-scroll-owner="guide">
+        <GameTabs items={tabs} value={index} onChange={onSelect}
+          ariaLabel="玩法章节" className={styles.guideTabs}
+          activeClassName={styles.activeTab} />
+        <small>{eyebrow}</small><h1>{title}</h1><p>{description}</p>
+        {points?.length && <ol>{points.map((point, pointIndex) =>
+          <li key={pointIndex}>{point}</li>)}</ol>}
+        {detail}
+      </div>
       <div className={styles.guideHint}><ShieldCheck size={16} />
         <span>{hint}</span></div>
       <div className={styles.guideActions}>
