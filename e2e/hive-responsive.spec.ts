@@ -325,14 +325,23 @@ test('Hive public pages stay stable across target viewports', async ({
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/hive');
-    await expect(page.getByTestId('hive-lobby-hero')).toBeVisible();
-    await expect(page.getByTestId('hive-lobby-facts')
+    const mobile = viewport.width <= 767;
+    const hero = mobile
+      ? page.locator('[data-game-mobile-lobby-hero]')
+      : page.getByTestId('hive-lobby-hero');
+    const facts = mobile
+      ? page.locator('[data-game-mobile-lobby-facts]')
+      : page.getByTestId('hive-lobby-facts');
+    await expect(hero).toBeVisible();
+    await expect(facts
       .locator(':scope > span')).toHaveCount(3);
     await expectNoOverflow(page);
     await capture(page, testInfo, `lobby-${viewport.width}x${viewport.height}`);
 
     await page.goto('/game/hive/guide');
-    await expect(page.getByTestId('hive-guide-visual')).toBeVisible();
+    await expect(mobile
+      ? page.locator('[data-game-mobile-guide-visual]')
+      : page.getByTestId('hive-guide-visual')).toBeVisible();
     await expectNoOverflow(page);
   }
 });

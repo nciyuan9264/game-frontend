@@ -77,7 +77,7 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
   className = '',
 }: GameMobileLobbyProps<TRoom, TFilter>) {
   return <div className={`${styles.mobileOnly} ${styles.lobby} ${className}`}
-    data-game-public-mobile="lobby">
+    data-game-public-mobile="lobby" data-game-mobile-scroll-owner="lobby">
     <section className={styles.lobbyHero} data-game-mobile-lobby-hero>
       <div className={styles.heroMedia}>{media}</div>
       <div className={styles.heroShade} />

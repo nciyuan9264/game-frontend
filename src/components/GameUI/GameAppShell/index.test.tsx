@@ -109,8 +109,8 @@ describe('GameAppShell', () => {
         </GameAppShell>
       </MemoryRouter>
     );
-    expect(container.firstElementChild?.className.split(' ')).toHaveLength(3);
-    expect(container.querySelector('div.main')?.className.split(' ')).toHaveLength(2);
-    expect(container.querySelector('main')?.className.split(' ')).toHaveLength(2);
+    expect(container.firstElementChild?.className.split(' ')).toHaveLength(4);
+    expect(container.querySelector('div.main')?.className.split(' ')).toHaveLength(3);
+    expect(container.querySelector('main')?.className.split(' ')).toHaveLength(3);
   });
 });

@@ -345,15 +345,30 @@ test('Onitama public pages stay stable across target viewports', async ({
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/onitama');
-    await expect(page.getByTestId('onitama-lobby-hero')).toBeVisible();
-    await expect(page.getByTestId('onitama-lobby-facts')
-      .locator(':scope > span')).toHaveCount(3);
+    const mobile = viewport.width <= 767;
+    const hero = mobile
+      ? page.locator('[data-game-mobile-lobby-hero]')
+      : page.getByTestId('onitama-lobby-hero');
+    const facts = mobile
+      ? page.locator('[data-game-mobile-lobby-facts]')
+      : page.getByTestId('onitama-lobby-facts');
+    await expect(hero).toBeVisible();
+    await expect(facts.locator(':scope > span')).toHaveCount(3);
     await expectNoOverflow(page);
     await capture(page, testInfo, `lobby-${viewport.width}x${viewport.height}`);
 
     await page.goto('/game/onitama/guide');
-    await expect(page.getByTestId('onitama-guide-visual')).toBeVisible();
-    await expect(page.locator('.move-card')).toHaveCount(16);
+    await expect(mobile
+      ? page.locator('[data-game-mobile-guide-visual]')
+      : page.getByTestId('onitama-guide-visual')).toBeVisible();
+    if (mobile) {
+      await page.getByRole('button', { name: '移动卡速查' }).click();
+      const catalog = page.getByRole('dialog', { name: '基础版十六式' });
+      await expect(catalog.locator('.move-card')).toHaveCount(16);
+      await catalog.getByRole('button', { name: '关闭面板' }).click();
+    } else {
+      await expect(page.locator('.move-card')).toHaveCount(16);
+    }
     await expectNoOverflow(page);
   }
 });
@@ -367,7 +382,7 @@ test('Onitama room keeps two explicit seats on mobile', async ({ page }) => {
   await expect(page.locator('[data-game-brand]')).toBeVisible();
   await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
   await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-  const seats = page.getByTestId('onitama-room-seat');
+  const seats = page.locator('[data-game-mobile-room-seat]');
   await expect(seats).toHaveCount(2);
   const boxes = await seats.evaluateAll(elements => elements.map(element => {
     const box = element.getBoundingClientRect();

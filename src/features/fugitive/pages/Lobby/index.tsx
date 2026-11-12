@@ -188,10 +188,11 @@ export default function Lobby() {
   const renderMobileRoom = (room: FugitiveRoom) => {
     const entry = roomEntry(room, { userID });
     const ownerProfile = roomOwnerProfile(room);
-    const ownerRole = roomRole(room);
-    const progress = room.status === 'match'
-      ? 0
-      : Math.min(42, Math.max(0, room.highestRevealed ?? 0));
+    const progressTotal = room.progressTotal ?? 42;
+    const progressCurrent = Math.min(
+      progressTotal,
+      Math.max(0, room.progressCurrent ?? room.highestRevealed ?? 0),
+    );
     return <article key={room.roomID} className="fugitive-mobile-room-card"
       aria-label={`房间 ${room.roomID}`} data-game-mobile-room-card>
       <div className="fugitive-mobile-room-heading">
@@ -210,7 +211,7 @@ export default function Lobby() {
             name: ownerProfile.name,
             avatar: ownerProfile.avatar,
           }} />
-          <span>房主</span><strong title={ownerProfile.name}>{ownerProfile.name}</strong>
+          <strong title={ownerProfile.name}>{ownerProfile.name}</strong>
         </div>
         <span className={`fugitive-mobile-room-mode ${
           room.visibility === 'private' ? 'private' : ''}`}>
@@ -219,18 +220,16 @@ export default function Lobby() {
             : <><Globe2 size={13} />公开房间</>}
         </span>
       </div>
-      <div className="fugitive-mobile-room-progress" role="progressbar"
-        aria-label="逃亡进度" aria-valuemin={0} aria-valuemax={42}
-        aria-valuenow={progress}>
-        <i style={{ width: `${progress / 42 * 100}%` }} />
-      </div>
+      {progressTotal > 0 && <div className="fugitive-mobile-room-progress"
+        role="progressbar" aria-label="逃亡进度" aria-valuemin={0}
+        aria-valuemax={progressTotal} aria-valuenow={progressCurrent}>
+        <i style={{ width: `${progressCurrent / progressTotal * 100}%` }} />
+      </div>}
       <div className="fugitive-mobile-room-bottom">
         <div className="fugitive-mobile-room-capacity">
           <span><Users size={16} /><b>{room.roomPlayer.length}</b>
             / {room.maxPlayers} 人</span>
-          <small>{room.status === 'match'
-            ? `等待${roleName(ownerRole === 'fugitive' ? 'marshal' : 'fugitive')}`
-            : `最高公开 ${room.highestRevealed ?? 0}`}</small>
+          <small>最高公开 {room.highestRevealed ?? progressCurrent}</small>
         </div>
         <ActionButton disabled={!entry.allowed} onClick={() => enter(room)}
           aria-label={`${entry.label} ${room.roomID}`}>

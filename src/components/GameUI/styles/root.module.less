@@ -22,12 +22,12 @@
   h2 { font-size: 20px; }
   h3 { font-size: 15px; }
   button, input, select, textarea { font: inherit; color: inherit; }
-  button, a[href], [role='button'], [role='tab'] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; transition: transform .08s ease,filter .08s ease; }
+  button, a[href], [role='button'], [role='tab'] { touch-action: manipulation; -webkit-tap-highlight-color: transparent; }
+  button:not([role='tab']), a[href], [role='button'] { transition: transform .08s ease,filter .08s ease; }
   button { cursor: pointer; line-height: 1.4; }
-  button:not(:disabled):not([aria-disabled='true']):active,
+  button:not([role='tab']):not(:disabled):not([aria-disabled='true']):active,
   a[href]:active,
-  [role='button']:not([aria-disabled='true']):active,
-  [role='tab']:not([aria-disabled='true']):active { transform: translateY(1px) scale(.98); filter: brightness(.94); }
+  [role='button']:not([aria-disabled='true']):active { transform: translateY(1px) scale(.98); filter: brightness(.94); }
   button:disabled { cursor: not-allowed; opacity: .4; }
   input, select, textarea { font-size: 16px; min-width: 0; }
   input::placeholder { color: var(--game-placeholder, #78919f); }

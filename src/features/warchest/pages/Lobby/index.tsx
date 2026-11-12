@@ -165,16 +165,18 @@ export default function Lobby() {
     const ownerProfile = roomOwnerProfile(room);
     return <GameMobileRoomCard key={room.roomID}
       roomID={room.roomID}
-      title={room.roomID}
       ownerName={ownerProfile.name}
       ownerAvatar={<PlayerAvatar name={ownerProfile.name}
         avatar={ownerProfile.avatar} size={32} />}
       playerCount={room.roomPlayer.length}
       maxPlayers={room.maxPlayers}
       status={room.status === 'match' ? '等待加入' : '对局中'}
-      meta={room.status === 'match'
-        ? `完整基础版 · ${room.turnTimeoutSeconds ?? 90} 秒行动`
-        : `领先方已控制 ${room.maxControlledLocations ?? 0} 处`}
+      progress={{
+        current: room.progressCurrent ?? 0,
+        total: room.progressTotal ?? 0,
+        label: '控制进度',
+        description: `已控制 ${room.progressCurrent ?? 0} / ${room.progressTotal ?? 0} 处`,
+      }}
       privateRoom={room.visibility === 'private'}
       actionLabel={entry.label}
       actionDisabled={!entry.allowed}

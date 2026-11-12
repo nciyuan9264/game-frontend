@@ -123,16 +123,18 @@ export default function Lobby() {
     const ownerProfile = roomOwnerProfile(room);
     return <GameMobileRoomCard key={room.roomID}
       roomID={room.roomID}
-      title={`${ownerProfile.name} 的玫瑰庭院`}
       ownerName={ownerProfile.name}
       ownerAvatar={<PlayerAvatar name={ownerProfile.name}
         avatar={ownerProfile.avatar} size={32} />}
       playerCount={room.roomPlayer.length}
       maxPlayers={room.maxPlayers}
       status={room.status === 'match' ? '等待入席' : '正在传信'}
-      meta={room.status === 'match'
-        ? '21 张牌新版 · 等待启封'
-        : `第 ${room.currentRound || room.nextRoundNo || 1} 轮`}
+      progress={{
+        current: room.progressCurrent ?? 0,
+        total: room.progressTotal ?? 0,
+        label: '好感进度',
+        description: `好感 ${room.progressCurrent ?? 0} / ${room.progressTotal ?? 0}`,
+      }}
       privateRoom={room.visibility === 'private'}
       actionLabel={entry.label}
       actionDisabled={!entry.allowed}

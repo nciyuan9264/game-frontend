@@ -235,9 +235,9 @@ async function expectNoHorizontalOverflow(page: Page) {
 }
 
 async function expectAlignedPreparationRoom(page: Page) {
-  const table = page.getByTestId('davinci-room-table');
-  const facts = page.getByTestId('davinci-room-facts');
-  const startBar = page.getByTestId('davinci-room-start-bar');
+  const table = page.locator('[data-game-mobile-room-table]');
+  const facts = page.locator('[data-game-mobile-room-summary]');
+  const startBar = page.locator('[data-game-mobile-room-dock]');
   await expect(table).toBeVisible();
   await expect(facts).toBeVisible();
   await expect(startBar).toBeVisible();
@@ -254,7 +254,7 @@ async function expectAlignedPreparationRoom(page: Page) {
   expect(Math.abs(tableBox.x - factsBox.x)).toBeLessThanOrEqual(1);
   expect(Math.abs(tableBox.width - factsBox.width)).toBeLessThanOrEqual(1);
   expect(tableBox.y + tableBox.height).toBeLessThan(factsBox.y);
-  expect(startPosition).toBe('fixed');
+  expect(startPosition).toBe('static');
 }
 
 async function expectVerticalScroll(anchor: Locator) {
@@ -304,7 +304,7 @@ test('DaVinci preparation room fits a mobile viewport', async ({ page }) => {
   await expectNoHorizontalOverflow(page);
 
   await page.setViewportSize({ width: 390, height: 430 });
-  await expectVerticalScroll(heading);
+  await expectVerticalScroll(page.locator('[data-game-mobile-room-table]'));
 
   await page.setViewportSize({ width: 390, height: 844 });
   await page.getByRole('button', { name: '房间设置' }).click();
@@ -387,7 +387,7 @@ test('DaVinci desktop play stage is bounded on an ultra-wide viewport', async ({
   page,
 }) => {
   await page.setViewportSize({ width: 2557, height: 1293 });
-  await mockSession(page, initializationSnapshot());
+  await mockSession(page, playingSnapshot());
   await page.goto(`/game/davinci/match?roomID=${roomID}`);
 
   const stage = page.getByTestId('davinci-play');

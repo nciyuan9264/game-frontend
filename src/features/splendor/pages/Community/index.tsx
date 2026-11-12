@@ -9,7 +9,7 @@ import {
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
@@ -260,11 +260,13 @@ export function My() {
           ]}
           historyTitle="过去的精彩"
           historyItems={historyItems}
+          historyHasMore={hasMore && !error}
+          historyLoading={loading}
+          onHistoryLoadMore={loadMore}
           emptyHistory={<Feedback>还没有对局记录。
             <Link to="/game/splendor">去大厅开一桌</Link>
           </Feedback>}
-          historyFooter={hasMore && <ActionButton pending={loading}
-            onClick={loadMore}>加载更多</ActionButton>}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => setPanel('logout')}

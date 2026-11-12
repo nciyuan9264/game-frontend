@@ -28,7 +28,7 @@ import {
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -328,16 +328,15 @@ export function My() {
           ]}
           historyTitle="战场纪事"
           historyItems={historyItems}
+          historyHasMore={history.hasMore && !history.error}
+          historyLoading={history.loading}
+          onHistoryLoadMore={history.loadMore}
           emptyHistory={<Notice>下一页，等待你来书写。
             <Link className="text-button" to="/game/warchest">
               开始第一场交锋
             </Link>
           </Notice>}
-          historyFooter={history.hasMore && <button
-            className="button secondary full" type="button"
-            disabled={history.loading} onClick={history.loadMore}>
-            加载更多
-          </button>}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logout.pending}
           logoutError={logout.error}
           onLogout={() => setLogoutOpen(true)}

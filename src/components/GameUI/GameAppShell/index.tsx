@@ -114,6 +114,7 @@ export function GameAppShell({
   const shellClassName = [
     rootClassName,
     classes.shell,
+    layoutStyles.viewportShell,
     inMatch ? classes.inMatch : '',
     hideRail ? classes.hideRail : '',
     hideHeader ? classes.hideHeader : '',
@@ -156,9 +157,13 @@ export function GameAppShell({
     </aside>}
     <div className={[
       classes.main,
+      layoutStyles.shellMain,
       compactMobileFooter ? layoutStyles.compactMobileShell : '',
     ].filter(Boolean).join(' ')}>
-      {!hideHeader && <header className={classes.header} data-game-shell-header data-game-shell-frame>
+      {!hideHeader && <header className={[
+        classes.header,
+        layoutStyles.shellHeader,
+      ].filter(Boolean).join(' ')} data-game-shell-header data-game-shell-frame>
         {inMatch
           ? <span className={classes.brand} data-game-brand>{renderBrand()}</span>
           : <Link
@@ -201,10 +206,14 @@ export function GameAppShell({
       </header>}
       <main className={[
         classes.content,
+        layoutStyles.shellContent,
         compactMobileFooter ? layoutStyles.compactMobileFooter : '',
       ].filter(Boolean).join(' ')} data-game-shell-content data-game-shell-frame>{children}</main>
     </div>
-    {!inMatch && <nav className={classes.mobileNav} aria-label={labels.mobileNavigation}>
+    {!inMatch && <nav className={[
+      classes.mobileNav,
+      layoutStyles.shellMobileNav,
+    ].filter(Boolean).join(' ')} aria-label={labels.mobileNavigation}>
       {navigation.map(item => <NavLink
         end
         key={item.path}

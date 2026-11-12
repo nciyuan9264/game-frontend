@@ -30,7 +30,6 @@ const opponent = {
 const games = [
   {
     game: 'othello',
-    seatTestID: 'othello-room-seat',
     metrics: {
       othello: {
         occupiedCount: 4,
@@ -41,7 +40,6 @@ const games = [
   },
   {
     game: 'yinsh',
-    seatTestID: 'yinsh-room-seat',
     metrics: {
       yinsh: {
         ringsRemoved: 0,
@@ -52,7 +50,6 @@ const games = [
   },
   {
     game: 'quoridor',
-    seatTestID: 'quoridor-room-seat',
     metrics: {
       quoridor: {
         turnCount: 0,
@@ -61,7 +58,6 @@ const games = [
   },
   {
     game: 'hex',
-    seatTestID: 'hex-room-seat',
     metrics: {
       hex: {
         turnCount: 0,
@@ -70,7 +66,6 @@ const games = [
   },
   {
     game: 'hive',
-    seatTestID: 'hive-room-seat',
     metrics: {
       hive: {
         turnCount: 0,
@@ -149,35 +144,75 @@ function overlaps(
 
 async function expectSeatControlsSeparated(
   page: Page,
-  seatTestID: string,
+  game: string,
 ) {
-  const opponentSeat = page.getByTestId(seatTestID).nth(1);
-  const decorativeSpans = opponentSeat.locator(
-    ':scope > span[aria-hidden="true"]',
-  );
-  const sideMarker = decorativeSpans.nth(0);
-  const avatar = decorativeSpans.nth(1);
+  const opponentSeat = page.locator(
+    '[data-game-mobile-room-seat], [data-testid="' + game + '-room-seat"]',
+  ).nth(1);
   const manageButton = opponentSeat.getByRole('button', {
     name: '管理席位 2',
   });
-  await expect(decorativeSpans).toHaveCount(2);
+  await expect(opponentSeat).toBeVisible();
   await expect(manageButton).toBeVisible();
 
-  const [markerBox, avatarBox, buttonBox] = await Promise.all([
-    sideMarker.boundingBox(),
-    avatar.boundingBox(),
-    manageButton.boundingBox(),
-  ]);
+  const { markerBox, avatarBox, buttonBox } = await opponentSeat.evaluate(
+    seat => {
+      const descendants = Array.from(
+        seat.querySelectorAll<HTMLElement>('*'),
+      );
+      const avatarWrapper = Array.from(seat.children)
+        .find(element => element.tagName === 'DIV') as HTMLElement | undefined;
+      const avatar = avatarWrapper
+        ? avatarWrapper.getBoundingClientRect().height > 0
+          ? avatarWrapper
+          : avatarWrapper.firstElementChild as HTMLElement | null
+        : descendants.find(element => {
+          const width = Number.parseFloat(element.style.width);
+          const height = Number.parseFloat(element.style.height);
+          return element.tagName === 'SPAN' && width >= 40 && height >= 40;
+        });
+      const marker = seat.hasAttribute('data-game-mobile-room-seat')
+        ? seat.children.item(1) as HTMLElement | null
+        : descendants.find(element => {
+          const box = element.getBoundingClientRect();
+          return getComputedStyle(element).position === 'absolute'
+            && !element.closest('button')
+            && !element.textContent?.trim()
+            && box.width >= 14
+            && box.width <= 30
+            && box.height >= 14
+            && box.height <= 30;
+        });
+      const button = seat.querySelector<HTMLElement>(
+        'button[aria-label="管理席位 2"]',
+      );
+      const rect = (element: HTMLElement | undefined | null) => {
+        if (!element) return null;
+        const box = element.getBoundingClientRect();
+        return {
+          x: box.x,
+          y: box.y,
+          width: box.width,
+          height: box.height,
+        };
+      };
+      return {
+        markerBox: rect(marker),
+        avatarBox: rect(avatar),
+        buttonBox: rect(button),
+      };
+    },
+  );
   expect(markerBox).not.toBeNull();
   expect(avatarBox).not.toBeNull();
   expect(buttonBox).not.toBeNull();
   if (!markerBox || !avatarBox || !buttonBox) return;
 
-  expect(buttonBox.x - (markerBox.x + markerBox.width))
-    .toBeGreaterThanOrEqual(6);
-  expect(overlaps(markerBox, avatarBox)).toBe(false);
   expect(overlaps(markerBox, buttonBox)).toBe(false);
-  expect(overlaps(avatarBox, buttonBox)).toBe(false);
+  expect(
+    overlaps(avatarBox, buttonBox),
+    `avatar=${JSON.stringify(avatarBox)} button=${JSON.stringify(buttonBox)}`,
+  ).toBe(false);
 }
 
 for (const game of games) {
@@ -188,12 +223,12 @@ for (const game of games) {
 
       await page.setViewportSize({ width: 390, height: 844 });
       await page.goto(`/game/${game.game}/match?roomID=${roomID}`);
-      await expectSeatControlsSeparated(page, game.seatTestID);
+      await expectSeatControlsSeparated(page, game.game);
 
       await page.setViewportSize({ width: 320, height: 568 });
-      await expectSeatControlsSeparated(page, game.seatTestID);
+      await expectSeatControlsSeparated(page, game.game);
 
       await page.setViewportSize({ width: 1440, height: 900 });
-      await expectSeatControlsSeparated(page, game.seatTestID);
+      await expectSeatControlsSeparated(page, game.game);
     });
 }

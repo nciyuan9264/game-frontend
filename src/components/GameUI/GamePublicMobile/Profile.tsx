@@ -1,5 +1,5 @@
-import type { ReactNode } from 'react';
-import { LogOut, Mail, Pencil } from 'lucide-react';
+import { useEffect, useRef, type ReactNode } from 'react';
+import { LogOut, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../ActionButton';
 import type {
@@ -18,8 +18,10 @@ export interface GameMobileProfileProps {
   historyTitle: ReactNode;
   historyItems: readonly GameMobileHistoryItem[];
   emptyHistory?: ReactNode;
-  historyFooter?: ReactNode;
-  historyStatus?: ReactNode;
+  historyHasMore?: boolean;
+  historyLoading?: boolean;
+  onHistoryLoadMore?: () => void;
+  isAdmin?: boolean;
   logoutPending?: boolean;
   logoutError?: ReactNode;
   onLogout: () => void;
@@ -35,35 +37,66 @@ export function GameMobileProfile({
   historyTitle,
   historyItems,
   emptyHistory,
-  historyFooter,
-  historyStatus,
+  historyHasMore = false,
+  historyLoading = false,
+  onHistoryLoadMore,
+  isAdmin = false,
   logoutPending,
   logoutError,
   onLogout,
 }: GameMobileProfileProps) {
+  const rootRef = useRef<HTMLDivElement>(null);
+  const historyEndRef = useRef<HTMLDivElement>(null);
+  const requestedRef = useRef(false);
+  useEffect(() => {
+    if (historyLoading) {
+      requestedRef.current = false;
+      return;
+    }
+    const root = rootRef.current;
+    const target = historyEndRef.current;
+    if (!root || !target || !historyHasMore || !onHistoryLoadMore) return;
+    const observer = new IntersectionObserver(([entry]) => {
+      if (!entry.isIntersecting || requestedRef.current) return;
+      requestedRef.current = true;
+      onHistoryLoadMore();
+    }, {
+      root,
+      rootMargin: '180px 0px',
+    });
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [
+    historyHasMore,
+    historyItems.length,
+    historyLoading,
+    onHistoryLoadMore,
+  ]);
+
   return <div className={`${styles.mobileOnly} ${styles.profile}`}
-    data-game-public-mobile="profile">
+    ref={rootRef}
+    data-game-public-mobile="profile"
+    data-game-mobile-scroll-owner="profile">
     <section className={styles.profileCard}>
-      <div className={styles.profileIdentity}>{avatar}<div><small>{eyebrow}</small>
-        <h1>{name}</h1><span>PLAYER ID · {playerID}</span></div></div>
-      <div className={styles.profileEmail}><Mail size={14} />
-        {email || '邮箱未绑定'}</div>
+      <div className={styles.profileIdentity}><div>
+          <small className={styles.profileEyebrow}>{eyebrow}</small>
+          <h1>{name}</h1>
+          <span className={styles.profilePlayerID}>PLAYER ID · {playerID}</span>
+          <span className={styles.profileIdentityEmail}
+            data-game-profile-email>{email || '邮箱未绑定'}</span>
+        </div><a className={styles.profileAvatarLink}
+          href="https://auth.gamebus.online/profile" aria-label="编辑资料">
+          {avatar}<span className={styles.profileAvatarEdit}>
+            <Pencil size={13} /></span>
+        </a></div>
       <div className={styles.profileStats}>{stats.map((stat, index) =>
         <span key={index}><b>{stat.value}</b><small>{stat.label}</small></span>)}
       </div>
-      <div className={styles.profileManage}>
-        <a href="https://auth.gamebus.online/profile"><Pencil size={14} />编辑资料</a>
-        <ActionButton variant="quiet" pending={logoutPending} onClick={onLogout}>
-          <LogOut size={14} />退出登录
-        </ActionButton>
-      </div>
-      {logoutError && <p role="alert" className={styles.profileError}>
-        {logoutError}</p>}
     </section>
     <section className={styles.profileHistory}>
       <h2>{historyTitle}</h2>
       {historyItems.length
-        ? <div>{historyItems.map(item => {
+        ? <div className={styles.historyList}>{historyItems.map(item => {
           const content = <><span><b>{item.title}</b><small>{item.detail}</small>
           </span>{item.accessory != null && <span
             className={styles.historyAccessory}>{item.accessory}</span>}</>;
@@ -72,9 +105,15 @@ export function GameMobileProfile({
             disabled={!item.onClick}>{content}</button>;
         })}</div>
         : emptyHistory}
-      {historyFooter}
-      {historyStatus && <footer className={styles.historyStatus}>
-        {historyStatus}</footer>}
+      {historyHasMore && <div ref={historyEndRef}
+        className={styles.historySentinel} aria-hidden="true" />}
+      {isAdmin && <div className={styles.profileAdminLogout}>
+        <ActionButton variant="quiet" pending={logoutPending} onClick={onLogout}>
+          <LogOut size={14} />退出登录
+        </ActionButton>
+        {logoutError && <p role="alert" className={styles.profileError}>
+          {logoutError}</p>}
+      </div>}
     </section>
   </div>;
 }

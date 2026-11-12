@@ -1,0 +1,64 @@
+.controls {
+  position: fixed;
+  right: 12px;
+  bottom: calc(10px + env(safe-area-inset-bottom));
+  z-index: 120;
+  display: grid;
+  width: min(430px, calc(100vw - 24px));
+  min-height: 44px;
+  grid-template-columns: auto minmax(0, 1fr) minmax(0, 1.2fr);
+  align-items: center;
+  gap: 8px;
+  padding: 7px 8px;
+  border: 1px solid rgb(127 127 127 / 28%);
+  border-radius: 7px;
+  background: rgb(250 250 248 / 96%);
+  box-shadow: 0 5px 20px rgb(0 0 0 / 14%);
+  color: #26323a;
+  font-family: Inter, 'Noto Sans SC Variable', 'Noto Sans SC',
+    -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  backdrop-filter: blur(12px);
+
+  > svg {
+    width: 17px;
+    height: 17px;
+    color: #6b5260;
+  }
+
+  label {
+    min-width: 0;
+  }
+
+  span {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    white-space: nowrap;
+  }
+
+  select {
+    width: 100%;
+    min-width: 0;
+    height: 30px;
+    padding: 0 25px 0 8px;
+    border: 1px solid #c9c9c4;
+    border-radius: 5px;
+    outline: none;
+    background: #fff;
+    color: #30383d;
+    font-family: 'Noto Sans SC Variable', 'Noto Sans SC', 'PingFang SC',
+      'Microsoft YaHei', sans-serif !important;
+    font-size: 11px;
+  }
+}
+
+@media (max-width: 420px) {
+  .controls {
+    right: var(--game-mobile-page-gutter);
+    bottom: calc(8px + env(safe-area-inset-bottom));
+    width: calc(100vw - 2 * var(--game-mobile-page-gutter));
+  }
+}

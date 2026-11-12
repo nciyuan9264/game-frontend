@@ -8,7 +8,7 @@ import {
   GameMobileRankings,
   type GameMobileHistoryItem,
 } from '@/components/GameUI/GamePublicMobile';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -210,12 +210,13 @@ export function My() {
           ]}
           historyTitle="对局记录"
           historyItems={historyItems}
+          historyHasMore={hasMore && !historyError}
+          historyLoading={historyLoading}
+          onHistoryLoadMore={loadNextHistoryPage}
           emptyHistory={<Feedback>还没有对局记录。
             <Link className={styles.link} to="/game/acquire">去大厅开一桌</Link>
           </Feedback>}
-          historyFooter={!!games.length && <InfiniteFooter
-            loading={historyLoading} error={historyError}
-            hasMore={hasMore} retry={retryHistory} anchorRef={sentinelRef} />}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => void handleLogout()}

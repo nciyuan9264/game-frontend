@@ -1,7 +1,30 @@
-import { expect, test } from '@playwright/test';
+import { expect, test, type Page } from '@playwright/test';
 import { installAccessToken, observePage } from './helpers';
 
+async function mockHomeAuth(page: Page) {
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    json: {
+      status_code: 200,
+      message: 'ok',
+      data: {
+        user_id: 'public-e2e',
+        display_name: '访客玩家',
+        roles: ['player'],
+      },
+    },
+  }));
+  await page.route('**/pam-api/platform/auth/acquisition-survey', route =>
+    route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: { completed: true, source: 'friend', options: [] },
+      },
+    }));
+}
+
 test('home and static assets render without browser or server errors', async ({ page }) => {
+  await mockHomeAuth(page);
   const assertClean = observePage(page);
   const response = await page.goto('/', { waitUntil: 'domcontentloaded' });
   expect(response?.ok()).toBeTruthy();
@@ -25,6 +48,7 @@ test('home and static assets render without browser or server errors', async ({ 
 });
 
 test('home game switcher remains usable on a narrow mobile viewport', async ({ page }) => {
+  await mockHomeAuth(page);
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/', { waitUntil: 'domcontentloaded' });
   await page.waitForLoadState('load');

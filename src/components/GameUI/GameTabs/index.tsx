@@ -1,14 +1,10 @@
 import {
-  useEffect,
   useRef,
-  useState,
   type ButtonHTMLAttributes,
   type KeyboardEvent,
   type ReactNode,
 } from 'react';
 import styles from './index.module.less';
-
-const PRESS_FEEDBACK_MS = 140;
 
 export interface GameTabItem<TValue extends string | number> {
   value: TValue;
@@ -50,30 +46,9 @@ export function GameTabs<TValue extends string | number>({
   getItemProps,
 }: GameTabsProps<TValue>) {
   const buttonsRef = useRef<Array<HTMLButtonElement | null>>([]);
-  const pressTimerRef = useRef<number>();
-  const [pressedValue, setPressedValue] = useState<TValue>();
-
-  useEffect(() => () => {
-    if (pressTimerRef.current !== undefined) {
-      window.clearTimeout(pressTimerRef.current);
-    }
-  }, []);
-
-  const showPressedFeedback = (nextValue: TValue) => {
-    if (pressTimerRef.current !== undefined) {
-      window.clearTimeout(pressTimerRef.current);
-    }
-    setPressedValue(nextValue);
-    pressTimerRef.current = window.setTimeout(() => {
-      setPressedValue(undefined);
-      pressTimerRef.current = undefined;
-    }, PRESS_FEEDBACK_MS);
-  };
-
   const selectAt = (index: number) => {
     const item = items[index];
     if (!item || item.disabled) return;
-    showPressedFeedback(item.value);
     onChange(item.value);
     buttonsRef.current[index]?.focus();
   };
@@ -108,7 +83,6 @@ export function GameTabs<TValue extends string | number>({
     className={[styles.list, className].filter(Boolean).join(' ')}
     role="tablist"
     aria-label={ariaLabel}
-    data-game-tabs-pressing={pressedValue !== undefined ? 'true' : undefined}
   >
     {items.map((item, index) => {
       const selected = item.value === value;
@@ -118,7 +92,6 @@ export function GameTabs<TValue extends string | number>({
         itemClassName,
         props?.className,
         selected ? activeClassName : '',
-        pressedValue === item.value ? styles.pressed : '',
       ].filter(Boolean).join(' ');
 
       return <button
@@ -131,11 +104,7 @@ export function GameTabs<TValue extends string | number>({
         tabIndex={selected ? 0 : -1}
         disabled={item.disabled}
         className={buttonClassName || undefined}
-        data-game-tab-pressed={pressedValue === item.value ? 'true' : undefined}
-        onClick={() => {
-          showPressedFeedback(item.value);
-          onChange(item.value);
-        }}
+        onClick={() => onChange(item.value)}
         onKeyDown={event => handleKeyDown(event, index)}
       >
         {renderItem ? renderItem(item, selected, index) : item.label}

@@ -83,6 +83,8 @@ describe('game room API', () => {
       ownerName: 'Alice',
       ownerAvatar: 'https://cdn.example.com/alice.png',
       maxScore: 0,
+      progressCurrent: 0,
+      progressTotal: 15,
     });
   });
 

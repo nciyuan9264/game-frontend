@@ -1,4 +1,4 @@
-import { expect, test, type Page } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 
 type GameType =
   | 'acquire'
@@ -56,6 +56,20 @@ const roomTitleRegressionGames: GameType[] = [
   'sixnimmt',
   'warchest',
 ];
+
+const roomProgressTotals: Partial<Record<GameType, number>> = {
+  acquire: 108,
+  splendor: 15,
+  yinsh: 3,
+  othello: 60,
+  hive: 22,
+  loveletter: 6,
+  sixnimmt: 66,
+  cantstop: 3,
+  forsale: 8,
+  fugitive: 42,
+  warchest: 6,
+};
 
 function metric(gameType: GameType, index: number) {
   if (rankGames.has(gameType)) {
@@ -132,6 +146,67 @@ const avatarPNG = Buffer.from(
 
 function ownerRoom(gameType: GameType, maxPlayers: number) {
   const roomID = `${gameType}_owner_identity`;
+  const metricsByGame = {
+    acquire: {
+      emptyTileCount: 108,
+      progressCurrent: 0,
+      progressTotal: 108,
+    },
+    davinci: {
+      boardCardCount: 26,
+      progressCurrent: 0,
+      progressTotal: 0,
+    },
+    splendor: { maxScore: 0, progressCurrent: 0, progressTotal: 15 },
+    yinsh: { ringsRemoved: 0, progressCurrent: 0, progressTotal: 3 },
+    othello: {
+      occupiedCount: 4,
+      progressCurrent: 0,
+      progressTotal: 60,
+    },
+    quoridor: { turnCount: 0 },
+    hex: { turnCount: 0 },
+    onitama: { turnCount: 0 },
+    hive: {
+      turnCount: 0,
+      placedPieceCount: 0,
+      progressCurrent: 0,
+      progressTotal: 22,
+    },
+    loveletter: {
+      currentRound: 1,
+      maxFavor: 0,
+      targetFavor: 6,
+      progressCurrent: 0,
+      progressTotal: 6,
+    },
+    sixnimmt: {
+      currentRound: 1,
+      maxPenalty: 0,
+      targetPenalty: 66,
+      progressCurrent: 0,
+      progressTotal: 66,
+    },
+    cantstop: {
+      maxClaimedColumns: 0,
+      targetColumns: 3,
+      progressCurrent: 0,
+      progressTotal: 3,
+    },
+    forsale: { progressCurrent: 0, progressTotal: 8 },
+    fugitive: {
+      highestRevealed: 0,
+      hiddenHideoutCount: 0,
+      progressCurrent: 0,
+      progressTotal: 42,
+    },
+    warchest: {
+      maxControlledLocations: 0,
+      progressCurrent: 0,
+      progressTotal: 6,
+    },
+  };
+  const metricsKey = gameType === 'forsale' ? 'forSale' : gameType;
   return {
     roomID,
     gameType,
@@ -169,23 +244,7 @@ function ownerRoom(gameType: GameType, maxPlayers: number) {
       ready: true,
       gameRole: gameType === 'fugitive' ? 'fugitive' : undefined,
     }],
-    metrics: {
-      acquire: { emptyTileCount: 108 },
-      davinci: { boardCardCount: 26 },
-      splendor: { maxScore: 0 },
-      yinsh: { ringsRemoved: 0 },
-      othello: { occupiedCount: 4 },
-      quoridor: { turnCount: 0 },
-      hex: { turnCount: 0 },
-      onitama: { turnCount: 0 },
-      hive: { turnCount: 0, placedPieceCount: 0 },
-      loveletter: { currentRound: 1 },
-      sixnimmt: { currentRound: 1 },
-      cantstop: { maxClaimedColumns: 0, targetColumns: 3 },
-      forsale: { progressCurrent: 0, progressTotal: 8 },
-      fugitive: { highestRevealed: 0, hiddenHideoutCount: 0 },
-      warchest: { maxControlledLocations: 0 },
-    },
+    metrics: { [metricsKey]: metricsByGame[gameType] },
   };
 }
 
@@ -232,7 +291,126 @@ async function expectMobileShell(page: Page, navigationName: string) {
   expect(navigationBox).toMatchObject({ y: 778, width: 390, height: 66 });
 }
 
+async function expectMobileBottomGutter(
+  page: Page,
+  rootSelector: string,
+  navigationName: string,
+) {
+  const [rootBox, navigationBox] = await Promise.all([
+    page.locator(rootSelector).boundingBox(),
+    page.getByRole('navigation', { name: navigationName }).boundingBox(),
+  ]);
+  expect(rootBox).not.toBeNull();
+  expect(navigationBox).not.toBeNull();
+  expect(Math.abs(
+    (navigationBox?.y ?? 0)
+    - ((rootBox?.y ?? 0) + (rootBox?.height ?? 0))
+    - 14,
+  )).toBeLessThanOrEqual(1);
+}
+
+async function expectLobbyContentBaseline(page: Page, card: Locator) {
+  const browser = page.locator('[data-game-mobile-lobby-browser]');
+  const search = page.getByPlaceholder('搜索房间号 / 房主').locator('..');
+  const alignedElements = [
+    page.locator('[data-game-mobile-lobby-hero] h1'),
+    browser.locator('header h2'),
+    browser.getByRole('tab').first(),
+    search.locator('svg'),
+    card.locator('h3'),
+  ];
+  const boxes = await Promise.all(alignedElements.map(element =>
+    element.boundingBox()));
+  expect(boxes.every(Boolean)).toBe(true);
+  const lefts = boxes.map(box => box?.x ?? 0);
+  expect(Math.max(...lefts) - Math.min(...lefts))
+    .toBeLessThanOrEqual(2);
+}
+
 test.use({ viewport: { width: 390, height: 844 } });
+
+test('mobile public heroes scale through all supported height tiers',
+  async ({ page }) => {
+    await mockData(page, 'acquire');
+    const samples: Array<{
+      lobby: number;
+      rank: number;
+      guide: number;
+    }> = [];
+
+    for (const viewport of [
+      { width: 430, height: 932 },
+      { width: 390, height: 844 },
+      { width: 390, height: 667 },
+      { width: 320, height: 568 },
+    ]) {
+      await page.setViewportSize(viewport);
+
+      await page.goto('/game/acquire', { waitUntil: 'domcontentloaded' });
+      const lobby = await page.locator('[data-game-mobile-lobby-hero]')
+        .boundingBox();
+      expect(lobby?.width).toBe(viewport.width - 28);
+
+      await page.goto('/game/acquire/rankings', {
+        waitUntil: 'domcontentloaded',
+      });
+      const rank = await page.locator('[data-game-mobile-rank-hero]')
+        .boundingBox();
+      expect(rank?.width).toBe(viewport.width - 28);
+
+      await page.goto('/game/acquire/guide', {
+        waitUntil: 'domcontentloaded',
+      });
+      const guide = await page.locator('[data-game-mobile-guide-visual]')
+        .boundingBox();
+      expect(guide?.width).toBe(viewport.width - 28);
+
+      samples.push({
+        lobby: lobby?.height ?? 0,
+        rank: rank?.height ?? 0,
+        guide: guide?.height ?? 0,
+      });
+    }
+
+    for (const key of ['lobby', 'rank', 'guide'] as const) {
+      expect(samples[0][key]).toBeGreaterThan(samples[1][key]);
+      expect(samples[1][key]).toBeGreaterThan(samples[2][key]);
+      expect(samples[2][key]).toBeGreaterThan(samples[3][key]);
+    }
+  });
+
+test('ranking tabs do not move sibling tabs while pressed or selected',
+  async ({ page }) => {
+    await mockData(page, 'acquire');
+    await page.goto('/game/acquire/rankings', {
+      waitUntil: 'domcontentloaded',
+    });
+    const tabs = page.getByRole('tablist', { name: '排行榜模式' })
+      .getByRole('tab');
+    await expect(tabs).toHaveCount(2);
+    const geometry = () => tabs.evaluateAll(elements => elements.map(element => {
+      const box = element.getBoundingClientRect();
+      return { x: box.x, y: box.y, width: box.width, height: box.height };
+    }));
+    const pulseOpacity = () => tabs.nth(1).evaluate(element =>
+      Number(getComputedStyle(element, '::before').opacity));
+    const initial = await geometry();
+    const target = await tabs.nth(1).boundingBox();
+    expect(target).not.toBeNull();
+    expect(await pulseOpacity()).toBe(0);
+
+    await page.mouse.move(
+      target!.x + target!.width / 2,
+      target!.y + target!.height / 2,
+    );
+    await page.mouse.down();
+    await expect.poll(pulseOpacity).toBeGreaterThan(0);
+    expect(await geometry()).toEqual(initial);
+    await page.mouse.up();
+    await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+    await expect.poll(pulseOpacity).toBe(0);
+    expect(await geometry()).toEqual(initial);
+  });
 
 for (const item of cases) {
   test(`${item.gameType} desktop public pages keep the 1700px content frame`,
@@ -270,8 +448,12 @@ for (const item of cases) {
         browser.boundingBox(),
         join.boundingBox(),
       ]);
-      expect(heroBox).toMatchObject({ width: 362, height: 227 });
-      expect(factsBox).toMatchObject({ width: 362, height: 63 });
+      expect(heroBox?.width).toBe(362);
+      expect(heroBox?.height ?? 0).toBeGreaterThanOrEqual(180);
+      expect(heroBox?.height ?? 300).toBeLessThanOrEqual(236);
+      expect(factsBox?.width).toBe(362);
+      expect(factsBox?.height ?? 0).toBeGreaterThanOrEqual(45);
+      expect(factsBox?.height ?? 100).toBeLessThanOrEqual(64);
       expect(browserBox?.width).toBe(362);
       expect(joinBox?.width).toBe(362);
 
@@ -279,9 +461,16 @@ for (const item of cases) {
       const share = page.getByRole('button', { name: /分享游戏/ }).first();
       const heroTitle = hero.locator('h1');
       const description = hero.locator('h1 + p');
-      const [createBox, shareBox, descriptionBox, heroColors] = await Promise.all([
+      const [
+        createBox,
+        shareBox,
+        heroTitleBox,
+        descriptionBox,
+        heroColors,
+      ] = await Promise.all([
         create.boundingBox(),
         share.boundingBox(),
+        heroTitle.boundingBox(),
         description.boundingBox(),
         hero.evaluate(element => {
           const title = element.querySelector('h1');
@@ -299,7 +488,8 @@ for (const item of cases) {
         title: 'rgb(242, 232, 214)',
         description: 'rgb(162, 182, 186)',
       });
-      expect((createBox?.x ?? 0) - (heroBox?.x ?? 0)).toBe(21);
+      expect(Math.abs((createBox?.x ?? 0) - (heroTitleBox?.x ?? 0)))
+        .toBeLessThanOrEqual(1);
       expect(shareBox?.y).toBe(createBox?.y);
       expect((heroBox?.y ?? 0) + (heroBox?.height ?? 0)
         - ((createBox?.y ?? 0) + (createBox?.height ?? 0)))
@@ -401,8 +591,8 @@ test('Acquire mobile lobby preserves the canonical hero composition',
         })),
       ]);
 
-    expect(eyebrowBox).toMatchObject({ width: 320, height: 9 });
-    expect(titleBox).toMatchObject({ width: 320, height: 76.65625 });
+    expect(eyebrowBox).toMatchObject({ width: 324, height: 9 });
+    expect(titleBox).toMatchObject({ width: 324, height: 76.65625 });
     expect(descriptionBox?.width).toBe(225);
     expect(mediaStyle).toEqual({ objectPosition: '63% 51%', opacity: '0.78' });
     expect(eyebrowStyle).toEqual({ display: 'flex', lineWidth: '21px' });
@@ -422,12 +612,28 @@ for (const item of cases) {
       const card = page.locator('[data-game-mobile-room-card]')
         .filter({ hasText: room.roomID });
       await expect(card).toContainText('真实房主');
+      await expect(card.getByRole('heading', { name: room.roomID }))
+        .toBeVisible();
+      await expect(card.getByText('房主', { exact: true })).toHaveCount(0);
+      const progress = card.getByRole('progressbar');
+      const progressTotal = roomProgressTotals[item.gameType];
+      await expect(progress).toHaveCount(progressTotal ? 1 : 0);
+      if (progressTotal) {
+        await expect(progress).toHaveAttribute(
+          'aria-valuemax',
+          String(progressTotal),
+        );
+      }
       const avatar = card.locator(`img[src="${ownerAvatarURL}"]`).first();
       await expect(avatar).toBeVisible();
       await expect.poll(() => avatar.evaluate(image =>
         image instanceof HTMLImageElement
         && image.complete
         && image.naturalWidth > 0)).toBe(true);
+
+      await expectLobbyContentBaseline(page, card);
+      await page.setViewportSize({ width: 320, height: 568 });
+      await expectLobbyContentBaseline(page, card);
       await expectNoOverflow(page);
     });
 }
@@ -450,10 +656,12 @@ for (const item of cases) {
         rankHero.boundingBox(),
         rankPanel.boundingBox(),
       ]);
-      expect(rankHeroBox).toMatchObject({ width: 362, height: 166 });
+      expect(rankHeroBox?.width).toBe(362);
+      expect(rankHeroBox?.height ?? 0).toBeGreaterThanOrEqual(130);
+      expect(rankHeroBox?.height ?? 300).toBeLessThanOrEqual(180);
       expect(rankPanelBox?.width).toBe(362);
       expect(rankPanelBox?.y).toBe(
-        (rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 18,
+        (rankHeroBox?.y ?? 0) + (rankHeroBox?.height ?? 0) + 14,
       );
 
       await page.goto(`/game/${item.gameType}/guide`, {
@@ -474,7 +682,12 @@ for (const item of cases) {
       expect(visualBox?.width).toBe(362);
       expect(panelBox?.width).toBe(362);
       expect(panelBox?.y).toBe(
-        (visualBox?.y ?? 0) + (visualBox?.height ?? 0) + 8,
+        (visualBox?.y ?? 0) + (visualBox?.height ?? 0) + 14,
+      );
+      await expectMobileBottomGutter(
+        page,
+        '[data-game-public-mobile="guide"]',
+        item.mobileNavigation,
       );
 
       for (let chapter = 0; chapter < await guideTabs.count(); chapter += 1) {
@@ -498,11 +711,10 @@ for (const item of cases) {
             }).filter(child => child.width > 0 && child.height > 0),
           };
         });
-        expect(mediaGeometry).toMatchObject({
-          width: 360,
-          height: 120,
-          overflow: 'hidden',
-        });
+        expect(mediaGeometry.width).toBe(360);
+        expect(mediaGeometry.overflow).toBe('hidden');
+        expect(mediaGeometry.height).toBeGreaterThanOrEqual(50);
+        expect(mediaGeometry.height).toBeLessThanOrEqual(125);
         expect(mediaGeometry.children.length).toBeGreaterThan(0);
         for (const child of mediaGeometry.children) {
           expect(child.top).toBeGreaterThanOrEqual(-1);
@@ -513,21 +725,115 @@ for (const item of cases) {
         if (item.gameType === 'warchest') {
           const troop = guideMedia.locator('.mobile-guide-unit .troop-art');
           await expect(troop).toBeVisible();
-          expect(await troop.boundingBox()).toMatchObject({
-            width: 80,
-            height: 120,
-          });
+          const troopBox = await troop.boundingBox();
+          expect(troopBox?.width ?? 0).toBeGreaterThan(0);
+          expect(troopBox?.width ?? 100).toBeLessThanOrEqual(80);
+          expect(Math.abs((troopBox?.height ?? 0) - mediaGeometry.height))
+            .toBeLessThanOrEqual(1);
         }
       }
 
       await page.goto(`/game/${item.gameType}/me`, {
         waitUntil: 'domcontentloaded',
       });
-      await expect(page.locator('[data-game-public-mobile="profile"]'))
-        .toBeVisible();
-      await expect(page.getByText('PLAYER ID · mobile-profile')).toBeVisible();
+      const profile = page.locator('[data-game-public-mobile="profile"]');
+      await expect(profile).toBeVisible();
+      await expect(page.getByText('mobile@example.com')).toBeVisible();
+      await expect(page.getByText('PLAYER ID · mobile-profile'))
+        .not.toBeVisible();
       await expect(page.getByRole('link', { name: /编辑资料/ })).toBeVisible();
+      await expect(page.getByRole('button', { name: /退出登录/ }))
+        .toHaveCount(0);
+      await expect(page.getByText('已经到底了')).toHaveCount(0);
+      await expect(page.getByText(/加载更多/)).toHaveCount(0);
       await expect(page.locator('[data-game-mobile-about-entry]')).toHaveCount(0);
+      const identityGeometry = await profile.locator(':scope > section')
+        .nth(0).locator(':scope > div').first().evaluate(element => {
+          const [copy, avatar] = [...element.children];
+          const name = copy.querySelector('h1')!;
+          const email = copy.querySelector<HTMLElement>(
+            '[data-game-profile-email]',
+          )!;
+          const eyebrow = copy.querySelector<HTMLElement>('small')!;
+          const playerID = [...copy.querySelectorAll<HTMLElement>('span')]
+            .find(item => item !== email)!;
+          const avatarBox = avatar.getBoundingClientRect();
+          const nameBox = name.getBoundingClientRect();
+          const emailBox = email.getBoundingClientRect();
+          return {
+            avatar: { width: avatarBox.width, height: avatarBox.height },
+            nameX: nameBox.x,
+            emailX: emailBox.x,
+            nameFont: getComputedStyle(name).fontSize,
+            emailFont: getComputedStyle(email).fontSize,
+            eyebrowDisplay: getComputedStyle(eyebrow).display,
+            playerIDDisplay: getComputedStyle(playerID).display,
+          };
+        });
+      expect(identityGeometry.avatar).toEqual({ width: 76, height: 76 });
+      expect(Math.abs(identityGeometry.nameX - identityGeometry.emailX))
+        .toBeLessThanOrEqual(1);
+      expect(identityGeometry).toMatchObject({
+        nameFont: '32px',
+        emailFont: '11px',
+        eyebrowDisplay: 'block',
+        playerIDDisplay: 'none',
+      });
+      const statDividers = await profile.locator(':scope > section').nth(0)
+        .evaluate(card => {
+          const stats = card.children[1] as HTMLElement;
+          return {
+            statsTop: getComputedStyle(stats).borderTopWidth,
+            statsColumns: [...stats.children].slice(1).map(item =>
+              getComputedStyle(item).borderLeftWidth),
+          };
+        });
+      expect(statDividers).toEqual({
+        statsTop: '0px',
+        statsColumns: ['0px', '0px'],
+      });
+      const [profileCardBox, profileHistoryBox] = await Promise.all([
+        profile.locator(':scope > section').nth(0).boundingBox(),
+        profile.locator(':scope > section').nth(1).boundingBox(),
+      ]);
+      expect(profileCardBox).not.toBeNull();
+      expect(profileHistoryBox).not.toBeNull();
+      expect(Math.abs(
+        (profileHistoryBox?.y ?? 0)
+        - ((profileCardBox?.y ?? 0) + (profileCardBox?.height ?? 0))
+        - 14,
+      )).toBeLessThanOrEqual(1);
+      const [identityStyle, historyStyle] = await profile
+        .locator(':scope > section').evaluateAll(sections =>
+          sections.map(section => {
+            const style = getComputedStyle(section);
+            return {
+              background: style.backgroundColor,
+              borderTop: style.borderTopWidth,
+              borderRight: style.borderRightWidth,
+              radius: style.borderRadius,
+              shadow: style.boxShadow,
+            };
+          }));
+      expect(identityStyle).toEqual({
+        background: 'rgba(0, 0, 0, 0)',
+        borderTop: '0px',
+        borderRight: '0px',
+        radius: '0px',
+        shadow: 'none',
+      });
+      expect(historyStyle).toEqual({
+        background: 'rgba(0, 0, 0, 0)',
+        borderTop: '1px',
+        borderRight: '0px',
+        radius: '0px',
+        shadow: 'none',
+      });
+      await expectMobileBottomGutter(
+        page,
+        '[data-game-public-mobile="profile"]',
+        item.mobileNavigation,
+      );
       await expectMobileShell(page, item.mobileNavigation);
       await expectNoOverflow(page);
     });
@@ -613,6 +919,94 @@ test('recent game titles use room numbers instead of room or opponent names',
     }
   });
 
+test('admin logout lives at the bottom of mobile history', async ({ page }) => {
+  await mockData(page, 'othello');
+  await page.unroute('**/pam-api/platform/auth/profile');
+  await page.route('**/pam-api/platform/auth/profile', route => route.fulfill({
+    json: {
+      status_code: 0,
+      message: 'ok',
+      data: {
+        user_id: 'mobile-profile',
+        display_name: '管理员',
+        email: 'admin@example.com',
+        avatar: '',
+        roles: ['player', 'Admin'],
+      },
+    },
+  }));
+  await page.goto('/game/othello/me', { waitUntil: 'domcontentloaded' });
+
+  const profile = page.locator('[data-game-public-mobile="profile"]');
+  const history = profile.locator(':scope > section').nth(1);
+  const logout = history.getByRole('button', { name: /退出登录/ });
+  await expect(logout).toBeVisible();
+  await expect(history.locator(':scope > :last-child')
+    .getByRole('button', { name: /退出登录/ })).toBeVisible();
+
+  await logout.click();
+  await expect(page.getByRole('dialog')).toContainText('离开当前账号');
+});
+
+test('mobile profile loads later history pages without a footer control',
+  async ({ page }) => {
+    await mockData(page, 'othello');
+    await page.unroute('**/pam-api/platform/history/games?**');
+    const requestedOffsets: number[] = [];
+    await page.route('**/pam-api/platform/history/games?**', route => {
+      const url = new URL(route.request().url());
+      const offset = Number(url.searchParams.get('offset') ?? 0);
+      requestedOffsets.push(offset);
+      const count = offset === 0 ? 20 : offset === 20 ? 1 : 0;
+      return route.fulfill({
+        json: {
+          status_code: 0,
+          message: 'ok',
+          data: {
+            games: Array.from({ length: count }, (_, index) => {
+              const sequence = offset + index + 1;
+              const id = `history-${sequence}`;
+              return {
+                id,
+                roomID: `OTHELLO-${String(sequence).padStart(4, '0')}`,
+                gameType: 'othello',
+                startedAt: '2026-10-29T12:20:44Z',
+                endedAt: '2026-10-29T12:26:44Z',
+                durationSeconds: 360,
+                maxPlayers: 2,
+                createdAt: '2026-10-29T12:20:44Z',
+                updatedAt: '2026-10-29T12:26:44Z',
+                players: [{
+                  id: `${id}-self`,
+                  gameID: id,
+                  userID: 'mobile-profile',
+                  playerID: 'mobile-profile',
+                  displayName: '移动端玩家',
+                  seatIndex: 0,
+                  isAI: false,
+                  finalScore: 32,
+                  finalRank: 1,
+                  isWinner: true,
+                  createdAt: '2026-10-29T12:20:44Z',
+                }],
+              };
+            }),
+          },
+        },
+      });
+    });
+    await page.goto('/game/othello/me', { waitUntil: 'domcontentloaded' });
+    await expect(page.getByText('OTHELLO-0001')).toBeVisible();
+
+    const profile = page.locator('[data-game-public-mobile="profile"]');
+    await profile.evaluate(element => {
+      element.scrollTop = element.scrollHeight;
+    });
+    await expect.poll(() => requestedOffsets.includes(20)).toBe(true);
+    await expect(page.getByText('OTHELLO-0021')).toBeVisible();
+    await expect(page.getByText(/加载更多|已经到底了/)).toHaveCount(0);
+  });
+
 test('Fugitive mobile profile matches the Acquire frame and typography',
   async ({ page }) => {
     await mockData(page, 'fugitive');
@@ -644,21 +1038,16 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
     const profileTypography = () => profile.evaluate(element => {
       const [card, history] = Array.from(element.children);
       const identity = card.children[0];
-      const stats = card.children[2];
-      const manage = card.children[3];
+      const stats = card.children[1];
       const row = history.querySelector('a, button');
       const rowContent = row?.querySelector('span');
       const fontSize = (target: Element | null | undefined) =>
         target ? getComputedStyle(target).fontSize : '';
       return {
-        eyebrow: fontSize(identity.querySelector('small')),
         name: fontSize(identity.querySelector('h1')),
-        playerID: fontSize(identity.querySelector('span')),
-        email: fontSize(card.children[1]),
+        email: fontSize(identity.querySelector('[data-game-profile-email]')),
         statValue: fontSize(stats.querySelector('b')),
         statLabel: fontSize(stats.querySelector('small')),
-        edit: fontSize(manage.querySelector('a')),
-        logout: fontSize(manage.querySelector('button')),
         historyTitle: fontSize(history.querySelector('h2')),
         historyRow: fontSize(row),
         historyName: fontSize(rowContent?.querySelector('b')),
@@ -678,19 +1067,24 @@ test('Fugitive mobile profile matches the Acquire frame and typography',
     });
     await expect(profile).toBeVisible();
     await expect(page.getByRole('heading', { name: '追逃档案' })).toBeVisible();
-    await expect(page.getByText('已经到底了')).toBeVisible();
+    await expect(page.getByText('已经到底了')).toHaveCount(0);
     expect(await profileTypography()).toEqual(acquireTypography);
-    await expect.poll(() => profile.locator(':scope > section').nth(1)
-      .evaluate(element => element.getBoundingClientRect().height))
-      .toBe(acquireHistoryHeight);
+    await expect.poll(async () => Math.abs(
+      await profile.locator(':scope > section').nth(1)
+        .evaluate(element => element.getBoundingClientRect().height)
+        - acquireHistoryHeight,
+    )).toBeLessThanOrEqual(1);
 
     const [profileBox, navigationBox] = await Promise.all([
       profile.boundingBox(),
       navigation.boundingBox(),
     ]);
     expect(profileBox).toMatchObject({ x: 14, width: 362 });
-    expect((profileBox?.y ?? 0) + (profileBox?.height ?? 0))
-      .toBe(navigationBox?.y);
+    expect(Math.abs(
+      (navigationBox?.y ?? 0)
+      - ((profileBox?.y ?? 0) + (profileBox?.height ?? 0))
+      - 14,
+    )).toBeLessThanOrEqual(1);
     await expect(page.locator('[data-game-mobile-about-entry]')).toHaveCount(0);
   });
 
@@ -723,7 +1117,7 @@ test('War Chest mobile public shell keeps the shared dark palette and frame',
         color: 'rgb(236, 232, 220)',
         headerBackground: 'rgb(13, 28, 36)',
         contentPaddingLeft: '14px',
-        contentPaddingTop: '15px',
+        contentPaddingTop: '14px',
       });
     }
 

@@ -446,9 +446,9 @@ test('davinci mobile cipher facts use the full strip width', async ({ page }) =>
   await mockHeaderData(page);
   await page.goto('/game/davinci');
 
-  const facts = page.getByLabel('达芬奇密码规则要点').locator(':scope > div');
-  await expect(facts).toHaveCSS('justify-content', 'space-between');
-  await expect(facts.locator(':scope > button')).toHaveCount(4);
+  const facts = page.locator('[data-game-mobile-lobby-facts]');
+  await expect(facts).toHaveCSS('display', 'grid');
+  await expect(facts.locator(':scope > span')).toHaveCount(3);
   await expect.poll(() => facts.evaluate(element =>
     element.scrollWidth <= element.clientWidth)).toBe(true);
 });

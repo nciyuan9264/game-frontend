@@ -269,6 +269,10 @@ export function Play({
             <header><span><i />经典棋盘 <small>· {
               ended ? '终局' : `第 ${data.roomData.moveLog.filter(entry => entry.kind === 'move').length + 1} 手`
             }</small></span><div>
+              <button type="button" aria-label="查看棋谱"
+                onClick={() => ui.setPanel('activity')}>
+                <History size={15} />
+              </button>
               <button type="button" aria-label="放大棋盘" onClick={() => ui.setPanel('zoom')}>
                 <Maximize2 size={15} /></button>
             </div></header>

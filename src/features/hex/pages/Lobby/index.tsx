@@ -145,16 +145,12 @@ export default function Lobby() {
     const ownerProfile = roomOwnerProfile(room);
     return <GameMobileRoomCard key={room.roomID}
       roomID={room.roomID}
-      title={`${ownerProfile.name} 的棋室`}
       ownerName={ownerProfile.name}
       ownerAvatar={<PlayerAvatar name={ownerProfile.name}
         avatar={ownerProfile.avatar} size={32} />}
       playerCount={room.roomPlayer.length}
       maxPlayers={room.maxPlayers}
       status={room.status === 'match' ? '等待落座' : '对局中'}
-      meta={room.status === 'match'
-        ? '经典 11 × 11 · 正在等待'
-        : `已行动 ${room.turnCount ?? 0} 回合`}
       privateRoom={room.visibility === 'private'}
       actionLabel={entry.label}
       actionDisabled={!entry.allowed}

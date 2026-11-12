@@ -12,7 +12,7 @@ import {
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
 import { Feedback } from '@/components/GameUI/Panel';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
@@ -303,13 +303,13 @@ export function My() {
           ]}
           historyTitle="信件档案"
           historyItems={historyItems}
+          historyHasMore={history.hasMore && !history.error}
+          historyLoading={history.loading}
+          onHistoryLoadMore={history.loadMore}
           emptyHistory={<Feedback>第一封信，等你落笔。
             <Link to="/game/loveletter">进入大厅</Link>
           </Feedback>}
-          historyFooter={history.hasMore && <ActionButton
-            disabled={history.loading} onClick={history.loadMore}>
-            {history.loading ? '载入中…' : '加载更多对局'}
-          </ActionButton>}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logout.pending} logoutError={logout.error}
           onLogout={() => setPanel('logout')}
         />}

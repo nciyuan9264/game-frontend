@@ -1,35 +1,37 @@
 .item {
-  transition: transform .08s ease, filter .08s ease;
-}
+  position: relative;
+  isolation: isolate;
+  transition:
+    color .16s ease,
+    border-color .16s ease,
+    background-color .16s ease;
+  transform: none !important;
+  filter: none !important;
 
-.pressed {
-  animation: gameTabPress 140ms ease-out;
-}
-
-.list[data-game-tabs-pressing='true'] {
-  .item:not(.pressed),
-  .item:not(.pressed)::before,
-  .item:not(.pressed)::after {
-    transition: none !important;
-    animation: none !important;
-    transform: none !important;
-    filter: none !important;
+  &::before {
+    position: absolute;
+    inset: 3px -7px;
+    z-index: -1;
+    border-radius: 5px;
+    background: currentColor;
+    content: '';
+    opacity: 0;
+    transform: scale(.84);
+    transition:
+      opacity .14s ease,
+      transform .18s cubic-bezier(.2, .75, .25, 1);
+    pointer-events: none;
   }
-}
 
-@keyframes gameTabPress {
-  0%, 100% {
-    transform: none;
-    filter: none;
-  }
-  45% {
-    transform: translateY(1px) scale(.98);
-    filter: brightness(.94);
+  &:active::before {
+    opacity: .1;
+    transform: scale(1);
   }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .pressed {
-    animation: none;
+  .item,
+  .item::before {
+    transition: none;
   }
 }

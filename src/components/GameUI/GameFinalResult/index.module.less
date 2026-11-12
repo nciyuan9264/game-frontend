@@ -9,16 +9,21 @@
 
 @media (max-width: 767px) {
   .page {
-    --game-final-result-page-padding: 8px;
-    --game-final-result-section-gap: 18px;
+    --game-final-result-page-padding: var(--game-mobile-page-gutter, 14px);
+    --game-final-result-section-gap: var(--game-mobile-section-gap, 14px);
     --game-final-result-action-gap: 9px;
 
     display: flex !important;
     box-sizing: border-box;
+    max-height: 100%;
+    overflow-y: auto;
     width: 100%;
+    max-width: none !important;
     min-height: 0 !important;
     flex-direction: column;
+    justify-content: flex-start !important;
     gap: var(--game-final-result-section-gap) !important;
+    margin: 0 !important;
   }
 
   .page[data-game-final-result-inset='self'] {
@@ -32,12 +37,9 @@
   }
 
   .page[data-game-final-result-inset='host'] {
-    margin-top: -5px !important;
-    margin-bottom: -13px !important;
-    padding: 0 0 calc(
-      var(--game-final-result-page-padding)
-      + env(safe-area-inset-bottom)
-    ) !important;
+    margin: 0 !important;
+    padding: 1px 6px calc(var(--game-final-result-page-padding)
+      + env(safe-area-inset-bottom)) !important;
   }
 
   .hero {
@@ -55,6 +57,13 @@
     grid-template-columns: none !important;
     flex-direction: column;
     gap: var(--game-final-result-section-gap) !important;
+  }
+
+  .hero,
+  .content,
+  .actions,
+  .footerNote {
+    flex: 0 0 auto;
   }
 
   .hero,

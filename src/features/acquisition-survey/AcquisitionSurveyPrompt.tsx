@@ -10,7 +10,10 @@ const ignoreClose = () => undefined;
 
 export function AcquisitionSurveyPrompt() {
   const location = useLocation();
-  const survey = useAcquisitionSurvey(!location.pathname.startsWith('/admin'));
+  const developmentPreview = import.meta.env.DEV
+    && location.pathname.startsWith('/__dev/');
+  const survey = useAcquisitionSurvey(!developmentPreview
+    && !location.pathname.startsWith('/admin'));
 
   if (!survey.visible) return null;
 

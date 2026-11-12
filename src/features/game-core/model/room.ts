@@ -163,6 +163,23 @@ export function filterLobbyRooms<TRoom extends LobbyRoomLike>(
 
 export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
   const owner = room.players.find(player => player.playerID === room.ownerPlayerID);
+  const progress = (() => {
+    switch (room.gameType) {
+      case 'acquire': return room.metrics.acquire;
+      case 'davinci': return room.metrics.davinci;
+      case 'splendor': return room.metrics.splendor;
+      case 'yinsh': return room.metrics.yinsh;
+      case 'othello': return room.metrics.othello;
+      case 'fugitive': return room.metrics.fugitive;
+      case 'warchest': return room.metrics.warchest;
+      case 'loveletter': return room.metrics.loveletter;
+      case 'sixnimmt': return room.metrics.sixnimmt;
+      case 'cantstop': return room.metrics.cantstop;
+      case 'forsale': return room.metrics.forSale;
+      case 'hive': return room.metrics.hive;
+      default: return undefined;
+    }
+  })();
   return {
     roomID: room.roomID,
     gameType: room.gameType as GameType,
@@ -202,22 +219,8 @@ export function toLobbyRoom(room: RoomInfo): LobbyRoomLike {
     targetColumns: room.metrics.cantstop?.targetColumns,
     forSaleProgressCurrent: room.metrics.forSale?.progressCurrent,
     forSaleProgressTotal: room.metrics.forSale?.progressTotal,
-    progressCurrent: room.metrics.fugitive?.progressCurrent
-      ?? room.metrics.warchest?.progressCurrent
-      ?? room.metrics.othello?.progressCurrent
-      ?? room.metrics.loveletter?.progressCurrent
-      ?? room.metrics.sixnimmt?.progressCurrent
-      ?? room.metrics.cantstop?.progressCurrent
-      ?? room.metrics.forSale?.progressCurrent
-      ?? room.metrics.hive?.progressCurrent,
-    progressTotal: room.metrics.fugitive?.progressTotal
-      ?? room.metrics.warchest?.progressTotal
-      ?? room.metrics.othello?.progressTotal
-      ?? room.metrics.loveletter?.progressTotal
-      ?? room.metrics.sixnimmt?.progressTotal
-      ?? room.metrics.cantstop?.progressTotal
-      ?? room.metrics.forSale?.progressTotal
-      ?? room.metrics.hive?.progressTotal,
+    progressCurrent: progress?.progressCurrent,
+    progressTotal: progress?.progressTotal,
   };
 }
 

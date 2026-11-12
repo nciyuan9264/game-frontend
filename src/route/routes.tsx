@@ -124,6 +124,26 @@ export interface AppRoute {
   children?: AppRoute[];
 }
 
+const developmentRoutes: AppRoute[] = import.meta.env.DEV
+  ? [
+      {
+        path: "/__dev/game",
+        element: React.createElement(lazy(() =>
+          import("@/features/dev-preview/Redirect"))),
+      },
+      {
+        path: "/__dev/acquire-result",
+        element: React.createElement(lazy(() =>
+          import("@/features/dev-preview/AcquireResultPreview"))),
+      },
+      {
+        path: "/__dev/othello",
+        element: React.createElement(lazy(() =>
+          import("@/features/othello/dev/Preview"))),
+      },
+    ]
+  : [];
+
 export const routes: AppRoute[] = [
   {
     path: "/admin/*",
@@ -252,6 +272,7 @@ export const routes: AppRoute[] = [
   { path: "/game/forsale/me", element: <ForSaleMy /> },
   { path: "/game/forsale/match", element: <ForSaleSession /> },
   { path: "/game/forsale/replay/:gameId", element: <ForSaleReplay /> },
+  ...developmentRoutes,
   {
     path: "/",
     element: <Home />

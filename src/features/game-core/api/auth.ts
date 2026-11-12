@@ -13,6 +13,12 @@ export interface AuthProfile {
   roles: string[];
 }
 
+export function hasAdminRole(
+  profile?: Pick<AuthProfile, 'roles'>,
+): boolean {
+  return profile?.roles.some(role => role.toLowerCase() === 'admin') ?? false;
+}
+
 export async function refreshToken() {
   return Refresh();
 }

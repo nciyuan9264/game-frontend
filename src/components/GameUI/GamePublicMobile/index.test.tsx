@@ -1,12 +1,13 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
 import { MemoryRouter } from 'react-router-dom';
-import { beforeAll, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeAll, describe, expect, it, vi } from 'vitest';
 import {
   GameMobileCreateRoomDialog,
   GameMobileGuide,
   GameMobileLobby,
   GameMobileProfile,
   GameMobileRankings,
+  GameMobileRoomCard,
 } from '.';
 
 beforeAll(() => {
@@ -16,6 +17,10 @@ beforeAll(() => {
   HTMLDialogElement.prototype.close = function close() {
     this.removeAttribute('open');
   };
+});
+
+afterEach(() => {
+  vi.unstubAllGlobals();
 });
 
 describe('GamePublicMobile', () => {
@@ -54,6 +59,33 @@ describe('GamePublicMobile', () => {
     expect(screen.getByText('ROOM 1')).toBeTruthy();
   });
 
+  it('renders only bounded room progress and clamps its current value', () => {
+    const { rerender } = render(<GameMobileRoomCard
+      roomID="ROOM-1" ownerName="Alice" ownerAvatar={<span>AVATAR</span>}
+      playerCount={2} maxPlayers={4} status="对局中"
+      progress={{ current: 12, total: 8, label: '轮次进度', description: '8 / 8 轮' }}
+      actionLabel="进入对局" onEnter={vi.fn()} />);
+
+    const progress = screen.getByRole('progressbar', { name: '轮次进度' });
+    expect(progress.getAttribute('aria-valuenow')).toBe('8');
+    expect(progress.getAttribute('aria-valuemax')).toBe('8');
+    expect(screen.getByText('8 / 8 轮')).toBeTruthy();
+
+    rerender(<GameMobileRoomCard
+      roomID="ROOM-1" ownerName="Alice" ownerAvatar={<span>AVATAR</span>}
+      playerCount={2} maxPlayers={4} status="对局中"
+      progress={{ current: 1, total: 0, label: '无界进度' }}
+      actionLabel="进入对局" onEnter={vi.fn()} />);
+    expect(screen.queryByRole('progressbar')).toBeNull();
+
+    rerender(<GameMobileRoomCard
+      roomID="ROOM-1" ownerName="Alice" ownerAvatar={<span>AVATAR</span>}
+      playerCount={2} maxPlayers={4} status="对局中"
+      progress={{ current: Number.POSITIVE_INFINITY, total: 8, label: '异常进度' }}
+      actionLabel="进入对局" onEnter={vi.fn()} />);
+    expect(screen.queryByRole('progressbar')).toBeNull();
+  });
+
   it('renders ranking, guide, and profile contracts', () => {
     const { container } = render(<MemoryRouter>
       <GameMobileRankings eyebrow="RANK" title="排行榜" description="真实记录"
@@ -74,8 +106,51 @@ describe('GamePublicMobile', () => {
 
     expect(screen.getByText('75%')).toBeTruthy();
     expect(screen.getByText('第一步')).toBeTruthy();
-    expect(screen.getByText('PLAYER ID · 1')).toBeTruthy();
+    expect(screen.getByText('邮箱未绑定')).toBeTruthy();
+    expect(screen.getByRole('link', { name: '编辑资料' })).toBeTruthy();
+    expect(screen.queryByRole('button', { name: /退出登录/ })).toBeNull();
     expect(container.querySelector('[data-game-mobile-rank-panel]')).toBeTruthy();
+    expect(container.querySelector(
+      '[data-game-mobile-scroll-owner="profile"]',
+    )).toBeTruthy();
+    expect(container.querySelector(
+      '[data-game-mobile-scroll-owner="profile-history"]',
+    )).toBeNull();
+  });
+
+  it('shows logout only for admins after their history', () => {
+    const onLogout = vi.fn();
+    render(<MemoryRouter><GameMobileProfile avatar={<span>AVATAR</span>}
+      eyebrow="PLAYER" name="Admin" playerID="1" isAdmin
+      stats={[{ label: '对局', value: 3 }]} historyTitle="最近对局"
+      historyItems={[{ id: '1', title: 'ROOM 1', detail: '已结束' }]}
+      onLogout={onLogout} /></MemoryRouter>);
+
+    const history = screen.getByRole('heading', { name: '最近对局' })
+      .closest('section')!;
+    const logout = screen.getByRole('button', { name: /退出登录/ });
+    expect(history.contains(logout)).toBe(true);
+    fireEvent.click(logout);
+    expect(onLogout).toHaveBeenCalledTimes(1);
+  });
+
+  it('loads the next history page when its sentinel enters view', async () => {
+    const onHistoryLoadMore = vi.fn();
+    vi.stubGlobal('IntersectionObserver', vi.fn(callback => ({
+      observe: (target: Element) => callback([{
+        isIntersecting: true,
+        target,
+      }]),
+      disconnect: vi.fn(),
+    })));
+    render(<MemoryRouter><GameMobileProfile avatar={<span>AVATAR</span>}
+      eyebrow="PLAYER" name="Alice" playerID="1"
+      stats={[{ label: '对局', value: 3 }]} historyTitle="最近对局"
+      historyItems={[{ id: '1', title: 'ROOM 1', detail: '已结束' }]}
+      historyHasMore onHistoryLoadMore={onHistoryLoadMore}
+      onLogout={vi.fn()} /></MemoryRouter>);
+
+    await waitFor(() => expect(onHistoryLoadMore).toHaveBeenCalledTimes(1));
   });
 
   it('submits the shared create room dialog with visibility', () => {

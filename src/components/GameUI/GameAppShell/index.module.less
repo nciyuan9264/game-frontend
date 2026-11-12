@@ -69,6 +69,58 @@
 }
 
 @media (max-width: 767px) {
+  .viewportShell[data-game-shell='app'] {
+    display: grid !important;
+    width: 100%;
+    block-size: 100dvh;
+    min-width: 0;
+    min-height: 0 !important;
+    grid-template-rows: minmax(0, 1fr) auto;
+    overflow: hidden !important;
+  }
+
+  .viewportShell[data-game-shell='app'] > .shellMain {
+    display: grid;
+    min-width: 0;
+    min-height: 0 !important;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding-bottom: 0 !important;
+    overflow: hidden;
+  }
+
+  .viewportShell[data-game-shell='app'] .shellHeader {
+    position: relative !important;
+    top: auto !important;
+    width: 100%;
+    height: auto !important;
+    min-height: var(--game-mobile-header-min-height);
+  }
+
+  .viewportShell[data-game-shell='app'] .shellContent {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    flex-direction: column;
+    margin: 0 auto;
+    padding:
+      var(--game-mobile-page-gutter)
+      var(--game-mobile-page-gutter)
+      var(--game-mobile-page-gutter) !important;
+    overflow: hidden;
+  }
+
+  .viewportShell[data-game-shell='app'] > .shellMobileNav {
+    position: static !important;
+    inset: auto !important;
+    width: 100%;
+    min-height: calc(
+      var(--game-mobile-nav-min-height)
+      + env(safe-area-inset-bottom)
+    );
+    flex: 0 0 auto;
+  }
+
   [data-game-shell] [data-game-shell-divider],
   [data-game-shell] [data-game-shell-breadcrumb],
   [data-game-shell] [data-game-shell-environment] {
@@ -99,24 +151,91 @@
     padding-bottom: 0 !important;
   }
 
-  .compactMobileFooter {
+  .viewportShell[data-game-shell='app'] .compactMobileFooter {
     display: flex;
-    min-height: calc(
-      100dvh
-      - var(--game-mobile-header-height, 57px)
-    );
+    min-height: 0;
     flex-direction: column;
-    padding-bottom: calc(
-      var(--game-mobile-nav-height, 66px)
-      + env(safe-area-inset-bottom)
-    ) !important;
+    padding-bottom: var(--game-mobile-page-gutter) !important;
 
     > * {
-      display: flex;
       width: 100%;
       min-height: 0;
       flex: 1;
-      flex-direction: column;
     }
+  }
+}
+
+@media (max-width: 767px) {
+  .viewportShell[data-game-shell='match']:has([data-game-room-mobile]),
+  .viewportShell[data-game-shell='match']:has([data-game-mobile-replay-heading]),
+  .viewportShell[data-game-shell='match']:has([data-game-final-result]) {
+    display: block;
+    width: 100%;
+    block-size: 100dvh;
+    min-width: 0;
+    min-height: 0 !important;
+    overflow: hidden !important;
+  }
+
+  .viewportShell[data-game-shell='match']:has([data-game-room-mobile]) > .shellMain,
+  .viewportShell[data-game-shell='match']:has([data-game-mobile-replay-heading]) > .shellMain,
+  .viewportShell[data-game-shell='match']:has([data-game-final-result]) > .shellMain {
+    display: grid;
+    width: 100%;
+    block-size: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    grid-template-rows: auto minmax(0, 1fr);
+    padding-bottom: 0 !important;
+    overflow: hidden;
+  }
+
+  .viewportShell.noHeader[data-game-shell='match'] > .shellMain {
+    grid-template-rows: minmax(0, 1fr);
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-room-mobile]),
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-mobile-replay-heading]),
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-final-result]) {
+    display: flex;
+    width: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    flex-direction: column;
+    overflow: hidden !important;
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-room-mobile]) {
+    padding: var(--game-mobile-page-gutter) !important;
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-mobile-replay-heading]) {
+    overflow-y: auto !important;
+    overscroll-behavior: contain;
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-final-result]) {
+    padding: 0 !important;
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-final-result])
+  > :not([data-game-final-result]) {
+    width: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .viewportShell[data-game-shell='match'] .shellContent:has([data-game-room-mobile]) > * {
+    width: 100%;
+    height: 100%;
+    min-width: 0;
+    min-height: 0 !important;
+    max-width: none;
+    margin: 0 !important;
+    padding: 0 !important;
+    overflow: hidden;
   }
 }

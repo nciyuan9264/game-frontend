@@ -1,4 +1,4 @@
-import { act, cleanup, fireEvent, render, screen } from '@testing-library/react';
+import { cleanup, fireEvent, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, it, vi } from 'vitest';
 import { GameTabs } from '.';
 
@@ -35,23 +35,16 @@ describe('GameTabs', () => {
     expect(onChange).toHaveBeenLastCalledWith('playing');
   });
 
-  it('marks only the activated tab during press feedback', () => {
-    vi.useFakeTimers();
+  it('does not create transient geometric press state', () => {
     const onChange = vi.fn();
     render(<GameTabs items={items} value="all" onChange={onChange} ariaLabel="房间筛选" />);
 
     fireEvent.click(screen.getByRole('tab', { name: '可加入' }));
 
     const tabs = screen.getAllByRole('tab');
-    expect(tabs.map(tab => tab.getAttribute('data-game-tab-pressed')))
-      .toEqual([null, 'true', null]);
-    expect(screen.getByRole('tablist', { name: '房间筛选' })
-      .getAttribute('data-game-tabs-pressing')).toBe('true');
-
-    act(() => vi.advanceTimersByTime(140));
     expect(tabs.every(tab => !tab.hasAttribute('data-game-tab-pressed'))).toBe(true);
     expect(screen.getByRole('tablist', { name: '房间筛选' })
       .hasAttribute('data-game-tabs-pressing')).toBe(false);
-    vi.useRealTimers();
+    expect(onChange).toHaveBeenCalledOnce();
   });
 });

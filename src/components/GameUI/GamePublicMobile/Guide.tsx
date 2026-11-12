@@ -41,7 +41,7 @@ export function GameMobileGuide({
   secondaryAction,
 }: GameMobileGuideProps) {
   return <div className={`${styles.mobileOnly} ${styles.guide}`}
-    data-game-public-mobile="guide">
+    data-game-public-mobile="guide" data-game-mobile-no-scroll>
     <aside className={styles.guideVisual} data-game-mobile-guide-visual>
       <div className={`${styles.guideMedia} ${
         visualFill ? styles.guideMediaFill : ''}`}

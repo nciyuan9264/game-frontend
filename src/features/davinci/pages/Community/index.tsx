@@ -9,7 +9,7 @@ import {
   GameMobileProfile,
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { ActionButton } from '@/components/GameUI/ActionButton';
 import { GameTabs } from '@/components/GameUI/GameTabs';
@@ -188,6 +188,8 @@ export function My() {
     games,
     error: historyError,
     loading: historyLoading,
+    hasMore,
+    loadMore,
   } = useGameHistory({ gameType: 'davinci', pageSize: 20 });
   const logoutAction = useGameLogout();
   const handleLogout = async () => {
@@ -226,9 +228,13 @@ export function My() {
           ]}
           historyTitle="最近对局"
           historyItems={historyItems}
+          historyHasMore={hasMore && !historyError}
+          historyLoading={historyLoading}
+          onHistoryLoadMore={loadMore}
           emptyHistory={<Feedback>还没有对局记录。
             <Link to="/game/davinci">去大厅开始第一局</Link>
           </Feedback>}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logoutAction.pending}
           logoutError={logoutAction.error}
           onLogout={() => void handleLogout()}

@@ -1,4 +1,5 @@
 import { expect, test, type Page } from '@playwright/test';
+import { captureOthello } from './othello-screenshots';
 
 const roomID = 'othello_analysis';
 const matchID = `${roomID}-r1`;
@@ -194,6 +195,7 @@ test('Othello analysis stays between the header and board at target sizes', asyn
   }));
 
   const analysis = page.getByTestId('othello-position-analysis');
+  await captureOthello(page, 'othello-mobile-play-analysis-ready');
   const board = page.getByRole('group', {
     name: '黑白棋棋盘，8 行 8 列。方向键移动，回车落子。',
   });

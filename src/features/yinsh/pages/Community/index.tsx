@@ -10,7 +10,7 @@ import {
   GameMobileRankings,
 } from '@/components/GameUI/GamePublicMobile';
 import { GameTabs } from '@/components/GameUI/GameTabs';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useAsyncResource } from '@/hooks/useAsyncResource';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLeaderboard } from '@/features/game-core/hooks/useGameLeaderboard';
@@ -211,11 +211,13 @@ export function My() {
           ]}
           historyTitle="过去的棋局"
           historyItems={historyItems}
+          historyHasMore={history.hasMore && !history.error}
+          historyLoading={history.loading}
+          onHistoryLoadMore={history.loadMore}
           emptyHistory={<Feedback>还没有对局记录。
             <Link to="/game/yinsh">去大厅开始第一局</Link>
           </Feedback>}
-          historyFooter={history.hasMore && <ActionButton
-            pending={history.loading} onClick={history.loadMore}>加载更多</ActionButton>}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logout.pending} logoutError={logout.error}
           onLogout={() => setLogoutOpen(true)}
         />}

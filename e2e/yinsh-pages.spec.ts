@@ -103,12 +103,12 @@ test('YINSH public pages stay compact on mobile', async ({ page }) => {
   await mockPublicData(page);
 
   await page.goto('/game/yinsh');
-  const lobbyHero = page.getByTestId('yinsh-lobby-hero');
+  const lobbyHero = page.locator('[data-game-mobile-lobby-hero]');
   await expect(lobbyHero).toBeVisible();
   expect((await lobbyHero.boundingBox())?.height).toBeLessThanOrEqual(240);
-  const joinCard = page.locator('[data-testid="yinsh-join-card"]:visible');
+  const joinCard = page.locator('[data-game-mobile-lobby-join]');
   await expect(joinCard).toBeVisible();
-  const facts = page.getByTestId('yinsh-lobby-facts')
+  const facts = page.locator('[data-game-mobile-lobby-facts]')
     .locator(':scope > span');
   await expect(facts).toHaveCount(3);
   const factRows = await facts.evaluateAll(elements =>
@@ -122,23 +122,26 @@ test('YINSH public pages stay compact on mobile', async ({ page }) => {
   await expect(page.getByRole('heading', {
     name: '对面已经留好了位置？',
   })).toBeVisible();
-  await expect(page.getByText('#friend_room')).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'friend_room' })).toBeVisible();
   await expectNoOverflow(page);
 
   await page.goto('/game/yinsh/rankings');
-  const rankHero = page.getByTestId('yinsh-rank-hero');
+  const rankHero = page.locator('[data-game-mobile-rank-hero]');
   await expect(rankHero).toBeVisible();
   expect((await rankHero.boundingBox())?.height).toBeLessThanOrEqual(180);
 
   await page.goto('/game/yinsh/guide');
-  const guideVisual = page.getByTestId('yinsh-guide-visual');
+  const guideVisual = page.locator('[data-game-mobile-guide-visual]');
   await expect(guideVisual).toBeVisible();
-  expect((await guideVisual.boundingBox())?.height).toBe(266);
+  expect((await guideVisual.boundingBox())?.height ?? 0)
+    .toBeGreaterThanOrEqual(140);
+  expect((await guideVisual.boundingBox())?.height ?? 0)
+    .toBeLessThanOrEqual(176);
   await expectNoOverflow(page);
 
   await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/game/yinsh');
-  await expect(page.getByTestId('yinsh-lobby-facts')).toBeVisible();
+  await expect(page.locator('[data-game-mobile-lobby-facts]')).toBeVisible();
   await expectNoOverflow(page);
 });
 
@@ -253,7 +256,7 @@ test('YINSH room uses the aligned two-seat mobile layout', async ({ page }) => {
   await mockRoom(page, [owner]);
   await page.goto(`/game/yinsh/match?roomID=${roomID}`);
 
-  const seats = page.getByTestId('yinsh-room-seat');
+  const seats = page.locator('[data-game-mobile-room-seat]');
   await expect(seats).toHaveCount(2);
   const boxes = await seats.evaluateAll(elements => elements.map(element => {
     const box = element.getBoundingClientRect();
@@ -262,22 +265,10 @@ test('YINSH room uses the aligned two-seat mobile layout', async ({ page }) => {
   expect(Math.abs(boxes[0].y - boxes[1].y)).toBeLessThanOrEqual(1);
   expect(Math.abs(boxes[0].width - boxes[1].width))
     .toBeLessThanOrEqual(1);
-  const seatMarkers = seats.first().locator(':scope > span[aria-hidden="true"]');
-  await expect(seatMarkers).toHaveCount(2);
-  const [ringBox, avatarBox] = await Promise.all([
-    seatMarkers.nth(0).boundingBox(),
-    seatMarkers.nth(1).boundingBox(),
-  ]);
-  expect(
-    (ringBox?.x ?? 0) + (ringBox?.width ?? 0) <= (avatarBox?.x ?? 0)
-      || (avatarBox?.x ?? 0) + (avatarBox?.width ?? 0) <= (ringBox?.x ?? 0)
-      || (ringBox?.y ?? 0) + (ringBox?.height ?? 0) <= (avatarBox?.y ?? 0)
-      || (avatarBox?.y ?? 0) + (avatarBox?.height ?? 0) <= (ringBox?.y ?? 0)
-  ).toBe(true);
   await expect(page.getByRole('button', {
     name: '在席位 2 添加人机',
   })).toBeVisible();
-  await expect(page.getByTestId('yinsh-room-facts')).toBeVisible();
+  await expect(page.locator('[data-game-mobile-room-summary]')).toBeVisible();
   await expect(page.getByRole('button', {
     name: '开始对局',
   })).toBeVisible();

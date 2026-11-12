@@ -33,7 +33,9 @@ export function RoomCard({ room, userID, onEnter }: {
       <span className={`${styles.status} ${room.status !== 'match' ? styles.playing : ''}`}>{room.status === 'match' ? '等待入座' : room.status === 'end' ? '已结束' : '对局中'}</span>
     </div>
     <div className={styles.meta}>
-      <div className={styles.host}><PlayerAvatar name={owner.name} avatar={owner.avatar} size={24} /><span>房主</span><strong title={owner.name}>{owner.name}</strong></div>
+      <div className={styles.host}><PlayerAvatar name={owner.name}
+        avatar={owner.avatar} size={24} /><strong title={owner.name}>
+          {owner.name}</strong></div>
       <span className={`${styles.mode} ${room.visibility === 'private' ? styles.private : ''}`}>
         {room.visibility === 'private' ? <><Lock size={13} />仅你可见</> : <><Building2 size={13} />经典对局</>}
       </span>

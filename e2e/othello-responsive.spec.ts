@@ -1,5 +1,6 @@
-import { expect, test, type Locator, type Page, type TestInfo } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { expectMobileFinalResultLayout } from './helpers';
+import { captureOthello } from './othello-screenshots';
 
 const roomID = 'othello_layout';
 const matchID = `${roomID}-r1`;
@@ -145,6 +146,45 @@ async function mockSession(page: Page, initialSnapshot = gameSnapshot()) {
       },
     },
   }));
+  await page.route(
+    `**/pam-api/platform/history/matches/${matchID}/result-card?**`,
+    route => route.fulfill({
+      json: {
+        status_code: 200,
+        message: 'ok',
+        data: {
+          game_type: 'othello',
+          started_at: '2026-10-25T00:00:00Z',
+          ended_at: '2026-10-25T00:10:00Z',
+          duration_seconds: 600,
+          players: [
+            {
+              display_name: human.displayName,
+              seat_index: human.seatIndex,
+              is_ai: false,
+              final_score: 36,
+              final_stocks: 0,
+              final_rank: 1,
+              is_winner: true,
+              game_role: 'black',
+              is_self: true,
+            },
+            {
+              display_name: ai.displayName,
+              seat_index: ai.seatIndex,
+              is_ai: true,
+              final_score: 28,
+              final_stocks: 0,
+              final_rank: 2,
+              is_winner: false,
+              game_role: 'white',
+              is_self: false,
+            },
+          ],
+        },
+      },
+    }),
+  );
   await page.routeWebSocket('**/ws?**', socket => {
     socket.send(JSON.stringify(initialSnapshot));
     socket.onMessage(message => commands.push(String(message)));
@@ -225,6 +265,7 @@ test('Othello mobile board and action dock fit 390x844', async ({ page }) => {
     getComputedStyle(element).colorScheme)).toBe('light only');
   const topbarBox = await page.locator('header').first().boundingBox();
   expect(topbarBox?.height).toBe(57);
+  await captureOthello(page, 'othello-mobile-play-analysis-empty');
   await page.getByRole('button', { name: 'D3，可落子，翻转 1 枚' }).click();
   await expect.poll(() => commands.some(command =>
     command.includes('"game_place_disc"')
@@ -253,7 +294,7 @@ test('Othello desktop keeps board and sidebar visible at 1440x900', async ({ pag
 
 test('Othello mobile final result returns through the timer slot', async ({
   page,
-}, testInfo: TestInfo) => {
+}) => {
   await page.setViewportSize({ width: 390, height: 844 });
   await mockSession(page, endedSnapshot());
   await page.goto(`/game/othello/match?roomID=${roomID}`);
@@ -265,10 +306,7 @@ test('Othello mobile final result returns through the timer slot', async ({
   const scoreNote = page.getByText('终局实际子数 · 空格不补计分');
   await expect(scoreNote).toBeVisible();
   await expect(page.getByText(/权威结算/)).toHaveCount(0);
-  await page.screenshot({
-    path: testInfo.outputPath('othello-mobile-results.png'),
-    fullPage: true,
-  });
+  await captureOthello(page, 'othello-mobile-results');
 
   await page.getByRole('button', { name: '回到棋盘' }).click();
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
@@ -277,10 +315,10 @@ test('Othello mobile final result returns through the timer slot', async ({
   await expect(page.getByRole('button', {
     name: /选择棋盘上的合法位置|等待对手落子/,
   })).toHaveCount(0);
-  await expect(page.getByRole('button', { name: '查看棋谱' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toBeVisible();
   await expectNoOverflow(page);
   await page.setViewportSize({ width: 360, height: 800 });
-  await expect(page.getByRole('button', { name: '查看棋谱' })).toHaveCount(0);
+  await expect(page.getByRole('button', { name: '查看棋谱' })).toBeVisible();
   await expect(page.getByRole('button', { name: '返回终局结算' })).toBeVisible();
   await expectNoOverflow(page);
 

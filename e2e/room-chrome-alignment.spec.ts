@@ -165,6 +165,12 @@ async function readChromeGeometry(page: Page) {
     const seats = document.querySelector<HTMLElement>(
       '[data-game-mobile-room-seats]',
     );
+    const roomContent = document.querySelector<HTMLElement>(
+      '[data-game-mobile-scroll-owner="room-content"]',
+    );
+    const dock = document.querySelector<HTMLElement>(
+      '[data-game-mobile-room-dock]',
+    );
     const headingStyle = heading ? getComputedStyle(heading) : undefined;
     const stageBox = stage?.getBoundingClientRect();
     const seatsBox = seats?.getBoundingClientRect();
@@ -186,12 +192,50 @@ async function readChromeGeometry(page: Page) {
       actionsGap: actions ? getComputedStyle(actions).columnGap : '',
       buttonHeights: buttons.map(button => button.getBoundingClientRect().height),
       mediaPosition: media ? getComputedStyle(media).position : '',
+      roomContentOverflowY: roomContent
+        ? getComputedStyle(roomContent).overflowY
+        : '',
+      dockPosition: dock ? getComputedStyle(dock).position : '',
       seatOffset: stageBox && seatsBox ? seatsBox.y - stageBox.y : -1,
       metaVisible: !!document.querySelector<HTMLElement>(
         '[data-game-room-heading-meta]',
       )?.offsetParent,
     };
   });
+}
+
+async function readSeatGeometry(page: Page) {
+  return page.locator('[data-game-mobile-room-seat]').evaluateAll(seats =>
+    seats.map(seat => {
+      const children = [...seat.children] as HTMLElement[];
+      const spans = children.filter(child => child.tagName === 'SPAN');
+      const rect = (element?: Element) => {
+        const box = element?.getBoundingClientRect();
+        return box ? {
+          top: box.top,
+          right: box.right,
+          bottom: box.bottom,
+          left: box.left,
+          width: box.width,
+          height: box.height,
+        } : undefined;
+      };
+      const occupied = seat.getAttribute('data-occupied') === 'true';
+      const avatarWrapper = children.find(child => child.tagName === 'DIV');
+      const avatar = avatarWrapper
+        && avatarWrapper.getBoundingClientRect().height > 0
+        ? avatarWrapper
+        : avatarWrapper?.firstElementChild;
+      return {
+        occupied,
+        seat: rect(seat),
+        avatar: rect(avatar),
+        name: rect(children.find(child => child.tagName === 'STRONG')),
+        detail: rect(children.find(child => child.tagName === 'SMALL')),
+        status: occupied ? rect(spans[spans.length - 1]) : undefined,
+        emptyIcon: occupied ? undefined : rect(spans[1]),
+      };
+    }));
 }
 
 test.use({ viewport: { width: 390, height: 844 } });
@@ -211,12 +255,16 @@ for (const config of games) {
       expect(geometry.headingGap).toBe('16px');
       expect(geometry.headingMarginLeft).toBe('2px');
       expect(geometry.headingMarginRight).toBe('2px');
-      expect(geometry.headingMarginBottom).toBe('17px');
+      expect(geometry.headingMarginBottom).toBe('0px');
       expect(geometry.identityGap).toBe('10px');
       expect(geometry.back).toMatchObject({ width: 36, height: 36 });
       expect(geometry.actionsGap).toBe('8px');
       expect(geometry.buttonHeights.length).toBeGreaterThan(0);
-      for (const height of geometry.buttonHeights) expect(height).toBe(35);
+      for (const height of geometry.buttonHeights) {
+        expect(height).toBeGreaterThanOrEqual(36);
+      }
+      expect(geometry.roomContentOverflowY).toBe('auto');
+      expect(geometry.dockPosition).toBe('static');
       expect(geometry.metaVisible).toBe(false);
       expect(geometry.heading?.height ?? 0).toBeGreaterThanOrEqual(90);
       expect(geometry.heading?.height ?? 0).toBeLessThanOrEqual(104);
@@ -225,22 +273,47 @@ for (const config of games) {
       if (geometry.mediaPosition) expect(geometry.mediaPosition).toBe('absolute');
       expect(geometry.seatOffset).toBeGreaterThanOrEqual(0);
       expect(geometry.seatOffset).toBeLessThanOrEqual(24);
-      if (config.game === 'quoridor' || config.game === 'onitama') {
-        for (const viewport of [
-          { width: 390, height: 844 },
-          { width: 320, height: 568 },
-        ]) {
-          await page.setViewportSize(viewport);
-          const seat = page.locator('[data-game-mobile-room-seat]').first();
-          const status = seat.getByText('准备就绪');
-          const [seatBox, statusBox] = await Promise.all([
-            seat.boundingBox(),
-            status.boundingBox(),
-          ]);
-          expect(seatBox).not.toBeNull();
-          expect(statusBox).not.toBeNull();
-          expect(statusBox!.y + statusBox!.height)
-            .toBeLessThanOrEqual(seatBox!.y + seatBox!.height);
+      for (const viewport of [
+        { width: 390, height: 844 },
+        { width: 320, height: 568 },
+      ]) {
+        await page.setViewportSize(viewport);
+        const seats = await readSeatGeometry(page);
+        expect(seats).toHaveLength(config.maxPlayers);
+        for (const seat of seats) {
+          expect(seat.seat).toBeDefined();
+          expect(seat.name).toBeDefined();
+          const content = seat.occupied
+            ? [seat.avatar, seat.name, seat.detail, seat.status]
+            : [seat.emptyIcon, seat.name, seat.detail];
+          for (const box of content.filter(Boolean)) {
+            expect(box!.top).toBeGreaterThanOrEqual(seat.seat!.top - 1);
+            expect(box!.right).toBeLessThanOrEqual(seat.seat!.right + 1);
+            expect(box!.bottom).toBeLessThanOrEqual(seat.seat!.bottom + 1);
+            expect(box!.left).toBeGreaterThanOrEqual(seat.seat!.left - 1);
+          }
+          if (seat.occupied) {
+            expect(seat.avatar).toBeDefined();
+            expect(seat.status).toBeDefined();
+            expect(seat.avatar!.bottom)
+              .toBeLessThanOrEqual(seat.name!.top + 1);
+            if (seat.detail) {
+              expect(seat.name!.bottom)
+                .toBeLessThanOrEqual(seat.detail.top + 1);
+              expect(seat.detail.bottom)
+                .toBeLessThanOrEqual(seat.status!.top + 1);
+            } else {
+              expect(seat.name!.bottom)
+                .toBeLessThanOrEqual(seat.status!.top + 1);
+            }
+          } else {
+            expect(seat.emptyIcon).toBeDefined();
+            expect(seat.detail).toBeDefined();
+            expect(seat.emptyIcon!.bottom)
+              .toBeLessThanOrEqual(seat.name!.top + 1);
+            expect(seat.name!.bottom)
+              .toBeLessThanOrEqual(seat.detail!.top + 1);
+          }
         }
       }
     });

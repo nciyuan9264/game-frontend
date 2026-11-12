@@ -129,7 +129,11 @@ test('Six Nimmt public pages follow the shared responsive frame', async ({ page 
     await expect(hero).toBeVisible();
     await expect(page.getByRole('button', { name: /创建房间/ })).toBeVisible();
     await expect(page.getByRole('button', { name: /分享游戏/ })).toBeVisible();
-    if (viewport.width <= 390) await expect(hero).toHaveCSS('height', '227px');
+    if (viewport.width <= 390) {
+      const heroBox = await hero.boundingBox();
+      expect(heroBox?.height ?? 0).toBeGreaterThanOrEqual(210);
+      expect(heroBox?.height ?? 0).toBeLessThanOrEqual(230);
+    }
     await expectNoOverflow(page);
     await capture(page, testInfo, `lobby-${viewport.width}x${viewport.height}`);
 

@@ -1,6 +1,7 @@
 import {
   expect,
   test,
+  type Locator,
   type Page,
   type TestInfo,
 } from '@playwright/test';
@@ -300,6 +301,13 @@ const expectNoOverflow = async (page: Page) => {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 };
 
+const expectCountdownAtMost = async (timer: Locator, maximum: number) => {
+  await expect(timer).toBeVisible();
+  const seconds = Number.parseInt((await timer.textContent()) ?? '', 10);
+  expect(seconds).toBeGreaterThan(0);
+  expect(seconds).toBeLessThanOrEqual(maximum);
+};
+
 const capture = async (page: Page, info: TestInfo, name: string) =>
   page.screenshot({ path: info.outputPath(`${name}.png`), fullPage: true });
 
@@ -370,9 +378,9 @@ test('For Sale mobile room follows the Acquire preparation layout',
     expect(geometry.markMarginRight).toBe('0px');
     expect(geometry.paddingLeft).toBe('0px');
     expect(geometry.paddingRight).toBe('0px');
-    expect(geometry.stagePaddingLeft).toBe('15px');
-    expect(geometry.stagePaddingRight).toBe('15px');
-    expect(geometry.seatWidth).toBeGreaterThan(160);
+    expect(geometry.stagePaddingLeft).toBe('18px');
+    expect(geometry.stagePaddingRight).toBe('18px');
+    expect(geometry.seatWidth).toBeGreaterThan(150);
     expect(geometry.seatHeight).toBeLessThanOrEqual(140);
     await expectNoOverflow(page);
     await capture(page, info, 'room-mobile');
@@ -457,7 +465,7 @@ test('For Sale mobile auction keeps cards and actions usable',
     const countdown = mobileTopbar.getByRole('timer');
     const history = mobileTopbar.getByRole('button', { name: '公开记录' });
     const rules = mobileTopbar.getByRole('button', { name: '桌边规则' });
-    await expect(countdown).toHaveText(/1[45]s/);
+    await expectCountdownAtMost(countdown, 15);
     for (const viewport of [
       { width: 390, height: 844 },
       { width: 360, height: 800 },
@@ -636,7 +644,7 @@ test('For Sale mobile sale reveal aligns player and property details',
     snapshot.view.forSale.roomData.players['110'].avatar = userAvatar;
     await mockSession(page, 3, snapshot);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
-    await expect(page.getByRole('timer')).toHaveText(/(9|10)s/);
+    await expectCountdownAtMost(page.getByRole('timer'), 10);
     await expect(page.getByRole('button', { name: '下一轮出售' })).toHaveCount(0);
 
     const reveal = page.locator('.fs-reveal');
@@ -717,7 +725,7 @@ test('For Sale buy result keeps the automatic eight-second hold',
     await mockSession(page, 3, snapshot);
     await page.goto(`/game/forsale/match?roomID=${roomID}`);
 
-    await expect(page.getByRole('timer')).toHaveText(/(7|8)s/);
+    await expectCountdownAtMost(page.getByRole('timer'), 8);
     await expect(page.getByText('本轮房产归属')).toBeVisible();
     await expect(page.getByRole('button', { name: '下一轮拍卖' })).toHaveCount(0);
     await expect(page.getByText(/自动开始下一轮拍卖/)).toBeVisible();

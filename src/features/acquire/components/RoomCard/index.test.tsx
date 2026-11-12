@@ -21,6 +21,7 @@ describe('Acquire room card', () => {
     render(<RoomCard room={room} userID="42" onEnter={() => {}} />);
 
     expect(screen.getByText('仅你可见')).toBeTruthy();
+    expect(screen.queryByText('房主', { exact: true })).toBeNull();
     expect(screen.getByRole('button', { name: '返回房间 private-room' })).toBeTruthy();
     expect(document.querySelector('img')?.getAttribute('src')).toBe(
       'https://cdn.example.com/alice.png',

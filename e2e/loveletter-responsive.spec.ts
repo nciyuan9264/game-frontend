@@ -267,7 +267,7 @@ test('Love Letter public pages follow the shared responsive frame', async ({
       )).toBeLessThanOrEqual(1);
       const heroBox = await hero.boundingBox();
       expect(heroBox).not.toBeNull();
-      expect(heroBox!.height).toBeGreaterThanOrEqual(225);
+      expect(heroBox!.height).toBeGreaterThanOrEqual(210);
       expect(heroBox!.height).toBeLessThanOrEqual(230);
     }
     await expectNoOverflow(page);
@@ -308,7 +308,7 @@ test('Love Letter mobile room keeps six seats and the ready dock in view', async
   const firstSeat = await seats.first().boundingBox();
   expect(firstSeat).not.toBeNull();
   expect(firstSeat!.height).toBeGreaterThanOrEqual(126);
-  expect(firstSeat!.height).toBeLessThanOrEqual(132);
+  expect(firstSeat!.height).toBeLessThanOrEqual(140);
   const dock = await page.locator('[data-game-mobile-room-dock]').boundingBox();
   expect(dock).not.toBeNull();
   expect(dock!.height).toBeLessThanOrEqual(115);

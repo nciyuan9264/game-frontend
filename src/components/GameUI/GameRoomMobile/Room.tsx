@@ -124,7 +124,8 @@ export function GameMobileRoom({
           <UserPlus size={15} />邀请好友</ActionButton>
       </div>
     </header>
-    <div className={styles.roomContent}>
+    <div className={styles.roomContent}
+      data-game-mobile-scroll-owner="room-content">
       <section className={`${styles.tablePanel} ${classNames?.table ?? ''}`}
         data-game-mobile-room-table>
         <header><span><Users size={15} />{gameLabel}<i />

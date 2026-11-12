@@ -247,8 +247,15 @@ test('Hex public pages stay stable across desktop and mobile', async ({
   ]) {
     await page.setViewportSize(viewport);
     await page.goto('/game/hex');
-    await expect(page.getByTestId('hex-lobby-hero')).toBeVisible();
-    await expect(page.getByTestId('hex-lobby-facts')
+    const mobile = viewport.width <= 767;
+    const hero = mobile
+      ? page.locator('[data-game-mobile-lobby-hero]')
+      : page.getByTestId('hex-lobby-hero');
+    const facts = mobile
+      ? page.locator('[data-game-mobile-lobby-facts]')
+      : page.getByTestId('hex-lobby-facts');
+    await expect(hero).toBeVisible();
+    await expect(facts
       .locator(':scope > span')).toHaveCount(3);
     await expect(page.getByText('11 × 11')).toBeVisible();
     await expectNoOverflow(page);
@@ -261,7 +268,9 @@ test('Hex public pages stay stable across desktop and mobile', async ({
     }
 
     await page.goto('/game/hex/guide');
-    await expect(page.getByTestId('hex-guide-visual')).toBeVisible();
+    await expect(mobile
+      ? page.locator('[data-game-mobile-guide-visual]')
+      : page.getByTestId('hex-guide-visual')).toBeVisible();
     await expect(page.getByText('交换规则')).toBeVisible();
     await expectNoOverflow(page);
   }
@@ -276,9 +285,10 @@ test('Hex room exposes the fixed online rules', async ({ page }) => {
   await expect(page.locator('[data-game-brand]')).toBeVisible();
   await expect(page.locator('[data-game-shell-platform-home]')).toBeHidden();
   await expect(page.locator('[data-game-shell-profile]')).toBeHidden();
-  await expect(page.getByTestId('hex-room-table')).toBeVisible();
-  await expect(page.getByTestId('hex-room-seat')).toHaveCount(2);
-  await expect(page.getByTestId('hex-room-table')
+  const table = page.locator('[data-game-mobile-room-table]');
+  await expect(table).toBeVisible();
+  await expect(page.locator('[data-game-mobile-room-seat]')).toHaveCount(2);
+  await expect(table
     .getByText('11 × 11', { exact: true })).toBeVisible();
   await expect(page.getByText('11 × 11 · Pie rule')).toBeVisible();
   await expectNoOverflow(page);

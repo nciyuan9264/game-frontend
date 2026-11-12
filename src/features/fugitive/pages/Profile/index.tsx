@@ -14,7 +14,7 @@ import {
   GameMobileProfile,
 } from '@/components/GameUI/GamePublicMobile';
 import { Feedback } from '@/components/GameUI/Panel';
-import { getProfile } from '@/features/game-core/api/auth';
+import { getProfile, hasAdminRole } from '@/features/game-core/api/auth';
 import { useGameHistory } from '@/features/game-core/hooks/useGameHistory';
 import { useGameLogout } from '@/features/game-core/hooks/useGameLogout';
 import { useGameStats } from '@/features/game-core/hooks/useGameStats';
@@ -97,18 +97,15 @@ export default function Profile() {
           ]}
           historyTitle="追逃档案"
           historyItems={historyItems}
+          historyHasMore={history.hasMore && !history.error}
+          historyLoading={history.loading}
+          onHistoryLoadMore={history.loadMore}
           emptyHistory={<Feedback>还没有追逃记录。
             <Link className="profile-empty-link" to="/game/fugitive">
               去大厅开始第一场
             </Link>
           </Feedback>}
-          historyFooter={history.hasMore && <button
-            className="button secondary full" type="button"
-            disabled={history.loading} onClick={history.loadMore}>
-            {history.loading ? '载入中…' : '加载更多对局'}
-          </button>}
-          historyStatus={history.games.length && !history.hasMore
-            ? '已经到底了' : undefined}
+          isAdmin={hasAdminRole(profile.data)}
           logoutPending={logout.pending}
           logoutError={logout.error}
           onLogout={() => setPanel('logout')}

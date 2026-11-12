@@ -136,6 +136,9 @@ export async function expectMobileFinalResultLayout(
   await expect(actions).toBeVisible();
 
   const expectCurrentGeometry = async () => {
+    await root.evaluate(element => {
+      element.scrollTop = 0;
+    });
     const [rootBox, heroBox, standingsBox, summaryBox, actionsBox] =
       await Promise.all([
         root.boundingBox(),
@@ -156,7 +159,7 @@ export async function expectMobileFinalResultLayout(
       actionsBox!.y - (summaryBox!.y + summaryBox!.height),
     ];
     for (const gap of gaps) {
-      expect(Math.abs(gap - 18)).toBeLessThanOrEqual(1);
+      expect(Math.abs(gap - 14)).toBeLessThanOrEqual(1);
     }
 
     const computedGaps = await Promise.all([
@@ -164,20 +167,27 @@ export async function expectMobileFinalResultLayout(
       root.locator('[data-game-final-result-content]')
         .evaluate(element => getComputedStyle(element).gap),
     ]);
-    expect(computedGaps).toEqual(['18px', '18px']);
+    expect(computedGaps).toEqual(['14px', '14px']);
 
-    const viewport = page.viewportSize();
-    expect(viewport).not.toBeNull();
-    const leftGutter = heroBox!.x;
-    const rightGutter = viewport!.width - heroBox!.x - heroBox!.width;
-    expect(Math.abs(heroBox!.y - 8)).toBeLessThanOrEqual(1);
-    expect(Math.abs(leftGutter - 8)).toBeLessThanOrEqual(1);
-    expect(Math.abs(rightGutter - 8)).toBeLessThanOrEqual(1);
+    const inset = await root.getAttribute('data-game-final-result-inset');
+    const expectedTop = inset === 'host' ? 1 : 14;
+    const expectedGutter = inset === 'host' ? 6 : 14;
+    const leftGutter = heroBox!.x - rootBox!.x;
+    const rightGutter = rootBox!.x + rootBox!.width
+      - heroBox!.x
+      - heroBox!.width;
+    expect(Math.abs(
+      heroBox!.y - rootBox!.y - expectedTop,
+    )).toBeLessThanOrEqual(1);
+    expect(Math.abs(leftGutter - expectedGutter)).toBeLessThanOrEqual(1);
+    expect(Math.abs(rightGutter - expectedGutter)).toBeLessThanOrEqual(1);
     for (const sectionBox of [standingsBox!, summaryBox!, actionsBox!]) {
-      const sectionRightGutter = viewport!.width
+      const sectionRightGutter = rootBox!.x + rootBox!.width
         - sectionBox.x
         - sectionBox.width;
-      expect(Math.abs(sectionBox.x - leftGutter)).toBeLessThanOrEqual(1);
+      expect(Math.abs(
+        sectionBox.x - rootBox!.x - leftGutter,
+      )).toBeLessThanOrEqual(1);
       expect(Math.abs(sectionRightGutter - rightGutter)).toBeLessThanOrEqual(1);
     }
 
@@ -187,14 +197,22 @@ export async function expectMobileFinalResultLayout(
       expect(footerNoteBox).not.toBeNull();
       const noteGap = footerNoteBox!.y
         - (actionsBox!.y + actionsBox!.height);
-      expect(Math.abs(noteGap - 18)).toBeLessThanOrEqual(1);
+      expect(Math.abs(noteGap - 14)).toBeLessThanOrEqual(1);
     }
-    const lastSection = hasFooterNote ? footerNote : actions;
-    const lastSectionBox = await lastSection.boundingBox();
-    expect(lastSectionBox).not.toBeNull();
-    const bottomPadding = rootBox!.y + rootBox!.height
-      - (lastSectionBox!.y + lastSectionBox!.height);
-    expect(Math.abs(bottomPadding - 8)).toBeLessThanOrEqual(1);
+    const scrollContract = await root.evaluate(element => {
+      const style = getComputedStyle(element);
+      return {
+        clientHeight: element.clientHeight,
+        overflowY: style.overflowY,
+        paddingBottom: Number.parseFloat(style.paddingBottom),
+        scrollHeight: element.scrollHeight,
+      };
+    });
+    expect(Math.abs(scrollContract.paddingBottom - 14)).toBeLessThanOrEqual(1);
+    expect(scrollContract.overflowY).toBe('auto');
+    expect(scrollContract.scrollHeight).toBeGreaterThanOrEqual(
+      scrollContract.clientHeight,
+    );
 
     await expect(actions).toHaveCSS('position', 'static');
     await expect(actions.locator('button')).toHaveCount(
