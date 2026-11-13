@@ -31,7 +31,7 @@ variants in `src/styles/game-mobile-layout.css`.
 Each page has one vertical scroll owner:
 
 - Lobby: page root.
-- Rankings: ranking rows.
+- Rankings: page root; ranking rows stay in normal flow.
 - Guide: chapter copy; the authority hint and actions stay outside the scroll
   region.
 - Profile: page root; history rows stay in normal flow and expand naturally.
@@ -58,6 +58,10 @@ chapter, authority hint, and primary action visible without vertical scrolling.
 - Profile identity/history and ranking intro/list are unframed page sections
   separated by one horizontal rule; only individual list rows use internal
   dividers.
+- Ranking and profile summary sections scroll away first. When the section
+  divider reaches the top of the page scrollport, it stays pinned together with
+  the ranking tabs/table heading or history heading while list rows continue
+  underneath.
 - Profile identity places the eyebrow, name, and email on the left with a
   prominent editable avatar on the right; player ID metadata stays hidden.
 - Profile stats use whitespace only: no top rule and no column dividers.

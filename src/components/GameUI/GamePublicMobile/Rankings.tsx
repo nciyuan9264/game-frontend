@@ -36,7 +36,8 @@ export function GameMobileRankings<TMode extends string>({
   footer,
 }: GameMobileRankingsProps<TMode>) {
   return <div className={`${styles.mobileOnly} ${styles.rankings}`}
-    data-game-public-mobile="rankings">
+    data-game-public-mobile="rankings"
+    data-game-mobile-scroll-owner="rankings">
     <section className={styles.rankHero} data-game-mobile-rank-hero>
       <div><small>{eyebrow}</small><h1>{title}</h1>
         <p>{description}</p></div>
@@ -44,17 +45,19 @@ export function GameMobileRankings<TMode extends string>({
         data-game-mobile-rank-icon aria-hidden="true">{icon}</span>
     </section>
     <section className={styles.rankPanel} data-game-mobile-rank-panel>
-      <div className={styles.rankControls}>
-        <GameTabs items={modes} value={mode} onChange={onModeChange}
-          ariaLabel="排行榜模式" className={styles.rankTabs}
-          activeClassName={styles.activeTab} />
-        {controls}
-      </div>
-      <div className={styles.rankList}
-        data-game-mobile-scroll-owner="rankings">
+      <header className={styles.rankStickyHeader}
+        data-game-mobile-sticky-header="rankings">
+        <div className={styles.rankControls}>
+          <GameTabs items={modes} value={mode} onChange={onModeChange}
+            ariaLabel="排行榜模式" className={styles.rankTabs}
+            activeClassName={styles.activeTab} />
+          {controls}
+        </div>
         <div className={`${styles.rankRow} ${styles.rankHead}`}>
           <span>名次</span><span>玩家</span><span>场次</span><span>战绩</span>
         </div>
+      </header>
+      <div className={styles.rankList} data-game-mobile-rank-list>
         {state}
         {entries.map((entry, index) => {
           const mine = String(entry.id) === String(currentUserID);

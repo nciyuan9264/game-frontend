@@ -206,6 +206,40 @@ async function expectScrollable(locator: Locator) {
     .toBeGreaterThan(0);
 }
 
+async function expectStickyHeader(
+  root: Locator,
+  headerSelector: string,
+) {
+  const header = root.locator(headerSelector);
+  await expect(header).toHaveCSS('position', 'sticky');
+  await root.evaluate(element => { element.scrollTop = 0; });
+  const initialDistance = await root.evaluate((element, selector) => {
+    const headerElement = element.querySelector(selector);
+    if (!headerElement) return 0;
+    return headerElement.getBoundingClientRect().top
+      - element.getBoundingClientRect().top;
+  }, headerSelector);
+  expect(initialDistance).toBeGreaterThan(0);
+  await root.evaluate((element, selector) => {
+    const headerElement = element.querySelector(selector);
+    if (!headerElement) return;
+    const distance = headerElement.getBoundingClientRect().top
+      - element.getBoundingClientRect().top;
+    element.scrollTop += distance + 16;
+  }, headerSelector);
+  const offsetFromTop = () => root.evaluate((element, selector) => {
+    const headerElement = element.querySelector(selector);
+    if (!headerElement) return Number.POSITIVE_INFINITY;
+    return headerElement.getBoundingClientRect().top
+      - element.getBoundingClientRect().top;
+  }, headerSelector);
+  await expect.poll(offsetFromTop).toBeLessThanOrEqual(0);
+  await expect.poll(offsetFromTop).toBeGreaterThanOrEqual(-1.1);
+  await root.evaluate(element => { element.scrollTop += 24; });
+  await expect.poll(offsetFromTop).toBeLessThanOrEqual(0);
+  await expect.poll(offsetFromTop).toBeGreaterThanOrEqual(-1.1);
+}
+
 test.use({ viewport: { width: 320, height: 568 } });
 
 for (const game of games) {
@@ -229,10 +263,17 @@ for (const game of games) {
       });
       const rankings = page.locator('[data-game-public-mobile="rankings"]');
       const rankList = page.locator(
-        '[data-game-mobile-scroll-owner="rankings"]',
+        '[data-game-mobile-rank-list]',
       );
-      await expect(rankings).toHaveCSS('overflow-y', 'hidden');
-      await expectScrollable(rankList);
+      await expectScrollable(rankings);
+      await expect(rankList).toHaveCSS('overflow-y', 'visible');
+      const rankListState = await readScrollState(rankList);
+      expect(rankListState.scrollHeight)
+        .toBeLessThanOrEqual(rankListState.clientHeight + 1);
+      await expectStickyHeader(
+        rankings,
+        '[data-game-mobile-sticky-header="rankings"]',
+      );
       await expectOuterShellLocked(page, rankings);
 
       await page.goto(`/game/${game.gameType}/guide`, {
@@ -286,6 +327,10 @@ for (const game of games) {
         .toBeLessThanOrEqual(historyState.clientHeight + 1);
       expect(historyListState.scrollHeight)
         .toBeLessThanOrEqual(historyListState.clientHeight + 1);
+      await expectStickyHeader(
+        profile,
+        '[data-game-mobile-sticky-header="profile"]',
+      );
       await expectOuterShellLocked(page, profile);
       await expect(navigation).toBeVisible();
     });

@@ -332,6 +332,28 @@ async function expectGuideActionsContained(page: Page) {
     );
 }
 
+async function expectStickySectionHeader(
+  section: Locator,
+  kind: 'profile' | 'rankings',
+) {
+  const header = section.locator(
+    `[data-game-mobile-sticky-header="${kind}"]`,
+  );
+  await expect(header).toHaveCSS('position', 'sticky');
+  await expect(header).toHaveCSS('top', '-1px');
+  await expect(header).toHaveCSS('border-top-width', '1px');
+  const [sectionBox, headerBox, background] = await Promise.all([
+    section.boundingBox(),
+    header.boundingBox(),
+    header.evaluate(element => getComputedStyle(element).backgroundColor),
+  ]);
+  expect(sectionBox).not.toBeNull();
+  expect(headerBox).not.toBeNull();
+  expect(Math.abs((headerBox?.y ?? 0) - (sectionBox?.y ?? 0)))
+    .toBeLessThanOrEqual(1);
+  expect(background).not.toBe('rgba(0, 0, 0, 0)');
+}
+
 async function expectLobbyContentBaseline(page: Page, card: Locator) {
   const browser = page.locator('[data-game-mobile-lobby-browser]');
   const search = page.getByPlaceholder('搜索房间号 / 房主').locator('..');
@@ -740,11 +762,12 @@ for (const item of cases) {
       });
       expect(rankListStyle).toEqual({
         background: 'rgba(0, 0, 0, 0)',
-        borderTop: '1px',
+        borderTop: '0px',
         borderRight: '0px',
         radius: '0px',
         shadow: 'none',
       });
+      await expectStickySectionHeader(rankPanel, 'rankings');
 
       await page.goto(`/game/${item.gameType}/guide`, {
         waitUntil: 'domcontentloaded',
@@ -907,11 +930,15 @@ for (const item of cases) {
       });
       expect(historyStyle).toEqual({
         background: 'rgba(0, 0, 0, 0)',
-        borderTop: '1px',
+        borderTop: '0px',
         borderRight: '0px',
         radius: '0px',
         shadow: 'none',
       });
+      await expectStickySectionHeader(
+        profile.locator(':scope > section').nth(1),
+        'profile',
+      );
       await expectMobileBottomGutter(
         page,
         '[data-game-public-mobile="profile"]',

@@ -94,7 +94,10 @@ export function GameMobileProfile({
       </div>
     </section>
     <section className={styles.profileHistory}>
-      <h2>{historyTitle}</h2>
+      <header className={styles.profileHistoryHeader}
+        data-game-mobile-sticky-header="profile">
+        <h2>{historyTitle}</h2>
+      </header>
       {historyItems.length
         ? <div className={styles.historyList}>{historyItems.map(item => {
           const content = <><span><b>{item.title}</b><small>{item.detail}</small>
