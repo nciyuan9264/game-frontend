@@ -11,6 +11,11 @@ import styles from './index.module.less';
 
 export function LobbyMobile(props: LobbyViewProps) {
   const { lobby } = props;
+  const resourceError = props.profileError || lobby.error;
+  const retryResources = () => {
+    if (props.profileError) props.retryProfile();
+    if (lobby.error) lobby.refresh();
+  };
   return <GameMobileLobby
     className={styles.mobileLobby}
     eyebrow="YOUR NEXT CITY STARTS HERE"
@@ -53,8 +58,10 @@ export function LobbyMobile(props: LobbyViewProps) {
     joinCode={props.code}
     onJoinCodeChange={props.setCode}
     onJoin={props.onJoin}
-    error={lobby.error && <div><Feedback error>{lobby.error}</Feedback>
-      <ActionButton onClick={lobby.refresh} pending={lobby.refreshing}>重试</ActionButton>
+    error={resourceError && <div><Feedback error>{resourceError}</Feedback>
+      <ActionButton onClick={retryResources} pending={lobby.refreshing}>
+        重试连接
+      </ActionButton>
     </div>}
   />;
 }

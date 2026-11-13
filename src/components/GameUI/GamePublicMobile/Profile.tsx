@@ -1,5 +1,5 @@
 import { useEffect, useRef, type ReactNode } from 'react';
-import { LogOut, Pencil } from 'lucide-react';
+import { History, LogOut, Pencil } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import { ActionButton } from '../ActionButton';
 import type {
@@ -107,7 +107,14 @@ export function GameMobileProfile({
           return <button key={item.id} type="button" onClick={item.onClick}
             disabled={!item.onClick}>{content}</button>;
         })}</div>
-        : emptyHistory}
+        : <div className={styles.mobileEmpty}
+          data-game-mobile-empty="profile">
+          <span className={styles.mobileEmptyIcon}><History size={20} /></span>
+          <div className={`${styles.mobileEmptyCopy} ${styles.profileEmptyCopy}`}>
+            {emptyHistory || <><b>还没有对局记录</b>
+              <small>完成一局后，这里会留下你的对局记录。</small></>}
+          </div>
+        </div>}
       {historyHasMore && <div ref={historyEndRef}
         className={styles.historySentinel} aria-hidden="true" />}
       {isAdmin && <div className={styles.profileAdminLogout}>

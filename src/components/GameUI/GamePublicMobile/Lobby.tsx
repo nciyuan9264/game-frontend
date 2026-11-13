@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import {
   ArrowRight,
   Building2,
+  CloudOff,
   KeyRound,
   Plus,
   Search,
@@ -40,6 +41,8 @@ export interface GameMobileLobbyProps<TRoom, TFilter extends string> {
   joinDescription?: ReactNode;
   emptyTitle?: ReactNode;
   emptyDescription?: ReactNode;
+  errorTitle?: ReactNode;
+  errorDescription?: ReactNode;
   error?: ReactNode;
   footer?: ReactNode;
   className?: string;
@@ -72,6 +75,8 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
   joinDescription = '输入完整房间号，找到朋友的桌。',
   emptyTitle = '还没有等待中的房间',
   emptyDescription = '创建房间，邀请朋友或添加公平 AI 开始。',
+  errorTitle = '大厅暂时无法连接',
+  errorDescription = '在线房间暂时不可用，请稍后重试。',
   error,
   footer,
   className = '',
@@ -109,8 +114,14 @@ export function GameMobileLobby<TRoom, TFilter extends string>({
             value={query} onChange={event => onQueryChange(event.target.value)} />
         </label>
       </div>
-      {error}
-      {rooms.length
+      {error
+        ? <div className={styles.lobbyError} data-game-mobile-error="lobby">
+          <span className={styles.lobbyErrorIcon}><CloudOff size={22} /></span>
+          <small>{browserEyebrow}</small>
+          <h3>{errorTitle}</h3><p>{errorDescription}</p>
+          <div className={styles.lobbyErrorSource}>{error}</div>
+        </div>
+        : rooms.length
         ? <div className={styles.lobbyCards}>{rooms.map(renderRoom)}</div>
         : <div className={styles.lobbyEmpty}><Building2 size={34} />
           <h3>{emptyTitle}</h3><p>{emptyDescription}</p></div>}

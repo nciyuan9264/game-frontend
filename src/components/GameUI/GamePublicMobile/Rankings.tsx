@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react';
-import { Trophy } from 'lucide-react';
+import { CircleAlert, Trophy } from 'lucide-react';
 import { GameTabs } from '../GameTabs';
 import type { GameMobileRankingEntry } from './types';
 import styles from './index.module.less';
@@ -58,7 +58,22 @@ export function GameMobileRankings<TMode extends string>({
         </div>
       </header>
       <div className={styles.rankList} data-game-mobile-rank-list>
-        {state}
+        <div className={`${styles.rankState} ${
+          !entries.length ? styles.rankStateStandalone : ''}`}
+        data-game-mobile-rank-state>
+          <span className={styles.rankErrorIcon}
+            data-game-mobile-error-icon aria-hidden="true">
+            <CircleAlert size={20} />
+          </span>
+          <span className={styles.rankErrorMessage}>排行榜暂时无法加载</span>
+          <div className={styles.rankStateContent}>{state}</div>
+        </div>
+        {!entries.length && <div className={`${styles.mobileEmpty} ${
+          styles.rankEmpty}`} data-game-mobile-empty="rankings">
+          <span className={styles.mobileEmptyIcon}><Trophy size={20} /></span>
+          <span className={styles.mobileEmptyCopy}><b>榜单等待第一局</b>
+            <small>完成有效对局后，真实成绩会出现在这里。</small></span>
+        </div>}
         {entries.map((entry, index) => {
           const mine = String(entry.id) === String(currentUserID);
           return <div className={`${styles.rankRow} ${mine ? styles.rankSelf : ''}`}

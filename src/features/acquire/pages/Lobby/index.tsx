@@ -65,13 +65,17 @@ export default function Lobby() {
     action.reset();
   };
   const props = {
-    lobby, profile: profile.data, stats: stats.data, statsError: stats.error, userID, code, setCode,
+    lobby, profile: profile.data, profileError: profile.error,
+    retryProfile: profile.retry, stats: stats.data, statsError: stats.error,
+    userID, code, setCode,
     onCreate: () => { action.reset(); setPanel('create'); }, onShare: () => { shareClipboard.reset(); setPanel('share'); },
     onCompany: (company: keyof typeof companyPriceTiers) => setPriceTier(companyPriceTiers[company]), onJoin: find, onEnter,
   };
   const initialLoading = !lobby.hasLoaded && !lobby.error || profile.loading && !profile.data;
   return <AppShell title="游戏大厅" profile={profile.data}>
-    {profile.error && <Feedback error>{profile.error}<ActionButton onClick={profile.retry}>重试资料</ActionButton></Feedback>}
+    {!isMobile && profile.error && <Feedback error>{profile.error}
+      <ActionButton onClick={profile.retry}>重试资料</ActionButton>
+    </Feedback>}
     {initialLoading ? <AcquireLoading status="正在连接在线大厅" /> : isMobile ? <LobbyMobile {...props} /> : <LobbyDesktop {...props} />}
     {!initialLoading && <footer className={styles.pageFooter}><span>{lobby.rooms.length} 个可见房间</span><span>一张桌，一座城，一段好时光。</span></footer>}
     {panel === 'create' && <ResponsiveDialog title="创建房间" eyebrow="CREATE YOUR NEXT TABLE" className={styles.createDialog} onClose={close}

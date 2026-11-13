@@ -17,6 +17,8 @@ import styles from './index.module.less';
 export interface LobbyViewProps {
   lobby: ReturnType<typeof useAcquireLobby>;
   profile?: AuthProfile;
+  profileError: string;
+  retryProfile: () => void;
   stats?: Stats;
   statsError: string;
   userID: string;

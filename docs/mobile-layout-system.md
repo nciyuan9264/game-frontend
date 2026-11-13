@@ -50,6 +50,8 @@ The document, shell, and an inner list must never scroll vertically together.
 Compact layouts reduce decorative media, padding, and secondary facts before
 changing readable copy or touch targets. Guide pages must keep the current
 chapter, authority hint, and primary action visible without vertical scrolling.
+Lobby heroes never shrink below `220px`; short screens scroll the lobby page
+instead of compressing or hiding hero copy and actions.
 
 ## Component rules
 
@@ -62,6 +64,16 @@ chapter, authority hint, and primary action visible without vertical scrolling.
   divider reaches the top of the page scrollport, it stays pinned together with
   the ranking tabs/table heading or history heading while list rows continue
   underneath.
+- Ranking and history empty states are unframed list content. They use one
+  compact circular icon with centered primary/secondary copy and never restore
+  a panel or card around the message.
+- Lobby resource failures replace the room list with one themed error state.
+  Keep the game-specific hero, colors, and browser eyebrow; hide raw transport
+  errors and provide one retry action without rendering the empty-room state.
+- Full ranking errors follow the same unframed state layout with a danger icon,
+  centered message, and compact retry action.
+- Sticky list headings use the page's own theme background only; they must not
+  introduce a raised or panel-colored strip.
 - Profile identity places the eyebrow, name, and email on the left with a
   prominent editable avatar on the right; player ID metadata stays hidden.
 - Profile stats use whitespace only: no top rule and no column dividers.

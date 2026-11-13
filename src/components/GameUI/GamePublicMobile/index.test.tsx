@@ -86,6 +86,42 @@ describe('GamePublicMobile', () => {
     expect(screen.queryByRole('progressbar')).toBeNull();
   });
 
+  it('renders lobby failures as one branded state', () => {
+    const retry = vi.fn();
+    const { container } = render(<GameMobileLobby
+      eyebrow="NEXT TABLE"
+      title="开一桌"
+      description="邀请朋友"
+      media={<img src="/hero.webp" alt="" />}
+      facts={[{ label: '玩家', value: '2–4' }]}
+      browserEyebrow="ROOMS"
+      browserTitle="找到房间"
+      roomCount="0 个房间"
+      filters={[{ value: 'all', label: '全部' }]}
+      filter="all"
+      onFilterChange={vi.fn()}
+      query=""
+      onQueryChange={vi.fn()}
+      rooms={[]}
+      renderRoom={() => null}
+      onCreate={vi.fn()}
+      onShare={vi.fn()}
+      joinCode=""
+      onJoinCodeChange={vi.fn()}
+      onJoin={vi.fn()}
+      error={<p role="alert">Request failed
+        <button type="button" onClick={retry}>重试</button></p>}
+    />);
+
+    expect(container.querySelector(
+      '[data-game-mobile-error="lobby"]',
+    )).toBeTruthy();
+    expect(screen.getByText('大厅暂时无法连接')).toBeTruthy();
+    expect(screen.queryByText('还没有等待中的房间')).toBeNull();
+    fireEvent.click(screen.getByRole('button', { name: '重试' }));
+    expect(retry).toHaveBeenCalledTimes(1);
+  });
+
   it('renders ranking, guide, and profile contracts', () => {
     const { container } = render(<MemoryRouter>
       <GameMobileRankings eyebrow="RANK" title="排行榜" description="真实记录"
@@ -107,6 +143,7 @@ describe('GamePublicMobile', () => {
     expect(screen.getByText('75%')).toBeTruthy();
     expect(screen.getByText('第一步')).toBeTruthy();
     expect(screen.getByText('邮箱未绑定')).toBeTruthy();
+    expect(screen.getByText('还没有对局记录')).toBeTruthy();
     expect(screen.getByRole('link', { name: '编辑资料' })).toBeTruthy();
     expect(screen.queryByRole('button', { name: /退出登录/ })).toBeNull();
     expect(container.querySelector('[data-game-mobile-rank-panel]')).toBeTruthy();
@@ -118,6 +155,9 @@ describe('GamePublicMobile', () => {
     )).toBeTruthy();
     expect(container.querySelector(
       '[data-game-mobile-sticky-header="profile"]',
+    )).toBeTruthy();
+    expect(container.querySelector(
+      '[data-game-mobile-empty="profile"]',
     )).toBeTruthy();
     expect(container.querySelector(
       '[data-game-mobile-scroll-owner="guide"]',

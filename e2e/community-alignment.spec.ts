@@ -354,6 +354,46 @@ async function expectStickySectionHeader(
   expect(background).not.toBe('rgba(0, 0, 0, 0)');
 }
 
+async function expectMobileEmptyState(
+  page: Page,
+  kind: 'profile' | 'rankings',
+) {
+  const empty = page.locator(`[data-game-mobile-empty="${kind}"]`);
+  await expect(empty).toBeVisible();
+  const geometry = await empty.evaluate(element => {
+    const icon = element.firstElementChild;
+    const copy = element.lastElementChild;
+    const nestedCopy = copy?.firstElementChild;
+    const style = getComputedStyle(element);
+    const nestedStyle = nestedCopy && getComputedStyle(nestedCopy);
+    const box = element.getBoundingClientRect();
+    const iconBox = icon?.getBoundingClientRect();
+    return {
+      background: style.backgroundColor,
+      borderTop: style.borderTopWidth,
+      display: style.display,
+      height: box.height,
+      icon: {
+        height: iconBox?.height ?? 0,
+        width: iconBox?.width ?? 0,
+      },
+      nestedBackground: nestedStyle?.backgroundColor ?? 'rgba(0, 0, 0, 0)',
+      nestedBorderTop: nestedStyle?.borderTopWidth ?? '0px',
+      textAlign: style.textAlign,
+    };
+  });
+  expect(geometry).toMatchObject({
+    background: 'rgba(0, 0, 0, 0)',
+    borderTop: '0px',
+    display: 'flex',
+    icon: { height: 46, width: 46 },
+    nestedBackground: 'rgba(0, 0, 0, 0)',
+    nestedBorderTop: '0px',
+    textAlign: 'center',
+  });
+  expect(geometry.height).toBeGreaterThanOrEqual(160);
+}
+
 async function expectLobbyContentBaseline(page: Page, card: Locator) {
   const browser = page.locator('[data-game-mobile-lobby-browser]');
   const search = page.getByPlaceholder('搜索房间号 / 房主').locator('..');
@@ -374,7 +414,7 @@ async function expectLobbyContentBaseline(page: Page, card: Locator) {
 
 test.use({ viewport: { width: 390, height: 844 } });
 
-test('mobile public heroes scale through all supported height tiers',
+test('mobile public heroes adapt without compressing lobby content',
   async ({ page }) => {
     await mockData(page, 'acquire');
     const samples: Array<{
@@ -395,6 +435,15 @@ test('mobile public heroes scale through all supported height tiers',
       const lobby = await page.locator('[data-game-mobile-lobby-hero]')
         .boundingBox();
       expect(lobby?.width).toBe(viewport.width - 28);
+      const [lobbyDescription, lobbyActions] = await Promise.all([
+        page.locator('[data-game-mobile-lobby-hero] p').boundingBox(),
+        page.locator('[data-game-mobile-lobby-hero] button').first()
+          .boundingBox(),
+      ]);
+      expect(lobbyDescription).not.toBeNull();
+      expect(lobbyActions).not.toBeNull();
+      expect((lobbyDescription?.y ?? 0) + (lobbyDescription?.height ?? 0))
+        .toBeLessThanOrEqual((lobbyActions?.y ?? 0) - 4);
 
       await page.goto('/game/acquire/rankings', {
         waitUntil: 'domcontentloaded',
@@ -417,7 +466,15 @@ test('mobile public heroes scale through all supported height tiers',
       });
     }
 
-    for (const key of ['lobby', 'rank', 'guide'] as const) {
+    for (const sample of samples) {
+      expect(sample.lobby).toBeGreaterThanOrEqual(220);
+      expect(sample.lobby).toBeLessThanOrEqual(235);
+    }
+    expect(samples[0].lobby).toBeGreaterThan(samples[1].lobby);
+    expect(Math.abs(samples[2].lobby - samples[3].lobby))
+      .toBeLessThanOrEqual(1);
+
+    for (const key of ['rank', 'guide'] as const) {
       expect(samples[0][key]).toBeGreaterThan(samples[1][key]);
       expect(samples[1][key]).toBeGreaterThan(samples[2][key]);
       expect(samples[2][key]).toBeGreaterThan(samples[3][key]);
@@ -453,6 +510,71 @@ test('guide actions stay pinned across chapters and compact viewports',
         await expectGuideActionsContained(page);
       }
     }
+  });
+
+test('mobile rankings use shared unframed empty and error states',
+  async ({ page }) => {
+    await mockData(page, 'acquire');
+    await page.unroute('**/pam-api/platform/rankings?**');
+    await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: { gameType: 'acquire', entries: [] },
+      },
+    }));
+    await page.goto('/game/acquire/rankings', {
+      waitUntil: 'domcontentloaded',
+    });
+    await expectMobileEmptyState(page, 'rankings');
+    await expect(page.getByText('榜单等待第一局')).toBeVisible();
+    await expect(page.getByText('完成有效对局后，真实成绩会出现在这里。'))
+      .toBeVisible();
+
+    await page.unroute('**/pam-api/platform/rankings?**');
+    await page.route('**/pam-api/platform/rankings?**', route => route.fulfill({
+      status: 500,
+      json: { status_code: 500, message: '排行榜暂时不可用', data: null },
+    }));
+    await page.reload({ waitUntil: 'domcontentloaded' });
+    const state = page.locator('[data-game-mobile-rank-state]');
+    const icon = state.locator('[data-game-mobile-error-icon]');
+    const alert = state.getByRole('alert');
+    await expect(state).toBeVisible();
+    await expect(icon).toBeVisible();
+    await expect(alert).toBeVisible();
+    await expect(page.getByText('排行榜暂时无法加载')).toBeVisible();
+    await expect(alert.getByRole('button', { name: '重试' })).toBeVisible();
+    await expect(page.locator('[data-game-mobile-empty="rankings"]'))
+      .not.toBeVisible();
+    const errorGeometry = await state.evaluate(element => {
+      const iconElement = element.querySelector(
+        '[data-game-mobile-error-icon]',
+      );
+      const alertElement = element.querySelector('[role="alert"]');
+      const style = getComputedStyle(element);
+      const alertStyle = alertElement && getComputedStyle(alertElement);
+      const iconBox = iconElement?.getBoundingClientRect();
+      return {
+        background: style.backgroundColor,
+        borderTop: style.borderTopWidth,
+        icon: {
+          height: iconBox?.height ?? 0,
+          width: iconBox?.width ?? 0,
+        },
+        nestedBackground: alertStyle?.backgroundColor,
+        nestedBorderTop: alertStyle?.borderTopWidth,
+        textAlign: style.textAlign,
+      };
+    });
+    expect(errorGeometry).toEqual({
+      background: 'rgba(0, 0, 0, 0)',
+      borderTop: '0px',
+      icon: { height: 46, width: 46 },
+      nestedBackground: 'rgba(0, 0, 0, 0)',
+      nestedBorderTop: '0px',
+      textAlign: 'center',
+    });
   });
 
 
@@ -939,6 +1061,7 @@ for (const item of cases) {
         profile.locator(':scope > section').nth(1),
         'profile',
       );
+      await expectMobileEmptyState(page, 'profile');
       await expectMobileBottomGutter(
         page,
         '[data-game-public-mobile="profile"]',

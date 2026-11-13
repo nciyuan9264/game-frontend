@@ -9,7 +9,7 @@
   --game-mobile-list-row-min-height: 64px;
   --game-mobile-header-min-height: 57px;
   --game-mobile-nav-min-height: 66px;
-  --game-mobile-lobby-hero-basis: clamp(190px, 27dvh, 235px);
+  --game-mobile-lobby-hero-basis: clamp(220px, 27dvh, 235px);
   --game-mobile-rank-hero-basis: clamp(140px, 20dvh, 176px);
   --game-mobile-guide-visual-basis: clamp(146px, 20dvh, 176px);
   --game-mobile-guide-media-basis: clamp(92px, 14dvh, 120px);
@@ -17,7 +17,6 @@
 
 @media (max-width: 767px) and (max-height: 760px) {
   :root {
-    --game-mobile-lobby-hero-basis: clamp(160px, 24dvh, 205px);
     --game-mobile-rank-hero-basis: clamp(112px, 18dvh, 145px);
     --game-mobile-guide-visual-basis: clamp(112px, 18dvh, 142px);
     --game-mobile-guide-media-basis: clamp(72px, 12dvh, 98px);
@@ -28,7 +27,6 @@
   :root {
     --game-mobile-section-gap: 10px;
     --game-mobile-surface-padding: 14px;
-    --game-mobile-lobby-hero-basis: clamp(128px, 23dvh, 166px);
     --game-mobile-rank-hero-basis: clamp(88px, 16dvh, 112px);
     --game-mobile-guide-visual-basis: clamp(76px, 15dvh, 96px);
     --game-mobile-guide-media-basis: clamp(50px, 10dvh, 64px);

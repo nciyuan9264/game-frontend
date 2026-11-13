@@ -82,6 +82,46 @@ async function holdLobbyData(page: Page) {
   return gate.release;
 }
 
+async function failLobbyData(page: Page, failProfile = false) {
+  await page.route('**/pam-api/platform/auth/profile', route =>
+    failProfile
+      ? route.fulfill({
+        status: 500,
+        json: { status_code: 500, message: 'profile unavailable', data: null },
+      })
+      : route.fulfill({
+        json: {
+          status_code: 0,
+          message: 'ok',
+          data: {
+            user_id: 'error-audit',
+            display_name: '错误态审计玩家',
+            email: 'error@example.com',
+            avatar: '',
+          },
+        },
+      }));
+  await page.route('**/pam-api/platform/rooms?**', route => route.fulfill({
+    status: 500,
+    json: { status_code: 500, message: 'rooms unavailable', data: null },
+  }));
+  await page.route('**/pam-api/platform/history/stats?**', route =>
+    route.fulfill({
+      json: {
+        status_code: 0,
+        message: 'ok',
+        data: {
+          totalGames: 0,
+          wins: 0,
+          winRate: 0,
+          avgScore: 0,
+          gamesByRole: {},
+          winsByRole: {},
+        },
+      },
+    }));
+}
+
 test.use({ viewport: { width: 390, height: 844 } });
 
 for (const item of cases) {
@@ -136,4 +176,44 @@ for (const item of cases) {
 
     await expect(loading).toBeHidden();
   });
+
+  test(`${item.gameType} uses a branded mobile lobby error state`,
+    async ({ page }) => {
+      await failLobbyData(page, item.gameType === 'acquire');
+      await page.goto(`/game/${item.gameType}`, {
+        waitUntil: 'domcontentloaded',
+      });
+
+      const error = page.locator('[data-game-mobile-error="lobby"]');
+      await expect(error).toBeVisible();
+      await expect(error.getByText('大厅暂时无法连接')).toBeVisible();
+      await expect(error.locator('.lucide-cloud-off')).toBeVisible();
+      await expect(error.getByRole('button', { name: /重试/ })).toBeVisible();
+      await expect(page.getByText('还没有等待中的房间')).toHaveCount(0);
+
+      const geometry = await error.evaluate(element => {
+        const box = element.getBoundingClientRect();
+        const source = element.querySelector('[role="alert"], .is-error')
+          ?? element.lastElementChild?.firstElementChild;
+        const sourceStyle = source && getComputedStyle(source);
+        return {
+          background: getComputedStyle(element).backgroundColor,
+          bottom: box.bottom,
+          left: box.left,
+          right: box.right,
+          sourceBackground: sourceStyle?.backgroundColor,
+          sourceBorderTop: sourceStyle?.borderTopWidth,
+          sourceFontSize: sourceStyle?.fontSize,
+          top: box.top,
+        };
+      });
+      expect(geometry.background).toBe('rgba(0, 0, 0, 0)');
+      expect(geometry.sourceBackground).toBe('rgba(0, 0, 0, 0)');
+      expect(geometry.sourceBorderTop).toBe('0px');
+      expect(geometry.sourceFontSize).toBe('0px');
+      expect(geometry.left).toBeGreaterThanOrEqual(0);
+      expect(geometry.right).toBeLessThanOrEqual(390);
+      expect(geometry.top).toBeGreaterThanOrEqual(0);
+      expect(geometry.bottom).toBeLessThanOrEqual(844);
+    });
 }
