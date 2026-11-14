@@ -49,6 +49,23 @@ async function expectNoHorizontalOverflow(page: Page) {
     document.documentElement.scrollWidth <= window.innerWidth)).toBe(true);
 }
 
+async function expectBottomAnchoredLeaveDialog(page: Page) {
+  await page.getByRole('button', { name: '离开当前房间' }).click();
+  const dialog = page.getByRole('dialog').last();
+  await expect(dialog).toBeVisible();
+  const viewport = page.viewportSize();
+  expect(viewport).not.toBeNull();
+  await expect.poll(async () => {
+    const box = await dialog.boundingBox();
+    return box
+      ? Math.abs(box.y + box.height - viewport!.height)
+      : Number.POSITIVE_INFINITY;
+  }).toBeLessThanOrEqual(2);
+  const box = await dialog.boundingBox();
+  expect(box).not.toBeNull();
+  expect(box!.height).toBeLessThan(viewport!.height - 100);
+}
+
 test.use({ viewport: { width: 390, height: 844 } });
 
 test('Acquire exposes its real final result preview', async ({ page }) => {
@@ -88,6 +105,9 @@ for (const [game, maxPlayers] of games) {
         );
         await expect(seats).toHaveCount(maxPlayers);
         await expect(occupied).toHaveCount(scene === 'room-empty' ? 1 : 2);
+        if (scene === 'room-ready') {
+          await expectBottomAnchoredLeaveDialog(page);
+        }
       }
     }
   });
